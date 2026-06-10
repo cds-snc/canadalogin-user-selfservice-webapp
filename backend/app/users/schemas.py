@@ -189,7 +189,7 @@ class IBMVerifyUserProfileSchema(BaseModel):
     details: Optional[SCIMUserDetails] = Field(
         default=None,
         alias=SCIM_IBM_USER_EXT,
-        validation_alias=AliasChoices(SCIM_IBM_USER_EXT, "details"),
+        validation_alias=AliasChoices("details", SCIM_IBM_USER_EXT),
         serialization_alias=SCIM_IBM_USER_EXT,
     )
     model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)

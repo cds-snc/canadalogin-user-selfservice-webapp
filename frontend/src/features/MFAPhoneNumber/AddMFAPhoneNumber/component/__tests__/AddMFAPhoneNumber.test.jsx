@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import { BrowserRouter } from "react-router";
@@ -1099,6 +1099,30 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
       await continueButton.click();
 
       expect(mockOnNext).toHaveBeenCalled();
+    });
+
+    it("should trigger onNext when pressing Enter in the phone input", async () => {
+      vi.mocked(ReactRouter.useParams).mockReturnValue({ language: "en" });
+
+      render(
+        <TestWrapper>
+          <AddMFAPhoneNumber
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={{ phoneNumber: "+16135551234", otpType: "smsotp" }}
+            setErrorCode={mockSetErrorCode}
+            errorMessage=""
+          />
+        </TestWrapper>,
+      );
+
+      const phoneInput = screen.getByRole("textbox");
+      fireEvent.keyDown(phoneInput, { key: "Enter", code: "Enter" });
+
+      await waitFor(() => {
+        expect(mockOnNext).toHaveBeenCalledTimes(1);
+      });
     });
 
     it("should trigger onCancel when Cancel button is clicked", () => {

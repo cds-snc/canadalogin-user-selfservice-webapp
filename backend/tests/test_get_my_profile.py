@@ -9,7 +9,7 @@ from app.users.services.get_my_profile import (
     dispatch_get_my_profile_from_ibm,
 )
 
-from app.users.schemas import IBMVerifyUserProfileSchema
+from app.users.schemas import IBMVerifyUserProfileSchema, SCIM_IBM_USER_EXT
 
 PROFILE_API_URL = "https://fake-tenant.verify.ibm.com/v2.0/Me"
 GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH = (
@@ -273,3 +273,59 @@ async def test_my_profile_with_no_phone_numbers(mock_dispatch_get, mock_mask_pro
     # Verify masking was still called (even with empty list)
     mock_mask_profile.assert_called_once()
     mock_dispatch_get.assert_called_once_with(http_client, "mock-token")
+
+
+def test_ibm_profile_schema_supports_urn_details_custom_attributes():
+    profile_data = {
+        "userName": "john.phan@example.com",
+        "emails": [{"value": "john.phan@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-789",
+        SCIM_IBM_USER_EXT: {
+            "pwdChangedTime": "2026-06-10T15:22:05Z",
+            "customAttributes": [{"name": "acceptedtermsversion", "values": ["1.0.0"]}],
+        },
+    }
+
+    parsed = IBMVerifyUserProfileSchema(**profile_data)
+
+    assert parsed.details is not None
+    assert parsed.details.pwdChangedTime == "2026-06-10T15:22:05Z"
+    assert parsed.details.customAttributes is not None
+    assert parsed.details.customAttributes[0].name == "acceptedtermsversion"
+
+
+def test_ibm_profile_schema_prioritizes_details_over_urn_when_both_present():
+    profile_data = {
+        "userName": "john.phan@example.com",
+        "emails": [{"value": "john.phan@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-790",
+        "details": {
+            "pwdChangedTime": "2026-06-10T15:22:05Z",
+            "customAttributes": [{"name": "preferred_source", "values": ["details"]}],
+        },
+        SCIM_IBM_USER_EXT: {
+            "pwdChangedTime": "2025-01-01T00:00:00Z",
+            "customAttributes": [{"name": "preferred_source", "values": ["urn"]}],
+        },
+    }
+
+    parsed = IBMVerifyUserProfileSchema(**profile_data)
+
+    assert parsed.details is not None
+    assert parsed.details.pwdChangedTime == "2026-06-10T15:22:05Z"
+    assert parsed.details.customAttributes is not None
+    assert parsed.details.customAttributes[0].values == ["details"]

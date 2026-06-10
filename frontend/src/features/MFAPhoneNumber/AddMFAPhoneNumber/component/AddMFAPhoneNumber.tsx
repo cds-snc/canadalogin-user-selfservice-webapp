@@ -217,6 +217,23 @@ export default function AddMFAPhoneNumber({
 
   const onSubmitHandler: React.FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault();
+    if (!phoneNumberValid || !phoneFormData.phoneNumber) {
+      return;
+    }
+    void doSubmit();
+  };
+
+  const submitFromInputEnter: React.KeyboardEventHandler<HTMLInputElement> = (
+    ev,
+  ) => {
+    if (ev.key !== "Enter") {
+      return;
+    }
+
+    ev.preventDefault();
+    if (!phoneNumberValid || !phoneFormData.phoneNumber) {
+      return;
+    }
     void doSubmit();
   };
 
@@ -312,6 +329,7 @@ export default function AddMFAPhoneNumber({
                     required: true,
                     autoFocus: true,
                     "aria-label": t("AddMFANumber.phoneLabel"),
+                    onKeyDown: submitFromInputEnter,
                   }}
                   specialLabel={t("AddMFANumber.phoneLabel")}
                   country={"ca"}

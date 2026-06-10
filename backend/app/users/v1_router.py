@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 @router.post(
     "/profile",
     response_model=ProfileResponse,
+    response_model_by_alias=False,
     tags=["Users"],
     summary="Update a user profile in verify",
     description="",
@@ -51,6 +52,7 @@ async def user_profile(
 @router.get(
     "/profile",
     response_model=ProfileResponse,
+    response_model_by_alias=False,
     tags=["Users"],
     summary="Get a single user's profile",
     description="",
@@ -103,6 +105,7 @@ async def user_factors(
 @router.post(
     "/profile/update-with-otp",
     response_model=ProfileResponse,
+    response_model_by_alias=False,
     tags=["Users"],
     summary="Update any profile field with OTP verification",
     description="Generalized endpoint to atomically validate OTP and update any profile field (email, name, phone, language). Ensures profile changes only occur after successful OTP verification.",

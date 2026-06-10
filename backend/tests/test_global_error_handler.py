@@ -19,6 +19,7 @@ from app.auth.services.auth_user_session import (
     get_user_info,
     get_user_id_token,
 )
+from app.users.schemas import IBMVerifyUserProfileSchema
 
 from app.otp.schemas import OtpType
 
@@ -2066,6 +2067,53 @@ class TestErrorHandlingUpdateProfileWithOtp:
 
 
 class TestErrorHandlingGetMyProfile:
+
+    @pytest.mark.asyncio
+    @patch.object(get_my_profile_module, "dispatch_get_my_profile_from_ibm")
+    @patch.object(get_my_profile_module, "mask_profile_details")
+    async def test_profile_response_uses_details_key_not_urn_alias(
+        self,
+        mock_mask_profile_details,
+        mock_dispatch_get_my_profile_from_ibm,
+        mock_test_client,
+    ):
+        extension_key = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User"
+        profile_data = {
+            "userName": "jo****@example.com",
+            "emails": [{"value": "jo****@example.com", "type": "work"}],
+            "meta": {
+                "location": "here",
+                "created": "2023-01-01T00:00:00Z",
+                "lastModified": "2023-09-22T12:30:00Z",
+                "resourceType": "User",
+            },
+            "active": True,
+            "id": "user-123",
+            extension_key: {
+                "pwdChangedTime": "2026-06-10T15:22:05Z",
+                "customAttributes": [
+                    {"name": "acceptedtermsversion", "values": ["1.0.0"]}
+                ],
+            },
+        }
+
+        mock_dispatch_get_my_profile_from_ibm.return_value = IBMVerifyUserProfileSchema(
+            **profile_data
+        )
+        mock_mask_profile_details.return_value = profile_data
+
+        mock_client = AsyncMock(spec=AsyncClient)
+        client = mock_test_client(mock_client)
+
+        response = client.request("GET", "/v1/users/profile")
+        response_json = response.json()
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "details" in response_json["data"]
+        assert extension_key not in response_json["data"]
+        assert response_json["data"]["details"]["customAttributes"][0]["name"] == (
+            "acceptedtermsversion"
+        )
 
     @pytest.mark.asyncio
     @patch.object(get_my_profile_module, "get_configuration")
