@@ -451,7 +451,8 @@ describe("AddFIDO2PasskeyPage", () => {
 
     expect(mockTrackEvent).toHaveBeenCalledWith({
       event: "form_step_start",
-      step: "verify_password",
+      step: "add_passkey_verify_password",
+      flow: "add_passkey",
     });
   });
 

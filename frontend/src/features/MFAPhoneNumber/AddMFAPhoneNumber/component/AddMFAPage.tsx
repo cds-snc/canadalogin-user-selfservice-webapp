@@ -145,6 +145,7 @@ export default function AddMFAPage() {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: ADD_MFA_ANALYTICS.STEPS.VERIFY_PASSWORD,
+      flow: ADD_MFA_ANALYTICS.FLOW_ID,
     });
     await validatePassword(password);
   };
@@ -449,6 +450,7 @@ export default function AddMFAPage() {
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_START,
           step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
+          flow: ADD_MFA_ANALYTICS.FLOW_ID,
           type: existingMfa.type,
         });
         await deleteMFA({
@@ -468,6 +470,7 @@ export default function AddMFAPage() {
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_START,
         step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
+        flow: ADD_MFA_ANALYTICS.FLOW_ID,
         type: phoneFormData.otpType,
       });
       const enrollMfaResponse = await enrollMFA();
@@ -486,6 +489,7 @@ export default function AddMFAPage() {
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_START,
           step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
+          flow: ADD_MFA_ANALYTICS.FLOW_ID,
           type: phoneFormData.otpType,
         });
         navigateToValidation = await sendMFAOtp({
@@ -518,6 +522,7 @@ export default function AddMFAPage() {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
+      flow: ADD_MFA_ANALYTICS.FLOW_ID,
       type: secondMFAOtpType,
     });
     const enrollMfaResponse = await enrollMFA({
@@ -539,6 +544,7 @@ export default function AddMFAPage() {
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_START,
         step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
+        flow: ADD_MFA_ANALYTICS.FLOW_ID,
         type: secondMFAOtpType,
       });
       return await sendMFAOtp({
@@ -600,6 +606,8 @@ export default function AddMFAPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: ADD_MFA_ANALYTICS.FLOW_ID,
+            type: userSelectedMfaFactor?.type,
           });
           return requestOtpCode();
         }}
@@ -611,6 +619,8 @@ export default function AddMFAPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: ADD_MFA_ANALYTICS.FLOW_ID,
+            type: userSelectedMfaFactor?.type,
           });
           return validateOtpCode(userOtp);
         }}
@@ -678,6 +688,7 @@ export default function AddMFAPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
+            flow: ADD_MFA_ANALYTICS.FLOW_ID,
             type: phoneFormData.otpType,
           });
           await verifyMFAOtp();
@@ -689,6 +700,7 @@ export default function AddMFAPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
+            flow: ADD_MFA_ANALYTICS.FLOW_ID,
             type: phoneFormData.otpType,
           });
           await sendMFAOtp({ reSendOtpCode: true });
@@ -703,6 +715,7 @@ export default function AddMFAPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
+            flow: ADD_MFA_ANALYTICS.FLOW_ID,
             type: phoneFormData.otpType,
           });
           setEnrollmentLoading(true);
@@ -717,6 +730,7 @@ export default function AddMFAPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
+            flow: ADD_MFA_ANALYTICS.FLOW_ID,
             type: phoneFormData.otpType,
           });
           setEnrollmentLoading(true);
@@ -730,6 +744,7 @@ export default function AddMFAPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_MFA_ANALYTICS.STEPS.ENROLL_MFA,
+            flow: ADD_MFA_ANALYTICS.FLOW_ID,
             type: phoneFormData.otpType,
           });
           setEnrollmentLoading(true);

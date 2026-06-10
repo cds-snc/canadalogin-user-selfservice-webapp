@@ -134,6 +134,7 @@ export default function ChangePasswordIndex() {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: CHANGE_PASSWORD_ANALYTICS.STEPS.VERIFY_PASSWORD,
+      flow: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
     });
     await validatePassword(password);
   };
@@ -313,6 +314,8 @@ export default function ChangePasswordIndex() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
+            type: userSelectedMfaFactor.type,
           });
           return requestOtpCode();
         }}
@@ -324,6 +327,8 @@ export default function ChangePasswordIndex() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
+            type: userSelectedMfaFactor.type,
           });
           return validateOtpCode(userOtp);
         }}
@@ -372,6 +377,7 @@ export default function ChangePasswordIndex() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: CHANGE_PASSWORD_ANALYTICS.STEPS.LOGOUT,
+            flow: CHANGE_PASSWORD_ANALYTICS.FLOW_ID,
           });
           logout();
         }}

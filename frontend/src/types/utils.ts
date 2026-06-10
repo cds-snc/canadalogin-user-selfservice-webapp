@@ -146,6 +146,7 @@ export interface AnalyticsTrackEvent {
   form_id: string;
   step: string;
   type?: string;
+  flow?: string;
   error?: string;
   duration_ms?: number;
 }

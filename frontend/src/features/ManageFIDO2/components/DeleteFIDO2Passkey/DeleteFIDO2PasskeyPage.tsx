@@ -142,6 +142,7 @@ export default function DeleteFIDO2PasskeyPage({
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_PASSWORD,
+      flow: DELETE_PASSKEY_ANALYTICS.FLOW_ID,
     });
     await validatePassword(password);
   }
@@ -163,6 +164,7 @@ export default function DeleteFIDO2PasskeyPage({
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+      flow: DELETE_PASSKEY_ANALYTICS.FLOW_ID,
     });
 
     const passkeyId = passkeyToDeleteId;

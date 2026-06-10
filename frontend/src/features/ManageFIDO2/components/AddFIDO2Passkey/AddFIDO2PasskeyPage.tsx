@@ -144,6 +144,7 @@ export default function AddFIDO2PasskeyPage({
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: ADD_PASSKEY_ANALYTICS.STEPS.VERIFY_PASSWORD,
+      flow: ADD_PASSKEY_ANALYTICS.FLOW_ID,
     });
     await validatePassword(password);
   }
@@ -165,6 +166,7 @@ export default function AddFIDO2PasskeyPage({
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: ADD_PASSKEY_ANALYTICS.STEPS.ADD_PASSKEY,
+      flow: ADD_PASSKEY_ANALYTICS.FLOW_ID,
     });
 
     if (!isWebAuthnSupported()) {
@@ -247,6 +249,7 @@ export default function AddFIDO2PasskeyPage({
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: ADD_PASSKEY_ANALYTICS.STEPS.ADD_NICKNAME,
+      flow: ADD_PASSKEY_ANALYTICS.FLOW_ID,
     });
 
     setRegistrationLoading(true);
@@ -397,6 +400,8 @@ export default function AddFIDO2PasskeyPage({
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: ADD_PASSKEY_ANALYTICS.FLOW_ID,
+            type: userSelectedMfaFactor?.type,
           });
           return validateOtpCode(otpValue);
         }}

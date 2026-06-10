@@ -1,6 +1,6 @@
 import ReactGA from "react-ga4";
 
-import { GA_CLICK_EVENTS } from "./analyticsConstants";
+import { GA_CLICK_EVENTS, getOtpTypeLabel } from "./analyticsConstants";
 import config from "../config";
 import type {
   AnalyticsPayload,
@@ -17,99 +17,84 @@ const CommonPages = {
 };
 
 const ProfileNameSteps = {
-  EditProfileNamePage: "Name Change - Step 1: Edit your name",
-  ProfileUpdateNameConfirmUpdate: "Name Change - Step 2: Confirm name change",
-  ProfileUpdateNameSuccess: "Name Change - Step 3: Name updated",
+  EditProfileNamePage: "Name Change - Edit your name",
+  ProfileUpdateNameConfirmUpdate: "Name Change - Confirm name change",
+  ProfileUpdateNameSuccess: "Name Change - Name updated",
 };
 
 const LanguageChangeSteps = {
-  EditLanguagePreferences: "Language Change - Step 1: Choose language",
-  ConfirmLanguageUpdate: "Language Change - Step 2: Confirm language",
-  SuccessfullyUpdatedLanguage: "Language Change - Step 3: Language updated",
+  EditLanguagePreferences: "Language Change - Choose language",
+  ConfirmLanguageUpdate: "Language Change - Confirm language",
+  SuccessfullyUpdatedLanguage: "Language Change - Language updated",
 };
 
 const PhoneChangeSteps = {
-  EditContactPhoneNumberPage:
-    "Phone Number Change - Step 1: Enter new phone number",
-  PhoneChangeVerifyOtp: "Phone Number Change - Step 2: Verify phone number",
-  PhoneChangeConfirmUpdate:
-    "Phone Number Change - Step 3: Confirm number change",
-  PhoneChangeSuccess: "Phone Number Change - Step 4: Number updated",
+  EditContactPhoneNumberPage: "Phone Number Change - Enter new phone number",
+  PhoneChangeVerifyOtp: "Phone Number Change - Verify phone number",
+  PhoneChangeConfirmUpdate: "Phone Number Change - Confirm number change",
+  PhoneChangeSuccess: "Phone Number Change - Number updated",
 };
 
 const EmailChangeSteps = {
-  EditEmailPage: "Email Change - Step 1: Verify it's you",
-  EmailChangeOtpSelection: "Email Change - Step 2: Choose verification method",
-  EmailChangeOtpValidation: "Email Change - Step 3: Enter verification code",
-  EmailChangeEnterEmail: "Email Change - Step 4: Enter new email",
-  EmailChangeVerifyNewEmail: "Email Change - Step 5: Verify new email",
-  EmailChangeConfirmUpdate: "Email Change - Step 6: Confirm email change",
-  EmailChangeSuccess: "Email Change - Step 7: Email updated",
+  EditEmailPage: "Email Change - Verify it's you",
+  EmailChangeOtpSelection: "Manage - 2 step verification method",
+  EmailChangeOtpValidation: "Manage - Initiate 2-step verification",
+  EmailChangeEnterEmail: "Email Change - Enter new email",
+  EmailChangeVerifyNewEmail: "Email Change - Verify new email",
+  EmailChangeConfirmUpdate: "Email Change - Confirm email change",
+  EmailChangeSuccess: "Email Change - Email updated",
 };
 
 const PasswordChangeSteps = {
-  Password: "Password Change - Step 1: Verify it's you",
-  PasswordChangeVerifyIdentity: "Password Change - Step 1: Verify it's you",
-  PasswordChangeOtpSelection:
-    "Password Change - Step 2: Choose verification method",
-  PasswordChangeOtpValidation:
-    "Password Change - Step 3: Enter verification code",
-  PasswordChangeEnterNewPassword:
-    "Password Change - Step 4: Enter new password",
-  PasswordChangeSuccess: "Password Change - Step 5: Password changed",
+  Password: "Password Change - Verify it's you",
+  PasswordChangeVerifyIdentity: "Password Change - Verify it's you",
+  PasswordChangeOtpSelection: "Manage - 2 step verification method",
+  PasswordChangeOtpValidation: "Manage - Initiate 2-step verification",
+  PasswordChangeEnterNewPassword: "Password Change - Enter new password",
+  PasswordChangeSuccess: "Password Change - Password changed",
 };
 
 const AddPhoneNumberSteps = {
-  AddMFAPage: "Add Phone Number - Step 1: Verify it's you",
-  AddPhoneNumberVerifyIdentity: "Add Phone Number - Step 1: Verify it's you",
-  AddPhoneNumberOtpSelection:
-    "Add Phone Number - Step 2: Choose verification method",
-  AddPhoneNumberOtpValidation:
-    "Add Phone Number - Step 3: Enter verification code",
-  AddPhoneNumberEnterNumber: "Add Phone Number - Step 4: Enter phone number",
-  AddPhoneNumberVerifyNumber: "Add Phone Number - Step 5: Verify phone number",
-  AddPhoneNumberSecondMethod: "Add Phone Number - Step 6: Set up backup method",
+  AddMFAPage: "Add Phone Number - Verify it's you",
+  AddPhoneNumberVerifyIdentity: "Add Phone Number - Verify it's you",
+  AddPhoneNumberOtpSelection: "Manage - 2 step verification method",
+  AddPhoneNumberOtpValidation: "Manage - Initiate 2-step verification",
+  AddPhoneNumberEnterNumber: "Add Phone Number - Enter phone number",
+  AddPhoneNumberVerifyNumber: "Add Phone Number - Verify phone number",
+  AddPhoneNumberSecondMethod: "Add Phone Number - Set up backup method",
 };
 
 const DeletePhoneNumberSteps = {
-  DeleteMFAPage: "Delete Phone Number - Step 1: Verify it's you",
-  DeletePhoneNumberVerifyIdentity:
-    "Delete Phone Number - Step 1: Verify it's you",
-  DeletePhoneNumberOtpSelection:
-    "Delete Phone Number - Step 2: Choose verification method",
-  DeletePhoneNumberOtpValidation:
-    "Delete Phone Number - Step 3: Enter verification code",
-  DeletePhoneNumberConfirm:
-    "Delete Phone Number - Step 4: Confirm number removal",
+  DeleteMFAPage: "Delete Phone Number - Verify it's you",
+  DeletePhoneNumberVerifyIdentity: "Delete Phone Number - Verify it's you",
+  DeletePhoneNumberOtpSelection: "Manage - 2 step verification method",
+  DeletePhoneNumberOtpValidation: "Manage - Initiate 2-step verification",
+  DeletePhoneNumberConfirm: "Delete Phone Number - Confirm number removal",
 };
 
 const AddPasskeySteps = {
   AddFIDO2PasskeyPage: "Add Passkey",
-  AddPasskeyVerifyIdentity: "Add Passkey - Step 1: Verify it's you",
-  AddPasskeyOtpSelection: "Add Passkey - Step 2: Choose verification method",
-  AddPasskeyOtpValidation: "Add Passkey - Step 3a: Enter verification code",
-  AddPasskeyVerifyPasskey:
-    "Add Passkey - Step 3b: Verify with existing passkey",
-  AddPasskeyRegister: "Add Passkey - Step 4: Register passkey",
-  AddPasskeySetNickname: "Add Passkey - Step 5: Name your passkey",
+  AddPasskeyVerifyIdentity: "Add Passkey - Verify it's you",
+  AddPasskeyOtpSelection: "Manage - 2 step verification method",
+  AddPasskeyOtpValidation: "Manage - Initiate 2-step verification",
+  AddPasskeyVerifyPasskey: "Add Passkey - Verify with existing passkey",
+  AddPasskeyRegister: "Add Passkey - Register passkey",
+  AddPasskeySetNickname: "Add Passkey - Name your passkey",
 };
 
 const DeletePasskeySteps = {
   DeleteFIDO2PasskeyPage: "Delete Passkey",
-  DeletePasskeyVerifyIdentity: "Delete Passkey - Step 1: Verify it's you",
-  DeletePasskeyOtpSelection:
-    "Delete Passkey - Step 2: Choose verification method",
-  DeletePasskeyOtpValidation:
-    "Delete Passkey - Step 3a: Enter verification code",
-  DeletePasskeyVerifyPasskey:
-    "Delete Passkey - Step 3b: Verify with existing passkey",
-  DeletePasskeyConfirm: "Delete Passkey - Step 4: Confirm removal",
-  DeletePasskeySuccess: "Delete Passkey - Step 5: Passkey deleted",
+  DeletePasskeyVerifyIdentity: "Delete Passkey - Verify it's you",
+  DeletePasskeyOtpSelection: "Manage - 2 step verification method",
+  DeletePasskeyOtpValidation: "Manage - Initiate 2-step verification",
+  DeletePasskeyVerifyPasskey: "Delete Passkey - Verify with existing passkey",
+  DeletePasskeyConfirm: "Delete Passkey - Confirm removal",
+  DeletePasskeySuccess: "Delete Passkey - Passkey deleted",
 };
 
 const RenamePasskeySteps = {
-  RenamePasskeyEdit: "Rename Passkey - Step 1: Name your passkey",
-  RenamePasskeySuccess: "Rename Passkey - Step 2: Passkey renamed",
+  RenamePasskeyEdit: "Rename Passkey - Name your passkey",
+  RenamePasskeySuccess: "Rename Passkey - Passkey renamed",
 };
 
 const GA_PAGE_TITLE_SUFFIXES: Record<string, string> = {
@@ -199,7 +184,7 @@ export function trackGA4Event(eventName: string, params?: GA4EventParams) {
 }
 
 export function trackAnalyticsEvent(
-  { event, form_id, step, type, error, duration_ms }: AnalyticsTrackEvent,
+  { event, form_id, step, type, flow, error, duration_ms }: AnalyticsTrackEvent,
   additionalParams?: GA4EventParams,
 ) {
   const reservedKeys = new Set([
@@ -207,6 +192,7 @@ export function trackAnalyticsEvent(
     "step",
     "page",
     "type",
+    "flow",
     "error",
     "duration_ms",
   ]);
@@ -215,8 +201,10 @@ export function trackAnalyticsEvent(
     step,
     page: typeof document !== "undefined" ? document.title : undefined,
   };
-  if (type !== undefined) {
-    params.type = type;
+  const normalizedType =
+    type !== undefined ? (getOtpTypeLabel(type) ?? type) : undefined;
+  if (normalizedType !== undefined) {
+    params.type = normalizedType;
   }
   if (error !== undefined) {
     params.error = error;
@@ -224,6 +212,7 @@ export function trackAnalyticsEvent(
   if (duration_ms !== undefined) {
     params.duration_ms = duration_ms;
   }
+  params.flow = flow ?? form_id;
   if (additionalParams) {
     const safeAdditionalParams = Object.fromEntries(
       Object.entries(additionalParams).filter(
