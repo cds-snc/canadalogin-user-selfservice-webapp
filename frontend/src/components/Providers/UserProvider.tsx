@@ -28,6 +28,25 @@ import {
   initialUserState,
 } from "../../types/user";
 
+const SCIM_IBM_USER_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User";
+
+type UserProfileApiShape = UserProfile & {
+  [SCIM_IBM_USER_EXT]?: UserProfile["details"];
+};
+
+function normalizeUserProfile(
+  profile: UserProfileApiShape | null | undefined,
+): UserProfile | null {
+  if (!profile) {
+    return null;
+  }
+
+  return {
+    ...profile,
+    details: profile.details ?? profile[SCIM_IBM_USER_EXT] ?? null,
+  };
+}
+
 type SessionTimeoutAction =
   | {
       type: typeof CONTEXT_ACTIONS.show_session_timeout_modal;
@@ -355,9 +374,12 @@ export function UserProvider({
         const rp_client_id = searchParams.get(RP_CLIENT_ID_KEY) ?? undefined;
         const response = await authService.get_my_user_profile(rp_client_id);
         if (response && response.data) {
+          const normalizedProfile = normalizeUserProfile(
+            response.data as UserProfileApiShape,
+          );
           userDispatch({
             type: CONTEXT_ACTIONS.updated_profile_success,
-            payload: response.data as UserProfile,
+            payload: normalizedProfile,
           });
           await getRelyingPartyInfo();
         }
