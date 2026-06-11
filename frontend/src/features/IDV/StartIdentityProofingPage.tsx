@@ -40,6 +40,10 @@ export default function StartIdentityProofingPage() {
     language: language,
   });
 
+  const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
+    language: language,
+  });
+
   const handleOnlineMethodChange = (method: IdvMethod) => {
     setOnlineSelectedMethod(method);
     setInPersonSelectedMethod(undefined);
@@ -64,8 +68,8 @@ export default function StartIdentityProofingPage() {
         navigate(serviceCanadaPage);
         break;
       case IN_PERSON_METHOD.canadaPostLocations:
-        // TODO: implement Canada Post locations flow
-        navigate(serviceCanadaPage);
+        // TODO: Update when Canada Post page is implemented
+        navigate(startIdentityProofingPage);
         break;
     }
   };
