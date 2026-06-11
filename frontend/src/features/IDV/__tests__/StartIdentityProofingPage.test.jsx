@@ -26,6 +26,7 @@ vi.mock("../../../utils/constants", () => ({
     idvServiceCanadaCentrePage: "idvServiceCanadaCentrePage",
     idvOnlineVerificationInfoPage: "idvOnlineVerificationInfoPage",
     idvProvincialVerificationPage: "idvProvincialVerificationPage",
+    idvStartIdentityProofingPage: "idv",
   },
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
   SERVICES: [
@@ -291,7 +292,7 @@ describe("StartIdentityProofingPage", () => {
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idvServiceCanadaCentrePage");
+    expect(mockNavigate).toHaveBeenCalledWith("/en/idv");
   });
 
   // ── Cancel button ──────────────────────────────
