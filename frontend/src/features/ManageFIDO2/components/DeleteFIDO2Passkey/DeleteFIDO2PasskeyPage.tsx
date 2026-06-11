@@ -62,7 +62,7 @@ export default function DeleteFIDO2PasskeyPage({
   const [customErrorMessage, setCustomErrorMessage] = useState("");
   const errorMessage =
     customErrorMessage || getErrorMessage(language, errorCode);
-  const { t } = useTranslation("security");
+  const { t } = useTranslation(["security", "common"]);
   const [userPasswordValue, setUserPasswordValue] = useState("");
 
   const [selected2FAPasskey, setSelected2FAPasskey] =
@@ -147,13 +147,41 @@ export default function DeleteFIDO2PasskeyPage({
     await validatePassword(password);
   }
 
+  const getOtpAttemptsErrorMessage = (errorData?: {
+    retries?: number;
+    attempts?: number;
+  }) => {
+    const retries = errorData?.retries;
+    const attempts = errorData?.attempts;
+
+    if (
+      retries === undefined ||
+      retries === null ||
+      attempts === undefined ||
+      attempts === null
+    ) {
+      return "";
+    }
+
+    const remaining = retries - attempts;
+    if (remaining <= 0) {
+      return t("Error.otp_max_attempts", { ns: "common" });
+    }
+
+    return t("Error.otp_invalid_attempts", {
+      ns: "common",
+      count: remaining,
+    });
+  };
+
   const validateOtpCode = async (_otpValue: string): Promise<void> => {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
       step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
     });
-    setWizardStep("deleteFIDO2PasskeyConfirmation");
     setErrorCode("");
+    setCustomErrorMessage("");
+    setWizardStep("deleteFIDO2PasskeyConfirmation");
   };
 
   const handleDeleteFIDO2 = async () => {
@@ -210,14 +238,19 @@ export default function DeleteFIDO2PasskeyPage({
           event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
           step: DELETE_PASSKEY_ANALYTICS.STEPS.SUCCESS,
         });
+        setCustomErrorMessage("");
         setWizardStep("deleteFIDO2PasskeySuccess");
       } else {
         throw new Error("error_delete_credential");
       }
     } catch (err) {
-      const errData = err as { data?: { message?: string } };
+      const errData = err as {
+        data?: { message?: string; retries?: number; attempts?: number };
+      };
       const message = errData?.data?.message ?? "error_delete_credential";
+      const attemptsMessage = getOtpAttemptsErrorMessage(errData?.data);
       setErrorCode(message);
+      setCustomErrorMessage("");
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
@@ -228,6 +261,9 @@ export default function DeleteFIDO2PasskeyPage({
           errData?.data?.message ?? "",
         )
       ) {
+        if (attemptsMessage) {
+          setCustomErrorMessage(attemptsMessage);
+        }
         setWizardStep("otpValidation");
       }
     } finally {
