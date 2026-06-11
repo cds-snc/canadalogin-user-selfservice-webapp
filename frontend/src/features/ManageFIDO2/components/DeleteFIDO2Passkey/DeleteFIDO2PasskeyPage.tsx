@@ -28,6 +28,7 @@ import {
   GA_FORM_EVENTS,
   DELETE_PASSKEY_ANALYTICS,
 } from "../../../../utils/analyticsConstants";
+import { authService } from "../../../../services/authService";
 
 interface DeleteFIDO2PasskeyPageProps {
   step?: string;
@@ -147,13 +148,49 @@ export default function DeleteFIDO2PasskeyPage({
     await validatePassword(password);
   }
 
-  const validateOtpCode = async (_otpValue: string): Promise<void> => {
-    trackEvent({
-      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-      step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
-    });
-    setWizardStep("deleteFIDO2PasskeyConfirmation");
-    setErrorCode("");
+  const validateOtpCode = async (otpValue: string): Promise<void> => {
+    const userData = {
+      otp: otpValue,
+      trxnId: otpSentResponse?.trxnId ?? "",
+      otpType:
+        serverMapping[
+          userSelectedMfaFactor!.type as keyof typeof serverMapping
+        ],
+    };
+
+    try {
+      const response = await authService.transientOtpVerify(userData);
+      if (response && response.success) {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+        });
+        setWizardStep("deleteFIDO2PasskeyConfirmation");
+        setErrorCode("");
+      }
+    } catch (err) {
+      const errData = err as {
+        response?: { data?: { message?: string; retries?: number } };
+      };
+      const errorMessage = errData?.response?.data?.message;
+      const hasRetries =
+        errData?.response?.data?.retries !== undefined &&
+        errData?.response?.data?.retries !== null;
+
+      if (hasRetries) {
+        // Re-throw so OtpVerification renders attempts remaining.
+        throw errData.response;
+      }
+
+      if (errorMessage) {
+        setErrorCode(errorMessage);
+      }
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
+        error: errorMessage || "error_otp_validation_failed",
+      });
+    }
   };
 
   const handleDeleteFIDO2 = async () => {

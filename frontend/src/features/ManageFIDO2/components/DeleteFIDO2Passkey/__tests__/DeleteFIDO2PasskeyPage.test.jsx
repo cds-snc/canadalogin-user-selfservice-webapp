@@ -292,6 +292,7 @@ describe("DeleteFIDO2PasskeyPage", () => {
     vi.clearAllMocks();
     mockUseOtpOperations.mockReturnValue({ ...mockOtpOpsDefaults });
     mockUsePasskeyOperations.mockReturnValue({ ...mockPasskeyOpsDefaults });
+    mockTransientOtpVerify.mockResolvedValue({ success: true });
     mockValidatePasswordLoading.value = false;
     capturedPasswordSuccessCallback = null;
     mockLocation.state = {
