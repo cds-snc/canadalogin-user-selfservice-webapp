@@ -19,10 +19,6 @@ const { mockTrackEvent } = vi.hoisted(() => ({
   mockTrackEvent: vi.fn(),
 }));
 
-const { mockTransientOtpVerify } = vi.hoisted(() => ({
-  mockTransientOtpVerify: vi.fn(),
-}));
-
 vi.mock("../../../../hooks/useFormTracking", () => ({
   useFormTracking: () => ({ trackEvent: mockTrackEvent }),
 }));
@@ -104,7 +100,7 @@ vi.mock("../../../../services/authService", () => ({
     logout: vi.fn().mockResolvedValue({ success: true }),
     requestPasswordPolicy: vi.fn(),
     transientOtpSend: vi.fn(),
-    transientOtpVerify: (...args) => mockTransientOtpVerify(...args),
+    transientOtpVerify: vi.fn(),
   },
 }));
 
@@ -367,7 +363,6 @@ describe("DeleteMFAPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocation.state = { factorIds: ["factor-1"] };
-    mockTransientOtpVerify.mockResolvedValue({ success: true });
 
     // Mock the useOtpOperations hook - default to loading false
     useOtpOperations.mockReturnValue({
