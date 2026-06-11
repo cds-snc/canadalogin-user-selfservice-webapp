@@ -8,7 +8,7 @@ import {
 import { useLocation, useNavigate, useParams } from "react-router";
 import { MAP_TYPES, useOtpOperations } from "../../../hooks/useOtpOperations";
 import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations";
-import { NON_PROD_ENVIRONMENT, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
 import Loader from "../../Layout/Loading";
@@ -103,7 +103,6 @@ export default function Manage2FAVerifications() {
 
   const { fido2Data: userFIDO2CredentialsData, loading: passkeyLoading } =
     usePasskeyOperations({
-      enabled: NON_PROD_ENVIRONMENT,
       setErrorCode: () => {},
     });
 
@@ -174,7 +173,7 @@ export default function Manage2FAVerifications() {
         </GcdsButton>
       </GcdsGrid>
 
-      {NON_PROD_ENVIRONMENT && (
+      {
         <GcdsGrid {...sectionCardProps}>
           <SectionHeader
             icon={
@@ -209,7 +208,7 @@ export default function Manage2FAVerifications() {
             {t("Manage2FAVerifications.addPasskey")}
           </GcdsButton>
         </GcdsGrid>
-      )}
+      }
     </GcdsContainer>
   );
 }
