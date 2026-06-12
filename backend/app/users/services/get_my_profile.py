@@ -44,7 +44,10 @@ async def dispatch_get_my_profile_from_ibm(
 
     json_data = response.json()
 
-    return IBMVerifyUserProfileSchema(**json_data)
+    return IBMVerifyUserProfileSchema.model_validate(
+        json_data,
+        context={"allow_invalid_profile_name": True},
+    )
 
 
 async def get_my_profile(
@@ -73,7 +76,10 @@ async def get_my_profile(
     profile_data = profile_response.model_dump()
     masked_profile_data = mask_profile_details(profile_data)
 
-    response_data = IBMVerifyUserProfileSchema(**masked_profile_data)
+    response_data = IBMVerifyUserProfileSchema.model_validate(
+        masked_profile_data,
+        context={"allow_invalid_profile_name": True},
+    )
 
     return ProfileResponse(
         success=True,
