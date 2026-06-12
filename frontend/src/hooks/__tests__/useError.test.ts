@@ -13,7 +13,7 @@ describe("useError", () => {
 
     expect(result.current.getError("name")).toEqual({
       heading: "There was a problem",
-      errorMsg: "The verification code is invalid or has expired.",
+      errorMsg: "Invalid code. Try again.",
     });
     expect(result.current.hasErrors()).toBe(true);
   });
