@@ -133,9 +133,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
         </TestWrapper>,
       );
 
-      expect(
-        screen.getByText("The verification code is invalid or has expired."),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Invalid code. Try again.")).toBeInTheDocument();
     });
 
     it("should display default error message for unknown error code", () => {
@@ -189,9 +187,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.getByText(
-          "Le code de vérification n'est pas valide ou a expiré.",
-        ),
+        screen.getByText("Code invalide. Veuillez réessayer."),
       ).toBeInTheDocument();
       expect(screen.getByText("Un problème est survenu")).toBeInTheDocument();
     });
@@ -232,9 +228,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
 
       const link = screen.getByTestId("error-link-0");
       expect(link).toHaveAttribute("href", "#error-href-1");
-      expect(link).toHaveTextContent(
-        "The verification code is invalid or has expired.",
-      );
+      expect(link).toHaveTextContent("Invalid code. Try again.");
     });
 
     it("should use custom error links when provided", () => {
@@ -409,8 +403,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
     const errorCodes = [
       {
         code: "CSIAM0010E",
-        expectedMessage:
-          "You have reached the limit of attempts. Wait 15 minutes and try again.",
+        expectedMessage: "Your code has expired. Request a new code below.",
       },
       { code: "CSIAM0038E", expectedMessage: "Too Many Attempts" },
       {
@@ -442,9 +435,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.getByText(
-          "You have reached the limit of attempts. Wait 15 minutes and try again.",
-        ),
+        screen.getByText("Your code has expired. Request a new code below."),
       ).toBeInTheDocument();
 
       rerender(
@@ -454,9 +445,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.queryByText(
-          "You have reached the limit of attempts. Wait 15 minutes and try again.",
-        ),
+        screen.queryByText("Your code has expired. Request a new code below."),
       ).not.toBeInTheDocument();
       expect(screen.getByText("Too Many Attempts")).toBeInTheDocument();
     });
@@ -469,9 +458,7 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.getByText(
-          "You have reached the limit of attempts. Wait 15 minutes and try again.",
-        ),
+        screen.getByText("Your code has expired. Request a new code below."),
       ).toBeInTheDocument();
 
       i18n.changeLanguage("fr");
@@ -482,13 +469,11 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       expect(
-        screen.queryByText(
-          "You have reached the limit of attempts. Wait 15 minutes and try again.",
-        ),
+        screen.queryByText("Your code has expired. Request a new code below."),
       ).not.toBeInTheDocument();
       expect(
         screen.getByText(
-          "Vous avez atteint la limite de tentatives. Attendez 15 minutes et réessayez.",
+          "Votre code a expiré. Veuillez demander un nouveau code ci-dessous.",
         ),
       ).toBeInTheDocument();
       i18n.changeLanguage("en");
