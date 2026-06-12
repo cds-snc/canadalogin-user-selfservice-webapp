@@ -141,6 +141,11 @@ class UserProfileName(BaseModel):
         v = v.strip()
         v = re.sub(r" +", " ", v)
 
+        # For upstream profile reads, tolerate legacy invalid characters so
+        # profile retrieval does not fail and break authenticated app flows.
+        if info.context and info.context.get("allow_invalid_profile_name"):
+            return v
+
         # givenName is not required; allow empty string without validation
         # familyName empty string is also passed through — the service layer
         # validates it and raises an HTTPException with an error code
