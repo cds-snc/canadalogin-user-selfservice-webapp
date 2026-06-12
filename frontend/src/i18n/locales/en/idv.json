@@ -64,5 +64,16 @@
     "signBackInNotice": "You will need to sign back in to your {{appName}} after proving your identity in person to confirm the proofing process.",
     "canadaPostLocationsOption": "Canada Post locations",
     "serviceCanadaLocationsOption": "Service Canada Centres"
+  },
+  "CompleteIdentityProofing":{
+    "pageTitle": "Complete identity proofing",
+    "heading": "Complete identity proofing when you're ready",
+    "accessRPServicePortalTitle": "To access the {{rpServicePortal}}, you need to complete identity proofing first",
+    "accessRPServicePortalText": "When you're ready, sign back in to your CanadaLogin account and you'll be brought back to this step automatically.",
+    "buttonStartIdentity": "Start identity proofing now",
+    "signOut": "Sign out",
+    "forMoreInformationNoticeHeader": "For more information",
+    "forMoreInformationNoticeText": "Learn more about how identity proofing works"
   }
 }
+ 
