@@ -4,13 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CompleteIdentityProofingPage from "../CompleteIDVWhenReady/CompleteIdentityProofing";
 import { authService } from "../../../services/authService";
 
-
 const mockSetLoading = vi.hoisted(() => vi.fn());
 
 const mockFlags = vi.hoisted(() => ({
   devOnlyFeature: true,
 }));
-
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -50,7 +48,9 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsText: ({ children }) => <p>{children}</p>,
   GcdsButton: ({ children, onGcdsClick, buttonRole }) => (
     <button
-      data-testid={buttonRole === "secondary" ? "signout-button" : "start-button"}
+      data-testid={
+        buttonRole === "secondary" ? "signout-button" : "start-button"
+      }
       onClick={(e) => onGcdsClick && onGcdsClick(e)}
     >
       {children}
@@ -231,7 +231,11 @@ describe("CompleteIdentityProofingPage", () => {
         screen.getByTestId("signout-button").click();
       });
 
-      expect(mockSetLoading).toHaveBeenNthCalledWith(1, true, "Signing you out...");
+      expect(mockSetLoading).toHaveBeenNthCalledWith(
+        1,
+        true,
+        "Signing you out...",
+      );
       expect(authService.logout).toHaveBeenCalledTimes(1);
     });
 
@@ -263,14 +267,20 @@ describe("CompleteIdentityProofingPage", () => {
       const consoleErrorSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
-      vi.mocked(authService.logout).mockRejectedValue(new Error("Network error"));
+      vi.mocked(authService.logout).mockRejectedValue(
+        new Error("Network error"),
+      );
       setup();
 
       await act(async () => {
         screen.getByTestId("signout-button").click();
       });
 
-      expect(mockSetLoading).toHaveBeenNthCalledWith(1, true, "Signing you out...");
+      expect(mockSetLoading).toHaveBeenNthCalledWith(
+        1,
+        true,
+        "Signing you out...",
+      );
       expect(mockSetLoading).toHaveBeenNthCalledWith(
         2,
         true,

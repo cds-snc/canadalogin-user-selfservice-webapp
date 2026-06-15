@@ -23,8 +23,7 @@ export default function CompleteIdentityProofingPage() {
 
   const rpInfo = state.relyingPartyInfo;
   const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const relyingPartyLinkName =
-    localizedDetail?.name ?? rpInfo?.linkName ?? "";
+  const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
   const rpServicePortal = relyingPartyLinkName || tLayout("TopNavBar.appName");
 
   const handleSignOut = async (event: Event) => {
@@ -73,10 +72,7 @@ export default function CompleteIdentityProofingPage() {
             })}
           </GcdsText>
           <GcdsGrid columns="max-content max-content" gap="200">
-            <GcdsButton
-              type="button"
-              href="#"
-            >
+            <GcdsButton type="button" href="#">
               {t("CompleteIdentityProofing.buttonStartIdentity")}
             </GcdsButton>
 
@@ -97,13 +93,10 @@ export default function CompleteIdentityProofingPage() {
               "CompleteIdentityProofing.forMoreInformationNoticeHeader",
             )}
           >
-            
-              <GcdsLink href="#" external size="regular">
-                {t("CompleteIdentityProofing.forMoreInformationNoticeText")}
-              </GcdsLink>
-            
+            <GcdsLink href="#" external size="regular">
+              {t("CompleteIdentityProofing.forMoreInformationNoticeText")}
+            </GcdsLink>
           </GcdsNotice>
-
         </GcdsContainer>
       </GcdsGrid>
     </GcdsContainer>

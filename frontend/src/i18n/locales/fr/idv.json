@@ -62,7 +62,7 @@
     "hintProvincialPartnerOption": "Use your BC Service Card or Alberta.ca account",
     "inPersonOption": "See in-person options"
   },
-  "CompleteIdentityProofing":{
+  "CompleteIdentityProofing": {
     "pageTitle": "Complete identity proofing",
     "heading": "Complete identity proofing when you're ready",
     "accessRPServicePortalTitle": "To access the {{rpServicePortal}}, you need to complete identity proofing first",

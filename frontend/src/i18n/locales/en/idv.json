@@ -65,7 +65,7 @@
     "canadaPostLocationsOption": "Canada Post locations",
     "serviceCanadaLocationsOption": "Service Canada Centres"
   },
-  "CompleteIdentityProofing":{
+  "CompleteIdentityProofing": {
     "pageTitle": "Complete identity proofing",
     "heading": "Complete identity proofing when you're ready",
     "accessRPServicePortalTitle": "To access the {{rpServicePortal}}, you need to complete identity proofing first",
@@ -76,4 +76,3 @@
     "forMoreInformationNoticeText": "Learn more about how identity proofing works"
   }
 }
- 
