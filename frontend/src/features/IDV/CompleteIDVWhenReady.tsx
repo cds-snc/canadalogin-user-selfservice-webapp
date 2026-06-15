@@ -10,11 +10,11 @@ import {
   GcdsNotice,
 } from "@gcds-core/components-react";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
-import { path } from "../../../utils/routeHelpers";
-import { useUser } from "../../../components/Providers/useUser";
-import { authService } from "../../../services/authService";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch";
+import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import { path } from "../../utils/routeHelpers";
+import { useUser } from "../../components/Providers/useUser";
+import { authService } from "../../services/authService";
+import { userProfileDispatch } from "../../utils/userProfileDispatch";
 
 export default function CompleteIdentityProofingPage() {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export default function CompleteIdentityProofingPage() {
   const { setLoading } = userProfileDispatch(dispatch);
 
   const { t, i18n } = useTranslation("idv");
-  const { t: tLayout } = useTranslation("layout");
+  const appName = t("CompleteIdentityProofing.appName");
 
   const handleStartIdentityProofing = () => {
     navigate(path(PAGES.idvStartIdentityProofingPage, { language }));
@@ -32,11 +32,11 @@ export default function CompleteIdentityProofingPage() {
   const rpInfo = state.relyingPartyInfo;
   const localizedDetail = rpInfo?.localized?.[i18n.language];
   const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
-  const rpServicePortal = relyingPartyLinkName || tLayout("TopNavBar.appName");
+  const rpServicePortal = relyingPartyLinkName || appName;
 
   const handleSignOut = async (event: Event) => {
     event.preventDefault();
-    setLoading(true, tLayout("TopNavBar.signingOut"));
+    setLoading(true, t("CompleteIdentityProofing.signingOut"));
 
     try {
       const response = await authService.logout();
@@ -49,7 +49,7 @@ export default function CompleteIdentityProofingPage() {
       window.location.href = "/";
     } catch (error) {
       console.error("Logout failed:", error);
-      setLoading(true, tLayout("TopNavBar.signOutFailed"));
+      setLoading(true, t("CompleteIdentityProofing.signOutFailed"));
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
@@ -76,7 +76,7 @@ export default function CompleteIdentityProofingPage() {
           </GcdsText>
           <GcdsText>
             {t("CompleteIdentityProofing.accessRPServicePortalText", {
-              appName: tLayout("TopNavBar.appName"),
+              appName,
             })}
           </GcdsText>
           <GcdsGrid columns="max-content max-content" gap="200">

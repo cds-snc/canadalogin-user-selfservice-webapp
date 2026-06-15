@@ -26,7 +26,7 @@ import ServiceCanadaCentreIDVCodePage from "./features/IDV/InPerson/ServiceCanad
 import StartIdentityProofingPage from "./features/IDV/StartIdentityProofingPage";
 import ProvincialVerificationPage from "./features/IDV/Online/ProvincialVerificationPage";
 import OnlineVerificationInfo from "./features/IDV/Online/OnlineVerificationInfo";
-import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady/CompleteIdentityProofing";
+import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 
 export const appRoutes: RouteObject[] = [
   {

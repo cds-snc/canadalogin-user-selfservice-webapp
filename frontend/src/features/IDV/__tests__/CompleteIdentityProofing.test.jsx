@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { act, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import CompleteIdentityProofingPage from "../CompleteIDVWhenReady/CompleteIdentityProofing";
+import CompleteIdentityProofingPage from "../CompleteIDVWhenReady";
 import { authService } from "../../../services/authService";
 
 const mockSetLoading = vi.hoisted(() => vi.fn());
