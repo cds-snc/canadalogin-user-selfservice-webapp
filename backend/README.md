@@ -7,7 +7,7 @@ This is the FastAPI application for the CanadaLogin back-end API.
 ### Prerequisites
 
 - Docker installed on your machine (use Colima if on a CDS MacBook)
-- Python 3.12 (if running locally without Docker)
+- Python 3.14 (if running locally without Docker)
 - Redis server running locally (required for session management)
 - `.env` file with required environment variables
 

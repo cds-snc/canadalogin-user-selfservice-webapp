@@ -81,7 +81,10 @@ async def dispatch_password_otp_validator(
     try:
         response.raise_for_status()
     except HTTPStatusError as exc:
-        if exc.response and exc.response.status_code == status.HTTP_400_BAD_REQUEST:
+        if exc.response and exc.response.status_code in {
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+        }:
             body = extract_response_body(exc.response)
             detail = {
                 "message": body.get("messageId", "Bad request"),

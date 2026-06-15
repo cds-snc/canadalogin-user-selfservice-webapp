@@ -58,7 +58,7 @@ export default function DeleteMFAPage() {
 
   const { state } = useUser();
   const [userPasswordValue, setUserPasswordValue] = useState("");
-  const { t } = useTranslation("security");
+  const { t } = useTranslation(["security", "common"]);
 
   const [errorCode, setErrorCode] = useState("");
   const [customErrorMessage, setCustomErrorMessage] = useState("");
@@ -169,6 +169,33 @@ export default function DeleteMFAPage() {
     }));
   };
 
+  const getOtpAttemptsErrorMessage = (errorData?: {
+    retries?: number;
+    attempts?: number;
+  }) => {
+    const retries = errorData?.retries;
+    const attempts = errorData?.attempts;
+
+    if (
+      retries === undefined ||
+      retries === null ||
+      attempts === undefined ||
+      attempts === null
+    ) {
+      return "";
+    }
+
+    const remaining = retries - attempts;
+    if (remaining <= 0) {
+      return t("Error.otp_max_attempts", { ns: "common" });
+    }
+
+    return t("Error.otp_invalid_attempts", {
+      ns: "common",
+      count: remaining,
+    });
+  };
+
   const deleteMFA = async () => {
     try {
       const verificationOtpType =
@@ -221,6 +248,7 @@ export default function DeleteMFAPage() {
         step: DELETE_MFA_ANALYTICS.STEPS.SUCCESS,
       });
       setErrorCode("");
+      setCustomErrorMessage("");
       navigate(backToManage2FAVerificationsPage, {
         state: {
           noticeType: "mfaDeleted",
@@ -228,9 +256,13 @@ export default function DeleteMFAPage() {
         },
       });
     } catch (error) {
-      const err = error as { data?: { message?: string } };
+      const err = error as {
+        data?: { message?: string; retries?: number; attempts?: number };
+      };
       const message = err?.data?.message ?? "";
+      const attemptsMessage = getOtpAttemptsErrorMessage(err?.data);
       setErrorCode(message);
+      setCustomErrorMessage("");
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
@@ -241,6 +273,9 @@ export default function DeleteMFAPage() {
           err?.data?.message ?? "",
         )
       ) {
+        if (attemptsMessage) {
+          setCustomErrorMessage(attemptsMessage);
+        }
         // If OTP is invalid, go back to OTP validation step
         setWizardStep("otpValidation");
         trackEvent({
@@ -252,13 +287,15 @@ export default function DeleteMFAPage() {
   };
 
   // Custom validateOtpCode that handles delete MFA flow
-  const validateOtpCode = async () => {
+  const validateOtpCode = async (_otpValue: string) => {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
       flow: DELETE_MFA_ANALYTICS.FLOW_ID,
       type: userSelectedMfaFactor?.type,
     });
+    setErrorCode("");
+    setCustomErrorMessage("");
     setWizardStep("deleteMFAPhoneNumberConfirm");
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,

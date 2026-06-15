@@ -155,6 +155,57 @@ async def test_dispatch_get_my_profile_from_ibm_success(monkeypatch):
 
 
 @pytest.mark.asyncio
+@respx.mock
+async def test_dispatch_get_my_profile_from_ibm_allows_legacy_invalid_names(
+    monkeypatch,
+):
+    """Profile reads should tolerate legacy names with disallowed characters."""
+    # Arrange
+    test_url = "https://mocked-api.ibm.com/v2.0/Me"
+
+    monkeypatch.setattr(
+        "app.users.services.get_my_profile.get_configuration",
+        lambda: Mock(profile_api_endpoint=test_url),
+    )
+
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "jo****@example.com",
+        "emails": [{"value": "jo****@example.com", "type": "work"}],
+        "name": {
+            "givenName": "john3",
+            "familyName": "doe@",
+        },
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-legacy-name",
+    }
+
+    respx.get(test_url).mock(return_value=Response(status_code=200, json=profile_data))
+
+    http_client = AsyncClient()
+
+    # Act
+    response = await dispatch_get_my_profile_from_ibm(
+        http_client, user_access_token="mock-token"
+    )
+
+    # Assert
+    assert isinstance(response, IBMVerifyUserProfileSchema)
+    assert response.name is not None
+    assert response.name.givenName == "john3"
+    assert response.name.familyName == "doe@"
+
+
+@pytest.mark.asyncio
 @patch("app.users.services.get_my_profile.mask_profile_details")
 @patch(GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH)
 async def test_my_profile_with_masked_phone_numbers(

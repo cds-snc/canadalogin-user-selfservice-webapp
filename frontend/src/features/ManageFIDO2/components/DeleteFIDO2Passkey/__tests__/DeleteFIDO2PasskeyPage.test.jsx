@@ -162,12 +162,11 @@ vi.mock("../../../../../hooks/usePasswordValidation", () => ({
 // ─── Services ──────────────────────────────────────────────────────────────
 
 const mockTransientOtpSend = vi.fn();
-const mockTransientOtpVerify = vi.fn();
 
 vi.mock("../../../../../services/authService", () => ({
   authService: {
     transientOtpSend: (...args) => mockTransientOtpSend(...args),
-    transientOtpVerify: (...args) => mockTransientOtpVerify(...args),
+    transientOtpVerify: vi.fn(),
   },
 }));
 
@@ -615,7 +614,6 @@ describe("DeleteFIDO2PasskeyPage", () => {
   // ── OTP send ─────────────────────────────────────────────────────────
 
   it("calls transientOtpSend with correct payload when requestOtpCode is invoked", async () => {
-    mockTransientOtpVerify.mockResolvedValueOnce({ success: true });
     mockTransientOtpSend.mockResolvedValueOnce({
       success: true,
       data: { trxnId: "new-txn" },
