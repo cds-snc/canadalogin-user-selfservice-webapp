@@ -5,6 +5,7 @@ import CompleteIdentityProofingPage from "../CompleteIDVWhenReady/CompleteIdenti
 import { authService } from "../../../services/authService";
 
 const mockSetLoading = vi.hoisted(() => vi.fn());
+const mockNavigate = vi.hoisted(() => vi.fn());
 
 const mockFlags = vi.hoisted(() => ({
   devOnlyFeature: true,
@@ -12,8 +13,16 @@ const mockFlags = vi.hoisted(() => ({
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
-  return { ...actual, useParams: () => ({ language: "en" }) };
+  return {
+    ...actual,
+    useParams: () => ({ language: "en" }),
+    useNavigate: () => mockNavigate,
+  };
 });
+
+vi.mock("../../../utils/routeHelpers", () => ({
+  path: (pageId, params) => `/${params?.language ?? "en"}/${pageId}`,
+}));
 
 vi.mock("../../../components/Providers/useUser", () => ({
   useUser: vi.fn(),
@@ -194,6 +203,16 @@ describe("CompleteIdentityProofingPage", () => {
       expect(screen.getByTestId("start-button")).toHaveTextContent(
         "Start identity proofing now",
       );
+    });
+
+    it("navigates to /idv when start identity button is clicked", async () => {
+      setup();
+
+      await act(async () => {
+        screen.getByTestId("start-button").click();
+      });
+
+      expect(mockNavigate).toHaveBeenCalledWith("/en/IdvStartIdentityProofingPage");
     });
 
     it("does not trigger logout when start identity button is clicked", async () => {

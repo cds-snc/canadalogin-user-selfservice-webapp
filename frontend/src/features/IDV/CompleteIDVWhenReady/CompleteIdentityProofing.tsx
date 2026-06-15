@@ -1,3 +1,4 @@
+import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
@@ -9,17 +10,24 @@ import {
   GcdsNotice,
 } from "@gcds-core/components-react";
 
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 import { useUser } from "../../../components/Providers/useUser";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 
 export default function CompleteIdentityProofingPage() {
+  const navigate = useNavigate();
+  const { language } = useParams();
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
 
   const { t, i18n } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
+
+  const handleStartIdentityProofing = () => {
+    navigate(path(PAGES.idvStartIdentityProofingPage, { language }));
+  };
 
   const rpInfo = state.relyingPartyInfo;
   const localizedDetail = rpInfo?.localized?.[i18n.language];
@@ -72,7 +80,13 @@ export default function CompleteIdentityProofingPage() {
             })}
           </GcdsText>
           <GcdsGrid columns="max-content max-content" gap="200">
-            <GcdsButton type="button" href="#">
+            <GcdsButton
+              type="button"
+              onGcdsClick={(ev: Event) => {
+                ev.preventDefault();
+                handleStartIdentityProofing();
+              }}
+            >
               {t("CompleteIdentityProofing.buttonStartIdentity")}
             </GcdsButton>
 

@@ -144,7 +144,7 @@ export const appRoutes: RouteObject[] = [
                       handle: { id: PAGES.idvStartIdentityProofingPage },
                     },
                     {
-                      path: "idv/required/complete-identity-proofing",
+                      path: "idv/required/",
                       element: <CompleteIdentityProofingPage />,
                       handle: { id: PAGES.idvCompleteIdentityProofingPage },
                     },
