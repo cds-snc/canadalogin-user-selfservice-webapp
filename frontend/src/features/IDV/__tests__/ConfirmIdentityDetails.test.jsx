@@ -167,13 +167,17 @@ describe("ConfirmIdentityDetails", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Update information" }));
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/IdvStartIdentityProofingPage");
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/IdvStartIdentityProofingPage",
+    );
   });
 
   it("navigates with empty destination when Confirm and continue is clicked", () => {
     render(<ConfirmIdentityDetails />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Confirm and continue" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Confirm and continue" }),
+    );
 
     expect(mockNavigate).toHaveBeenCalledWith("");
   });
