@@ -20,9 +20,9 @@
     "noPhoneAdded": "No contact phone number has been added",
     "addPhoneNumber": "Add a phone number",
     "provenInformation": "Proven information",
-    "completeIdentityProofingTitle": "Complete identity proofing",
-    "completeIdentityProofingDescription": "Verifying your identity helps you securely access connected government services.",
-    "completeIdentityProofingCta": "Start identity verification"
+    "completeIdentityProofingTitle": "Get access to more services",
+    "completeIdentityProofingDescription": "Complete identity proofing to secure your CanadaLogin, make recovery easier, and access more Government of Canada services.",
+    "completeIdentityProofingCta": "Complete identity proofing"
   },
   "ProvenInformationCard": {
     "name": "Name",

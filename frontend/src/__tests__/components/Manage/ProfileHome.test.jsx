@@ -207,7 +207,7 @@ describe("ProfileHome", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Verifying your identity helps you securely access connected government services.",
+        "Complete identity proofing to secure your CanadaLogin, make recovery easier, and access more Government of Canada services.",
       ),
     ).toBeInTheDocument();
     expect(

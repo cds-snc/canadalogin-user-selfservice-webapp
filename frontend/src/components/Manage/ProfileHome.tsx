@@ -82,12 +82,14 @@ export default function ProfileHome() {
             noticeRole="info"
             noticeTitleTag="h2"
             noticeTitle={t("ProfileHome.completeIdentityProofingTitle")}
+            marginBottom="300"
           >
             <GcdsText>
               {t("ProfileHome.completeIdentityProofingDescription")}
             </GcdsText>
             <GcdsButton
               type="button"
+              button-role="secondary"
               onGcdsClick={(ev: { preventDefault: () => void }) => {
                 ev.preventDefault();
                 navigate(startIdentityProofingPage);
