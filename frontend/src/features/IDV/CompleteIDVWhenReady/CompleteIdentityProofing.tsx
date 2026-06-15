@@ -1,4 +1,3 @@
-import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
@@ -10,39 +9,45 @@ import {
   GcdsNotice,
 } from "@gcds-core/components-react";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
-import { path } from "../../../utils/routeHelpers";
+import { DEV_ONLY_FEATURE } from "../../../utils/constants";
 import { useUser } from "../../../components/Providers/useUser";
 import { authService } from "../../../services/authService";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 
 export default function CompleteIdentityProofingPage() {
-  const navigate = useNavigate();
-  const { language } = useParams();
-  const { state } = useUser();
+  const { state, dispatch } = useUser();
+  const { setLoading } = userProfileDispatch(dispatch);
 
   const { t, i18n } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
 
-  const localizedRpDetail = state.relyingPartyInfo?.localized?.[i18n.language];
-  const rpServicePortal =
-    localizedRpDetail?.name ??
-    state.relyingPartyInfo?.linkName ??
-    tLayout("TopNavBar.appName");
+  const rpInfo = state.relyingPartyInfo;
+  const localizedDetail = rpInfo?.localized?.[i18n.language];
+  const relyingPartyLinkName =
+    localizedDetail?.name ?? rpInfo?.linkName ?? "";
+  const relyingPartyUrl = localizedDetail?.url ?? rpInfo?.url ?? "";
+  const shouldRenderRelyingPartyLink = relyingPartyLinkName && relyingPartyUrl;
+  const rpServicePortal = relyingPartyLinkName || tLayout("TopNavBar.appName");
 
-  const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
-    language: language,
-  });
+  const handleSignOut = async (event: Event) => {
+    event.preventDefault();
+    setLoading(true, tLayout("TopNavBar.signingOut"));
 
-  const handleStartIdentityProofing = () => {
-    navigate(startIdentityProofingPage);
-  };
-
-  const handleSignOut = async () => {
     try {
-      await authService.logout();
+      const response = await authService.logout();
+      const redirectUrl = response?.data?.redirect_url || null;
+
+      if (redirectUrl) {
+        return;
+      }
+
+      window.location.href = "/";
     } catch (error) {
       console.error("Logout failed:", error);
-      window.location.href = "/";
+      setLoading(true, tLayout("TopNavBar.signOutFailed"));
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
     }
   };
 
@@ -72,19 +77,15 @@ export default function CompleteIdentityProofingPage() {
           <GcdsGrid columns="max-content max-content" gap="200">
             <GcdsButton
               type="button"
-              onGcdsClick={(ev) => {
-                ev.preventDefault();
-                handleStartIdentityProofing();
-              }}
+              href="#"
             >
               {t("CompleteIdentityProofing.buttonStartIdentity")}
             </GcdsButton>
 
             <GcdsButton
               buttonRole="secondary"
-              onGcdsClick={(ev) => {
-                ev.preventDefault();
-                void handleSignOut();
+              onGcdsClick={(event: Event) => {
+                void handleSignOut(event);
               }}
             >
               {t("CompleteIdentityProofing.signOut")}
@@ -93,13 +94,16 @@ export default function CompleteIdentityProofingPage() {
           <GcdsNotice
             noticeRole="info"
             noticeTitleTag="h2"
+            style={{ marginTop: "2rem" }}
             noticeTitle={t(
               "CompleteIdentityProofing.forMoreInformationNoticeHeader",
             )}
           >
-            <GcdsLink href="#" external size="regular">
-              {t("CompleteIdentityProofing.forMoreInformationNoticeText")}
-            </GcdsLink>
+            
+              <GcdsLink href="#" external size="regular">
+                {t("CompleteIdentityProofing.forMoreInformationNoticeText")}
+              </GcdsLink>
+            
           </GcdsNotice>
 
         </GcdsContainer>

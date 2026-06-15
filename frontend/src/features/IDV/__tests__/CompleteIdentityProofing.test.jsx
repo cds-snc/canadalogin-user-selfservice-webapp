@@ -1,42 +1,24 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import CompleteIdentityProofingPage from "../required/CompleteIdentityProofing";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import CompleteIdentityProofingPage from "../CompleteIDVWhenReady/CompleteIdentityProofing";
 import { authService } from "../../../services/authService";
 
-const mockNavigate = vi.fn();
+
+const mockSetLoading = vi.hoisted(() => vi.fn());
+
 const mockFlags = vi.hoisted(() => ({
   devOnlyFeature: true,
 }));
 
-const mockUseUserState = vi.hoisted(() => ({
-  value: {
-    state: {
-      relyingPartyInfo: {
-        linkName: "Service Portal",
-        url: "https://example.test",
-        localized: {
-          en: {
-            name: "Localized RP",
-            url: "https://example.test/en",
-          },
-        },
-      },
-    },
-  },
-}));
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
-  return {
-    ...actual,
-    useParams: () => ({ language: "en" }),
-    useNavigate: () => mockNavigate,
-  };
+  return { ...actual, useParams: () => ({ language: "en" }) };
 });
 
 vi.mock("../../../components/Providers/useUser", () => ({
-  useUser: () => mockUseUserState.value,
+  useUser: vi.fn(),
 }));
 
 vi.mock("../../../utils/constants", async () => {
@@ -46,20 +28,16 @@ vi.mock("../../../utils/constants", async () => {
     get DEV_ONLY_FEATURE() {
       return mockFlags.devOnlyFeature;
     },
-    PAGES: {
-      ...actual.PAGES,
-    },
+    PAGES: { ...actual.PAGES },
   };
 });
 
-vi.mock("../../../utils/routeHelpers", () => ({
-  path: (pageId, params) => `/${params.language}/${pageId}`,
+vi.mock("../../../utils/userProfileDispatch", () => ({
+  userProfileDispatch: () => ({ setLoading: mockSetLoading }),
 }));
 
 vi.mock("../../../services/authService", () => ({
-  authService: {
-    logout: vi.fn(),
-  },
+  authService: { logout: vi.fn() },
 }));
 
 vi.mock("@gcds-core/components-react", () => ({
@@ -78,7 +56,11 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </button>
   ),
-  GcdsLink: ({ children, href }) => <a href={href}>{children}</a>,
+  GcdsLink: ({ children, href, ...props }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
   GcdsNotice: ({ children, noticeTitle }) => (
     <div data-testid="gcds-notice">
       <span>{noticeTitle}</span>
@@ -87,69 +69,222 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
 }));
 
+import { useUser } from "../../../components/Providers/useUser";
+
+const defaultUserState = {
+  dispatch: vi.fn(),
+  state: {
+    relyingPartyInfo: {
+      linkName: "Service Portal",
+      url: "https://example.test",
+      localized: {
+        en: { name: "Localized RP", url: "https://example.test/en" },
+      },
+    },
+  },
+};
+
+const setup = (userState = defaultUserState) => {
+  vi.mocked(useUser).mockReturnValue(userState);
+  return render(<CompleteIdentityProofingPage />);
+};
+
 describe("CompleteIdentityProofingPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
     mockFlags.devOnlyFeature = true;
-    mockUseUserState.value = {
-      state: {
-        relyingPartyInfo: {
-          linkName: "Service Portal",
-          url: "https://example.test",
-          localized: {
-            en: {
-              name: "Localized RP",
-              url: "https://example.test/en",
-            },
-          },
-        },
+
+    delete window.location;
+    window.location = {
+      _href: "",
+      get href() {
+        return this._href;
+      },
+      set href(value) {
+        this._href = value;
       },
     };
   });
 
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockFlags.devOnlyFeature = false;
-
-    const { container } = render(<CompleteIdentityProofingPage />);
-
-    expect(container).toBeEmptyDOMElement();
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
-  it("renders page content with localized relying party name", () => {
-    render(<CompleteIdentityProofingPage />);
+  describe("DEV_ONLY_FEATURE gating", () => {
+    it("renders nothing when DEV_ONLY_FEATURE is false", () => {
+      mockFlags.devOnlyFeature = false;
 
-    expect(
-      screen.getByRole("heading", {
-        name: "Complete identity proofing when you're ready",
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "To access the Localized RP, you need to complete identity proofing first",
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "When you're ready, sign back in to your CanadaLogin account and you'll be brought back to this step automatically.",
-      ),
-    ).toBeInTheDocument();
-    expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
-    expect(screen.getByText("For more information")).toBeInTheDocument();
+      const { container } = setup();
+
+      expect(container).toBeEmptyDOMElement();
+    });
+
+    it("renders page content when DEV_ONLY_FEATURE is true", () => {
+      setup();
+
+      expect(
+        screen.getByRole("heading", {
+          name: "Complete identity proofing when you're ready",
+        }),
+      ).toBeInTheDocument();
+    });
   });
 
-  it("navigates to Start Identity Proofing when start button is clicked", () => {
-    render(<CompleteIdentityProofingPage />);
+  describe("RP name resolution", () => {
+    it("uses localized RP name when available", () => {
+      setup();
 
-    fireEvent.click(screen.getByTestId("start-button"));
+      expect(
+        screen.getByText(
+          "To access the Localized RP, you need to complete identity proofing first",
+        ),
+      ).toBeInTheDocument();
+    });
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/IdvStartIdentityProofingPage");
+    it("falls back to linkName when localized RP name is missing", () => {
+      setup({
+        dispatch: vi.fn(),
+        state: {
+          relyingPartyInfo: {
+            linkName: "Fallback Link Name",
+            localized: {},
+          },
+        },
+      });
+
+      expect(
+        screen.getByText(
+          "To access the Fallback Link Name, you need to complete identity proofing first",
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it("falls back to app name when both localized name and linkName are unavailable", () => {
+      setup({
+        dispatch: vi.fn(),
+        state: { relyingPartyInfo: { localized: {} } },
+      });
+
+      expect(
+        screen.getByText(
+          "To access the CanadaLogin, you need to complete identity proofing first",
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it("renders body text and notice section", () => {
+      setup();
+
+      expect(
+        screen.getByText(
+          "When you're ready, sign back in to your CanadaLogin account and you'll be brought back to this step automatically.",
+        ),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
+      expect(screen.getByText("For more information")).toBeInTheDocument();
+    });
   });
 
-  it("calls authService.logout when sign out button is clicked", () => {
-    render(<CompleteIdentityProofingPage />);
+  describe("Start Identity button", () => {
+    it("renders the start identity button", () => {
+      setup();
 
-    fireEvent.click(screen.getByTestId("signout-button"));
+      expect(screen.getByTestId("start-button")).toBeInTheDocument();
+      expect(screen.getByTestId("start-button")).toHaveTextContent(
+        "Start identity proofing now",
+      );
+    });
 
-    expect(authService.logout).toHaveBeenCalledTimes(1);
+    it("does not trigger logout when start identity button is clicked", async () => {
+      setup();
+
+      await act(async () => {
+        screen.getByTestId("start-button").click();
+      });
+
+      expect(authService.logout).not.toHaveBeenCalled();
+      expect(mockSetLoading).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Notice link", () => {
+    it("renders the notice link with the correct href", () => {
+      setup();
+
+      const noticeLink = screen.getByRole("link", {
+        name: "Learn more about how identity proofing works",
+      });
+      expect(noticeLink).toBeInTheDocument();
+      expect(noticeLink).toHaveAttribute("href", "#");
+    });
+  });
+
+  describe("Logout flow", () => {
+    it("sets signing-out loading state and calls logout on click", async () => {
+      vi.mocked(authService.logout).mockResolvedValue({
+        data: { redirect_url: "https://example.test/logout" },
+      });
+      setup();
+
+      await act(async () => {
+        screen.getByTestId("signout-button").click();
+      });
+
+      expect(mockSetLoading).toHaveBeenNthCalledWith(1, true, "Signing you out...");
+      expect(authService.logout).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not redirect via window.location when redirect_url is returned", async () => {
+      vi.mocked(authService.logout).mockResolvedValue({
+        data: { redirect_url: "https://example.test/logout" },
+      });
+      setup();
+
+      await act(async () => {
+        screen.getByTestId("signout-button").click();
+      });
+
+      expect(window.location.href).toBe("");
+    });
+
+    it("redirects to / when logout returns no redirect_url", async () => {
+      vi.mocked(authService.logout).mockResolvedValue({ data: {} });
+      setup();
+
+      await act(async () => {
+        screen.getByTestId("signout-button").click();
+      });
+
+      expect(window.location.href).toBe("/");
+    });
+
+    it("shows failure message then redirects to / after 2s on logout error", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      vi.mocked(authService.logout).mockRejectedValue(new Error("Network error"));
+      setup();
+
+      await act(async () => {
+        screen.getByTestId("signout-button").click();
+      });
+
+      expect(mockSetLoading).toHaveBeenNthCalledWith(1, true, "Signing you out...");
+      expect(mockSetLoading).toHaveBeenNthCalledWith(
+        2,
+        true,
+        "Failed to sign you out. Redirecting...",
+      );
+      expect(window.location.href).toBe("");
+
+      await act(async () => {
+        vi.runAllTimers();
+      });
+
+      expect(window.location.href).toBe("/");
+
+      consoleErrorSpy.mockRestore();
+    });
   });
 });
