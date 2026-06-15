@@ -25,8 +25,6 @@ export default function CompleteIdentityProofingPage() {
   const localizedDetail = rpInfo?.localized?.[i18n.language];
   const relyingPartyLinkName =
     localizedDetail?.name ?? rpInfo?.linkName ?? "";
-  const relyingPartyUrl = localizedDetail?.url ?? rpInfo?.url ?? "";
-  const shouldRenderRelyingPartyLink = relyingPartyLinkName && relyingPartyUrl;
   const rpServicePortal = relyingPartyLinkName || tLayout("TopNavBar.appName");
 
   const handleSignOut = async (event: Event) => {
