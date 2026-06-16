@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.23.3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.2...v1.23.3) (2026-06-16)
+
+
+### Bug Fixes
+
+* add feature flag for passkey text display in ManageDashboard ([#1627](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1627)) ([a4a0e35](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a4a0e3569a3f93338ad7a2fd37dfca49957533ee))
+
 ## [1.23.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.1...v1.23.2) (2026-06-12)
 
 
