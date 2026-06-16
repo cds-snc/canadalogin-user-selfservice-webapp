@@ -10,7 +10,8 @@
     "twoStepDescription": "Gérez vos clés d’accès ou les numéros de téléphone auxquels vous recevez des codes de vérification.",
     "enabled": "Active",
     "manage": "Gérer",
-    "pageTitle": "Paramètres de sécurité"
+    "pageTitle": "Paramètres de sécurité",
+    "twoStepDescriptionPhoneOnly": "Gérez vos numéros de téléphone auxquels vous recevez des codes de vérification."
   },
   "OtpSelection": {
     "title": "Vérifiez d'abord qu'il s'agit bien de vous",
