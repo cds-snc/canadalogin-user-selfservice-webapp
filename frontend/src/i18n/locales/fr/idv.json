@@ -74,10 +74,7 @@
     "reProofingRequired": "To update this information, you'll need to complete identity proofing again.",
     "updateInformation": "Update information",
     "contactInfo": "Contact info",
-    "preferredNameHint": "This name is used for display purposes only",
-    "emailHint": "This email is used for signing in and contacting you:",
     "phoneNumber": "Phone number",
-    "phoneNumberHint": "This number is used for 2-step verification and contacting you:",
     "communication": "Communication",
     "confirmAndContinue": "Confirm and continue"
   }

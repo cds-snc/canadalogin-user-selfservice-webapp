@@ -14,7 +14,13 @@ import { useUser } from "../../../components/Providers/useUser";
 import { useNavigateHelper } from "../../../hooks/useNavigate";
 import type { GcdsNavigationEvent } from "../../../types/profileName";
 
-export default function ViewProfileNameCard() {
+type ViewProfileNameCardProps = {
+  hasBorder?: boolean;
+};
+
+export default function ViewProfileNameCard({
+  hasBorder = true,
+}: ViewProfileNameCardProps) {
   const { t } = useTranslation("profile");
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
@@ -26,10 +32,11 @@ export default function ViewProfileNameCard() {
   });
 
   return (
-    <GcdsContainer className="sectionCard">
+    <GcdsContainer className={hasBorder ? "sectionCard" : undefined}>
       <GcdsHeading tag="h3" marginTop="300">
         {t("ProfileHome.preferredName")}
       </GcdsHeading>
+      <GcdsText>{t("ProfileHome.preferredNameDescription")}</GcdsText>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{name}</GcdsText>
         <GcdsLink

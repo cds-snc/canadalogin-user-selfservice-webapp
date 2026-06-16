@@ -119,9 +119,6 @@ describe("ConfirmIdentityDetails", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Identity proofing details" }),
-    ).toBeInTheDocument();
-    expect(
       screen.getByRole("heading", { name: "Contact info" }),
     ).toBeInTheDocument();
     expect(
@@ -134,16 +131,14 @@ describe("ConfirmIdentityDetails", () => {
       screen.getByText("This email is used for signing in and contacting you:"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "This number is used for 2-step verification and contacting you:",
-      ),
+      screen.getByText("This number is used for contacting you:"),
     ).toBeInTheDocument();
   });
 
   it("shows verified badges when name, email, and phone exist", () => {
     render(<ConfirmIdentityDetails />);
 
-    expect(screen.getAllByTestId("verified-badge")).toHaveLength(3);
+    expect(screen.getAllByTestId("verified-badge")).toHaveLength(2);
   });
 
   it("shows verified badge only for existing values", () => {
