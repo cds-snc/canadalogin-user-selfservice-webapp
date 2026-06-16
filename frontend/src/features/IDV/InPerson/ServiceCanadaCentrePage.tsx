@@ -1,27 +1,23 @@
 import {
   GcdsButton,
-  GcdsDetails,
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
   GcdsNotice,
   GcdsText,
   GcdsContainer,
+  GcdsSelect,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { useUser } from "../../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
 export default function ServiceCanadaCentrePage() {
-  const { state } = useUser();
   const navigate = useNavigate();
   const { language } = useParams();
 
   const { t } = useTranslation("idv");
-
-  const email = state?.userProfile?.userName ?? "";
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,
@@ -33,12 +29,8 @@ export default function ServiceCanadaCentrePage() {
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="450">
+      <GcdsGrid columns="1">
         <GcdsContainer>
-          {" "}
-          <GcdsText marginBottom="0" size="small">
-            {t("ServiceCanadaCentre.pageTitle")}
-          </GcdsText>
           <GcdsHeading tag="h1">{t("ServiceCanadaCentre.heading")}</GcdsHeading>
         </GcdsContainer>
 
@@ -57,10 +49,6 @@ export default function ServiceCanadaCentrePage() {
               <GcdsText marginBottom="0">
                 {t("ServiceCanadaCentre.step2")}
               </GcdsText>
-
-              <GcdsDetails detailsTitle={t("ServiceCanadaCentre.listOfIds")}>
-                {t("ServiceCanadaCentre.listOfIds")}
-              </GcdsDetails>
             </li>
             <li>
               <GcdsText marginBottom="0">
@@ -70,18 +58,18 @@ export default function ServiceCanadaCentrePage() {
           </ol>
         </GcdsContainer>
 
-        <GcdsHeading tag="h2" marginTop="0">
+        <GcdsHeading tag="h2" marginTop="0" marginBottom="0">
           {t("ServiceCanadaCentre.receiveCodeHeading")}
         </GcdsHeading>
 
-        <GcdsContainer>
-          {" "}
-          <GcdsText>{t("ServiceCanadaCentre.receiveCodeDescription")}</GcdsText>
-          <GcdsText>
-            {t("ServiceCanadaCentre.emailInstructions")}{" "}
-            <strong>{email}</strong>
-          </GcdsText>
-        </GcdsContainer>
+        <GcdsSelect
+          label={t("ServiceCanadaCentre.selectIdLabel")}
+          name="selectId"
+          selectId="selectId"
+          defaultValue={t("ServiceCanadaCentre.selectIdDropdownDefaultValue")}
+        >
+          <option value="1">{t("ServiceCanadaCentre.selectIdOption1")}</option>
+        </GcdsSelect>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
