@@ -183,6 +183,9 @@ export default function OtpVerification({
   }, [time]);
 
   const userMfaType = userSelectedMfaFactor?.type;
+  const isEmailFactor =
+    userMfaType === FLOW_TYPES.email || userMfaType === FLOW_TYPES.emailOtp;
+
   const handleRequestNewCode = async () => {
     const requestSucceeded = await requestOtpCode();
 
@@ -214,7 +217,7 @@ export default function OtpVerification({
 
       <GcdsContainer>
         <GcdsHeading tag="h1" lang={language}>
-          {userMfaType === FLOW_TYPES.email
+          {isEmailFactor
             ? t("CheckYourEmail.checkYourEmail")
             : t("Verification.checkYourPhone")}
         </GcdsHeading>
@@ -266,7 +269,7 @@ export default function OtpVerification({
           </>
         ) : (
           <>
-            {userMfaType === FLOW_TYPES.email && (
+            {isEmailFactor && (
               <GcdsText>{t("CheckYourEmail.toChangeYourPassword")}</GcdsText>
             )}
             <GcdsText>
@@ -291,7 +294,7 @@ export default function OtpVerification({
                 {countdownDisplay ?? t("Verification.tenMinutes")}
               </strong>
             </GcdsText>
-            {userMfaType !== FLOW_TYPES.email && (
+            {!isEmailFactor && (
               <GcdsHeading tag="h2">{t("Verification.enterCode")}</GcdsHeading>
             )}
 
@@ -375,7 +378,7 @@ export default function OtpVerification({
               void handleRequestNewCode();
             }}
           >
-            {userMfaType !== FLOW_TYPES.email
+            {!isEmailFactor
               ? t("Verification.requestNewCode")
               : t("CheckYourEmail.sendCodeAgain")}
           </GcdsLink>

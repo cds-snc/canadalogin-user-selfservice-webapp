@@ -10,7 +10,8 @@
     "twoStepDescription": "Manage your passkeys or phone numbers that receive verification codes.",
     "enabled": "Enabled",
     "manage": "Manage",
-    "pageTitle": "Security settings"
+    "pageTitle": "Security settings",
+    "twoStepDescriptionPhoneOnly": "Manage your phone numbers that receive verification codes."
   },
   "OtpSelection": {
     "title": "First, verify it's you ",
