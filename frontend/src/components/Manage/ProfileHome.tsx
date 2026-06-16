@@ -3,6 +3,8 @@ import {
   GcdsHeading,
   GcdsGrid,
   GcdsText,
+  GcdsLink,
+  GcdsNotice,
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
@@ -28,9 +30,9 @@ export default function ProfileHome() {
           {t("ProfileHome.title")}
         </GcdsHeading>
         {DEV_ONLY_FEATURE && (
-          <GcdsContainer className="idvNoticeSpacing">
-            <CompleteIdentityProofingNotice />
-          </GcdsContainer>
+          <GcdsNotice noticeRole="success" noticeTitleTag="h3" noticeTitle="Your information was successfully updated in CanadaLogin">
+            &nbsp;
+          </GcdsNotice>
         )}
         {DEV_ONLY_FEATURE && (
           <GcdsContainer>
