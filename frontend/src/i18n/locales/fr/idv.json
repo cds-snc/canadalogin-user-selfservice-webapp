@@ -25,16 +25,16 @@
   },
   "ProvincialVerification": {
     "pageTitle": "Prove your identity",
-    "heading": "Get ready for provincial partner sign in",
+    "heading": "Get ready for provincial verification",
     "followSteps": "Follow the steps to complete the process",
-    "step1": "Have your provincial partner app ready",
-    "step2": "Select the appropriate option and follow the steps to prove your identity",
-    "step3": "Once the proofing is complete, you will be automatically redirected",
+    "step1": "Select the appropriate option and follow the steps to sign in and prove your identity",
+    "step2": "Once the verification is complete, you will be automatically redirected",
     "bcServicesCard": "BC Services Card",
     "albertaAccount": "Alberta.ca Account",
     "backButton": "Back",
     "moreInfoTitle": "For more information",
-    "learnMoreLink": "Learn more about provincial identity proofing"
+    "learnMoreLink": "Learn more about provincial identity proofing",
+    "differentMethod": "Choose a different method"
   },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",

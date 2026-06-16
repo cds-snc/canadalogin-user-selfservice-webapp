@@ -26,9 +26,6 @@ export default function ProvincialVerificationPage() {
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
         <GcdsContainer>
-          <GcdsText marginBottom="0" size="small">
-            {t("ProvincialVerification.pageTitle")}
-          </GcdsText>
           <GcdsHeading tag="h1">
             {t("ProvincialVerification.heading")}
           </GcdsHeading>
@@ -47,11 +44,6 @@ export default function ProvincialVerificationPage() {
             <li>
               <GcdsText marginBottom="0">
                 {t("ProvincialVerification.step2")}
-              </GcdsText>
-            </li>
-            <li>
-              <GcdsText marginBottom="0">
-                {t("ProvincialVerification.step3")}
               </GcdsText>
             </li>
           </ol>
@@ -84,7 +76,7 @@ export default function ProvincialVerificationPage() {
               navigate(-1);
             }}
           >
-            {t("ProvincialVerification.backButton")}
+            {t("ProvincialVerification.differentMethod")}
           </GcdsButton>
         </GcdsGrid>
 

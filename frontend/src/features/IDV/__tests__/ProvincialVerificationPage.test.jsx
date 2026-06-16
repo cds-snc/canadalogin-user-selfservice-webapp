@@ -86,10 +86,9 @@ describe("ProvincialVerificationPage", () => {
   it("renders the page title and main heading", () => {
     render(<ProvincialVerificationPage />);
 
-    expect(screen.getByText("Prove your identity")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
-        name: "Get ready for provincial partner sign in",
+        name: "Get ready for provincial verification",
       }),
     ).toBeInTheDocument();
   });
@@ -102,20 +101,17 @@ describe("ProvincialVerificationPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders all three steps", () => {
+  it("renders all two steps", () => {
     render(<ProvincialVerificationPage />);
 
     expect(
-      screen.getByText("Have your provincial partner app ready"),
-    ).toBeInTheDocument();
-    expect(
       screen.getByText(
-        "Select the appropriate option and follow the steps to prove your identity",
+        "Select the appropriate option and follow the steps to sign in and prove your identity",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Once the proofing is complete, you will be automatically redirected",
+        "Once the verification is complete, you will be automatically redirected",
       ),
     ).toBeInTheDocument();
   });
@@ -177,7 +173,9 @@ describe("ProvincialVerificationPage", () => {
   it("renders the Back button", () => {
     render(<ProvincialVerificationPage />);
 
-    expect(screen.getByTestId("back-button")).toHaveTextContent("Back");
+    expect(screen.getByTestId("back-button")).toHaveTextContent(
+      "Choose a different method",
+    );
   });
 
   it("calls navigate(-1) when Back button is clicked", () => {
