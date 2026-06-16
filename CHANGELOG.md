@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.23.4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.3...v1.23.4) (2026-06-16)
+
+
+### Bug Fixes
+
+* 404 rp not found error in staging ([#1637](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1637)) ([386245a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/386245aca12abad025378e4ee2e81dc1933aaee8))
+* skip FIDO2 lookup when at least one OTP factor remains ([386245a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/386245aca12abad025378e4ee2e81dc1933aaee8))
+* update OTP verification messages and add feature flag for passkey text display ([#1635](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1635)) ([ab559d6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ab559d6a2e6fcbd68b48928860acb7b18eae4335))
+
+
+### Miscellaneous Chores
+
+* bump version to 1.23.3 in staging.json ([#1632](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1632)) ([25be94e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/25be94eb0ba653727e793b8f5b64ade504fa7825))
+
 ## [1.23.3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.2...v1.23.3) (2026-06-16)
 
 
