@@ -3,6 +3,7 @@
     "title": "Renseignements personnels",
     "basicInfo": "Renseignements de base",
     "preferredName": "Nom d'usage",
+    "preferredNameDescription": "Ce nom est utilisé à des fins d'affichage uniquement",
     "exampleName": "Nom Exemple",
     "edit": "Modifier",
     "contactInfo": "Coordonnées",

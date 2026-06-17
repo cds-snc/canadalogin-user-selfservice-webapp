@@ -142,6 +142,7 @@ export const PAGES = {
   idvProvenInformationCard: "IdvProvenInformationCard",
   idvProvincialVerificationPage: "IdvProvincialVerificationPage",
   idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
+  idvDetailsConfirmationPage: "IdvDetailsConfirmationPage",
 } as const;
 
 export const PRIVACY_NOTICE_LINKS = {

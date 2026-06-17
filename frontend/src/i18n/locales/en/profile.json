@@ -3,6 +3,7 @@
     "title": "Personal information",
     "basicInfo": "Basic information",
     "preferredName": "Preferred name",
+    "preferredNameDescription": "This name is used for display purposes only",
     "exampleName": "Example Name",
     "edit": "Edit",
     "contactInfo": "Contact information",

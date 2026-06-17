@@ -61,5 +61,21 @@
     "provincialPartnerOption": "Provincial partner",
     "hintProvincialPartnerOption": "Use your BC Service Card or Alberta.ca account",
     "inPersonOption": "See in-person options"
+  },
+  "ConfirmIdentityDetails": {
+    "pageTitle": "Confirm what will be saved to your CanadaLogin",
+    "description": "Review the details that will be saved to your CanadaLogin. You can edit most information here, or update it later in your CanadaLogin account.",
+    "identityProofingDetails": "Identity proofing details",
+    "name": "Name",
+    "dateOfBirth": "Date of birth",
+    "idDocumentSavedToCanadaLogin": "ID document saved to CanadaLogin",
+    "dateOfBirthValue": "Not available",
+    "idDocumentValue": "Not available",
+    "reProofingRequired": "To update this information, you'll need to complete identity proofing again.",
+    "updateInformation": "Update information",
+    "contactInfo": "Contact info",
+    "phoneNumber": "Phone number",
+    "communication": "Communication",
+    "confirmAndContinue": "Confirm and continue"
   }
 }
