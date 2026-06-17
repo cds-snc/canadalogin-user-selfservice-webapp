@@ -21,7 +21,8 @@
     "addPhoneNumber": "Add a phone number",
     "provenInformation": "Proven information",
     "maintenanceTitle": "Maintenance",
-    "maintenanceNoticeBody": "This page is under maintenance, editing your information will be available again shortly."
+    "maintenanceNoticeBody": "This page is under maintenance, editing your information will be available again shortly.",
+    "successNoticeTitle": "Your information was successfully updated in CanadaLogin"
   },
   "ProvenInformationCard": {
     "name": "Name",

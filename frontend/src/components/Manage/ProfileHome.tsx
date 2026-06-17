@@ -5,7 +5,6 @@ import {
   GcdsGrid,
   GcdsText,
   GcdsLink,
-  GcdsNotice,
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
@@ -17,6 +16,7 @@ import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameC
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import { path } from "../../utils/routeHelpers";
 import ProvenInformationCard from "../../features/IDV/ProvenInformationCard";
+import IdentityInfoSuccessNotice from "../../features/IDV/IdentityInfoSuccessNotice";
 
 interface DisplayEmailInfoProps {
   email: string;
@@ -60,7 +60,9 @@ const DisplayEmailInfo = ({ email }: DisplayEmailInfoProps) => {
   );
 };
 
-export default function ProfileHome() {
+export default function ProfileHome(
+  { showIDVSuccessNotice = false } : { showIDVSuccessNotice?: boolean }
+) {
   const { t } = useTranslation("profile");
   const { state } = useUser();
   const email = state?.userProfile?.userName || "";
@@ -72,11 +74,7 @@ export default function ProfileHome() {
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>
-        {DEV_ONLY_FEATURE && (
-          <GcdsNotice noticeRole="success" noticeTitleTag="h3" noticeTitle="Your information was successfully updated in CanadaLogin">
-            &nbsp;
-          </GcdsNotice>
-        )}
+        <IdentityInfoSuccessNotice showIDVSuccessNotice={showIDVSuccessNotice} />
         {DEV_ONLY_FEATURE && (
           <GcdsContainer>
             <GcdsGrid columns="1fr auto" className="gridInline">

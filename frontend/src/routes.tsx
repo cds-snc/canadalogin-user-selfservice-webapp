@@ -162,6 +162,11 @@ export const appRoutes: RouteObject[] = [
                       element: <ProvincialVerificationPage />,
                       handle: { id: PAGES.idvProvincialVerificationPage },
                     },
+                    {
+                      path: "idv/success",
+                      element: <ProfileHome showIDVSuccessNotice={true} />,
+                      handle: { id: PAGES.idvSuccessPage },
+                    }
                   ]
                 : []),
             ],
