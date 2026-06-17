@@ -282,6 +282,26 @@ docker run -d -p 8000:8000 \
    brew services list | grep redis
    ```
 
+   **Dev container note (Linux): Redis protected mode can block Docker access**
+
+   In a dev container, `host.docker.internal:6379` may be reachable but still rejected by Redis with an error like `DENIED Redis is running in protected mode`.
+
+   Verify from a container:
+
+   ```bash
+   docker run --rm --add-host host.docker.internal:host-gateway redis:7-alpine \
+     redis-cli -h host.docker.internal -p 6379 ping
+   ```
+
+   If you see `DENIED`, restart local Redis with container-accessible settings:
+
+   ```bash
+   redis-cli shutdown nosave
+   redis-server --daemonize yes --bind 0.0.0.0 --protected-mode no
+   ```
+
+   Then re-run the backend Docker command.
+
 2. If you encounter permission issues:
 
    ```bash

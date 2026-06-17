@@ -26,6 +26,7 @@ import ServiceCanadaCentreIDVCodePage from "./features/IDV/InPerson/ServiceCanad
 import StartIdentityProofingPage from "./features/IDV/StartIdentityProofingPage";
 import ProvincialVerificationPage from "./features/IDV/Online/ProvincialVerificationPage";
 import OnlineVerificationInfo from "./features/IDV/Online/OnlineVerificationInfo";
+import IdentityVerificationSuccessPage from "./features/IDV/IdentityVerificationSuccessPage";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -161,6 +162,11 @@ export const appRoutes: RouteObject[] = [
                       path: "idv/online/provincial",
                       element: <ProvincialVerificationPage />,
                       handle: { id: PAGES.idvProvincialVerificationPage },
+                    },
+                    {
+                      path: "idv/success",
+                      element: <IdentityVerificationSuccessPage />,
+                      handle: { id: PAGES.idvSuccessPage },
                     },
                   ]
                 : []),
