@@ -214,7 +214,7 @@ export const appRoutes: RouteObject[] = [
                       path: "idv/success",
                       element: <ProfileHome showIDVSuccessNotice={true} />,
                       handle: { id: PAGES.idvSuccessPage },
-                    }
+                    },
                   ]
                 : []),
             ],
