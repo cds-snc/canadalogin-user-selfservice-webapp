@@ -44,7 +44,7 @@ export default function ConfirmIdentityDetails() {
             {t("ConfirmIdentityDetails.contactInfo")}
           </GcdsHeading>
           <GcdsContainer className="sectionCard">
-            <ViewProfileNameCard hasBorder={false} />
+            <ViewProfileNameCard isConfirmIdentityDetails />
             <div className="separator" />
             <DisplayEmailInfo />
             <div className="separator" />

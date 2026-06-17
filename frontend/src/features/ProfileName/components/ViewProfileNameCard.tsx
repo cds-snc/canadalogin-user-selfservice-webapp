@@ -15,11 +15,11 @@ import { useNavigateHelper } from "../../../hooks/useNavigate";
 import type { GcdsNavigationEvent } from "../../../types/profileName";
 
 type ViewProfileNameCardProps = {
-  hasBorder?: boolean;
+  isConfirmIdentityDetails?: boolean;
 };
 
 export default function ViewProfileNameCard({
-  hasBorder = true,
+  isConfirmIdentityDetails = false,
 }: ViewProfileNameCardProps) {
   const { t } = useTranslation("profile");
   const { language = "en" } = useParams<{ language: string }>();
@@ -32,11 +32,15 @@ export default function ViewProfileNameCard({
   });
 
   return (
-    <GcdsContainer className={hasBorder ? "sectionCard" : undefined}>
+    <GcdsContainer
+      className={isConfirmIdentityDetails ? undefined : "sectionCard"}
+    >
       <GcdsHeading tag="h3" marginTop="300">
         {t("ProfileHome.preferredName")}
       </GcdsHeading>
-      <GcdsText>{t("ProfileHome.preferredNameDescription")}</GcdsText>
+      {isConfirmIdentityDetails && (
+        <GcdsText>{t("ProfileHome.preferredNameDescription")}</GcdsText>
+      )}
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{name}</GcdsText>
         <GcdsLink
