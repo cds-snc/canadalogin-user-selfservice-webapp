@@ -60,9 +60,11 @@ const DisplayEmailInfo = ({ email }: DisplayEmailInfoProps) => {
   );
 };
 
-export default function ProfileHome(
-  { showIDVSuccessNotice = false } : { showIDVSuccessNotice?: boolean }
-) {
+export default function ProfileHome({
+  showIDVSuccessNotice = false,
+}: {
+  showIDVSuccessNotice?: boolean;
+}) {
   const { t } = useTranslation("profile");
   const { state } = useUser();
   const email = state?.userProfile?.userName || "";
@@ -74,7 +76,9 @@ export default function ProfileHome(
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>
-        <IdentityInfoSuccessNotice showIDVSuccessNotice={showIDVSuccessNotice} />
+        <IdentityInfoSuccessNotice
+          showIDVSuccessNotice={showIDVSuccessNotice}
+        />
         {DEV_ONLY_FEATURE && (
           <GcdsContainer>
             <GcdsGrid columns="1fr auto" className="gridInline">
