@@ -4,7 +4,6 @@ import {
   GcdsGrid,
   GcdsText,
   GcdsLink,
-  GcdsNotice,
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
@@ -15,10 +14,53 @@ import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import ProvenInformationCard from "../../features/IDV/ProvenInformationCard";
-import ViewEmailInfo from "../../features/ProfileName/components/ViewEmailInfo";
-import CompleteIdentityProofingNotice from "../../features/IDV/components/CompleteIdentityProofingNotice";
+import IdentityInfoSuccessNotice from "../../features/IDV/IdentityInfoSuccessNotice";
 
-export default function ProfileHome() {
+interface DisplayEmailInfoProps {
+  email: string;
+}
+
+type GcdsNavigationEvent = CustomEvent<string> & {
+  preventDefault: () => void;
+};
+
+const DisplayEmailInfo = ({ email }: DisplayEmailInfoProps) => {
+  const { language } = useParams();
+  const navigate = useNavigate();
+  const { t } = useTranslation("profile");
+  const editEmail = path(PAGES.editEmailPage, {
+    language,
+  });
+
+  return (
+    <>
+      <GcdsHeading tag="h3" marginTop="300">
+        {t("ProfileHome.email")}
+      </GcdsHeading>
+      <GcdsText>{t("ProfileHome.emailDescription")}</GcdsText>
+      <GcdsGrid columns="1fr auto" className="gridInline">
+        <GcdsText>{email}</GcdsText>
+        {DEV_ONLY_FEATURE && (
+          <GcdsLink
+            href={editEmail}
+            size="regular"
+            onGcdsClick={(event: GcdsNavigationEvent) => {
+              event.preventDefault();
+              navigate(event.detail);
+            }}
+          >
+            {t("ProfileHome.edit")}
+          </GcdsLink>
+        )}
+      </GcdsGrid>
+      <VerifiedBadge text={t("ProfileHome.verified")} />
+    </>
+  );
+};
+
+export default function ProfileHome(
+  { showIDVSuccessNotice = false } : { showIDVSuccessNotice?: boolean }
+) {
   const { t } = useTranslation("profile");
   const { state } = useUser();
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
@@ -29,11 +71,7 @@ export default function ProfileHome() {
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>
-        {DEV_ONLY_FEATURE && (
-          <GcdsNotice noticeRole="success" noticeTitleTag="h3" noticeTitle="Your information was successfully updated in CanadaLogin">
-            &nbsp;
-          </GcdsNotice>
-        )}
+        <IdentityInfoSuccessNotice showIDVSuccessNotice={showIDVSuccessNotice} />
         {DEV_ONLY_FEATURE && (
           <GcdsContainer>
             <GcdsGrid columns="1fr auto" className="gridInline">
