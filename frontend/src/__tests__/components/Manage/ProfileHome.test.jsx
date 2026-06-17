@@ -123,6 +123,9 @@ describe("ProfileHome", () => {
       screen.getByRole("heading", { name: "Basic information" }),
     ).toBeInTheDocument();
     expect(screen.getByTestId("view-name-card")).toBeInTheDocument();
+    expect(
+      screen.queryByText("This name is used for display purposes only"),
+    ).not.toBeInTheDocument();
   });
 
   it("renders the Contact information section", () => {

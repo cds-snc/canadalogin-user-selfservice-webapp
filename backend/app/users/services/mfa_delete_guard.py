@@ -22,11 +22,8 @@ async def assert_remaining_mfa_factor_after_deletion(
     otp_factors_response = await get_user_otp_factors(
         http_client, user_access_token, validated=None
     )
-    fido2_registrations_response = await get_user_fido2_registrations(
-        http_client, user_access_token
-    )
 
-    if not otp_factors_response.success or not fido2_registrations_response.success:
+    if not otp_factors_response.success:
         logger.warning("Unable to retrieve user MFA factors before deletion")
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
@@ -38,6 +35,23 @@ async def assert_remaining_mfa_factor_after_deletion(
         for factor in otp_factors_response.data
         if factor.id not in otp_factor_ids_to_delete
     )
+
+    # If any OTP factors remain, we can safely allow deletion without
+    # requiring a FIDO2 lookup.
+    if remaining_otp_factors >= 1:
+        return
+
+    fido2_registrations_response = await get_user_fido2_registrations(
+        http_client, user_access_token
+    )
+
+    if not fido2_registrations_response.success:
+        logger.warning("Unable to retrieve user FIDO2 factors before deletion")
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Unable to retrieve user MFA factors",
+        )
+
     remaining_fido2_factors = sum(
         1
         for registration in (fido2_registrations_response.data.fido2 or [])

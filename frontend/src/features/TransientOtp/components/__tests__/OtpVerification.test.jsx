@@ -385,6 +385,17 @@ describe("OtpVerification Component", () => {
       expect(screen.getByText("Check your email")).toBeInTheDocument();
     });
 
+    it("renders Email-specific heading for emailotp factors", () => {
+      const emailOtpFactor = {
+        id: "factor-3",
+        type: FLOW_TYPES.emailOtp,
+        destination: "test@example.com",
+      };
+      renderComponent({ userSelectedMfaFactor: emailOtpFactor });
+
+      expect(screen.getByText("Check your email")).toBeInTheDocument();
+    });
+
     it("renders Email-specific instructions", () => {
       const emailFactor = {
         id: "factor-3",

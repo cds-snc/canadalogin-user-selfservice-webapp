@@ -1,5 +1,43 @@
 # Changelog
 
+## [1.23.4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.3...v1.23.4) (2026-06-16)
+
+
+### Bug Fixes
+
+* 404 rp not found error in staging ([#1637](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1637)) ([386245a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/386245aca12abad025378e4ee2e81dc1933aaee8))
+* skip FIDO2 lookup when at least one OTP factor remains ([386245a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/386245aca12abad025378e4ee2e81dc1933aaee8))
+* update OTP verification messages and add feature flag for passkey text display ([#1635](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1635)) ([ab559d6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ab559d6a2e6fcbd68b48928860acb7b18eae4335))
+
+
+### Miscellaneous Chores
+
+* bump version to 1.23.3 in staging.json ([#1632](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1632)) ([25be94e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/25be94eb0ba653727e793b8f5b64ade504fa7825))
+
+## [1.23.3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.2...v1.23.3) (2026-06-16)
+
+
+### Bug Fixes
+
+* add feature flag for passkey text display in ManageDashboard ([#1627](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1627)) ([a4a0e35](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a4a0e3569a3f93338ad7a2fd37dfca49957533ee))
+
+## [1.23.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.1...v1.23.2) (2026-06-12)
+
+
+### Bug Fixes
+
+* enhance OTP validation error messages for better user feedback ([#1616](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1616)) ([ed88df9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ed88df9135fa557f30aff25e19c1dde8b2867582))
+* implement transient OTP verification in delete MFA flows ([#1613](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1613)) ([f099689](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f099689247d87125cc002f12f5b1c53e617c743e))
+* tolerate legacy invalid characters in user profile names ([#1615](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1615)) ([fddd13a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fddd13a029e436af9e96329326fa3bcd7af5a35f))
+* Updated the .devcontainer to run python bookworn ([#1591](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1591)) ([d1d1ae9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d1d1ae9b67d3eaeda274af8f32cc3e77e2d73dd3))
+
+
+### Miscellaneous Chores
+
+* bump prod version ([a3ed2b2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a3ed2b2219e9882649b324bdf512b0f9900f1090))
+* bump prod version 1.23.1 ([#1612](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1612)) ([a3ed2b2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a3ed2b2219e9882649b324bdf512b0f9900f1090))
+* bump staging version ([#1606](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1606)) ([bf73463](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/bf73463b2dbe2c4ce62e4c11d800f8aeca4b5890))
+
 ## [1.23.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.0...v1.23.1) (2026-06-10)
 
 

@@ -114,6 +114,46 @@ async def test_allows_otp_deletion_when_enabled_passkey_remains(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_skips_fido2_lookup_when_otp_factor_still_remains(monkeypatch):
+    async def mock_get_user_otp_factors(client, user_access_token, validated=None):
+        return UserPhoneAuthFactorsResponse(
+            success=True,
+            data=[
+                UserPhoneOTP(
+                    id="factor-123",
+                    type=PhoneOtpType.SMSOTP,
+                    destination="5551234567",
+                ),
+                UserPhoneOTP(
+                    id="factor-456",
+                    type=PhoneOtpType.VOICEOTP,
+                    destination="5559876543",
+                ),
+            ],
+            message="ok",
+        )
+
+    async def mock_get_user_fido2_registrations(client, user_access_token):
+        raise AssertionError("FIDO2 lookup should not be called when OTP remains")
+
+    monkeypatch.setattr(
+        "app.users.services.mfa_delete_guard.get_user_otp_factors",
+        mock_get_user_otp_factors,
+    )
+    monkeypatch.setattr(
+        "app.users.services.mfa_delete_guard.get_user_fido2_registrations",
+        mock_get_user_fido2_registrations,
+    )
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        await assert_remaining_mfa_factor_after_deletion(
+            http_client=client,
+            user_access_token="user-token-abc",
+            otp_factor_ids_to_delete={"factor-123"},
+        )
+
+
+@pytest.mark.asyncio
 async def test_ignores_disabled_passkeys_when_counting_remaining_factors(monkeypatch):
     async def mock_get_user_otp_factors(client, user_access_token, validated=None):
         return UserPhoneAuthFactorsResponse(success=True, data=[], message="ok")
