@@ -11,7 +11,7 @@ import {
   GcdsSelect,
   GcdsText,
 } from "@gcds-core/components-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
@@ -42,6 +42,18 @@ const COUNTRY_OPTIONS = [
 export default function VisitCanadaPost() {
   const { t } = useTranslation("idv");
   const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    givenName: "",
+    familyName: "",
+    dateOfBirth: "",
+    address: "",
+    province: "",
+    country: "",
+  });
+
+  const updateField = (field: keyof typeof formData, value: string) =>
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
   useEffect(() => {
     const applySelectShadowWidth = () => {
@@ -114,6 +126,12 @@ export default function VisitCanadaPost() {
             hint={t("VisitCanadaPost.givenNameHint")}
             required
             validateOn="other"
+            onGcdsChange={(e: CustomEvent) =>
+              updateField(
+                "givenName",
+                (e.target as HTMLInputElement)?.value ?? "",
+              )
+            }
           />
 
           <GcdsInput
@@ -123,6 +141,12 @@ export default function VisitCanadaPost() {
             hint={t("VisitCanadaPost.familyNameHint")}
             required
             validateOn="other"
+            onGcdsChange={(e: CustomEvent) =>
+              updateField(
+                "familyName",
+                (e.target as HTMLInputElement)?.value ?? "",
+              )
+            }
           />
 
           <GcdsDateInput
@@ -131,6 +155,14 @@ export default function VisitCanadaPost() {
             required
             format="full"
             validateOn="other"
+            onGcdsChange={(e: CustomEvent) =>
+              updateField(
+                "dateOfBirth",
+                (e as CustomEvent).detail ??
+                  (e.target as HTMLInputElement)?.value ??
+                  "",
+              )
+            }
           />
 
           <GcdsInput
@@ -140,6 +172,12 @@ export default function VisitCanadaPost() {
             hint={t("VisitCanadaPost.addressHint")}
             required
             validateOn="other"
+            onGcdsChange={(e: CustomEvent) =>
+              updateField(
+                "address",
+                (e.target as HTMLInputElement)?.value ?? "",
+              )
+            }
           />
 
           <GcdsSelect
@@ -150,6 +188,12 @@ export default function VisitCanadaPost() {
             required
             defaultValue=""
             validateOn="other"
+            onGcdsChange={(e: CustomEvent) =>
+              updateField(
+                "province",
+                (e.target as HTMLSelectElement)?.value ?? "",
+              )
+            }
           >
             {PROVINCE_OPTIONS.map((option) => (
               <option key={option.value || "blank"} value={option.value}>
@@ -166,6 +210,12 @@ export default function VisitCanadaPost() {
             required
             defaultValue=""
             validateOn="other"
+            onGcdsChange={(e: CustomEvent) =>
+              updateField(
+                "country",
+                (e.target as HTMLSelectElement)?.value ?? "",
+              )
+            }
           >
             {COUNTRY_OPTIONS.map((option) => (
               <option key={option.value || "blank"} value={option.value}>
@@ -176,7 +226,14 @@ export default function VisitCanadaPost() {
         </GcdsContainer>
 
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton type="button">
+          <GcdsButton
+            type="button"
+            onGcdsClick={(event: Event) => {
+              event.preventDefault();
+              // navigate("" , { state: formData });
+              // TODO: Navigate to the next page once it is implemented
+            }}
+          >
             {t("VisitCanadaPost.continueButton")}
           </GcdsButton>
           <GcdsButton

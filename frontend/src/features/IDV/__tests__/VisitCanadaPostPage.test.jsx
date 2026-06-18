@@ -5,13 +5,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import VisitCanadaPost from "../InPerson/VisitCanadaPostPage";
 
 const mockNavigate = vi.fn();
-let mockDevOnlyFeature = true;
+const mockFlags = vi.hoisted(() => ({ devOnlyFeature: true }));
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+    useParams: () => ({ language: "en" }),
   };
 });
 
@@ -20,7 +21,7 @@ vi.mock("../../../utils/constants", async () => {
   return {
     ...actual,
     get DEV_ONLY_FEATURE() {
-      return mockDevOnlyFeature;
+      return mockFlags.devOnlyFeature;
     },
   };
 });
@@ -63,8 +64,22 @@ vi.mock("@gcds-core/components-react", () => {
         {children}
       </details>
     ),
-    GcdsInput: ({ label }) => <div>{label}</div>,
-    GcdsDateInput: ({ legend }) => <div>{legend}</div>,
+    GcdsInput: ({ label, onGcdsChange, inputId }) => (
+      <input
+        aria-label={label}
+        data-testid={inputId}
+        onChange={(e) => onGcdsChange && onGcdsChange(e)}
+      />
+    ),
+    GcdsDateInput: ({ legend, onGcdsChange }) => (
+      <input
+        aria-label={legend}
+        data-testid="dateOfBirth"
+        onChange={(e) =>
+          onGcdsChange && onGcdsChange({ detail: e.target.value })
+        }
+      />
+    ),
     GcdsSelect,
     GcdsButton: ({ children, buttonRole, onGcdsClick }) => (
       <button
@@ -89,11 +104,11 @@ vi.mock("@gcds-core/components-react", () => {
 describe("VisitCanadaPost", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockDevOnlyFeature = true;
+    mockFlags.devOnlyFeature = true;
   });
 
   it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
+    mockFlags.devOnlyFeature = false;
 
     const { container } = render(<VisitCanadaPost />);
 
