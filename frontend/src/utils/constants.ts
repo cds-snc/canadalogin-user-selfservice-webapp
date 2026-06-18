@@ -2,6 +2,34 @@ import config from "../config";
 
 export const AVAILABLE_LANGUAGES = { en: "en", fr: "fr" } as const;
 
+export const CANADIAN_PROVINCES_AND_TERRITORIES = [
+  { code: "AB", labels: { en: "Alberta", fr: "Alberta" } },
+  {
+    code: "BC",
+    labels: { en: "British Columbia", fr: "Colombie-Britannique" },
+  },
+  { code: "MB", labels: { en: "Manitoba", fr: "Manitoba" } },
+  { code: "NB", labels: { en: "New Brunswick", fr: "Nouveau-Brunswick" } },
+  {
+    code: "NL",
+    labels: { en: "Newfoundland and Labrador", fr: "Terre-Neuve-et-Labrador" },
+  },
+  {
+    code: "NT",
+    labels: { en: "Northwest Territories", fr: "Territoires du Nord-Ouest" },
+  },
+  { code: "NS", labels: { en: "Nova Scotia", fr: "Nouvelle-Écosse" } },
+  { code: "NU", labels: { en: "Nunavut", fr: "Nunavut" } },
+  { code: "ON", labels: { en: "Ontario", fr: "Ontario" } },
+  {
+    code: "PE",
+    labels: { en: "Prince Edward Island", fr: "Île-du-Prince-Édouard" },
+  },
+  { code: "QC", labels: { en: "Quebec", fr: "Québec" } },
+  { code: "SK", labels: { en: "Saskatchewan", fr: "Saskatchewan" } },
+  { code: "YT", labels: { en: "Yukon", fr: "Yukon" } },
+] as const;
+
 export const PROFILE_LANGUAGES = {
   en: "en-ca",
   fr: "fr-ca",
