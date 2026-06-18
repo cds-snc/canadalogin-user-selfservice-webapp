@@ -98,7 +98,7 @@ export default function VisitCanadaPost() {
             </ol>
           </GcdsText>
           <GcdsDetails detailsTitle={t("VisitCanadaPost.listOfIds")}>
-            {t("VisitCanadaPost.listOfIds")}
+            <GcdsText>{t("VisitCanadaPost.listOfIds")}</GcdsText>
           </GcdsDetails>
         </GcdsContainer>
 

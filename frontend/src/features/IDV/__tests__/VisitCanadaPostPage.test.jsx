@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useEffect, useRef } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import VisitCanadaPost from "../InPerson/VisitCanadaPost";
+import VisitCanadaPost from "../InPerson/VisitCanadaPostPage";
 
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
