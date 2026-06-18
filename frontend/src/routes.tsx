@@ -23,6 +23,7 @@ import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passk
 import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage";
 import ServiceCanadaCentrePage from "./features/IDV/InPerson/ServiceCanadaCentrePage";
 import ServiceCanadaCentreIDVCodePage from "./features/IDV/InPerson/ServiceCanadaCentreIDVCodePage";
+import VisitCanadaPost from "./features/IDV/InPerson/VisitCanadaPostPage";
 import ProofingBarcodeCanadaPostPage from "./features/IDV/InPerson/ProofingBarcodeCanadaPostPage";
 import StartIdentityProofingPage from "./features/IDV/StartIdentityProofingPage";
 import ProvincialVerificationPage from "./features/IDV/Online/ProvincialVerificationPage";
@@ -149,6 +150,11 @@ export const appRoutes: RouteObject[] = [
                       path: "idv/required/",
                       element: <CompleteIdentityProofingPage />,
                       handle: { id: PAGES.idvCompleteIdentityProofingPage },
+                    },
+                    {
+                      path: "idv/in-person/canada-post",
+                      element: <VisitCanadaPost />,
+                      handle: { id: PAGES.idvVisitCanadaPostPage },
                     },
                     {
                       path: "idv/in-person/service-canada-centre",

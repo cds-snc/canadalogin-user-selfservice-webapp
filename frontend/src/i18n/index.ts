@@ -113,6 +113,7 @@ export const PAGE_NAMESPACE_MAP: Record<string, I18nNamespace> = {
   NoticeFactory: "otp",
   // idv
   IdvServiceCanadaCentrePage: "idv",
+  IdvVisitCanadaPostPage: "idv",
   IdvProofingBarcodeCanadaPostPage: "idv",
 };
 
