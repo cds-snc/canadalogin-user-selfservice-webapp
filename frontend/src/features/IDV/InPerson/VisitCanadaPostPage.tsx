@@ -17,7 +17,6 @@ import { useNavigate } from "react-router";
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
 
 const PROVINCE_OPTIONS = [
-  { value: "", label: "" },
   { value: "AB", label: "Alberta" },
   { value: "BC", label: "British Columbia" },
   { value: "MB", label: "Manitoba" },
@@ -34,7 +33,6 @@ const PROVINCE_OPTIONS = [
 ];
 
 const COUNTRY_OPTIONS = [
-  { value: "", label: "" },
   { value: "CA", label: "Canada" },
   { value: "US", label: "United States" },
 ];
@@ -204,6 +202,7 @@ export default function VisitCanadaPost() {
               )
             }
           >
+            <option value="">Select option</option>
             {PROVINCE_OPTIONS.map((option) => (
               <option key={option.value || "blank"} value={option.value}>
                 {option.label}
@@ -226,6 +225,7 @@ export default function VisitCanadaPost() {
               )
             }
           >
+            <option value="">Select option</option>
             {COUNTRY_OPTIONS.map((option) => (
               <option key={option.value || "blank"} value={option.value}>
                 {option.label}
