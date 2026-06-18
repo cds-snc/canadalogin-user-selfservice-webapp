@@ -35,7 +35,7 @@ export default function MobileCompleteConfirmation() {
             noticeTitle={t("MobileCompleteConfirmation.moreInfoTitle")}
           >
             <GcdsText>
-                {t("MobileCompleteConfirmation.moreInfoBody", {
+              {t("MobileCompleteConfirmation.moreInfoBody", {
                 appName: tLayout("TopNavBar.appName"),
               })}
             </GcdsText>
