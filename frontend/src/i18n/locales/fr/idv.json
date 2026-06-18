@@ -25,7 +25,22 @@
     "dateOfBirthdayLabel": "Date of birth",
     "addressLabel": "Address",
     "addressHint": "Enter your street address",
-    "proviceLabel": "Province/ State"
+    "proviceLabel": "Province/ Territory",
+    "provinces": {
+      "AB": "Alberta",
+      "BC": "Colombie-Britannique",
+      "MB": "Manitoba",
+      "NB": "Nouveau-Brunswick",
+      "NL": "Terre-Neuve-et-Labrador",
+      "NT": "Territoires du Nord-Ouest",
+      "NS": "Nouvelle-Écosse",
+      "NU": "Nunavut",
+      "ON": "Ontario",
+      "PE": "Île-du-Prince-Édouard",
+      "QC": "Québec",
+      "SK": "Saskatchewan",
+      "YT": "Yukon"
+    }
   },
   "ServiceCanadaCentreCode": {
     "heading": "Here is your unique identification code for your identity proofing",
