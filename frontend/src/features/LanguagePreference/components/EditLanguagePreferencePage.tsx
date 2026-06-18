@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { useNavigate, useLocation, useParams } from "react-router";
 
@@ -50,7 +50,7 @@ export default function EditLanguagePreferencePage() {
   const { state, dispatch } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
-  const initialStep =
+  const initialStep: LanguagePreferenceWizardStep =
     (location.state as { step?: LanguagePreferenceWizardStep } | null)?.step ??
     "editLanguage";
 
@@ -69,6 +69,16 @@ export default function EditLanguagePreferencePage() {
   });
 
   useWizardPageTracking(wizardStep, LANGUAGE_PAGE_BY_STEP);
+
+  // Sync wizardStep with location.state when it changes (e.g., after navigation)
+  useEffect(() => {
+    const stepFromState = (
+      location.state as { step?: LanguagePreferenceWizardStep } | null
+    )?.step;
+    if (stepFromState) {
+      setWizardStep(stepFromState);
+    }
+  }, [location.state]);
 
   const { t } = useTranslation(["security", "common"]);
 
@@ -101,9 +111,6 @@ export default function EditLanguagePreferencePage() {
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
       step: LANGUAGE_PREFERENCE_ANALYTICS.STEPS.CONFIRM_UPDATE,
     });
-    navigate(`/${routeLanguage}/profile/update-language/confirm-update`, {
-      replace: true,
-    });
   };
 
   const saveUpdatedLanguagePreferences = async () => {
@@ -130,12 +137,16 @@ export default function EditLanguagePreferencePage() {
 
         if (successLanguageCode !== routeLanguage) {
           // Language changed — navigate to the new language URL immediately so
-          // the whole app switches locale. The success step is shown on arrival
-          // via location state read by the useState initializer above.
-          navigate(`/${successLanguageCode}/profile/update-language`, {
-            replace: true,
-            state: { step: "success" as LanguagePreferenceWizardStep },
-          });
+          // switches locale, but keep the same base path and use state for step
+          navigate(
+            path(PAGES.editLanguagePreferences, {
+              language: successLanguageCode,
+            }),
+            {
+              replace: true,
+              state: { step: "success" as LanguagePreferenceWizardStep },
+            },
+          );
         } else {
           setWizardStep("success");
         }
@@ -163,9 +174,7 @@ export default function EditLanguagePreferencePage() {
   };
 
   const handleBackToProfile = () => {
-    navigate(
-      path(PAGES.ProfileHome, { language: languageFormData.languageCode }),
-    );
+    navigate(path(PAGES.ProfileHome, { language: routeLanguage }));
   };
 
   let errorMessage = errorCode
