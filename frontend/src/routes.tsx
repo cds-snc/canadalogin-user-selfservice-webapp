@@ -27,7 +27,7 @@ import StartIdentityProofingPage from "./features/IDV/StartIdentityProofingPage"
 import ProvincialVerificationPage from "./features/IDV/Online/ProvincialVerificationPage";
 import OnlineVerificationInfo from "./features/IDV/Online/OnlineVerificationInfo";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
-import MobileCompleteConfirmation from "./features/IDV/Online/MobileCompleteConfirmation";
+import IdentityVerificationSuccess from "./features/IDV/Online/IdentityVerificationSuccess";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -171,8 +171,8 @@ export const appRoutes: RouteObject[] = [
                     },
                     {
                       path: "idv/online/bluink/confirmation",
-                      element: <MobileCompleteConfirmation />,
-                      handle: { id: PAGES.idvOnlineMobileConfirmationPage },
+                      element: <IdentityVerificationSuccess />,
+                      handle: { id: PAGES.idvIdentityVerificationSuccessPage },
                     },
                   ]
                 : []),

@@ -81,7 +81,7 @@
     "communication": "Communication",
     "confirmAndContinue": "Confirm and continue"
   },
-  "MobileCompleteConfirmation": {
+  "IdentityVerificationSuccess": {
     "pageTitle": "Prove your identity",
     "heading": "Identity proofing is complete",
     "continueButton": "Continue",

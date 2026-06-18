@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 // import { useNavigate } from "react-router";
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
 
-export default function MobileCompleteConfirmation() {
+export default function IdentityVerificationSuccess() {
   // const navigate = useNavigate();
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
@@ -24,7 +24,7 @@ export default function MobileCompleteConfirmation() {
       <GcdsGrid columns="1" gap="450">
         <GcdsContainer>
           <GcdsHeading tag="h1">
-            {t("MobileCompleteConfirmation.heading")}
+            {t("IdentityVerificationSuccess.heading")}
           </GcdsHeading>
         </GcdsContainer>
 
@@ -32,10 +32,10 @@ export default function MobileCompleteConfirmation() {
           <GcdsNotice
             noticeRole="info"
             noticeTitleTag="h2"
-            noticeTitle={t("MobileCompleteConfirmation.moreInfoTitle")}
+            noticeTitle={t("IdentityVerificationSuccess.moreInfoTitle")}
           >
             <GcdsText>
-              {t("MobileCompleteConfirmation.moreInfoBody", {
+              {t("IdentityVerificationSuccess.moreInfoBody", {
                 appName: tLayout("TopNavBar.appName"),
               })}
             </GcdsText>
@@ -49,7 +49,7 @@ export default function MobileCompleteConfirmation() {
               // TODO: navigate to next IDV step
             }}
           >
-            {t("MobileCompleteConfirmation.continueButton")}
+            {t("IdentityVerificationSuccess.continueButton")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>
