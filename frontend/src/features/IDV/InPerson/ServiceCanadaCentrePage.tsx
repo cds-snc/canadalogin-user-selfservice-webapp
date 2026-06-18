@@ -22,6 +22,30 @@ import {
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
+const ID_TYPE_OPTIONS = [
+  {
+    value: "driverLicence",
+    labelKey: "ServiceCanadaCentre.driverLicenceOption",
+  },
+  {
+    value: "photoIDHealthCard",
+    labelKey: "ServiceCanadaCentre.photoIDHealthCardOption",
+  },
+  {
+    value: "photoIDServiceCard",
+    labelKey: "ServiceCanadaCentre.photoIDServiceCardOption",
+  },
+  { value: "passport", labelKey: "ServiceCanadaCentre.passportOption" },
+  {
+    value: "canadianPRCard",
+    labelKey: "ServiceCanadaCentre.canadianPRCardOption",
+  },
+  {
+    value: "indianStatus",
+    labelKey: "ServiceCanadaCentre.indianStatusOption",
+  },
+] as const;
+
 const IDS_REQUIRING_ADDRESS_AND_PROVINCE = new Set([
   "driverLicence",
   "photoIDHealthCard",
@@ -48,6 +72,11 @@ export default function ServiceCanadaCentrePage() {
 
   const showAddressAndProvinceFields =
     IDS_REQUIRING_ADDRESS_AND_PROVINCE.has(selectedIdType);
+
+  const handleIdTypeChange = (e: CustomEvent<string>) => {
+    const selectedValue = (e.target as HTMLSelectElement).value;
+    setSelectedIdType(selectedValue);
+  };
 
   useEffect(() => {
     const form = formRef.current;
@@ -94,165 +123,158 @@ export default function ServiceCanadaCentrePage() {
 
   return (
     <GcdsContainer role="main">
-      <GcdsContainer>
-        <GcdsHeading tag="h1">{t("ServiceCanadaCentre.heading")}</GcdsHeading>
-      </GcdsContainer>
-
-      <GcdsContainer>
-        {" "}
-        <GcdsText>
-          <strong>{t("ServiceCanadaCentre.followSteps")}</strong>
-        </GcdsText>
-        <ol>
-          <li>
-            <GcdsText marginBottom="0">
-              {t("ServiceCanadaCentre.step1")}
-            </GcdsText>
-          </li>
-          <li>
-            <GcdsText marginBottom="0">
-              {t("ServiceCanadaCentre.step2")}
-            </GcdsText>
-          </li>
-          <li>
-            <GcdsText marginBottom="0">
-              {t("ServiceCanadaCentre.step3")}
-            </GcdsText>
-          </li>
-        </ol>
-      </GcdsContainer>
-
       <form ref={formRef}>
-        <GcdsFieldset
-          legend={t("ServiceCanadaCentre.enterDetailsHeading")}
-          legendSize="h2"
-        >
-          {" "}
-          <GcdsSelect
-            label={t("ServiceCanadaCentre.selectIdLabel")}
-            name="selectId"
-            selectId="selectId"
-            value={selectedIdType}
-            defaultValue={t("ServiceCanadaCentre.selectIdDropdownDefaultValue")}
-            required
-            onGcdsChange={(e: CustomEvent<string>) => {
-              const selectedValue = (e.target as HTMLSelectElement).value;
-              setSelectedIdType(selectedValue);
-            }}
-          >
-            <option value="driverLicence">
-              {t("ServiceCanadaCentre.driverLicenceOption")}
-            </option>
-            <option value="photoIDHealthCard">
-              {t("ServiceCanadaCentre.photoIDHealthCardOption")}
-            </option>
-            <option value="photoIDServiceCard">
-              {t("ServiceCanadaCentre.photoIDServiceCardOption")}
-            </option>
-            <option value="passport">
-              {t("ServiceCanadaCentre.passportOption")}
-            </option>
-            <option value="canadianPRCard">
-              {t("ServiceCanadaCentre.canadianPRCardOption")}
-            </option>
-            <option value="indianStatus">
-              {t("ServiceCanadaCentre.indianStatusOption")}
-            </option>
-          </GcdsSelect>
-        </GcdsFieldset>
+        <GcdsGrid columns="1" gap="200">
+          <GcdsHeading tag="h1">{t("ServiceCanadaCentre.heading")}</GcdsHeading>
 
-        {hasSelectedIdType ? (
-          <>
-            <GcdsFieldset
-              legend={t("ServiceCanadaCentre.enterDetailsHeading")}
-              legendSize="h2"
+          <GcdsContainer>
+            {" "}
+            <GcdsText>
+              <strong>{t("ServiceCanadaCentre.followSteps")}</strong>
+            </GcdsText>
+            <ol>
+              <li>
+                <GcdsText marginBottom="0">
+                  {t("ServiceCanadaCentre.step1")}
+                </GcdsText>
+              </li>
+              <li>
+                <GcdsText marginBottom="0">
+                  {t("ServiceCanadaCentre.step2")}
+                </GcdsText>
+              </li>
+              <li>
+                <GcdsText marginBottom="0">
+                  {t("ServiceCanadaCentre.step3")}
+                </GcdsText>
+              </li>
+            </ol>
+          </GcdsContainer>
+
+          <GcdsFieldset
+            legend={t("ServiceCanadaCentre.enterDetailsHeading")}
+            legendSize="h2"
+            style={{ overflow: "hidden" }}
+          >
+            <GcdsSelect
+              label={t("ServiceCanadaCentre.selectIdLabel")}
+              name="selectId"
+              selectId="selectId"
+              value={selectedIdType}
+              required
+              onGcdsChange={handleIdTypeChange}
+              defaultValue={t(
+                "ServiceCanadaCentre.selectIdDropdownDefaultValue",
+              )}
+              style={{ maxWidth: "100%" }}
             >
+              {ID_TYPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {t(option.labelKey)}
+                </option>
+              ))}
+            </GcdsSelect>
+
+            {hasSelectedIdType && (
               <GcdsDateInput
                 legend={t("ServiceCanadaCentre.idExpirationLabel")}
                 name="id-expiration-date-input"
                 format="full"
                 required
               />
-            </GcdsFieldset>
+            )}
+          </GcdsFieldset>
+          {hasSelectedIdType && (
+            <>
+              <GcdsFieldset
+                legend={t("ServiceCanadaCentre.enterDetailsIdHeading")}
+                legendSize="h2"
+              >
+                <GcdsInput
+                  required
+                  inputId="first-name-input"
+                  name="first-name-input"
+                  label={t("ServiceCanadaCentre.firstNameLabel")}
+                />
+                <GcdsInput
+                  required
+                  inputId="last-name-input"
+                  name="last-name-input"
+                  label={t("ServiceCanadaCentre.lastNameLabel")}
+                />
+                <GcdsDateInput
+                  legend={t("ServiceCanadaCentre.dateOfBirthdayLabel")}
+                  name="date-of-birth-input"
+                  format="full"
+                  required
+                />
+                {showAddressAndProvinceFields && (
+                  <>
+                    <GcdsInput
+                      inputId="address-input"
+                      name="address-input"
+                      label={t("ServiceCanadaCentre.addressLabel")}
+                      hint={t("ServiceCanadaCentre.addressHint")}
+                    />
 
-            <GcdsFieldset
-              legend={t("ServiceCanadaCentre.enterDetailsIdHeading")}
-              legendSize="h2"
+                    <GcdsSelect
+                      name="select-province"
+                      selectId="select-province"
+                      defaultValue={t(
+                        "ServiceCanadaCentre.selectIdDropdownDefaultValue",
+                      )}
+                      label={t("ServiceCanadaCentre.proviceLabel")}
+                      style={{ maxWidth: "100%" }}
+                    >
+                      {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
+                        <option key={province.code} value={province.code}>
+                          {province.labels[currentLanguage]}
+                        </option>
+                      ))}
+                    </GcdsSelect>
+                  </>
+                )}
+              </GcdsFieldset>
+            </>
+          )}
+
+          <GcdsGrid
+            columns="1"
+            columnsDesktop="max-content max-content"
+            gap="200"
+          >
+            <GcdsButton
+              type="button"
+              disabled={!isFormValid}
+              onClick={onContinue}
             >
-              <GcdsInput
-                required
-                inputId="first-name-input"
-                name="first-name-input"
-                label={t("ServiceCanadaCentre.firstNameLabel")}
-              />
-              <GcdsInput
-                required
-                inputId="last-name-input"
-                name="last-name-input"
-                label={t("ServiceCanadaCentre.lastNameLabel")}
-              />
-              <GcdsDateInput
-                legend={t("ServiceCanadaCentre.dateOfBirthdayLabel")}
-                name="date-of-birth-input"
-                format="full"
-                required
-              />
-              {showAddressAndProvinceFields ? (
-                <>
-                  <GcdsInput
-                    inputId="address-input"
-                    name="address-input"
-                    label={t("ServiceCanadaCentre.addressLabel")}
-                    hint={t("ServiceCanadaCentre.addressHint")}
-                  />
+              {t("ServiceCanadaCentre.continueButton")}
+            </GcdsButton>
+            <GcdsButton
+              type="button"
+              buttonRole="secondary"
+              onClick={() => {
+                navigate(-1);
+              }}
+            >
+              {t("ServiceCanadaCentre.backButton")}
+            </GcdsButton>
+          </GcdsGrid>
 
-                  <GcdsSelect
-                    name="select-province"
-                    selectId="select-province"
-                    defaultValue={t(
-                      "ServiceCanadaCentre.selectIdDropdownDefaultValue",
-                    )}
-                    label={t("ServiceCanadaCentre.proviceLabel")}
-                  >
-                    {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
-                      <option key={province.code} value={province.code}>
-                        {province.labels[currentLanguage]}
-                      </option>
-                    ))}
-                  </GcdsSelect>
-                </>
-              ) : null}
-            </GcdsFieldset>
-          </>
-        ) : null}
+          <GcdsNotice
+            noticeRole="info"
+            noticeTitleTag="h2"
+            noticeTitle={t("ServiceCanadaCentre.moreInfoTitle")}
+          >
+            {
+              //TODO: populate with real URL once available
+            }
+            <GcdsLink href={"#"} external={true}>
+              {t("ServiceCanadaCentre.learnMoreLink")}
+            </GcdsLink>
+          </GcdsNotice>
+        </GcdsGrid>
       </form>
-
-      <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton type="button" disabled={!isFormValid} onClick={onContinue}>
-          {t("ServiceCanadaCentre.continueButton")}
-        </GcdsButton>
-        <GcdsButton
-          type="button"
-          buttonRole="secondary"
-          onClick={() => {
-            navigate(-1);
-          }}
-        >
-          {t("ServiceCanadaCentre.backButton")}
-        </GcdsButton>
-        <GcdsNotice
-          noticeRole="info"
-          noticeTitleTag="h2"
-          noticeTitle={t("ServiceCanadaCentre.moreInfoTitle")}
-        >
-          {
-            //TODO: populate with real URL once available
-          }
-          <GcdsLink href={"#"} external={true}>
-            {t("ServiceCanadaCentre.learnMoreLink")}
-          </GcdsLink>
-        </GcdsNotice>
-      </GcdsGrid>
     </GcdsContainer>
   );
 }
