@@ -90,13 +90,13 @@ export default function ProofingBarcodeCanadaPostPage() {
         </GcdsContainer>
 
         <GcdsDetails detailsTitle={t("ProofingBarcodeCanadaPost.listOfIds")}>
-          <ul>
-            {acceptableIds.map((acceptableId) => (
-              <li key={acceptableId}>
-                <GcdsText>{acceptableId}</GcdsText>
-              </li>
-            ))}
-          </ul>
+          <GcdsText>
+            <ul>
+              {acceptableIds.map((acceptableId) => (
+                <li key={acceptableId}>{acceptableId}</li>
+              ))}
+            </ul>
+          </GcdsText>
         </GcdsDetails>
 
         <GcdsContainer>
@@ -162,9 +162,6 @@ export default function ProofingBarcodeCanadaPostPage() {
               <div className="separator" style={{ margin: "0" }} />
 
               <GcdsGrid columns="1fr auto" className="gridInline">
-                <GcdsText marginBottom="300">
-                  {t("ProofingBarcodeCanadaPost.reProofingRequired")}
-                </GcdsText>
                 <GcdsButton
                   buttonRole="secondary"
                   type="button"
