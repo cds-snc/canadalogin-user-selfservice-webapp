@@ -114,6 +114,7 @@ export const PAGE_NAMESPACE_MAP: Record<string, I18nNamespace> = {
   // idv
   IdvServiceCanadaCentrePage: "idv",
   IdvVisitCanadaPostPage: "idv",
+  IdvProofingBarcodeCanadaPostPage: "idv",
 };
 
 i18n.use(initReactI18next).init({

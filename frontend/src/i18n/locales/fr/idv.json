@@ -46,6 +46,27 @@
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about Canada Post Identity Proofing"
   },
+  "ProofingBarcodeCanadaPost": {
+    "heading": "Take your proofing barcode to Canada Post",
+    "barcodeAriaLabel": "Barcode for code {{code}}",
+    "codeValidDays": "The code is valid for 30 days and has been emailed to",
+    "visitInstruction": "Visit a Canada Post with your barcode and one valid ID document.",
+    "listOfIds": "List of acceptable IDs",
+    "acceptableIdOption1": "Canadian passport",
+    "acceptableIdOption2": "Provincial or territorial driver's licence",
+    "acceptableIdOption3": "Permanent resident card",
+    "yourInformationHeading": "Your information",
+    "givenName": "Given name",
+    "lastName": "Last name",
+    "dateOfBirth": "Date of birth",
+    "address": "Address",
+    "idSelected": "ID selected",
+    "reProofingRequired": "To update this information, you'll need to complete identity proofing again.",
+    "updateInformationButton": "Update information",
+    "findNearestTitle": "Find your nearest Canada Post",
+    "findNearestBody": "Complete your identity proofing at an available",
+    "findNearestLink": "Canada Post near you"
+  },
   "ProvincialVerification": {
     "pageTitle": "Prove your identity",
     "heading": "Get ready for provincial partner sign in",
