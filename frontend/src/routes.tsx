@@ -27,6 +27,7 @@ import StartIdentityProofingPage from "./features/IDV/StartIdentityProofingPage"
 import ProvincialVerificationPage from "./features/IDV/Online/ProvincialVerificationPage";
 import OnlineVerificationInfo from "./features/IDV/Online/OnlineVerificationInfo";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
+import OnlineVerificationErrorState from "./features/IDV/Online/OnlineVerificationErrorState";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -167,6 +168,11 @@ export const appRoutes: RouteObject[] = [
                       path: "idv/details-confirmation",
                       element: <ConfirmIdentityDetails />,
                       handle: { id: PAGES.idvDetailsConfirmationPage },
+                    },
+                    {
+                      path: "idv/online/error-state",
+                      element: <OnlineVerificationErrorState />,
+                      handle: { id: PAGES.idvOnlineVerificationErrorStatePage },
                     },
                   ]
                 : []),

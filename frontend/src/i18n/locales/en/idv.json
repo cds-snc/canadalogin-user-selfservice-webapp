@@ -80,5 +80,20 @@
     "phoneNumber": "Phone number",
     "communication": "Communication",
     "confirmAndContinue": "Confirm and continue"
+  },
+  "OnlineVerificationErrorState": {
+    "moreInfoTitle": "Your identity could not be verified",
+    "learnMoreText": "You will need to try again with another method",
+    "pageTitle": "How do you want to prove your identity?",
+    "learnMoreDescription": "Learn more about identity proofing",
+    "radioOnlineLabel": "Do it online and get instant access",
+    "documentScanningOption": "Selfie and photo of your ID",
+    "hintDocumentScanningOption": "You will be asked to take a photo of yourself and your ID with your phone camera.",
+    "provincialPartnerOption": "Use your provincial sign in",
+    "hintProvincialPartnerOption": "Use your BC Service Card or Alberta.ca account to prove your identity.",
+    "inPersonOption": "or do it in person",
+    "signBackInNotice": "You will only get access to this service after proving your identity in person and signing back in with your CanadaLogin.",
+    "canadaPostLocationsOption": "Canada Post locations",
+    "serviceCanadaLocationsOption": "Service Canada Centres"
   }
 }
