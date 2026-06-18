@@ -85,6 +85,19 @@
     "hintProvincialPartnerOption": "Use your BC Service Card or Alberta.ca account",
     "inPersonOption": "See in-person options"
   },
+  "CompleteIdentityProofing": {
+    "appName": "CanadaLogin",
+    "pageTitle": "Complete identity proofing",
+    "heading": "Complete identity proofing when you're ready",
+    "accessRPServicePortalTitle": "To access the {{rpServicePortal}}, you need to complete identity proofing first",
+    "accessRPServicePortalText": "When you're ready, sign back in to your {{appName}} account and you'll be brought back to this step automatically.",
+    "buttonStartIdentity": "Start identity proofing now",
+    "signOut": "Sign out",
+    "signingOut": "Signing you out...",
+    "signOutFailed": "Failed to sign you out. Redirecting...",
+    "forMoreInformationNoticeHeader": "For more information",
+    "forMoreInformationNoticeText": "Learn more about how identity proofing works"
+  },
   "ConfirmIdentityDetails": {
     "pageTitle": "Confirm what will be saved to your CanadaLogin",
     "description": "Review the details that will be saved to your CanadaLogin. You can edit most information here, or update it later in your CanadaLogin account.",
