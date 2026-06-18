@@ -39,11 +39,20 @@ const COUNTRY_OPTIONS = [
   { value: "US", label: "United States" },
 ];
 
+interface VisitCanadaPostFormData {
+  givenName: string;
+  familyName: string;
+  dateOfBirth: string;
+  address: string;
+  province: string;
+  country: string;
+}
+
 export default function VisitCanadaPost() {
   const { t } = useTranslation("idv");
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
+  const [, setFormData] = useState<VisitCanadaPostFormData>({
     givenName: "",
     familyName: "",
     dateOfBirth: "",
@@ -52,7 +61,7 @@ export default function VisitCanadaPost() {
     country: "",
   });
 
-  const updateField = (field: keyof typeof formData, value: string) =>
+  const updateField = (field: keyof VisitCanadaPostFormData, value: string) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
 
   useEffect(() => {
