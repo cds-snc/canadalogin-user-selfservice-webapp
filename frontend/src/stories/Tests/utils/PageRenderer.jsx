@@ -22,6 +22,7 @@ import DeleteFIDO2PasskeyPage from "../../../features/ManageFIDO2/components/Del
 import AddFIDO2PasskeyPage from "../../../features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage";
 import ServiceCanadaCentrePage from "../../../features/IDV/InPerson/ServiceCanadaCentrePage";
 import ServiceCanadaCentreIDVCodePage from "../../../features/IDV/InPerson/ServiceCanadaCentreIDVCodePage";
+import ProofingBarcodeCanadaPostPage from "../../../features/IDV/InPerson/ProofingBarcodeCanadaPostPage";
 import StartIdentityProofingPage from "../../../features/IDV/StartIdentityProofingPage";
 import ProvenInformationCard from "../../../features/IDV/ProvenInformationCard";
 
@@ -75,6 +76,8 @@ const PageRenderer = ({ page, ...props }) => {
       return <ServiceCanadaCentrePage />;
     case PAGES.idvServiceCanadaCentreCodePage:
       return <ServiceCanadaCentreIDVCodePage />;
+    case PAGES.idvProofingBarcodeCanadaPostPage:
+      return <ProofingBarcodeCanadaPostPage />;
     case PAGES.idvProvenInformationCard:
       return <ProvenInformationCard />;
     case PAGES.startIdentityProofingPage:
