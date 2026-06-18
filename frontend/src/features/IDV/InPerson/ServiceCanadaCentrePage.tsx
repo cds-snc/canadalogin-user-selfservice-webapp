@@ -44,6 +44,7 @@ const ID_TYPE_OPTIONS = [
     value: "indianStatus",
     labelKey: "ServiceCanadaCentre.indianStatusOption",
   },
+  { value: "noIds", labelKey: "ServiceCanadaCentre.noIds" },
 ] as const;
 
 const IDS_REQUIRING_ADDRESS_AND_PROVINCE = new Set([
@@ -166,7 +167,6 @@ export default function ServiceCanadaCentrePage() {
               defaultValue={t(
                 "ServiceCanadaCentre.selectIdDropdownDefaultValue",
               )}
-              style={{ maxWidth: "100%" }}
             >
               {ID_TYPE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>

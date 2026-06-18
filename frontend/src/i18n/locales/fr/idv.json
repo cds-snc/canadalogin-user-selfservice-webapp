@@ -18,6 +18,7 @@
     "passportOption": "Canadian and International Passport",
     "canadianPRCardOption": "Canadian PR Card",
     "indianStatusOption": "Secure Certificate of Indian Status",
+    "noIds": "I don’t have any of these IDs",
     "idExpirationLabel": "When does it expire?",
     "enterDetailsIdHeading": "Enter your details as shown on the ID",
     "firstNameLabel": "First Name",
