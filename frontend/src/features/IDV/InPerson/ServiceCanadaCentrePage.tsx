@@ -14,24 +14,13 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import {
+  AVAILABLE_LANGUAGES,
+  CANADIAN_PROVINCES_AND_TERRITORIES,
+  DEV_ONLY_FEATURE,
+  PAGES,
+} from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-
-const PROVINCES_AND_TERRITORY_CODES = [
-  "AB",
-  "BC",
-  "MB",
-  "NB",
-  "NL",
-  "NT",
-  "NS",
-  "NU",
-  "ON",
-  "PE",
-  "QC",
-  "SK",
-  "YT",
-] as const;
 
 const IDS_REQUIRING_ADDRESS_AND_PROVINCE = new Set([
   "driverLicence",
@@ -51,6 +40,10 @@ export default function ServiceCanadaCentrePage() {
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,
   });
+  const currentLanguage =
+    language === AVAILABLE_LANGUAGES.fr
+      ? AVAILABLE_LANGUAGES.fr
+      : AVAILABLE_LANGUAGES.en;
   const hasSelectedIdType = selectedIdType !== "";
 
   const showAddressAndProvinceFields =
@@ -223,9 +216,9 @@ export default function ServiceCanadaCentrePage() {
                     )}
                     label={t("ServiceCanadaCentre.proviceLabel")}
                   >
-                    {PROVINCES_AND_TERRITORY_CODES.map((provinceCode) => (
-                      <option key={provinceCode} value={provinceCode}>
-                        {t(`ServiceCanadaCentre.provinces.${provinceCode}`)}
+                    {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
+                      <option key={province.code} value={province.code}>
+                        {province.labels[currentLanguage]}
                       </option>
                     ))}
                   </GcdsSelect>
