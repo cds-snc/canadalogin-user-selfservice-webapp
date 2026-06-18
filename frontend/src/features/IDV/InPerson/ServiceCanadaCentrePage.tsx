@@ -133,15 +133,13 @@ export default function ServiceCanadaCentrePage() {
             name="selectId"
             selectId="selectId"
             value={selectedIdType}
+            defaultValue={t("ServiceCanadaCentre.selectIdDropdownDefaultValue")}
             required
             onGcdsChange={(e: CustomEvent<string>) => {
               const selectedValue = (e.target as HTMLSelectElement).value;
               setSelectedIdType(selectedValue);
             }}
           >
-            <option value="">
-              {t("ServiceCanadaCentre.selectIdDropdownDefaultValue")}
-            </option>
             <option value="driverLicence">
               {t("ServiceCanadaCentre.driverLicenceOption")}
             </option>
