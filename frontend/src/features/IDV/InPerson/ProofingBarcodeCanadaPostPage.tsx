@@ -1,7 +1,6 @@
 import {
   GcdsButton,
   GcdsContainer,
-  GcdsDetails,
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
@@ -14,6 +13,7 @@ import BarcodeDisplay from "../helpers/BarcodeDisplay";
 import { useUser } from "../../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
 
 type ProofingBarcodeCanadaPostState = {
   idvCode?: string;
@@ -49,14 +49,7 @@ export default function ProofingBarcodeCanadaPostPage() {
   const address = locationState?.address?.trim() || "--";
   const idSelected = locationState?.idSelected?.trim() || "--";
 
-  const acceptableIds =
-    locationState?.acceptableIds && locationState.acceptableIds.length > 0
-      ? locationState.acceptableIds
-      : [
-          t("ProofingBarcodeCanadaPost.acceptableIdOption1"),
-          t("ProofingBarcodeCanadaPost.acceptableIdOption2"),
-          t("ProofingBarcodeCanadaPost.acceptableIdOption3"),
-        ];
+  const acceptableIds = locationState?.acceptableIds;
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -89,15 +82,10 @@ export default function ProofingBarcodeCanadaPostPage() {
           <GcdsText>{t("ProofingBarcodeCanadaPost.visitInstruction")}</GcdsText>
         </GcdsContainer>
 
-        <GcdsDetails detailsTitle={t("ProofingBarcodeCanadaPost.listOfIds")}>
-          <GcdsText>
-            <ul>
-              {acceptableIds.map((acceptableId) => (
-                <li key={acceptableId}>{acceptableId}</li>
-              ))}
-            </ul>
-          </GcdsText>
-        </GcdsDetails>
+        <AcceptableIdsDetails
+          detailsTitle={t("ProofingBarcodeCanadaPost.listOfIds")}
+          acceptableIds={acceptableIds}
+        />
 
         <GcdsContainer>
           <GcdsHeading tag="h2" marginTop="0">

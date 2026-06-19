@@ -2,7 +2,6 @@ import {
   GcdsButton,
   GcdsContainer,
   GcdsDateInput,
-  GcdsDetails,
   GcdsGrid,
   GcdsHeading,
   GcdsInput,
@@ -15,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
 
 const PROVINCE_OPTIONS = [
   { value: "AB", label: "Alberta" },
@@ -116,9 +116,7 @@ export default function VisitCanadaPost() {
               <li>{t("VisitCanadaPost.step4")}</li>
             </ol>
           </GcdsText>
-          <GcdsDetails detailsTitle={t("VisitCanadaPost.listOfIds")}>
-            <GcdsText>{t("VisitCanadaPost.listOfIds")}</GcdsText>
-          </GcdsDetails>
+          <AcceptableIdsDetails detailsTitle={t("VisitCanadaPost.listOfIds")} />
         </GcdsContainer>
 
         <GcdsContainer>

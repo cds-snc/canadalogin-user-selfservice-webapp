@@ -141,6 +141,27 @@ describe("VisitCanadaPost", () => {
     expect(screen.getByText("United States")).toBeInTheDocument();
   });
 
+  it("renders the complete acceptable ID list", () => {
+    render(<VisitCanadaPost />);
+
+    expect(
+      screen.getByText("Provincial/Territorial Driver's licence."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Provincial/Territorial Photo ID Health card."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Provincial/Territorial Photo ID/Service card."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Canadian and International Passport."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Canadian PR Cards")).toBeInTheDocument();
+    expect(
+      screen.getByText("Secure Certificate of Indian Status."),
+    ).toBeInTheDocument();
+  });
+
   it("navigates back when Different method is clicked", () => {
     render(<VisitCanadaPost />);
 
