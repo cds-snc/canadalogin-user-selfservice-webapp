@@ -23,9 +23,9 @@ export default function OnlineVerificationInfo() {
   const { t } = useTranslation("idv");
 
   const currentLanguage =
-    language === AVAILABLE_LANGUAGES.en
-      ? AVAILABLE_LANGUAGES.en
-      : AVAILABLE_LANGUAGES.fr;
+    language === AVAILABLE_LANGUAGES.fr
+      ? AVAILABLE_LANGUAGES.fr
+      : AVAILABLE_LANGUAGES.en;
 
   const handleContinue = () => {
     identityVerificationApi
