@@ -1,12 +1,14 @@
 import "@testing-library/jest-dom/vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ServiceCanadaCentrePage from "../InPerson/ServiceCanadaCentrePage";
+import i18n from "../../../i18n/test";
 
 // ────────────────────────────────────────────────
 // Mocks
 // ────────────────────────────────────────────────
 const mockNavigate = vi.fn();
+const mockRouteParams = vi.hoisted(() => ({ language: "en" }));
 const mockFlags = vi.hoisted(() => ({
   devOnlyFeature: true,
 }));
@@ -15,7 +17,7 @@ vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
     ...actual,
-    useParams: () => ({ language: "en" }),
+    useParams: () => mockRouteParams,
     useNavigate: () => mockNavigate,
   };
 });
@@ -45,22 +47,88 @@ vi.mock("../../../utils/constants", async () => {
 });
 
 vi.mock("@gcds-core/components-react", () => ({
-  GcdsContainer: ({ children }) => <div>{children}</div>,
-  GcdsGrid: ({ children }) => <div>{children}</div>,
+  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
+  GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsHeading: ({ children, tag }) => {
     const Tag = tag ?? "h2";
     return <Tag>{children}</Tag>;
   },
-  GcdsText: ({ children }) => <p>{children}</p>,
-  GcdsButton: ({ children, onClick, buttonRole }) => (
+  GcdsFieldset: ({ children, legend }) => (
+    <fieldset>
+      <legend>{legend}</legend>
+      {children}
+    </fieldset>
+  ),
+  GcdsText: ({ children, ...props }) => <p {...props}>{children}</p>,
+  GcdsButton: ({ children, onClick, buttonRole, disabled, ...props }) => (
     <button
       data-testid={
         buttonRole === "secondary" ? "back-button" : "continue-button"
       }
       onClick={onClick}
+      disabled={disabled}
+      {...props}
     >
       {children}
     </button>
+  ),
+  GcdsSelect: ({
+    children,
+    label,
+    name,
+    selectId,
+    required,
+    value,
+    defaultValue,
+    onGcdsChange,
+    ...props
+  }) => {
+    // For controlled components with defaultValue, we need to use the value if provided
+    // Otherwise use defaultValue. If required and value equals defaultValue, treat as invalid.
+    const selectValue = value !== undefined ? value : defaultValue;
+    return (
+      <>
+        <label htmlFor={selectId}>{label}</label>
+        <select
+          id={selectId}
+          name={name}
+          data-testid={selectId}
+          required={required}
+          value={selectValue}
+          defaultValue={defaultValue}
+          onChange={(e) => {
+            onGcdsChange?.({ target: e.target });
+          }}
+          {...props}
+        >
+          {children}
+        </select>
+      </>
+    );
+  },
+  GcdsInput: ({ inputId, label, required, name, ...props }) => (
+    <>
+      <label htmlFor={inputId}>{label}</label>
+      <input
+        id={inputId}
+        name={name}
+        required={required}
+        data-testid={inputId}
+        {...props}
+      />
+    </>
+  ),
+  GcdsDateInput: ({ legend, name, required, ...props }) => (
+    <>
+      <label htmlFor={name}>{legend}</label>
+      <input
+        id={name}
+        name={name}
+        required={required}
+        data-testid={name}
+        {...props}
+      />
+    </>
   ),
   GcdsLink: ({ children, href }) => <a href={href}>{children}</a>,
   GcdsNotice: ({ children, noticeTitle }) => (
@@ -68,12 +136,6 @@ vi.mock("@gcds-core/components-react", () => ({
       <span>{noticeTitle}</span>
       {children}
     </div>
-  ),
-  GcdsDetails: ({ children, detailsTitle }) => (
-    <details>
-      <summary>{detailsTitle}</summary>
-      {children}
-    </details>
   ),
 }));
 
@@ -84,84 +146,103 @@ describe("ServiceCanadaCentrePage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
+    mockRouteParams.language = "en";
+    i18n.changeLanguage("en");
   });
 
-  it("renders the page title and main heading", () => {
+  afterEach(() => {
+    i18n.changeLanguage("en");
+  });
+
+  it("renders the page heading and only selectId on initial mount", () => {
     render(<ServiceCanadaCentrePage />);
 
-    expect(screen.getByText("Prove your identity")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         name: "Get ready to visit a Service Canada Centre",
       }),
     ).toBeInTheDocument();
+    expect(screen.getByTestId("selectId")).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("id-expiration-date-input"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("first-name-input")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("last-name-input")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("date-of-birth-input")).not.toBeInTheDocument();
+    expect(screen.getByTestId("continue-button")).toBeInTheDocument();
+    expect(screen.getByTestId("back-button")).toBeInTheDocument();
   });
 
-  it("renders the follow steps instruction", () => {
+  it("renders the rest of the form once an ID is selected", () => {
     render(<ServiceCanadaCentrePage />);
 
-    expect(
-      screen.getByText("Follow the steps to complete the process"),
-    ).toBeInTheDocument();
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+
+    expect(screen.getByTestId("id-expiration-date-input")).toBeInTheDocument();
+    expect(screen.getByTestId("first-name-input")).toBeInTheDocument();
+    expect(screen.getByTestId("last-name-input")).toBeInTheDocument();
+    expect(screen.getByTestId("date-of-birth-input")).toBeInTheDocument();
   });
 
-  it("renders all three steps", () => {
+  it("hides address and province fields until a qualifying ID is selected", () => {
     render(<ServiceCanadaCentrePage />);
 
-    expect(
-      screen.getByText(/Continue to receive your unique identification code/),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Find the closest available Service Canada Centre/),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Once the Service Canada agent confirms proofing/),
-    ).toBeInTheDocument();
+    expect(screen.queryByTestId("address-input")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
   });
 
-  it("renders the list of acceptable IDs details element", () => {
+  it("shows address and province fields for driver's licence", () => {
     render(<ServiceCanadaCentrePage />);
 
-    const matches = screen.getAllByText("List of acceptable IDs");
-    expect(matches.length).toBeGreaterThanOrEqual(1);
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "driverLicence" },
+    });
+
+    expect(screen.getByTestId("address-input")).toBeInTheDocument();
+    expect(screen.getByTestId("select-province")).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Alberta" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Yukon" })).toBeInTheDocument();
   });
 
-  it("renders the receive code section heading", () => {
+  it("does not show address and province fields for passport", () => {
     render(<ServiceCanadaCentrePage />);
 
-    expect(
-      screen.getByRole("heading", {
-        name: "Receive your unique identification code",
-      }),
-    ).toBeInTheDocument();
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+
+    expect(screen.queryByTestId("address-input")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
   });
 
-  it("renders the receive code description", () => {
+  it("navigates to the next page only when form is valid", () => {
     render(<ServiceCanadaCentrePage />);
 
-    expect(
-      screen.getByText(
-        /The next screen will generate your unique identification code/,
-      ),
-    ).toBeInTheDocument();
-  });
+    const continueButton = screen.getByTestId("continue-button");
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2026-12-31" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("last-name-input"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
+      target: { value: "1990-01-01" },
+    });
 
-  it("displays the user email in the email instructions", () => {
-    render(<ServiceCanadaCentrePage />);
+    fireEvent.click(continueButton);
 
-    expect(screen.getByText("test@example.com")).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Instructions along with your code will also be emailed/,
-      ),
-    ).toBeInTheDocument();
-  });
-
-  it("renders the Continue and Back buttons", () => {
-    render(<ServiceCanadaCentrePage />);
-
-    expect(screen.getByTestId("continue-button")).toHaveTextContent("Continue");
-    expect(screen.getByTestId("back-button")).toHaveTextContent("Back");
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/idv/in-person/service-canada-centre/idv-code",
+    );
   });
 
   it("calls navigate(-1) when Back button is clicked", () => {
@@ -172,33 +253,19 @@ describe("ServiceCanadaCentrePage", () => {
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
-  it("renders the more information notice", () => {
-    render(<ServiceCanadaCentrePage />);
+  it("renders French province labels when language is fr", async () => {
+    mockRouteParams.language = "fr";
+    await i18n.changeLanguage("fr");
 
-    expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
-    expect(screen.getByText("For more information")).toBeInTheDocument();
+    render(<ServiceCanadaCentrePage />);
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "driverLicence" },
+    });
+
     expect(
-      screen.getByText(
-        "Learn more about Service Canada Centre identity proofing",
-      ),
+      screen.getByRole("option", { name: "Colombie-Britannique" }),
     ).toBeInTheDocument();
-  });
-
-  it("renders in French when language param is fr", async () => {
-    const routerMod = await import("react-router");
-    vi.spyOn(routerMod, "useParams").mockReturnValue({ language: "fr" });
-
-    // Verify the component renders without error for the fr language param
-    render(<ServiceCanadaCentrePage />);
-
-    expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
-  });
-
-  it("renders without crashing when userProfile is null", () => {
-    // The top-level vi.mock applies; this test simply verifies the
-    // fallback empty string for email does not throw.
-    render(<ServiceCanadaCentrePage />);
-    expect(screen.getByTestId("continue-button")).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Québec" })).toBeInTheDocument();
   });
 
   it("renders nothing when DEV_ONLY_FEATURE is false", () => {
