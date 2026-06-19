@@ -11,10 +11,11 @@ import {
   GcdsSelect,
   GcdsText,
 } from "@gcds-core/components-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { useNavigate, useParams } from "react-router";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 
 const PROVINCE_OPTIONS = [
   { value: "AB", label: "Alberta" },
@@ -40,7 +41,6 @@ const COUNTRY_OPTIONS = [
 interface VisitCanadaPostFormData {
   givenName: string;
   familyName: string;
-  dateOfBirth: string;
   address: string;
   province: string;
   country: string;
@@ -49,15 +49,17 @@ interface VisitCanadaPostFormData {
 export default function VisitCanadaPost() {
   const { t } = useTranslation("idv");
   const navigate = useNavigate();
+  const { language } = useParams();
 
-  const [, setFormData] = useState<VisitCanadaPostFormData>({
+  const [formData, setFormData] = useState<VisitCanadaPostFormData>({
     givenName: "",
     familyName: "",
-    dateOfBirth: "",
     address: "",
     province: "",
     country: "",
   });
+
+  const dateInputRef = useRef<HTMLGcdsDateInputElement>(null);
 
   const updateField = (field: keyof VisitCanadaPostFormData, value: string) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -157,19 +159,12 @@ export default function VisitCanadaPost() {
           />
 
           <GcdsDateInput
+            ref={dateInputRef}
             name="dateOfBirth"
             legend={t("VisitCanadaPost.dobLabel")}
             required
             format="full"
             validateOn="other"
-            onGcdsChange={(e: CustomEvent) =>
-              updateField(
-                "dateOfBirth",
-                (e as CustomEvent).detail ??
-                  (e.target as HTMLInputElement)?.value ??
-                  "",
-              )
-            }
           />
 
           <GcdsInput
@@ -239,8 +234,19 @@ export default function VisitCanadaPost() {
             type="button"
             onGcdsClick={(event: Event) => {
               event.preventDefault();
-              // navigate("" , { state: formData });
-              // TODO: Navigate to the next page once it is implemented
+              navigate(
+                path(PAGES.idvProofingBarcodeCanadaPostPage, { language }),
+                {
+                  state: {
+                    givenName: formData.givenName,
+                    lastName: formData.familyName,
+                    dateOfBirth: dateInputRef.current?.value ?? "",
+                    address: formData.address,
+                    province: formData.province,
+                    country: formData.country,
+                  },
+                },
+              );
             }}
           >
             {t("VisitCanadaPost.continueButton")}
