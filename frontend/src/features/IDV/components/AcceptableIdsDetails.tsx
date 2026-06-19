@@ -29,8 +29,8 @@ export default function AcceptableIdsDetails({
   return (
     <GcdsDetails detailsTitle={detailsTitle}>
       <ul aria-label={detailsTitle}>
-        {ids.map((acceptableId) => (
-          <li key={acceptableId}>{acceptableId}</li>
+        {ids.map((acceptableId, index) => (
+          <li key={`${acceptableId}-${index}`}>{acceptableId}</li>
         ))}
       </ul>
     </GcdsDetails>
