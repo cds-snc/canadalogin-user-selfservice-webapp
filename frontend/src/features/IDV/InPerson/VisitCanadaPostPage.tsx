@@ -14,24 +14,13 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import {
+  AVAILABLE_LANGUAGES,
+  CANADIAN_PROVINCES_AND_TERRITORIES,
+  DEV_ONLY_FEATURE,
+  PAGES,
+} from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-
-const PROVINCE_OPTIONS = [
-  { value: "AB", label: "Alberta" },
-  { value: "BC", label: "British Columbia" },
-  { value: "MB", label: "Manitoba" },
-  { value: "NB", label: "New Brunswick" },
-  { value: "NL", label: "Newfoundland and Labrador" },
-  { value: "NS", label: "Nova Scotia" },
-  { value: "NT", label: "Northwest Territories" },
-  { value: "NU", label: "Nunavut" },
-  { value: "ON", label: "Ontario" },
-  { value: "PE", label: "Prince Edward Island" },
-  { value: "QC", label: "Quebec" },
-  { value: "SK", label: "Saskatchewan" },
-  { value: "YT", label: "Yukon" },
-];
 
 const COUNTRY_OPTIONS = [
   { value: "CA", label: "Canada" },
@@ -50,6 +39,10 @@ export default function VisitCanadaPost() {
   const { t } = useTranslation("idv");
   const navigate = useNavigate();
   const { language } = useParams();
+  const currentLanguage =
+    language === AVAILABLE_LANGUAGES.fr
+      ? AVAILABLE_LANGUAGES.fr
+      : AVAILABLE_LANGUAGES.en;
 
   const [formData, setFormData] = useState<VisitCanadaPostFormData>({
     givenName: "",
@@ -198,9 +191,9 @@ export default function VisitCanadaPost() {
             }
           >
             <option value="">Select option</option>
-            {PROVINCE_OPTIONS.map((option) => (
-              <option key={option.value || "blank"} value={option.value}>
-                {option.label}
+            {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
+              <option key={province.code || "blank"} value={province.code}>
+                {province.labels[currentLanguage]}
               </option>
             ))}
           </GcdsSelect>
