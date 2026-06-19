@@ -19,8 +19,7 @@ export const APPROVED_DOCUMENTS = [
   {
     value: "photoIDServiceCard",
     labels: {
-      [AVAILABLE_LANGUAGES.en]:
-        "Provincial/Territorial Photo ID Service Card",
+      [AVAILABLE_LANGUAGES.en]: "Provincial/Territorial Photo ID Service Card",
       [AVAILABLE_LANGUAGES.fr]:
         "Carte de service avec photo provincial/territorial",
     },

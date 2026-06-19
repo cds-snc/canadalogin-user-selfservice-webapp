@@ -144,11 +144,13 @@ export default function ServiceCanadaCentrePage() {
                 "ServiceCanadaCentre.selectIdDropdownDefaultValue",
               )}
             >
-              {APPROVED_DOCUMENTS.map((option: typeof APPROVED_DOCUMENTS[number]) => (
-                <option key={option.value} value={option.value}>
-                  {option.labels[currentLanguage]}
-                </option>
-              ))}
+              {APPROVED_DOCUMENTS.map(
+                (option: (typeof APPROVED_DOCUMENTS)[number]) => (
+                  <option key={option.value} value={option.value}>
+                    {option.labels[currentLanguage]}
+                  </option>
+                ),
+              )}
             </GcdsSelect>
 
             {hasSelectedIdType && (

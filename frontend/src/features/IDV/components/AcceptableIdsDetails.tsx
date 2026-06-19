@@ -19,8 +19,10 @@ export default function AcceptableIdsDetails({
       : AVAILABLE_LANGUAGES.en;
 
   const defaultAcceptableIds = APPROVED_DOCUMENTS.filter(
-    (doc: typeof APPROVED_DOCUMENTS[number]) => doc.value !== "noIds",
-  ).map((doc: typeof APPROVED_DOCUMENTS[number]) => doc.labels[currentLanguage]);
+    (doc: (typeof APPROVED_DOCUMENTS)[number]) => doc.value !== "noIds",
+  ).map(
+    (doc: (typeof APPROVED_DOCUMENTS)[number]) => doc.labels[currentLanguage],
+  );
 
   const ids =
     acceptableIds && acceptableIds.length > 0
