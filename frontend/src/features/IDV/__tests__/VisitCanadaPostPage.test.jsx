@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useEffect, useRef } from "react";
+import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import VisitCanadaPost from "../InPerson/VisitCanadaPostPage";
 
@@ -71,15 +72,9 @@ vi.mock("@gcds-core/components-react", () => {
         onChange={(e) => onGcdsChange && onGcdsChange(e)}
       />
     ),
-    GcdsDateInput: ({ legend, onGcdsChange }) => (
-      <input
-        aria-label={legend}
-        data-testid="dateOfBirth"
-        onChange={(e) =>
-          onGcdsChange && onGcdsChange({ detail: e.target.value })
-        }
-      />
-    ),
+    GcdsDateInput: React.forwardRef(({ legend }, ref) => (
+      <input ref={ref} aria-label={legend} data-testid="dateOfBirth" />
+    )),
     GcdsSelect,
     GcdsButton: ({ children, buttonRole, onGcdsClick }) => (
       <button
@@ -185,5 +180,50 @@ describe("VisitCanadaPost", () => {
         expect(internalSelect?.style.width).toBe("100%");
       });
     });
+  });
+
+  it("navigates to ProofingBarcodeCanadaPostPage with form data when Continue is clicked", () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        state: expect.objectContaining({
+          givenName: "Jane",
+          lastName: "Doe",
+          address: "123 Main St",
+        }),
+      }),
+    );
+  });
+
+  it("reads dateOfBirth from the date input ref on continue", () => {
+    render(<VisitCanadaPost />);
+
+    const dateInput = screen.getByTestId("dateOfBirth");
+    fireEvent.change(dateInput, { target: { value: "1990-05-15" } });
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        state: expect.objectContaining({
+          dateOfBirth: "1990-05-15",
+        }),
+      }),
+    );
   });
 });
