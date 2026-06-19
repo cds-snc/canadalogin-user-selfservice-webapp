@@ -9,13 +9,20 @@ import {
   GcdsHeading,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { useNavigate, useParams } from "react-router";
+import { AVAILABLE_LANGUAGES, DEV_ONLY_FEATURE } from "../../../utils/constants";
 import { identityVerificationApi } from "../api/identityVerificationApi";
+import { APPROVED_DOCUMENTS } from "../data/approvedDocuments";
 
 export default function OnlineVerificationInfo() {
   const navigate = useNavigate();
+  const { language } = useParams();
   const { t } = useTranslation("idv");
+
+  const currentLanguage =
+    language === AVAILABLE_LANGUAGES.en
+      ? AVAILABLE_LANGUAGES.en
+      : AVAILABLE_LANGUAGES.fr;
 
   const handleContinue = () => {
     identityVerificationApi
@@ -56,7 +63,13 @@ export default function OnlineVerificationInfo() {
               <GcdsDetails
                 detailsTitle={t("OnlineVerificationInfo.listOfAcceptableIds")}
               >
-                {t("OnlineVerificationInfo.listOfAcceptableIds")}
+                <ul aria-label={t("OnlineVerificationInfo.listOfAcceptableIds")}>
+                  {APPROVED_DOCUMENTS.filter(
+                    (doc: typeof APPROVED_DOCUMENTS[number]) => doc.value !== "noIds",
+                  ).map((doc: typeof APPROVED_DOCUMENTS[number]) => (
+                    <li key={doc.value}>{doc.labels[currentLanguage]}</li>
+                  ))}
+                </ul>
               </GcdsDetails>
             </li>
             <li>

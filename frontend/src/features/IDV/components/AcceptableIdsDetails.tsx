@@ -1,5 +1,7 @@
 import { GcdsDetails } from "@gcds-core/components-react";
-import { useTranslation } from "react-i18next";
+import { useParams } from "react-router";
+import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
+import { APPROVED_DOCUMENTS } from "../data/approvedDocuments";
 
 interface AcceptableIdsDetailsProps {
   detailsTitle: string;
@@ -10,16 +12,15 @@ export default function AcceptableIdsDetails({
   detailsTitle,
   acceptableIds,
 }: AcceptableIdsDetailsProps) {
-  const { t } = useTranslation("idv");
+  const { language } = useParams();
+  const currentLanguage =
+    language === AVAILABLE_LANGUAGES.fr
+      ? AVAILABLE_LANGUAGES.fr
+      : AVAILABLE_LANGUAGES.en;
 
-  const defaultAcceptableIds = [
-    t("AcceptableIds.driverLicence"),
-    t("AcceptableIds.photoIdHealthCard"),
-    t("AcceptableIds.photoIdServiceCard"),
-    t("AcceptableIds.passport"),
-    t("AcceptableIds.prCards"),
-    t("AcceptableIds.secureCertificateOfIndianStatus"),
-  ];
+  const defaultAcceptableIds = APPROVED_DOCUMENTS.filter(
+    (doc: typeof APPROVED_DOCUMENTS[number]) => doc.value !== "noIds",
+  ).map((doc: typeof APPROVED_DOCUMENTS[number]) => doc.labels[currentLanguage]);
 
   const ids =
     acceptableIds && acceptableIds.length > 0
@@ -29,7 +30,7 @@ export default function AcceptableIdsDetails({
   return (
     <GcdsDetails detailsTitle={detailsTitle}>
       <ul aria-label={detailsTitle}>
-        {ids.map((acceptableId, index) => (
+        {ids.map((acceptableId: string, index: number) => (
           <li key={`${acceptableId}-${index}`}>{acceptableId}</li>
         ))}
       </ul>
