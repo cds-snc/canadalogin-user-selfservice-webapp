@@ -20,6 +20,7 @@ import {
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
 
 const COUNTRY_OPTIONS = [
   { value: "CA", label: "Canada" },
