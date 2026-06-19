@@ -147,13 +147,5 @@
     "phoneNumber": "Phone number",
     "communication": "Communication",
     "confirmAndContinue": "Confirm and continue"
-  },
-  "AcceptableIds": {
-    "driverLicence": "Provincial/Territorial Driver's licence.",
-    "photoIdHealthCard": "Provincial/Territorial Photo ID Health card.",
-    "photoIdServiceCard": "Provincial/Territorial Photo ID/Service card.",
-    "passport": "Canadian and International Passport.",
-    "prCards": "Canadian PR Cards",
-    "secureCertificateOfIndianStatus": "Secure Certificate of Indian Status."
   }
 }
