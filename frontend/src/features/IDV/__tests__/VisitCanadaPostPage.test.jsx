@@ -145,20 +145,20 @@ describe("VisitCanadaPost", () => {
     render(<VisitCanadaPost />);
 
     expect(
-      screen.getByText("Provincial/Territorial Driver's licence."),
+      screen.getByText("Provincial/Territorial Driver's Licence"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Provincial/Territorial Photo ID Health card."),
+      screen.getByText("Provincial/Territorial Photo ID Health Card"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Provincial/Territorial Photo ID/Service card."),
+      screen.getByText("Provincial/Territorial Photo ID Service Card"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Canadian and International Passport."),
+      screen.getByText("Canadian and International Passport"),
     ).toBeInTheDocument();
-    expect(screen.getByText("Canadian PR Cards")).toBeInTheDocument();
+    expect(screen.getByText("Canadian PR Card")).toBeInTheDocument();
     expect(
-      screen.getByText("Secure Certificate of Indian Status."),
+      screen.getByText("Secure Certificate of Indian Status"),
     ).toBeInTheDocument();
   });
 

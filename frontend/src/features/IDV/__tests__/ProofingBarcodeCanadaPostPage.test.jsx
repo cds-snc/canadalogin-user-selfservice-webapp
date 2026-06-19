@@ -132,10 +132,10 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     ).toBeInTheDocument();
     expect(screen.getAllByText("--").length).toBeGreaterThan(0);
     expect(
-      screen.getByText("Provincial/Territorial Driver's licence."),
+      screen.getByText("Provincial/Territorial Driver's Licence"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Secure Certificate of Indian Status."),
+      screen.getByText("Secure Certificate of Indian Status"),
     ).toBeInTheDocument();
   });
 

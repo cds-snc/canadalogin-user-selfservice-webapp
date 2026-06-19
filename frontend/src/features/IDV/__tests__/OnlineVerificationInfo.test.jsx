@@ -21,6 +21,7 @@ vi.mock("../../../utils/constants", () => ({
   get DEV_ONLY_FEATURE() {
     return mockDevOnlyFeature;
   },
+  AVAILABLE_LANGUAGES: { en: "en", fr: "fr" },
   PAGES: {},
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
 }));
