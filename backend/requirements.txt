@@ -5,7 +5,7 @@ python-multipart==0.0.30
 python-dotenv==1.2.2
 webauthn==1.11.1
 cryptography==46.0.7
-pydantic-settings==2.14.1
+pydantic-settings==2.14.2
 pydantic==2.13.4
 httpx==0.28.1
 email-validator==2.3.0
