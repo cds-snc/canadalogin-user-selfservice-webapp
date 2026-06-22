@@ -104,16 +104,18 @@ export default function VisitCanadaPost() {
               <strong>{t("VisitCanadaPost.followSteps")}</strong>
             </GcdsText>
 
-          <GcdsText>
-            <ol>
-              <li>{t("VisitCanadaPost.step1")}</li>
-              <li>{t("VisitCanadaPost.step2")}</li>
-              <li>{t("VisitCanadaPost.step3")}</li>
-              <li>{t("VisitCanadaPost.step4")}</li>
-            </ol>
-          </GcdsText>
-          <AcceptableIdsDetails detailsTitle={t("VisitCanadaPost.listOfIds")} />
-        </GcdsContainer>
+            <GcdsText>
+              <ol>
+                <li>{t("VisitCanadaPost.step1")}</li>
+                <li>{t("VisitCanadaPost.step2")}</li>
+                <li>{t("VisitCanadaPost.step3")}</li>
+                <li>{t("VisitCanadaPost.step4")}</li>
+              </ol>
+            </GcdsText>
+            <AcceptableIdsDetails
+              detailsTitle={t("VisitCanadaPost.listOfIds")}
+            />
+          </GcdsContainer>
 
           <GcdsContainer>
             <GcdsHeading tag="h2" marginTop="0">
