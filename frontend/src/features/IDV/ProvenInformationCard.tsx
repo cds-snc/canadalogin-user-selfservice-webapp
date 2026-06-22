@@ -17,7 +17,6 @@ export default function ProvenInformationCard() {
   const { t } = useTranslation("profile");
   const navigate = useNavigate();
   const { language } = useParams();
-
   const { state } = useUser();
   const name = state?.userProfile?.name?.formatted || "";
 

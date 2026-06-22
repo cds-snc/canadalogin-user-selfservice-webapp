@@ -55,7 +55,7 @@ const IDS_REQUIRING_ADDRESS_AND_PROVINCE = new Set([
 
 export default function ServiceCanadaCentrePage() {
   const navigate = useNavigate();
-  const { language } = useParams();
+  const { language, journeyType } = useParams();
   const formRef = useRef<HTMLFormElement>(null);
   const [selectedIdType, setSelectedIdType] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
@@ -64,6 +64,7 @@ export default function ServiceCanadaCentrePage() {
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,
+    journeyType: journeyType,
   });
   const currentLanguage =
     language === AVAILABLE_LANGUAGES.fr

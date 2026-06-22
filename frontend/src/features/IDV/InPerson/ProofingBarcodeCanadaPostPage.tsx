@@ -28,7 +28,7 @@ type ProofingBarcodeCanadaPostState = {
 
 export default function ProofingBarcodeCanadaPostPage() {
   const { t } = useTranslation("idv");
-  const { language } = useParams();
+  const { language, journeyType } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = useUser();
@@ -40,6 +40,7 @@ export default function ProofingBarcodeCanadaPostPage() {
 
   const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
     language,
+    journeyType,
   });
 
   const email = state?.userProfile?.userName ?? "";
