@@ -77,5 +77,14 @@
     "phoneNumber": "Phone number",
     "communication": "Communication",
     "confirmAndContinue": "Confirm and continue"
+  },
+  "OnlineVerificationErrorState": {
+    "moreInfoTitle": "Your identity could not be verified",
+    "learnMoreText": "You will need to try again with another method",
+    "pageTitle": "How do you want to prove your identity?",
+    "radioOnlineLabel": "Do it online and get instant access",
+    "inPersonOption": "or do it in person",
+    "signBackInNotice": "You will only get access to this service after proving your identity in person and signing back in with your CanadaLogin.",
+    "cancelButton": "Not ready yet?"
   }
 }
