@@ -27,9 +27,11 @@ export default function StartIdentityProofingPage() {
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
     language,
+    journeyType,
   });
   const visitCanadaPostPage = path(PAGES.idvVisitCanadaPostPage, {
     language,
+    journeyType,
   });
   // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
