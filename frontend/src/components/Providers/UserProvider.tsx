@@ -160,6 +160,32 @@ export function UserProvider({
   const { language } = useParams();
   const { t } = useTranslation("layout");
 
+  useEffect(() => {
+    if (searchParams.size === 0) {
+      return;
+    }
+
+    const seenKeys = new Set<string>();
+    for (const key of searchParams.keys()) {
+      if (seenKeys.has(key)) {
+        continue;
+      }
+
+      if (key === RP_CLIENT_ID_KEY) {
+        continue;
+      }
+
+      seenKeys.add(key);
+      const values = searchParams.getAll(key);
+      if (values.length === 1) {
+        sessionStorage.setItem(key, values[0]);
+      } else if (values.length > 1) {
+        // Preserve repeated query params under the same key.
+        sessionStorage.setItem(key, JSON.stringify(values));
+      }
+    }
+  }, [searchParams]);
+
   // keep latest expire in a ref so SSE handler can compare without capturing stale closure state
   const latestExpireRef = useRef<number | null>(
     sessionTimeoutState.newServerSideExpirationTime,
