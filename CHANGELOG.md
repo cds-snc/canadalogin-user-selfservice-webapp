@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.24.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.4...v1.24.0) (2026-06-22)
+
+
+### Features
+
+* **identity-verification:** Added a form component to wrap the page ([#1674](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1674)) ([a4bd8e8](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a4bd8e8de76e9ef0ea2cec46ced277013deeb969))
+* **identity-verification:** Added CompleteIdentityProofing Page ([#1611](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1611)) ([0b8a74c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0b8a74cc16ee244b5bfa2b0a7dac64d485cf3626))
+* **identity-verification:** Adding Integration between Get Ready To … ([#1663](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1663)) ([1b8a9cc](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1b8a9ccf3887fc230eb204824c5930378ec33c5f))
+* **identity-verification:** Adding Integration between Get Ready To Visit Canada Post and Proofing Barcode ([1b8a9cc](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1b8a9ccf3887fc230eb204824c5930378ec33c5f))
+* **identity-verification:** confirm what will be saved to your canadalogin ([#1621](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1621)) ([00f555c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/00f555cc7bc415fbe7cf84a483c01ca5768d5167))
+* **identity-verification:** Creating Visit Canada Post Page ([#1642](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1642)) ([aff6911](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/aff6911f7e0d0cb5189316505f96bf9f58108ddf))
+* **identity-verification:** Take your proofing barcode to Canada Post ([#1653](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1653)) ([bb69182](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/bb69182d2c1a3257c85541e839284904b9f319f6))
+* **idv:** re-implement SCC page to align with new Figma designs ([#1661](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1661)) ([1ed714a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1ed714a430e0edde92709c6a24529cc3bc2c9072))
+* remove passkey feature flags for release ([11411ff](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/11411ffaa437cec595afd9beefb6f8076f230d93))
+
+
+### Bug Fixes
+
+* **language-preference:** retain language selection on navigation state change ([#1656](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1656)) ([63c8290](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/63c82907cc14e411e01d1a22a66c016a93dcc937))
+
+
+### Code Refactoring
+
+* **identity-verification:** reusing canadian province array ([#1667](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1667)) ([6ba957a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6ba957a03bdf35c03c23094dddefa8ebd6e38464))
+
+
+### Miscellaneous Chores
+
+* bump version to 1.23.4 in staging.json ([#1638](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1638)) ([a0ff4f5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a0ff4f5d3f482ef07b318e64fc12a73ff69b1727))
+* remove passkey feature flags for release ([#1683](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1683)) ([11411ff](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/11411ffaa437cec595afd9beefb6f8076f230d93))
+* update production version to 1.23.4 in prod.json ([#1640](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1640)) ([20f6a85](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/20f6a85d94abee1a9becfcf6ef12f47519e42a1f))
+
 ## [1.23.4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.3...v1.23.4) (2026-06-16)
 
 
