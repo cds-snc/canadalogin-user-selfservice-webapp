@@ -13,7 +13,10 @@ import {
 import OnlineRadioButtons from "./../components/OnlineRadioButtons";
 import InPersonRadioButtons from "./../components/InPersonRadioButtons";
 import { ONLINE_IDV_METHOD, type IdvMethod } from "./../components/methods.ts";
-import { IN_PERSON_METHOD, type InPersonMethod } from "./../components/methods.ts";
+import {
+  IN_PERSON_METHOD,
+  type InPersonMethod,
+} from "./../components/methods.ts";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
@@ -77,15 +80,15 @@ export default function OnlineVerificationErrorState() {
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
         <GcdsContainer>
-            <GcdsNotice
-                noticeRole="danger"
-                noticeTitleTag="h2"
-                noticeTitle={t("OnlineVerificationErrorState.moreInfoTitle")}
-                >
-                <GcdsText>
-                    {t("OnlineVerificationErrorState.learnMoreText")}
-                </GcdsText>
-            </GcdsNotice>
+          <GcdsNotice
+            noticeRole="danger"
+            noticeTitleTag="h2"
+            noticeTitle={t("OnlineVerificationErrorState.moreInfoTitle")}
+          >
+            <GcdsText>
+              {t("OnlineVerificationErrorState.learnMoreText")}
+            </GcdsText>
+          </GcdsNotice>
         </GcdsContainer>
         <GcdsContainer>
           <GcdsHeading tag="h1">
