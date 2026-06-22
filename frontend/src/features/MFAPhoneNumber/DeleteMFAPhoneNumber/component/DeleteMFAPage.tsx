@@ -152,6 +152,7 @@ export default function DeleteMFAPage() {
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
+    enabled: true,
     setErrorCode,
   });
 

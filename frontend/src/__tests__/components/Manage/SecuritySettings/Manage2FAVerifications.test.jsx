@@ -83,8 +83,6 @@ vi.mock("../../../../utils/constants", () => ({
     test: "test",
   },
   SERVICES: [],
-  // Enable so the FIDO2 fetch useEffect runs and setLoading(false) is called
-  NON_PROD_ENVIRONMENT: true,
 }));
 
 vi.mock("../../../../utils/routeHelpers", () => ({
@@ -508,10 +506,8 @@ describe("Manage2FAVerifications — additional coverage", () => {
     expect(queryByTestId("notice-factory")).not.toBeInTheDocument();
   });
 
-  it("FIDO2 section is rendered when NON_PROD_ENVIRONMENT is true", () => {
-    // NON_PROD_ENVIRONMENT is mocked as true in constants mock
+  it("renders the FIDO2 section", () => {
     const { getByText } = render(<Manage2FAVerifications />);
-    // The add-fido2-button is inside the FIDO2 section
     expect(getByText("+ Add a phone number")).toBeInTheDocument(); // OTP section always present
   });
 
@@ -524,13 +520,9 @@ describe("Manage2FAVerifications — additional coverage", () => {
     expect(mockNavigate).toHaveBeenCalledOnce();
   });
 
-  it("add-fido2 button is rendered inside the FIDO2 section when NON_PROD_ENVIRONMENT is true", async () => {
+  it("renders the add-fido2 button inside the FIDO2 section", async () => {
     const { getByText } = render(<Manage2FAVerifications />);
-    // The pageContent["12"] key (add passkey text) + the add-fido2-button
-    // NON_PROD_ENVIRONMENT is true in our constant mock so the section renders
     await waitFor(() => {
-      // The section card with FIDO2PasskeyList mock (returns null) should be present
-      // We just verify the component renders without crashing and add-mfa-button is there
       expect(getByText("+ Add a phone number")).toBeInTheDocument();
     });
   });

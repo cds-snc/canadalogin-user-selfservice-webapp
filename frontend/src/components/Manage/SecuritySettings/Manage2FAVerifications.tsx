@@ -8,7 +8,7 @@ import {
 import { useLocation, useNavigate, useParams } from "react-router";
 import { MAP_TYPES, useOtpOperations } from "../../../hooks/useOtpOperations";
 import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations";
-import { NON_PROD_ENVIRONMENT, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
 import Loader from "../../Layout/Loading";
@@ -103,7 +103,7 @@ export default function Manage2FAVerifications() {
 
   const { fido2Data: userFIDO2CredentialsData, loading: passkeyLoading } =
     usePasskeyOperations({
-      enabled: NON_PROD_ENVIRONMENT,
+      enabled: true,
       setErrorCode: () => {},
     });
 
@@ -174,42 +174,40 @@ export default function Manage2FAVerifications() {
         </GcdsButton>
       </GcdsGrid>
 
-      {NON_PROD_ENVIRONMENT && (
-        <GcdsGrid {...sectionCardProps}>
-          <SectionHeader
-            icon={
-              <FIDOPasskeyIcon
-                width="34"
-                height="34"
-                aria-hidden="true"
-                focusable="false"
-              />
-            }
-            title={t("Manage2FAVerifications.passkeysHeading")}
-          />
-          {userFIDO2CredentialsData.length < 1 && (
-            <>
-              <FIDOPasskeyCollage aria-hidden="true" focusable="false" />
-              <PasskeyInfoPanel />
-            </>
-          )}
-          <FIDO2PasskeyList
-            userFIDO2CredentialsData={userFIDO2CredentialsData}
-            totalFactorCount={totalFactorCount}
-            setErrorCode={setErrorCode}
-            errorMessage={errorMessage}
-          />
-          <GcdsButton
-            id="add-fido2-button"
-            onGcdsClick={(event) => {
-              event.preventDefault();
-              navigate(addFido2PagePath);
-            }}
-          >
-            {t("Manage2FAVerifications.addPasskey")}
-          </GcdsButton>
-        </GcdsGrid>
-      )}
+      <GcdsGrid {...sectionCardProps}>
+        <SectionHeader
+          icon={
+            <FIDOPasskeyIcon
+              width="34"
+              height="34"
+              aria-hidden="true"
+              focusable="false"
+            />
+          }
+          title={t("Manage2FAVerifications.passkeysHeading")}
+        />
+        {userFIDO2CredentialsData.length < 1 && (
+          <>
+            <FIDOPasskeyCollage aria-hidden="true" focusable="false" />
+            <PasskeyInfoPanel />
+          </>
+        )}
+        <FIDO2PasskeyList
+          userFIDO2CredentialsData={userFIDO2CredentialsData}
+          totalFactorCount={totalFactorCount}
+          setErrorCode={setErrorCode}
+          errorMessage={errorMessage}
+        />
+        <GcdsButton
+          id="add-fido2-button"
+          onGcdsClick={(event) => {
+            event.preventDefault();
+            navigate(addFido2PagePath);
+          }}
+        >
+          {t("Manage2FAVerifications.addPasskey")}
+        </GcdsButton>
+      </GcdsGrid>
     </GcdsContainer>
   );
 }

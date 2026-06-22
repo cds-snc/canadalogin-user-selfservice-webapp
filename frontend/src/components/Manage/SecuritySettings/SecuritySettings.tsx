@@ -10,11 +10,7 @@ import {
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
-import {
-  PAGES,
-  DEV_ONLY_FEATURE,
-  NON_PROD_ENVIRONMENT,
-} from "../../../utils/constants";
+import { PAGES, DEV_ONLY_FEATURE } from "../../../utils/constants";
 
 import { useUser } from "../../Providers/useUser";
 import EnabledBadge from "../../Badges/EnabledBadge";
@@ -62,11 +58,7 @@ export default function SecuritySettings() {
         <GcdsHeading tag="h3" marginTop="300">
           {t("SecuritySettings.twoStepVerification")}
         </GcdsHeading>
-        <GcdsText>
-          {NON_PROD_ENVIRONMENT
-            ? t("SecuritySettings.twoStepDescription")
-            : t("SecuritySettings.twoStepDescriptionPhoneOnly")}
-        </GcdsText>
+        <GcdsText>{t("SecuritySettings.twoStepDescription")}</GcdsText>
         <GcdsGrid columns="1fr" gap="300" align-items="center">
           <EnabledBadge text={t("SecuritySettings.enabled")} />
           <GcdsLink href={manage2FAVerificationsPage} size="regular">

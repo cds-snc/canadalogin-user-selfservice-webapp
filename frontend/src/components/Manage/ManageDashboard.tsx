@@ -10,7 +10,7 @@ import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useError } from "../../hooks/useError";
 import { useNavigateHelper } from "../../hooks/useNavigate";
-import { NON_PROD_ENVIRONMENT, PAGES } from "../../utils/constants";
+import { PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 import { useUser } from "../Providers/useUser";
 import { trackCardClick } from "../../utils/gatag";
@@ -105,13 +105,11 @@ export default function ManageDashboard() {
                 {t("ManageDashboard.securitySettingsPhone")}
               </GcdsText>
             </li>
-            {NON_PROD_ENVIRONMENT && (
-              <li>
-                <GcdsText marginBottom="0">
-                  {t("ManageDashboard.securitySettingsPasskey")}
-                </GcdsText>
-              </li>
-            )}
+            <li>
+              <GcdsText marginBottom="0">
+                {t("ManageDashboard.securitySettingsPasskey")}
+              </GcdsText>
+            </li>
           </ul>
         </GcdsCard>
       </GcdsGrid>
