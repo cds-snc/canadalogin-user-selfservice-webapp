@@ -8,15 +8,15 @@ import {
   GcdsLink,
   GcdsText,
   GcdsContainer,
-  GcdsNotice,
 } from "@gcds-core/components-react";
 
-import OnlineRadioButtons from "./components/OnlineRadioButtons";
-import InPersonRadioButtons from "./components/InPersonRadioButtons";
-import { ONLINE_IDV_METHOD, type IdvMethod } from "./components/methods.ts";
-import { IN_PERSON_METHOD, type InPersonMethod } from "./components/methods.ts";
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
+import IdentityProofingRadioButtons from "./components/IdentityProofingRadioButtons";
+import {
+  START_IDENTITY_OPTION,
+  type StartIdentityOption,
+} from "./components/methods";
 
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
@@ -24,51 +24,24 @@ export default function StartIdentityProofingPage() {
 
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
-  const [onlineSelectedMethod, setOnlineSelectedMethod] = useState<IdvMethod>();
-  const [inPersonSelectedMethod, setInPersonSelectedMethod] =
-    useState<InPersonMethod>();
-
-  const serviceCanadaPage = path(PAGES.idvServiceCanadaCentrePage, {
-    language: language,
-    journeyType: journeyType,
-  });
-
+  const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
-    language: language,
-    journeyType: journeyType,
+    language,
   });
-
-  const provincialVerificationPage = path(PAGES.idvProvincialVerificationPage, {
-    language: language,
-    journeyType: journeyType,
+  const visitCanadaPostPage = path(PAGES.idvVisitCanadaPostPage, {
+    language,
   });
-
-  const handleOnlineMethodChange = (method: IdvMethod) => {
-    setOnlineSelectedMethod(method);
-    setInPersonSelectedMethod(undefined);
-  };
-
-  const handleInPersonMethodChange = (method: InPersonMethod) => {
-    setInPersonSelectedMethod(method);
-    setOnlineSelectedMethod(undefined);
-  };
-
+  // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
-    const selected = onlineSelectedMethod ?? inPersonSelectedMethod;
-
-    switch (selected) {
-      case ONLINE_IDV_METHOD.documentScanning:
+    switch (selectedOption) {
+      case START_IDENTITY_OPTION.online:
         navigate(onlineVerificationInfoPage);
         break;
-      case ONLINE_IDV_METHOD.provincialPartner:
-        navigate(provincialVerificationPage);
+      case START_IDENTITY_OPTION.inPerson:
+        navigate(visitCanadaPostPage);
         break;
-      case IN_PERSON_METHOD.serviceCanadaLocations:
-        navigate(serviceCanadaPage);
-        break;
-      case IN_PERSON_METHOD.canadaPostLocations:
-        // TODO: implement Canada Post locations flow
-        navigate(serviceCanadaPage);
+      case START_IDENTITY_OPTION.cantProveNow:
+      default:
         break;
     }
   };
@@ -97,31 +70,16 @@ export default function StartIdentityProofingPage() {
           <GcdsHeading tag="h2" marginTop="300" characterLimit={false}>
             {t("StartIdentityProofing.howToProveHeading")}
           </GcdsHeading>
-          <OnlineRadioButtons
-            selectedMethod={onlineSelectedMethod}
-            onMethodChange={handleOnlineMethodChange}
-          />
-
-          <GcdsHeading tag="h4" marginTop="300" characterLimit={false}>
-            {t("StartIdentityProofing.inPersonOption")}
-          </GcdsHeading>
-          <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
-            <GcdsText>
-              {t("StartIdentityProofing.signBackInNotice", {
-                appName: tLayout("TopNavBar.appName"),
-              })}
-            </GcdsText>
-          </GcdsNotice>
-          <InPersonRadioButtons
-            selectedMethod={inPersonSelectedMethod}
-            onMethodChange={handleInPersonMethodChange}
+          <IdentityProofingRadioButtons
+            selectedOption={selectedOption}
+            onOptionChange={setSelectedOption}
           />
         </GcdsContainer>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             type="button"
-            disabled={!onlineSelectedMethod && !inPersonSelectedMethod}
+            disabled={!selectedOption}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               handleContinue();
@@ -131,7 +89,6 @@ export default function StartIdentityProofingPage() {
           </GcdsButton>
           <GcdsButton
             buttonRole="secondary"
-            style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               // back to Relying Party page? For now, navigate to account settings page
