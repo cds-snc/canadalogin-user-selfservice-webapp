@@ -22,10 +22,26 @@ vi.mock("../../../utils/constants", () => ({
   get DEV_ONLY_FEATURE() {
     return mockDevOnlyFeature;
   },
+  PAGES: {
+    idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
+    idvVisitCanadaPostPage: "IdvVisitCanadaPostPage",
+  },
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
   SERVICES: [
     { id: 1, title: "Parks Canada Reservations", description: "", url: "#" },
   ],
+}));
+
+vi.mock("../../../utils/routeHelpers", () => ({
+  path: (page, { language } = {}) => {
+    const resolvedLanguage = language || "en";
+
+    if (page === "IdvOnlineVerificationInfoPage") {
+      return `/${resolvedLanguage}/idv/online`;
+    }
+
+    return `/${resolvedLanguage}/idv/in-person/canada-post`;
+  },
 }));
 
 vi.mock("@gcds-core/components-react", () => ({
@@ -148,7 +164,7 @@ describe("StartIdentityProofingPage", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Set up a visit to a Canada Post or Service Canada Center with one piece of ID.",
+        "Set up a visit to a Canada Post or Service Canada Centre with one piece of ID.",
       ),
     ).toBeInTheDocument();
   });
@@ -161,7 +177,7 @@ describe("StartIdentityProofingPage", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "This service requries identity proofing but you can sign out and complete identity proofing when ready.",
+        "This service requires identity proofing but you can sign out and complete identity proofing when ready.",
       ),
     ).toBeInTheDocument();
   });
@@ -203,7 +219,7 @@ describe("StartIdentityProofingPage", () => {
   });
 
   // ── Continue button actions ────────────────────
-  it("navigates to idv/online for online option", () => {
+  it("navigates to online verification page for online option", () => {
     render(<StartIdentityProofingPage />);
 
     fireEvent.click(
@@ -216,7 +232,7 @@ describe("StartIdentityProofingPage", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/en/idv/online");
   });
 
-  it("navigates to idv/in-person for in-person option", () => {
+  it("navigates to visit canada post page for in-person option", () => {
     render(<StartIdentityProofingPage />);
 
     fireEvent.click(
@@ -226,7 +242,7 @@ describe("StartIdentityProofingPage", () => {
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idv/in-person");
+    expect(mockNavigate).toHaveBeenCalledWith("/en/idv/in-person/canada-post");
   });
 
   it("does not navigate for cant prove now option", () => {

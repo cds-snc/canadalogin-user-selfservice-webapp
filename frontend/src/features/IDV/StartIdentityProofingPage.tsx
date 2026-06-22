@@ -11,7 +11,8 @@ import {
   GcdsContainer,
 } from "@gcds-core/components-react";
 
-import { DEV_ONLY_FEATURE } from "../../utils/constants";
+import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import { path } from "../../utils/routeHelpers";
 
 const START_IDENTITY_OPTION = {
   online: "online",
@@ -37,16 +38,20 @@ export default function StartIdentityProofingPage() {
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
-
+  const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
+    language,
+  });
+  const visitCanadaPostPage = path(PAGES.idvVisitCanadaPostPage, {
+    language,
+  });
+  // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
-    const languagePrefix = language ? `/${language}` : "";
-
     switch (selectedOption) {
       case START_IDENTITY_OPTION.online:
-        navigate(`${languagePrefix}/idv/online`);
+        navigate(onlineVerificationInfoPage);
         break;
       case START_IDENTITY_OPTION.inPerson:
-        navigate(`${languagePrefix}/idv/in-person`);
+        navigate(visitCanadaPostPage);
         break;
       case START_IDENTITY_OPTION.cantProveNow:
       default:
@@ -129,7 +134,6 @@ export default function StartIdentityProofingPage() {
           </GcdsButton>
           <GcdsButton
             buttonRole="secondary"
-            style={{ width: "fit-content" }}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               // back to Relying Party page? For now, navigate to account settings page
