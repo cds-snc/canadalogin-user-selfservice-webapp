@@ -1,6 +1,6 @@
 import { useReducer, useEffect, useRef, useMemo } from "react";
 import type { ReactNode } from "react";
-import { useSearchParams, useParams } from "react-router";
+import { useSearchParams, useParams, useLocation } from "react-router";
 import {
   useEventSource,
   useEventSourceListener,
@@ -29,6 +29,15 @@ import {
 } from "../../types/user";
 
 const SCIM_IBM_USER_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User";
+const POST_LOGIN_REDIRECT_PATH_KEY = "post_login_redirect_path";
+
+function isHomeLikePath(path: string): boolean {
+  return path === "/" || /^\/[a-z]{2}\/?$/.test(path);
+}
+
+function isSafeInternalPath(path: string): boolean {
+  return path.startsWith("/") && !path.startsWith("//");
+}
 
 type UserProfileApiShape = UserProfile & {
   [SCIM_IBM_USER_EXT]?: UserProfile["details"];
@@ -157,8 +166,17 @@ export function UserProvider({
     initialSessionTimeoutState,
   );
   const [searchParams] = useSearchParams();
+  const { pathname } = useLocation();
   const { language } = useParams();
   const { t } = useTranslation("layout");
+
+  useEffect(() => {
+    if (isHomeLikePath(pathname)) {
+      return;
+    }
+
+    sessionStorage.setItem(POST_LOGIN_REDIRECT_PATH_KEY, pathname);
+  }, [pathname]);
 
   useEffect(() => {
     if (searchParams.size === 0) {
@@ -407,6 +425,21 @@ export function UserProvider({
             type: CONTEXT_ACTIONS.updated_profile_success,
             payload: normalizedProfile,
           });
+
+          const intendedPath = sessionStorage.getItem(
+            POST_LOGIN_REDIRECT_PATH_KEY,
+          );
+          if (
+            intendedPath &&
+            isSafeInternalPath(intendedPath) &&
+            intendedPath !== pathname &&
+            isHomeLikePath(pathname)
+          ) {
+            sessionStorage.removeItem(POST_LOGIN_REDIRECT_PATH_KEY);
+            window.location.href = intendedPath;
+            return;
+          }
+
           await getRelyingPartyInfo();
         }
       } catch (err) {
