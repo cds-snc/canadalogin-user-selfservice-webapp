@@ -2,11 +2,16 @@ import { GcdsButton, GcdsNotice, GcdsText } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 
+import { PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
+
 export default function CompleteIdentityProofingNotice() {
   const { language } = useParams<{ language: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
-  const startIdentityProofingPage = `/${language ?? "en"}/idv`;
+  const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
+    language,
+  });
 
   return (
     <GcdsNotice
