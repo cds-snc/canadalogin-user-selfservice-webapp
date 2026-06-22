@@ -152,7 +152,7 @@ export const appRoutes: RouteObject[] = [
                       handle: { id: PAGES.idvCompleteIdentityProofingPage },
                     },
                     {
-                      path: "idv/in-person/canada-post",
+                      path: "idv/in-person",
                       element: <VisitCanadaPost />,
                       handle: { id: PAGES.idvVisitCanadaPostPage },
                     },

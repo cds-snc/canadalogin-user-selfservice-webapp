@@ -6,17 +6,29 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
+  GcdsRadios,
   GcdsText,
   GcdsContainer,
-  GcdsNotice,
 } from "@gcds-core/components-react";
 
-import OnlineRadioButtons from "./components/OnlineRadioButtons";
-import InPersonRadioButtons from "./components/InPersonRadioButtons";
-import { ONLINE_IDV_METHOD, type IdvMethod } from "./components/methods.ts";
-import { IN_PERSON_METHOD, type InPersonMethod } from "./components/methods.ts";
-import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
-import { path } from "../../utils/routeHelpers";
+import { DEV_ONLY_FEATURE } from "../../utils/constants";
+
+const START_IDENTITY_OPTION = {
+  online: "online",
+  inPerson: "inPerson",
+  cantProveNow: "cantProveNow",
+} as const;
+
+type StartIdentityOption =
+  (typeof START_IDENTITY_OPTION)[keyof typeof START_IDENTITY_OPTION];
+
+interface RadioOption {
+  label: string;
+  id: string;
+  value: string;
+  hint: string;
+  checked: boolean;
+}
 
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
@@ -24,51 +36,47 @@ export default function StartIdentityProofingPage() {
 
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
-  const [onlineSelectedMethod, setOnlineSelectedMethod] = useState<IdvMethod>();
-  const [inPersonSelectedMethod, setInPersonSelectedMethod] =
-    useState<InPersonMethod>();
-
-  const serviceCanadaPage = path(PAGES.idvServiceCanadaCentrePage, {
-    language: language,
-  });
-
-  const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
-    language: language,
-  });
-
-  const provincialVerificationPage = path(PAGES.idvProvincialVerificationPage, {
-    language: language,
-  });
-
-  const handleOnlineMethodChange = (method: IdvMethod) => {
-    setOnlineSelectedMethod(method);
-    setInPersonSelectedMethod(undefined);
-  };
-
-  const handleInPersonMethodChange = (method: InPersonMethod) => {
-    setInPersonSelectedMethod(method);
-    setOnlineSelectedMethod(undefined);
-  };
+  const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
 
   const handleContinue = () => {
-    const selected = onlineSelectedMethod ?? inPersonSelectedMethod;
+    const languagePrefix = language ? `/${language}` : "";
 
-    switch (selected) {
-      case ONLINE_IDV_METHOD.documentScanning:
-        navigate(onlineVerificationInfoPage);
+    switch (selectedOption) {
+      case START_IDENTITY_OPTION.online:
+        navigate(`${languagePrefix}/idv/online`);
         break;
-      case ONLINE_IDV_METHOD.provincialPartner:
-        navigate(provincialVerificationPage);
+      case START_IDENTITY_OPTION.inPerson:
+        navigate(`${languagePrefix}/idv/in-person`);
         break;
-      case IN_PERSON_METHOD.serviceCanadaLocations:
-        navigate(serviceCanadaPage);
-        break;
-      case IN_PERSON_METHOD.canadaPostLocations:
-        // TODO: implement Canada Post locations flow
-        navigate(serviceCanadaPage);
+      case START_IDENTITY_OPTION.cantProveNow:
+      default:
         break;
     }
   };
+
+  const radioOptions: RadioOption[] = [
+    {
+      label: t("StartIdentityProofing.onlineInstantOption"),
+      id: `radio-${START_IDENTITY_OPTION.online}`,
+      value: START_IDENTITY_OPTION.online,
+      hint: t("StartIdentityProofing.onlineInstantHint"),
+      checked: selectedOption === START_IDENTITY_OPTION.online,
+    },
+    {
+      label: t("StartIdentityProofing.inPersonSignBackInOption"),
+      id: `radio-${START_IDENTITY_OPTION.inPerson}`,
+      value: START_IDENTITY_OPTION.inPerson,
+      hint: t("StartIdentityProofing.inPersonSignBackInHint"),
+      checked: selectedOption === START_IDENTITY_OPTION.inPerson,
+    },
+    {
+      label: t("StartIdentityProofing.cantProveNowOption"),
+      id: `radio-${START_IDENTITY_OPTION.cantProveNow}`,
+      value: START_IDENTITY_OPTION.cantProveNow,
+      hint: t("StartIdentityProofing.cantProveNowHint"),
+      checked: selectedOption === START_IDENTITY_OPTION.cantProveNow,
+    },
+  ];
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -94,31 +102,24 @@ export default function StartIdentityProofingPage() {
           <GcdsHeading tag="h2" marginTop="300" characterLimit={false}>
             {t("StartIdentityProofing.howToProveHeading")}
           </GcdsHeading>
-          <OnlineRadioButtons
-            selectedMethod={onlineSelectedMethod}
-            onMethodChange={handleOnlineMethodChange}
-          />
-
-          <GcdsHeading tag="h4" marginTop="300" characterLimit={false}>
-            {t("StartIdentityProofing.inPersonOption")}
-          </GcdsHeading>
-          <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
-            <GcdsText>
-              {t("StartIdentityProofing.signBackInNotice", {
-                appName: tLayout("TopNavBar.appName"),
-              })}
-            </GcdsText>
-          </GcdsNotice>
-          <InPersonRadioButtons
-            selectedMethod={inPersonSelectedMethod}
-            onMethodChange={handleInPersonMethodChange}
-          />
+          <GcdsRadios
+            name="start-identity-proofing-method"
+            legend={t("StartIdentityProofing.howToProveHeading")}
+            hideLegend
+            options={radioOptions}
+            value={selectedOption ?? ""}
+            onGcdsChange={(e: CustomEvent<string>) => {
+              setSelectedOption(
+                (e.target as HTMLInputElement).value as StartIdentityOption,
+              );
+            }}
+          ></GcdsRadios>
         </GcdsContainer>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             type="button"
-            disabled={!onlineSelectedMethod && !inPersonSelectedMethod}
+            disabled={!selectedOption}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               handleContinue();
