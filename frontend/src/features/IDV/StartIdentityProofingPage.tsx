@@ -6,30 +6,17 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsRadios,
   GcdsText,
   GcdsContainer,
 } from "@gcds-core/components-react";
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
-
-const START_IDENTITY_OPTION = {
-  online: "online",
-  inPerson: "inPerson",
-  cantProveNow: "cantProveNow",
-} as const;
-
-type StartIdentityOption =
-  (typeof START_IDENTITY_OPTION)[keyof typeof START_IDENTITY_OPTION];
-
-interface RadioOption {
-  label: string;
-  id: string;
-  value: string;
-  hint: string;
-  checked: boolean;
-}
+import IdentityProofingRadioButtons from "./components/IdentityProofingRadioButtons";
+import {
+  START_IDENTITY_OPTION,
+  type StartIdentityOption,
+} from "./components/methods";
 
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
@@ -59,30 +46,6 @@ export default function StartIdentityProofingPage() {
     }
   };
 
-  const radioOptions: RadioOption[] = [
-    {
-      label: t("StartIdentityProofing.onlineInstantOption"),
-      id: `radio-${START_IDENTITY_OPTION.online}`,
-      value: START_IDENTITY_OPTION.online,
-      hint: t("StartIdentityProofing.onlineInstantHint"),
-      checked: selectedOption === START_IDENTITY_OPTION.online,
-    },
-    {
-      label: t("StartIdentityProofing.inPersonSignBackInOption"),
-      id: `radio-${START_IDENTITY_OPTION.inPerson}`,
-      value: START_IDENTITY_OPTION.inPerson,
-      hint: t("StartIdentityProofing.inPersonSignBackInHint"),
-      checked: selectedOption === START_IDENTITY_OPTION.inPerson,
-    },
-    {
-      label: t("StartIdentityProofing.cantProveNowOption"),
-      id: `radio-${START_IDENTITY_OPTION.cantProveNow}`,
-      value: START_IDENTITY_OPTION.cantProveNow,
-      hint: t("StartIdentityProofing.cantProveNowHint"),
-      checked: selectedOption === START_IDENTITY_OPTION.cantProveNow,
-    },
-  ];
-
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
@@ -107,18 +70,10 @@ export default function StartIdentityProofingPage() {
           <GcdsHeading tag="h2" marginTop="300" characterLimit={false}>
             {t("StartIdentityProofing.howToProveHeading")}
           </GcdsHeading>
-          <GcdsRadios
-            name="start-identity-proofing-method"
-            legend={t("StartIdentityProofing.howToProveHeading")}
-            hideLegend
-            options={radioOptions}
-            value={selectedOption ?? ""}
-            onGcdsChange={(e: CustomEvent<string>) => {
-              setSelectedOption(
-                (e.target as HTMLInputElement).value as StartIdentityOption,
-              );
-            }}
-          ></GcdsRadios>
+          <IdentityProofingRadioButtons
+            selectedOption={selectedOption}
+            onOptionChange={setSelectedOption}
+          />
         </GcdsContainer>
 
         <GcdsGrid columns="max-content max-content" gap="200">

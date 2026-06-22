@@ -13,3 +13,12 @@ export const ONLINE_IDV_METHOD = {
 
 export type IdvMethod =
   (typeof ONLINE_IDV_METHOD)[keyof typeof ONLINE_IDV_METHOD];
+
+export const START_IDENTITY_OPTION = {
+  online: "online",
+  inPerson: "inPerson",
+  cantProveNow: "cantProveNow",
+} as const;
+
+export type StartIdentityOption =
+  (typeof START_IDENTITY_OPTION)[keyof typeof START_IDENTITY_OPTION];
