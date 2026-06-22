@@ -20,7 +20,7 @@ import { path } from "../../utils/routeHelpers";
 
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
-  const { language } = useParams();
+  const { language, journeyType } = useParams();
 
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
@@ -30,14 +30,17 @@ export default function StartIdentityProofingPage() {
 
   const serviceCanadaPage = path(PAGES.idvServiceCanadaCentrePage, {
     language: language,
+    journeyType: journeyType,
   });
 
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
     language: language,
+    journeyType: journeyType,
   });
 
   const provincialVerificationPage = path(PAGES.idvProvincialVerificationPage, {
     language: language,
+    journeyType: journeyType,
   });
 
   const handleOnlineMethodChange = (method: IdvMethod) => {
