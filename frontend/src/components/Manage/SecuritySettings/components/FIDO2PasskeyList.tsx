@@ -20,6 +20,7 @@ import {
   RENAME_PASSKEY_ANALYTICS,
 } from "../../../../utils/analyticsConstants";
 import { trackPage } from "../../../../utils/gatag";
+import Separator from "../../../Layout/Separator";
 
 interface Fido2CredentialWithCreated extends Fido2Credential {
   created?: string;
@@ -242,7 +243,7 @@ export default function FIDO2PasskeyList({
             </>
           )}
         </GcdsGrid>
-        <div className="separator" />
+        <Separator />
       </GcdsContainer>
     );
   });

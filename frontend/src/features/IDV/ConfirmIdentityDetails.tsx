@@ -9,6 +9,7 @@ import {
 
 import { useTranslation } from "react-i18next";
 import { DEV_ONLY_FEATURE } from "../../utils/constants";
+import Separator from "../../components/Layout/Separator";
 import { useUser } from "../../components/Providers/useUser";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import ProvenInformationCard from "../IDV/ProvenInformationCard";
@@ -45,9 +46,9 @@ export default function ConfirmIdentityDetails() {
           </GcdsHeading>
           <GcdsContainer className="sectionCard">
             <ViewProfileNameCard isConfirmIdentityDetails />
-            <div className="separator" />
+            <Separator />
             <DisplayEmailInfo />
-            <div className="separator" />
+            <Separator />
             <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
           </GcdsContainer>
         </GcdsContainer>

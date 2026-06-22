@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { DEV_ONLY_FEATURE } from "../../utils/constants";
 import { useUser } from "../Providers/useUser";
 import VerifiedBadge from "../Badges/VerifiedBadge";
+import Separator from "../Layout/Separator";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
@@ -51,7 +52,7 @@ export default function ProfileHome() {
 
           <GcdsContainer className="sectionCard">
             <ViewEmailInfo />
-            <div className="separator" />
+            <Separator />
             <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
           </GcdsContainer>
         </GcdsContainer>
@@ -62,7 +63,7 @@ export default function ProfileHome() {
           </GcdsHeading>
           <GcdsContainer className="sectionCard">
             <ViewLanguagePreferences />
-            <div className="separator" />
+            <Separator />
             <GcdsHeading tag="h3" marginTop="300">
               {t("ProfileHome.notifications")}
             </GcdsHeading>

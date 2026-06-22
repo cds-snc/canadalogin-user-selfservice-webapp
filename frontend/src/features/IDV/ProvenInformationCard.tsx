@@ -8,6 +8,7 @@ import {
 
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
+import Separator from "../../components/Layout/Separator";
 import { useUser } from "../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
@@ -47,7 +48,7 @@ export default function ProvenInformationCard() {
           </GcdsText>
         </div>
 
-        <div className="separator" style={{ margin: "0" }} />
+        <Separator style={{ margin: "0" }} />
 
         <div>
           <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
@@ -58,7 +59,7 @@ export default function ProvenInformationCard() {
           </GcdsText>
         </div>
 
-        <div className="separator" style={{ margin: "0" }} />
+        <Separator style={{ margin: "0" }} />
 
         <div>
           <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
@@ -69,7 +70,7 @@ export default function ProvenInformationCard() {
           </GcdsText>
         </div>
 
-        <div className="separator" style={{ margin: "0" }} />
+        <Separator style={{ margin: "0" }} />
 
         <GcdsGrid columns="1fr auto" className="gridInline">
           <GcdsText marginBottom="300">

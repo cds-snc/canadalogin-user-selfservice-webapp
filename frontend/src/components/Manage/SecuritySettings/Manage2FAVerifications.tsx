@@ -25,6 +25,7 @@ import type { OtpFactorReference } from "../../../types/hooks";
 import { useEffect, useState } from "react";
 import { getErrorMessage } from "../../../utils/errorUtils";
 import ErrorSummaryWithFocus from "../../ErrorSummaryWithFocus/ErrorSummaryWithFocus";
+import Separator from "../../Layout/Separator";
 
 const sectionCardProps = {
   columns: "1fr",
@@ -160,7 +161,7 @@ export default function Manage2FAVerifications() {
             <GcdsText textRole="secondary" marginBottom="0">
               {t("Manage2FAVerifications.phoneEmptyState")}
             </GcdsText>
-            <div className="separator" />
+            <Separator />
           </>
         )}
         <GcdsButton

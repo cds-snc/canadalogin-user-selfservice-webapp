@@ -9,6 +9,7 @@ import { PAGES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { path } from "../../../../utils/routeHelpers";
 import type { OtpFactorReference } from "../../../../types/hooks";
+import Separator from "../../../Layout/Separator";
 
 interface PhoneFactorsListProps {
   userPhoneFactorsMap: Record<string, OtpFactorReference[]>;
@@ -87,7 +88,7 @@ export default function PhoneFactorsList({
               <GcdsSrOnly tag="span"> {phoneNumber}</GcdsSrOnly>
             </GcdsButton>
           )}
-          <div className="separator" />
+          <Separator />
         </GcdsContainer>
       );
     },
