@@ -17,6 +17,7 @@ export default function CompleteIdentityProofingNotice() {
       <GcdsText>{t("CompleteIdentityProofing.noticeDescription")}</GcdsText>
       <GcdsButton
         type="button"
+        buttonRole="secondary"
         onGcdsClick={() => {
           navigate(startIdentityProofingPage);
         }}

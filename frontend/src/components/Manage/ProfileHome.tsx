@@ -27,7 +27,11 @@ export default function ProfileHome() {
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>
-        {DEV_ONLY_FEATURE && <CompleteIdentityProofingNotice />}
+        {DEV_ONLY_FEATURE && (
+          <GcdsContainer className="idvNoticeSpacing">
+            <CompleteIdentityProofingNotice />
+          </GcdsContainer>
+        )}
         {DEV_ONLY_FEATURE && (
           <GcdsContainer>
             <GcdsGrid columns="1fr auto" className="gridInline">
