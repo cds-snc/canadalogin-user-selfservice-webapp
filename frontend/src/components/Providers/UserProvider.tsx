@@ -1,6 +1,6 @@
 import { useReducer, useEffect, useRef, useMemo } from "react";
 import type { ReactNode } from "react";
-import { useSearchParams, useParams, useLocation } from "react-router";
+import { useSearchParams, useParams } from "react-router";
 import {
   useEventSource,
   useEventSourceListener,
@@ -29,15 +29,6 @@ import {
 } from "../../types/user";
 
 const SCIM_IBM_USER_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User";
-const POST_LOGIN_REDIRECT_PATH_KEY = "post_login_redirect_path";
-
-function isHomeLikePath(path: string): boolean {
-  return path === "/" || /^\/[a-z]{2}\/?$/.test(path);
-}
-
-function isSafeInternalPath(path: string): boolean {
-  return path.startsWith("/") && !path.startsWith("//");
-}
 
 type UserProfileApiShape = UserProfile & {
   [SCIM_IBM_USER_EXT]?: UserProfile["details"];
@@ -166,43 +157,8 @@ export function UserProvider({
     initialSessionTimeoutState,
   );
   const [searchParams] = useSearchParams();
-  const { pathname } = useLocation();
   const { language } = useParams();
   const { t } = useTranslation("layout");
-
-  useEffect(() => {
-    if (isHomeLikePath(pathname)) {
-      return;
-    }
-
-    sessionStorage.setItem(POST_LOGIN_REDIRECT_PATH_KEY, pathname);
-  }, [pathname]);
-
-  useEffect(() => {
-    if (searchParams.size === 0) {
-      return;
-    }
-
-    const seenKeys = new Set<string>();
-    for (const key of searchParams.keys()) {
-      if (seenKeys.has(key)) {
-        continue;
-      }
-
-      if (key === RP_CLIENT_ID_KEY) {
-        continue;
-      }
-
-      seenKeys.add(key);
-      const values = searchParams.getAll(key);
-      if (values.length === 1) {
-        sessionStorage.setItem(key, values[0]);
-      } else if (values.length > 1) {
-        // Preserve repeated query params under the same key.
-        sessionStorage.setItem(key, JSON.stringify(values));
-      }
-    }
-  }, [searchParams]);
 
   // keep latest expire in a ref so SSE handler can compare without capturing stale closure state
   const latestExpireRef = useRef<number | null>(
@@ -426,29 +382,16 @@ export function UserProvider({
             payload: normalizedProfile,
           });
 
-          const intendedPath = sessionStorage.getItem(
-            POST_LOGIN_REDIRECT_PATH_KEY,
-          );
-          if (
-            intendedPath &&
-            isSafeInternalPath(intendedPath) &&
-            intendedPath !== pathname &&
-            isHomeLikePath(pathname)
-          ) {
-            sessionStorage.removeItem(POST_LOGIN_REDIRECT_PATH_KEY);
-            window.location.href = intendedPath;
-            return;
-          }
-
           await getRelyingPartyInfo();
         }
       } catch (err) {
-        console.log("User not authenticated:", err);
+        console.error("User not authenticated:", err);
         // After a deliberate logout, redirect immediately with prompt=login so IBM
         // Verify shows the login form instead of silently re-authenticating.
         if (sessionStorage.getItem("post_logout") === "true") {
           sessionStorage.removeItem("post_logout");
-          window.location.href = `${OIDC_REDIRECT.login}?prompt=login`;
+          const returnToPage = `${window.location.pathname}${window.location.search}`;
+          window.location.href = `${OIDC_REDIRECT.login}?prompt=login&returnToPage=${encodeURIComponent(returnToPage)}`;
           return;
         }
       } finally {

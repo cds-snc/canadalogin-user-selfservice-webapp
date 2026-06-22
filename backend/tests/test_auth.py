@@ -338,7 +338,7 @@ async def test_callback_handler_success_flow_sets_session_and_redirects(app, cli
     assert resp.status_code in (302, 307)
     assert (
         resp.headers["location"]
-        == "https://pm.example.com/dashboard?returnToPage=/dashboard"
+        == "https://pm.example.com/dashboard?returnToPage=%2Fdashboard"
     )
 
     # returnToPage is one-time and should be consumed by callback_handler

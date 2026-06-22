@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlencode
 
 from typing import Optional
 from fastapi import Request
@@ -81,7 +82,13 @@ async def callback_handler(request: Request):
     returnToPageValue = request.session.pop(SessionKeys.RETURN_TO_PAGE.value, None)
 
     if returnToPageValue:
-        clientRedirectValue = f"{returnToPageValue}?{SessionKeys.RETURN_TO_PAGE.value}={returnToPageValue}"
+        query_separator = "&" if "?" in returnToPageValue else "?"
+        return_to_page_query = urlencode(
+            {SessionKeys.RETURN_TO_PAGE.value: returnToPageValue}
+        )
+        clientRedirectValue = (
+            f"{returnToPageValue}{query_separator}{return_to_page_query}"
+        )
         redirectValue += clientRedirectValue
         logger.info(f"Return to page set in session: {redirectValue}")
 

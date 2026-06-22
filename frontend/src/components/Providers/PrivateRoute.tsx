@@ -28,6 +28,11 @@ type SignUpGuard = RouteGuard & {
 function PrivateRoute() {
   const { state } = useUser();
   const { t } = useTranslation("security");
+  const { pathname, search } = useLocation();
+
+  const returnToPage = `${pathname}${search}`;
+  const loginWithReturnToPage = `${OIDC_REDIRECT.login}?returnToPage=${encodeURIComponent(returnToPage)}`;
+  const loginWithPromptAndReturnToPage = `${OIDC_REDIRECT.login}?prompt=login&returnToPage=${encodeURIComponent(returnToPage)}`;
 
   useEffect(() => {
     if (!state.isLoading && !state.userProfile) {
@@ -36,12 +41,17 @@ function PrivateRoute() {
         sessionStorage.removeItem("post_logout");
         // After deliberate logout, force IBM Verify to show the login form
         // instead of silently re-authenticating from a live session.
-        window.location.href = `${OIDC_REDIRECT.login}?prompt=login`;
+        window.location.href = loginWithPromptAndReturnToPage;
       } else {
-        window.location.href = OIDC_REDIRECT.login;
+        window.location.href = loginWithReturnToPage;
       }
     }
-  }, [state.isLoading, state.userProfile]);
+  }, [
+    loginWithPromptAndReturnToPage,
+    loginWithReturnToPage,
+    state.isLoading,
+    state.userProfile,
+  ]);
   if (state.isLoading) {
     return (
       <Loader
