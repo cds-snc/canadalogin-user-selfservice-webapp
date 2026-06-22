@@ -17,14 +17,17 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../utils/constants", () => ({
-  get DEV_ONLY_FEATURE() {
-    return mockDevOnlyFeature;
-  },
-  AVAILABLE_LANGUAGES: { en: "en", fr: "fr" },
-  PAGES: {},
-  VITE_ENVIRONMENTS: { dev: "development", test: "test" },
-}));
+vi.mock("../../../utils/constants", async () => {
+  const actual = await vi.importActual("../../../utils/constants");
+  return {
+    ...actual,
+    get DEV_ONLY_FEATURE() {
+      return mockDevOnlyFeature;
+    },
+    PAGES: {},
+    VITE_ENVIRONMENTS: { dev: "development", test: "test" },
+  };
+});
 
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
