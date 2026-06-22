@@ -142,47 +142,47 @@ export const appRoutes: RouteObject[] = [
               ...(DEV_ONLY_FEATURE
                 ? [
                     {
-                      path: "idv/",
+                      path: "idv/:journeyType",
                       element: <StartIdentityProofingPage />,
                       handle: { id: PAGES.idvStartIdentityProofingPage },
                     },
                     {
-                      path: "idv/required/",
+                      path: "idv/:journeyType/required/",
                       element: <CompleteIdentityProofingPage />,
                       handle: { id: PAGES.idvCompleteIdentityProofingPage },
                     },
                     {
-                      path: "idv/in-person/canada-post",
+                      path: "idv/:journeyType/in-person/canada-post",
                       element: <VisitCanadaPost />,
                       handle: { id: PAGES.idvVisitCanadaPostPage },
                     },
                     {
-                      path: "idv/in-person/service-canada-centre",
-                      element: <ServiceCanadaCentrePage />,
-                      handle: { id: PAGES.idvServiceCanadaCentrePage },
-                    },
-                    {
-                      path: "idv/in-person/service-canada-centre/idv-code",
-                      element: <ServiceCanadaCentreIDVCodePage />,
-                      handle: { id: PAGES.idvServiceCanadaCentreCodePage },
-                    },
-                    {
-                      path: "idv/in-person/canada-post/idv-code",
+                      path: "idv/:journeyType/in-person/canada-post/idv-code",
                       element: <ProofingBarcodeCanadaPostPage />,
                       handle: { id: PAGES.idvProofingBarcodeCanadaPostPage },
                     },
                     {
-                      path: "idv/online",
+                      path: "idv/:journeyType/in-person/service-canada-centre",
+                      element: <ServiceCanadaCentrePage />,
+                      handle: { id: PAGES.idvServiceCanadaCentrePage },
+                    },
+                    {
+                      path: "idv/:journeyType/in-person/service-canada-centre/idv-code",
+                      element: <ServiceCanadaCentreIDVCodePage />,
+                      handle: { id: PAGES.idvServiceCanadaCentreCodePage },
+                    },
+                    {
+                      path: "idv/:journeyType/online",
                       element: <OnlineVerificationInfo />,
                       handle: { id: PAGES.idvOnlineVerificationInfoPage },
                     },
                     {
-                      path: "idv/online/provincial",
+                      path: "idv/:journeyType/online/provincial",
                       element: <ProvincialVerificationPage />,
                       handle: { id: PAGES.idvProvincialVerificationPage },
                     },
                     {
-                      path: "idv/details-confirmation",
+                      path: "idv/:journeyType/details-confirmation",
                       element: <ConfirmIdentityDetails />,
                       handle: { id: PAGES.idvDetailsConfirmationPage },
                     },
