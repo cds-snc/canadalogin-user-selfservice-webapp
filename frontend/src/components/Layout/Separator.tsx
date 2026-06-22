@@ -1,9 +1,8 @@
-import type { CSSProperties } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 
-interface SeparatorProps {
-  style?: CSSProperties;
-}
+type SeparatorProps = ComponentPropsWithoutRef<"div">;
 
-export default function Separator({ style }: SeparatorProps) {
-  return <div className="separator" style={style} />;
+export default function Separator({ className, ...props }: SeparatorProps) {
+  const mergedClassName = ["separator", className].filter(Boolean).join(" ");
+  return <div className={mergedClassName} {...props} />;
 }
