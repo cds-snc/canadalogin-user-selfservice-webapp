@@ -11,6 +11,7 @@ import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
+import { IDV_JOURNEY_TYPE } from "./constants";
 
 export default function ProvenInformationCard() {
   const { t } = useTranslation("profile");
@@ -24,6 +25,7 @@ export default function ProvenInformationCard() {
     PAGES.idvStartIdentityProofingPage,
     {
       language: language,
+      journeyType: IDV_JOURNEY_TYPE.UPDATE,
     },
   );
 
