@@ -33,7 +33,7 @@ vi.mock("react-i18next", async () => {
 });
 
 vi.mock("../../../../utils/routeHelpers", () => ({
-  path: (id: string, params: { language?: string }) =>
+  path: (_id: string, params: { language?: string }) =>
     `/${params.language ?? "en"}/idv`,
 }));
 
