@@ -99,9 +99,12 @@ vi.mock("../../../features/IDV/ProvenInformationCard", () => ({
   default: () => <div data-testid="proven-information-card" />,
 }));
 
-vi.mock("../../../features/IDV/components/CompleteIdentityProofingNotice", () => ({
-  default: () => <div data-testid="idv-complete-notice" />,
-}));
+vi.mock(
+  "../../../features/IDV/components/CompleteIdentityProofingNotice",
+  () => ({
+    default: () => <div data-testid="idv-complete-notice" />,
+  }),
+);
 
 describe("ProfileHome", () => {
   beforeEach(() => {
