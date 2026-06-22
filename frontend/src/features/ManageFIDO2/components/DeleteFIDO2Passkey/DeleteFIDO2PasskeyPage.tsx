@@ -98,6 +98,7 @@ export default function DeleteFIDO2PasskeyPage({
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
+    enabled: true,
     setErrorCode,
   });
 

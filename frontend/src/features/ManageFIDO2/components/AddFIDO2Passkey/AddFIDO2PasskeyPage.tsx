@@ -150,6 +150,7 @@ export default function AddFIDO2PasskeyPage({
   }
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
+    enabled: true,
     setErrorCode,
   });
 

@@ -171,6 +171,7 @@ export default function AddMFAPage() {
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
+    enabled: true,
     setErrorCode,
   });
 
