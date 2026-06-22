@@ -23,9 +23,8 @@ vi.mock("../../../utils/constants", () => ({
     return mockDevOnlyFeature;
   },
   PAGES: {
-    idvServiceCanadaCentrePage: "idvServiceCanadaCentrePage",
-    idvOnlineVerificationInfoPage: "idvOnlineVerificationInfoPage",
-    idvProvincialVerificationPage: "idvProvincialVerificationPage",
+    idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
+    idvVisitCanadaPostPage: "IdvVisitCanadaPostPage",
   },
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
   SERVICES: [
@@ -34,15 +33,14 @@ vi.mock("../../../utils/constants", () => ({
 }));
 
 vi.mock("../../../utils/routeHelpers", () => ({
-  path: (pageId, params) => `/${params.language}/${pageId}`,
-}));
+  path: (page, { language } = {}) => {
+    const resolvedLanguage = language || "en";
 
-const mockGetOnlineIdentityVerificationUrl = vi.fn();
+    if (page === "IdvOnlineVerificationInfoPage") {
+      return `/${resolvedLanguage}/idv/online`;
+    }
 
-vi.mock("../api/identityVerificationApi", () => ({
-  identityVerificationApi: {
-    getOnlineIdentityVerificationUrl: (...args) =>
-      mockGetOnlineIdentityVerificationUrl(...args),
+    return `/${resolvedLanguage}/idv/in-person/canada-post`;
   },
 }));
 
@@ -87,6 +85,7 @@ vi.mock("@gcds-core/components-react", () => ({
             readOnly={!onGcdsChange}
           />
           {opt.label}
+          {opt.hint ? <span>{opt.hint}</span> : null}
         </label>
       ))}
     </fieldset>
@@ -147,21 +146,40 @@ describe("StartIdentityProofingPage", () => {
   it("renders online radio options", () => {
     render(<StartIdentityProofingPage />);
 
-    expect(screen.getByText("Selfie and photo of your ID")).toBeInTheDocument();
-    expect(screen.getByText("Use your provincial sign in")).toBeInTheDocument();
+    expect(
+      screen.getByText("Prove identity online and get instant access"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Do either a selfie and ID check or sign with a provincial account (BC, AB).",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("renders in-person heading and options", () => {
     render(<StartIdentityProofingPage />);
 
-    expect(screen.getByText("Canada Post locations")).toBeInTheDocument();
-    expect(screen.getByText("Service Canada Centres")).toBeInTheDocument();
+    expect(
+      screen.getByText("Do it in person and sign back in when done"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Set up a visit to a Canada Post or Service Canada Centre with one piece of ID.",
+      ),
+    ).toBeInTheDocument();
   });
 
-  it("renders the sign back in notice", () => {
+  it("renders the cant prove now option", () => {
     render(<StartIdentityProofingPage />);
 
-    expect(screen.getByText(/sign back in to your/)).toBeInTheDocument();
+    expect(
+      screen.getByText("Can't prove your identity right now?"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "This service requires identity proofing but you can sign out and complete identity proofing when ready.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("renders Continue and Cancel buttons", () => {
@@ -182,7 +200,7 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     const radio = screen.getByRole("radio", {
-      name: /Selfie and photo of your ID/,
+      name: /Prove identity online and get instant access/,
     });
     fireEvent.click(radio);
 
@@ -193,105 +211,51 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     const radio = screen.getByRole("radio", {
-      name: /Service Canada Centres/,
+      name: /Do it in person and sign back in when done/,
     });
     fireEvent.click(radio);
 
     expect(screen.getByTestId("continue-button")).not.toBeDisabled();
   });
 
-  // ── Mutual exclusion ──────────────────────────
-  it("clears in-person selection when online method is selected", () => {
-    render(<StartIdentityProofingPage />);
-
-    // First select in-person
-    fireEvent.click(
-      screen.getByRole("radio", { name: /Service Canada Centres/ }),
-    );
-    // Then select online
-    fireEvent.click(
-      screen.getByRole("radio", { name: /Selfie and photo of your ID/ }),
-    );
-
-    // In-person radio should no longer be checked
-    expect(
-      screen.getByRole("radio", { name: /Service Canada Centres/ }),
-    ).not.toBeChecked();
-    // Online radio should be checked
-    expect(
-      screen.getByRole("radio", { name: /Selfie and photo of your ID/ }),
-    ).toBeChecked();
-  });
-
-  it("clears online selection when in-person method is selected", () => {
-    render(<StartIdentityProofingPage />);
-
-    // First select online
-    fireEvent.click(
-      screen.getByRole("radio", { name: /Selfie and photo of your ID/ }),
-    );
-    // Then select in-person
-    fireEvent.click(
-      screen.getByRole("radio", { name: /Canada Post locations/ }),
-    );
-
-    // Online radio should no longer be checked
-    expect(
-      screen.getByRole("radio", { name: /Selfie and photo of your ID/ }),
-    ).not.toBeChecked();
-    // In-person radio should be checked
-    expect(
-      screen.getByRole("radio", { name: /Canada Post locations/ }),
-    ).toBeChecked();
-  });
-
   // ── Continue button actions ────────────────────
-  it("navigates to online verification info page for document scanning option", () => {
+  it("navigates to online verification page for online option", () => {
     render(<StartIdentityProofingPage />);
 
     fireEvent.click(
-      screen.getByRole("radio", { name: /Selfie and photo of your ID/ }),
+      screen.getByRole("radio", {
+        name: /Prove identity online and get instant access/,
+      }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/idvOnlineVerificationInfoPage",
-    );
+    expect(mockNavigate).toHaveBeenCalledWith("/en/idv/online");
   });
 
-  it("navigates to provincial verification page for provincial partner option", () => {
+  it("navigates to visit canada post page for in-person option", () => {
     render(<StartIdentityProofingPage />);
 
     fireEvent.click(
-      screen.getByRole("radio", { name: /Use your provincial sign in/ }),
+      screen.getByRole("radio", {
+        name: /Do it in person and sign back in when done/,
+      }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/idvProvincialVerificationPage",
-    );
+    expect(mockNavigate).toHaveBeenCalledWith("/en/idv/in-person/canada-post");
   });
 
-  it("navigates to Service Canada page for Service Canada option", () => {
+  it("does not navigate for cant prove now option", () => {
     render(<StartIdentityProofingPage />);
 
     fireEvent.click(
-      screen.getByRole("radio", { name: /Service Canada Centres/ }),
+      screen.getByRole("radio", {
+        name: /Can't prove your identity right now\?/,
+      }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idvServiceCanadaCentrePage");
-  });
-
-  it("navigates for Canada Post option", () => {
-    render(<StartIdentityProofingPage />);
-
-    fireEvent.click(
-      screen.getByRole("radio", { name: /Canada Post locations/ }),
-    );
-    fireEvent.click(screen.getByTestId("continue-button"));
-
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idvServiceCanadaCentrePage");
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   // ── Cancel button ──────────────────────────────
