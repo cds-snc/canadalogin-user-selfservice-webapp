@@ -52,9 +52,7 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsText: ({ children }: { children: React.ReactNode }) => (
-    <p>{children}</p>
-  ),
+  GcdsText: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
   GcdsButton: ({
     children,
     onGcdsClick,
@@ -89,9 +87,7 @@ describe("CompleteIdentityProofingNotice", () => {
   it("renders the notice description text", () => {
     render(<CompleteIdentityProofingNotice />);
     expect(
-      screen.getByText(
-        /Complete identity proofing to secure your CanadaLogin/,
-      ),
+      screen.getByText(/Complete identity proofing to secure your CanadaLogin/),
     ).toBeInTheDocument();
   });
 
