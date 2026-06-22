@@ -95,7 +95,6 @@ export default function OnlineVerificationErrorState() {
             selectedMethod={onlineSelectedMethod}
             onMethodChange={handleOnlineMethodChange}
           />
-
           <GcdsHeading tag="h4" marginTop="300" characterLimit={false}>
             {t("OnlineVerificationErrorState.inPersonOption")}
           </GcdsHeading>
@@ -130,7 +129,8 @@ export default function OnlineVerificationErrorState() {
               navigate("/");
             }}
           >
-            {t("Button.cancel", { ns: "common" })}
+            {/* {t("Button.cancel", { ns: "common" })} */}
+            {t("OnlineVerificationErrorState.cancelButton")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>
