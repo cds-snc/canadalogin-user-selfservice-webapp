@@ -55,12 +55,6 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </a>
   ),
-  GcdsDetails: ({ children, detailsTitle }) => (
-    <details>
-      <summary>{detailsTitle}</summary>
-      {children}
-    </details>
-  ),
 }));
 
 const mockUserState = {
