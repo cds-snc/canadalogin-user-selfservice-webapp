@@ -95,13 +95,14 @@ export default function VisitCanadaPost() {
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="450">
-        <GcdsContainer>
-          <GcdsHeading tag="h1">{t("VisitCanadaPost.heading")}</GcdsHeading>
+      <form style={{ width: "100%" }}>
+        <GcdsGrid columns="1" gap="450">
+          <GcdsContainer>
+            <GcdsHeading tag="h1">{t("VisitCanadaPost.heading")}</GcdsHeading>
 
-          <GcdsText>
-            <strong>{t("VisitCanadaPost.followSteps")}</strong>
-          </GcdsText>
+            <GcdsText>
+              <strong>{t("VisitCanadaPost.followSteps")}</strong>
+            </GcdsText>
 
           <GcdsText>
             <ol>
@@ -114,156 +115,161 @@ export default function VisitCanadaPost() {
           <AcceptableIdsDetails detailsTitle={t("VisitCanadaPost.listOfIds")} />
         </GcdsContainer>
 
-        <GcdsContainer>
-          <GcdsHeading tag="h2" marginTop="0">
-            {t("VisitCanadaPost.enterInfoHeading")}
-          </GcdsHeading>
+          <GcdsContainer>
+            <GcdsHeading tag="h2" marginTop="0">
+              {t("VisitCanadaPost.enterInfoHeading")}
+            </GcdsHeading>
 
-          <GcdsInput
-            inputId="givenName"
-            name="givenName"
-            label={t("VisitCanadaPost.givenNameLabel")}
-            hint={t("VisitCanadaPost.givenNameHint")}
-            required
-            validateOn="other"
-            onGcdsChange={(e: CustomEvent) =>
-              updateField(
-                "givenName",
-                (e.target as HTMLInputElement)?.value ?? "",
-              )
-            }
-          />
+            <GcdsInput
+              inputId="givenName"
+              name="givenName"
+              label={t("VisitCanadaPost.givenNameLabel")}
+              hint={t("VisitCanadaPost.givenNameHint")}
+              required
+              validateOn="other"
+              onGcdsChange={(e: CustomEvent) =>
+                updateField(
+                  "givenName",
+                  (e.target as HTMLInputElement)?.value ?? "",
+                )
+              }
+            />
 
-          <GcdsInput
-            inputId="familyName"
-            name="familyName"
-            label={t("VisitCanadaPost.familyNameLabel")}
-            hint={t("VisitCanadaPost.familyNameHint")}
-            required
-            validateOn="other"
-            onGcdsChange={(e: CustomEvent) =>
-              updateField(
-                "familyName",
-                (e.target as HTMLInputElement)?.value ?? "",
-              )
-            }
-          />
+            <GcdsInput
+              inputId="familyName"
+              name="familyName"
+              label={t("VisitCanadaPost.familyNameLabel")}
+              hint={t("VisitCanadaPost.familyNameHint")}
+              required
+              validateOn="other"
+              onGcdsChange={(e: CustomEvent) =>
+                updateField(
+                  "familyName",
+                  (e.target as HTMLInputElement)?.value ?? "",
+                )
+              }
+            />
 
-          <GcdsDateInput
-            ref={dateInputRef}
-            name="dateOfBirth"
-            legend={t("VisitCanadaPost.dobLabel")}
-            required
-            format="full"
-            validateOn="other"
-          />
+            <GcdsDateInput
+              ref={dateInputRef}
+              name="dateOfBirth"
+              legend={t("VisitCanadaPost.dobLabel")}
+              required
+              format="full"
+              validateOn="other"
+            />
 
-          <GcdsInput
-            inputId="address"
-            name="address"
-            label={t("VisitCanadaPost.addressLabel")}
-            hint={t("VisitCanadaPost.addressHint")}
-            required
-            validateOn="other"
-            onGcdsChange={(e: CustomEvent) =>
-              updateField(
-                "address",
-                (e.target as HTMLInputElement)?.value ?? "",
-              )
-            }
-          />
+            <GcdsInput
+              inputId="address"
+              name="address"
+              label={t("VisitCanadaPost.addressLabel")}
+              hint={t("VisitCanadaPost.addressHint")}
+              required
+              validateOn="other"
+              onGcdsChange={(e: CustomEvent) =>
+                updateField(
+                  "address",
+                  (e.target as HTMLInputElement)?.value ?? "",
+                )
+              }
+            />
 
-          <GcdsSelect
-            className="visit-canada-post-select"
-            selectId="province"
-            name="province"
-            label={t("VisitCanadaPost.provinceLabel")}
-            required
-            defaultValue=""
-            validateOn="other"
-            onGcdsChange={(e: CustomEvent) =>
-              updateField(
-                "province",
-                (e.target as HTMLSelectElement)?.value ?? "",
-              )
-            }
+            <GcdsSelect
+              className="visit-canada-post-select"
+              selectId="province"
+              name="province"
+              label={t("VisitCanadaPost.provinceLabel")}
+              required
+              defaultValue=""
+              validateOn="other"
+              onGcdsChange={(e: CustomEvent) =>
+                updateField(
+                  "province",
+                  (e.target as HTMLSelectElement)?.value ?? "",
+                )
+              }
+            >
+              <option value="">Select option</option>
+              {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
+                <option key={province.code || "blank"} value={province.code}>
+                  {province.labels[currentLanguage]}
+                </option>
+              ))}
+            </GcdsSelect>
+
+            <GcdsSelect
+              className="visit-canada-post-select"
+              selectId="country"
+              name="country"
+              label={t("VisitCanadaPost.countryLabel")}
+              required
+              defaultValue=""
+              validateOn="other"
+              onGcdsChange={(e: CustomEvent) =>
+                updateField(
+                  "country",
+                  (e.target as HTMLSelectElement)?.value ?? "",
+                )
+              }
+            >
+              <option value="">Select option</option>
+              {COUNTRY_OPTIONS.map((option) => (
+                <option key={option.value || "blank"} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </GcdsSelect>
+          </GcdsContainer>
+
+          <GcdsGrid
+            columns="1"
+            columnsDesktop="max-content max-content"
+            gap="200"
           >
-            <option value="">Select option</option>
-            {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
-              <option key={province.code || "blank"} value={province.code}>
-                {province.labels[currentLanguage]}
-              </option>
-            ))}
-          </GcdsSelect>
-
-          <GcdsSelect
-            className="visit-canada-post-select"
-            selectId="country"
-            name="country"
-            label={t("VisitCanadaPost.countryLabel")}
-            required
-            defaultValue=""
-            validateOn="other"
-            onGcdsChange={(e: CustomEvent) =>
-              updateField(
-                "country",
-                (e.target as HTMLSelectElement)?.value ?? "",
-              )
-            }
-          >
-            <option value="">Select option</option>
-            {COUNTRY_OPTIONS.map((option) => (
-              <option key={option.value || "blank"} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </GcdsSelect>
-        </GcdsContainer>
-
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
-            type="button"
-            onGcdsClick={(event: Event) => {
-              event.preventDefault();
-              navigate(
-                path(PAGES.idvProofingBarcodeCanadaPostPage, { language }),
-                {
-                  state: {
-                    givenName: formData.givenName,
-                    lastName: formData.familyName,
-                    dateOfBirth: dateInputRef.current?.value ?? "",
-                    address: formData.address,
-                    province: formData.province,
-                    country: formData.country,
+            <GcdsButton
+              type="button"
+              onGcdsClick={(event: Event) => {
+                event.preventDefault();
+                navigate(
+                  path(PAGES.idvProofingBarcodeCanadaPostPage, { language }),
+                  {
+                    state: {
+                      givenName: formData.givenName,
+                      lastName: formData.familyName,
+                      dateOfBirth: dateInputRef.current?.value ?? "",
+                      address: formData.address,
+                      province: formData.province,
+                      country: formData.country,
+                    },
                   },
-                },
-              );
-            }}
-          >
-            {t("VisitCanadaPost.continueButton")}
-          </GcdsButton>
-          <GcdsButton
-            type="button"
-            buttonRole="secondary"
-            onGcdsClick={(event: Event) => {
-              event.preventDefault();
-              navigate(-1);
-            }}
-          >
-            {t("VisitCanadaPost.differentMethodButton")}
-          </GcdsButton>
-        </GcdsGrid>
+                );
+              }}
+            >
+              {t("VisitCanadaPost.continueButton")}
+            </GcdsButton>
+            <GcdsButton
+              type="button"
+              buttonRole="secondary"
+              onGcdsClick={(event: Event) => {
+                event.preventDefault();
+                navigate(-1);
+              }}
+            >
+              {t("VisitCanadaPost.differentMethodButton")}
+            </GcdsButton>
+          </GcdsGrid>
 
-        <GcdsNotice
-          noticeRole="info"
-          noticeTitleTag="h2"
-          noticeTitle={t("VisitCanadaPost.moreInfoTitle")}
-        >
-          <GcdsLink href="#" external={true}>
-            {t("VisitCanadaPost.learnMoreLink")}
-          </GcdsLink>
-        </GcdsNotice>
-      </GcdsGrid>
+          <GcdsNotice
+            noticeRole="info"
+            noticeTitleTag="h2"
+            noticeTitle={t("VisitCanadaPost.moreInfoTitle")}
+          >
+            <GcdsLink href="#" external={true}>
+              {t("VisitCanadaPost.learnMoreLink")}
+            </GcdsLink>
+          </GcdsNotice>
+        </GcdsGrid>
+      </form>
     </GcdsContainer>
   );
 }
