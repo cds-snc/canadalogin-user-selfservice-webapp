@@ -9,7 +9,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { useUser } from "../../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
-import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
 
 interface ServiceCanadaCentreIDVCodePageProps {
   // TODO: replace with real code once API integration is in place
@@ -48,10 +47,6 @@ export default function ServiceCanadaCentreIDVCodePage({
             {t("ServiceCanadaCentreCode.visitInstruction")}
           </GcdsText>
         </GcdsContainer>
-
-        <AcceptableIdsDetails
-          detailsTitle={t("ServiceCanadaCentre.listOfIds")}
-        />
 
         <GcdsNotice
           noticeRole="info"

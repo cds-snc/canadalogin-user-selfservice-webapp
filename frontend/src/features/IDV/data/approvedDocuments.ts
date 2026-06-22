@@ -12,14 +12,16 @@ export const APPROVED_DOCUMENTS = [
     value: "photoIDHealthCard",
     labels: {
       [AVAILABLE_LANGUAGES.en]: "Provincial/Territorial Photo ID Health Card",
-      [AVAILABLE_LANGUAGES.fr]: "Carte d'assurance-maladie avec photo provincial/territorial",
+      [AVAILABLE_LANGUAGES.fr]:
+        "Carte d'assurance-maladie avec photo provincial/territorial",
     },
   },
   {
     value: "photoIDServiceCard",
     labels: {
       [AVAILABLE_LANGUAGES.en]: "Provincial/Territorial Photo ID Service Card",
-      [AVAILABLE_LANGUAGES.fr]: "Carte de service avec photo provincial/territorial",
+      [AVAILABLE_LANGUAGES.fr]:
+        "Carte de service avec photo provincial/territorial",
     },
   },
   {
