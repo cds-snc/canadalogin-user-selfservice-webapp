@@ -10,16 +10,13 @@ import {
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import {
-  DEV_ONLY_FEATURE,
-} from "../../../utils/constants";
+import { DEV_ONLY_FEATURE } from "../../../utils/constants";
 import { identityVerificationApi } from "../api/identityVerificationApi";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 
 export default function OnlineVerificationInfo() {
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
-
 
   const handleContinue = () => {
     identityVerificationApi
