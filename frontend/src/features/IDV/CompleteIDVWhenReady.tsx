@@ -23,7 +23,8 @@ export default function CompleteIdentityProofingPage() {
   const { setLoading } = userProfileDispatch(dispatch);
 
   const { t, i18n } = useTranslation("idv");
-  const appName = t("CompleteIdentityProofing.appName");
+  const { t: tLayout } = useTranslation("layout");
+  const appName = tLayout("TopNavBar.appName");
 
   const handleStartIdentityProofing = () => {
     navigate(path(PAGES.idvStartIdentityProofingPage, { language }));
