@@ -135,6 +135,15 @@
     "forMoreInformationNoticeHeader": "For more information",
     "forMoreInformationNoticeText": "Learn more about how identity proofing works"
   },
+  "ApprovedDocuments": {
+    "driverLicence": "Provincial/Territorial Driver's Licence",
+    "photoIDHealthCard": "Provincial/Territorial Photo ID Health Card",
+    "photoIDServiceCard": "Provincial/Territorial Photo ID Service Card",
+    "passport": "Canadian and International Passport",
+    "canadianPRCard": "Canadian PR Card",
+    "indianStatus": "Secure Certificate of Indian Status",
+    "noIds": "I don't have any of these IDs"
+  },
   "ConfirmIdentityDetails": {
     "pageTitle": "Confirm what will be saved to your CanadaLogin",
     "description": "Review the details that will be saved to your CanadaLogin. You can edit most information here, or update it later in your CanadaLogin account.",

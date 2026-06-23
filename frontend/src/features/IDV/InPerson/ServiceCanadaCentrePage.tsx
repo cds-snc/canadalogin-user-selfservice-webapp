@@ -21,7 +21,7 @@ import {
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import { APPROVED_DOCUMENTS } from "../data/approvedDocuments";
+import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 
 const IDS_REQUIRING_ADDRESS_AND_PROVINCE = new Set([
   "driverLicence",
@@ -144,13 +144,11 @@ export default function ServiceCanadaCentrePage() {
                 "ServiceCanadaCentre.selectIdDropdownDefaultValue",
               )}
             >
-              {APPROVED_DOCUMENTS.map(
-                (option: (typeof APPROVED_DOCUMENTS)[number]) => (
-                  <option key={option.value} value={option.value}>
-                    {option.labels[currentLanguage]}
-                  </option>
-                ),
-              )}
+              {APPROVED_DOCUMENT_VALUES.map((docValue) => (
+                <option key={docValue} value={docValue}>
+                  {t(`ApprovedDocuments.${docValue}`)}
+                </option>
+              ))}
             </GcdsSelect>
 
             {hasSelectedIdType && (

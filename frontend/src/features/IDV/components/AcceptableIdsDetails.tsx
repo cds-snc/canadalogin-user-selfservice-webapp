@@ -1,7 +1,8 @@
 import { GcdsDetails } from "@gcds-core/components-react";
 import { useParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import { AVAILABLE_LANGUAGES } from "../../../utils/constants";
-import { APPROVED_DOCUMENTS_WITHOUT_NO_IDS } from "../data/approvedDocuments";
+import { APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS } from "../data/approvedDocuments";
 
 interface AcceptableIdsDetailsProps {
   detailsTitle: string;
@@ -13,13 +14,14 @@ export default function AcceptableIdsDetails({
   acceptableIds,
 }: AcceptableIdsDetailsProps) {
   const { language } = useParams();
+  const { t } = useTranslation("idv");
   const currentLanguage =
     language === AVAILABLE_LANGUAGES.fr
       ? AVAILABLE_LANGUAGES.fr
       : AVAILABLE_LANGUAGES.en;
 
-  const defaultAcceptableIds = APPROVED_DOCUMENTS_WITHOUT_NO_IDS.map(
-    (doc) => doc.labels[currentLanguage],
+  const defaultAcceptableIds = APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS.map(
+    (docValue) => t(`ApprovedDocuments.${docValue}`),
   );
 
   const ids =

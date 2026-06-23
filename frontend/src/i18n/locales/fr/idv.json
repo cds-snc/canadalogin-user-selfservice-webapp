@@ -132,6 +132,15 @@
     "forMoreInformationNoticeHeader": "For more information",
     "forMoreInformationNoticeText": "Learn more about how identity proofing works"
   },
+  "ApprovedDocuments": {
+    "driverLicence": "Permis de conduire provincial/territorial",
+    "photoIDHealthCard": "Carte d'assurance-maladie avec photo provincial/territorial",
+    "photoIDServiceCard": "Carte de service avec photo provincial/territorial",
+    "passport": "Passeport canadien et international",
+    "canadianPRCard": "Carte de résidence permanente canadienne",
+    "indianStatus": "Certificat de statut d'Indien sécurisé",
+    "noIds": "Je n'ai aucune de ces pièces d'identité"
+  },
   "ConfirmIdentityDetails": {
     "pageTitle": "Confirm what will be saved to your CanadaLogin",
     "description": "Review the details that will be saved to your CanadaLogin. You can edit most information here, or update it later in your CanadaLogin account.",
