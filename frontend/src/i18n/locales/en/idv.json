@@ -138,8 +138,6 @@
     "signOut": "Sign out",
     "signingOut": "Signing you out...",
     "signOutFailed": "Failed to sign you out. Redirecting...",
-    "forMoreInformationNoticeHeader": "For more information",
-    "forMoreInformationNoticeText": "Learn more about how identity proofing works",
     "noDocumentsNoticeHeader": "Don't have the required documents for identity proofing?",
     "noDocumentsNoticeText": "If you do not have the required identity documents, or are unable to complete the proofing process because of some other circumstances, you will need to contact {{rpServicePortal}} directly to ask about alternative ways to verify your identity and access the service.",
     "contactLink": "RP Service Portal contact"
