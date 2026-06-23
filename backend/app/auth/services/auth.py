@@ -1,4 +1,6 @@
 import logging
+from urllib.parse import urlencode
+import re
 
 from typing import Optional
 from fastapi import Request
@@ -17,7 +19,12 @@ def is_safe_return_to_page(return_to_page: Optional[str]) -> bool:
     if not return_to_page or not isinstance(return_to_page, str):
         return False
 
-    return return_to_page.startswith("/") and not return_to_page.startswith("//")
+    if not return_to_page.startswith("/") or return_to_page.startswith("//"):
+        return False
+
+    # Language root routes do not need explicit returnToPage and can cause
+    # noisy URLs like /en?returnToPage=%2Fen when persisted through login.
+    return re.fullmatch(r"/(en|fr)/?", return_to_page) is None
 
 
 def get_base_profile_management_url():
@@ -80,8 +87,14 @@ async def callback_handler(request: Request):
     redirectValue = get_base_profile_management_url()
     returnToPageValue = request.session.pop(SessionKeys.RETURN_TO_PAGE.value, None)
 
-    if returnToPageValue:
-        clientRedirectValue = f"{returnToPageValue}?{SessionKeys.RETURN_TO_PAGE.value}={returnToPageValue}"
+    if is_safe_return_to_page(returnToPageValue):
+        query_separator = "&" if "?" in returnToPageValue else "?"
+        return_to_page_query = urlencode(
+            {SessionKeys.RETURN_TO_PAGE.value: returnToPageValue}
+        )
+        clientRedirectValue = (
+            f"{returnToPageValue}{query_separator}{return_to_page_query}"
+        )
         redirectValue += clientRedirectValue
         logger.info(f"Return to page set in session: {redirectValue}")
 

@@ -28,20 +28,38 @@ type SignUpGuard = RouteGuard & {
 function PrivateRoute() {
   const { state } = useUser();
   const { t } = useTranslation("security");
+  const { pathname, search } = useLocation();
+
+  const returnToPage = `${pathname}${search}`;
+  const isLanguageRootPath = /^\/(en|fr)\/?$/.test(pathname);
+  const shouldIncludeReturnToPage = Boolean(search) || !isLanguageRootPath;
+  const loginWithReturnToPage = shouldIncludeReturnToPage
+    ? `${OIDC_REDIRECT.login}?returnToPage=${encodeURIComponent(returnToPage)}`
+    : OIDC_REDIRECT.login;
 
   useEffect(() => {
     if (!state.isLoading && !state.userProfile) {
       const postLogout = sessionStorage.getItem("post_logout") === "true";
       if (postLogout) {
         sessionStorage.removeItem("post_logout");
+        const postLogoutReturnToPage = sessionStorage.getItem(
+          "post_logout_return_to_page",
+        );
+        sessionStorage.removeItem("post_logout_return_to_page");
         // After deliberate logout, force IBM Verify to show the login form
         // instead of silently re-authenticating from a live session.
-        window.location.href = `${OIDC_REDIRECT.login}?prompt=login`;
+        // Do not pass returnToPage here; backend logout already stored one-time
+        // returnToPage in session and we don't want to overwrite it.
+        if (postLogoutReturnToPage) {
+          window.location.href = `${OIDC_REDIRECT.login}?returnToPage=${encodeURIComponent(postLogoutReturnToPage)}`;
+        } else {
+          window.location.href = OIDC_REDIRECT.login;
+        }
       } else {
-        window.location.href = OIDC_REDIRECT.login;
+        window.location.href = loginWithReturnToPage;
       }
     }
-  }, [state.isLoading, state.userProfile]);
+  }, [loginWithReturnToPage, state.isLoading, state.userProfile]);
   if (state.isLoading) {
     return (
       <Loader

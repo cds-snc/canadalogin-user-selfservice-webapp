@@ -129,7 +129,7 @@ export const authService: AuthServiceContract = {
 
     // Do NOT use handleApiError here. A 401 on initial page load is expected (e.g.
     // after logout) and should be handled silently so PrivateRoute can decide the
-    // correct redirect (including prompt=login after deliberate logout).
+    // correct redirect.
     const response = await axios.get<AuthServiceResponse>(profileUrl);
     return response.data;
   },
@@ -197,6 +197,12 @@ export const authService: AuthServiceContract = {
   },
   logout: async (returnToPage) => {
     try {
+      if (returnToPage) {
+        sessionStorage.setItem("post_logout_return_to_page", returnToPage);
+      } else {
+        sessionStorage.removeItem("post_logout_return_to_page");
+      }
+
       const logoutUrl = new URL(
         `${config.apiUrl}${SUBMIT_END_POINTS.logout}`,
         window.location.origin,
