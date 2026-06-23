@@ -14,6 +14,7 @@ import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameC
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import ProvenInformationCard from "../../features/IDV/ProvenInformationCard";
 import ViewEmailInfo from "../../features/ProfileName/components/ViewEmailInfo";
+import CompleteIdentityProofingNotice from "../../features/IDV/components/CompleteIdentityProofingNotice";
 
 export default function ProfileHome() {
   const { t } = useTranslation("profile");
@@ -26,6 +27,11 @@ export default function ProfileHome() {
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>
+        {DEV_ONLY_FEATURE && (
+          <GcdsContainer className="idvNoticeSpacing">
+            <CompleteIdentityProofingNotice />
+          </GcdsContainer>
+        )}
         {DEV_ONLY_FEATURE && (
           <GcdsContainer>
             <GcdsGrid columns="1fr auto" className="gridInline">

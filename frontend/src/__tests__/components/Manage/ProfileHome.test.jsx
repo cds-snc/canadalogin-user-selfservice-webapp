@@ -99,6 +99,13 @@ vi.mock("../../../features/IDV/ProvenInformationCard", () => ({
   default: () => <div data-testid="proven-information-card" />,
 }));
 
+vi.mock(
+  "../../../features/IDV/components/CompleteIdentityProofingNotice",
+  () => ({
+    default: () => <div data-testid="idv-complete-notice" />,
+  }),
+);
+
 describe("ProfileHome", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -158,6 +165,7 @@ describe("ProfileHome", () => {
 
   it("renders the Proven information section when DEV_ONLY_FEATURE is true", () => {
     render(<ProfileHome />);
+    expect(screen.getByTestId("idv-complete-notice")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Proven information" }),
     ).toBeInTheDocument();
@@ -167,6 +175,7 @@ describe("ProfileHome", () => {
   it("hides the Proven information section when DEV_ONLY_FEATURE is false", () => {
     mockDevOnlyFeature = false;
     render(<ProfileHome />);
+    expect(screen.queryByTestId("idv-complete-notice")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("heading", { name: "Proven information" }),
     ).not.toBeInTheDocument();
