@@ -93,6 +93,11 @@
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about provincial identity proofing"
   },
+  "ProveIdentityOnline": {
+    "heading": "Prove your identity online",
+    "continueButton": "Continue",
+    "backButton": "Back"
+  },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",
     "heading": "Get ready for selfie and ID check",
@@ -120,10 +125,10 @@
     "cantProveNowHint": "This service requires identity proofing but you can sign out and complete identity proofing when ready.",
     "radioOnlineLabel": "Do it online",
     "documentScanningOption": "Selfie and photo of your ID",
-    "hintDocumentScanningOption": "Use your phone to take a photo of yourself and your ID for a quick online check.",
+    "hintDocumentScanningOption": "You will be asked to take a photo of yourself and then your government issued photo ID with your phone camera.",
     "signBackInNotice": "You will need to sign back in to your {{appName}} after proving your identity in person to confirm the proofing process.",
     "provincialPartnerOption": "Use your provincial sign in",
-    "hintProvincialPartnerOption": "Use your BC Service Card or Alberta.ca account to verify your identity.",
+    "hintProvincialPartnerOption": "Use your BC Service Card or Alberta.ca account to prove your identity.",
     "inPersonOption": "or do it in person",
     "canadaPostLocationsOption": "Canada Post locations",
     "serviceCanadaLocationsOption": "Service Canada Centres"
