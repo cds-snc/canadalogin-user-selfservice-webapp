@@ -66,10 +66,8 @@ export default function ProveIdentityOnlinePage() {
             {t("ProveIdentityOnline.continueButton")}
           </GcdsButton>
           <GcdsButton
-            type="button"
-            buttonRole="secondary"
             onClick={() => {
-              navigate(-1);
+              navigate(path(PAGES.idvStartIdentityProofingPage, { language }));
             }}
           >
             {t("ProveIdentityOnline.backButton")}

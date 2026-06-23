@@ -25,14 +25,18 @@ vi.mock("../../../utils/constants", () => ({
   },
   PAGES: {
     idvProveIdentityOnlinePage: "IdvProveIdentityOnlinePage",
+    idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
     idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
     idvProvincialVerificationPage: "IdvProvincialVerificationPage",
   },
-}));
 
 vi.mock("../../../utils/routeHelpers", () => ({
   path: (page, { language } = {}) => {
     const resolvedLanguage = language || "en";
+
+    if (page === "IdvStartIdentityProofingPage") {
+      return `/${resolvedLanguage}/idv/`;
+    }
 
     if (page === "IdvOnlineVerificationInfoPage") {
       return `/${resolvedLanguage}/idv/online`;
@@ -173,13 +177,13 @@ describe("ProveIdentityOnlinePage", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/en/idv/online/provincial");
   });
 
-  it("navigates back when Back button is clicked", () => {
+  it("navigates back to StartIdentityProofingPage when Back button is clicked", () => {
     render(<ProveIdentityOnlinePage />);
 
     const backButton = screen.getByTestId("back-button");
     fireEvent.click(backButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    expect(mockNavigate).toHaveBeenCalledWith("/en/idv/");
   });
 
   it("does not render when DEV_ONLY_FEATURE is false", () => {
