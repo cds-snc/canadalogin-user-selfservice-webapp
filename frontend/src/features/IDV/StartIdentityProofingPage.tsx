@@ -12,6 +12,7 @@ import {
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
+import { useUser } from "../../components/Providers/useUser";
 import IdentityProofingRadioButtons from "./components/IdentityProofingRadioButtons";
 import {
   START_IDENTITY_OPTION,
@@ -21,10 +22,18 @@ import {
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
   const { language } = useParams();
+  const { state } = useUser();
 
   const { t } = useTranslation("idv");
-  const { t: tLayout } = useTranslation("layout");
+  const { t: tLayout, i18n } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
+
+  const rpInfo = state.relyingPartyInfo;
+  const localizedDetail = rpInfo?.localized?.[i18n.language];
+  const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
+  const appName = tLayout("TopNavBar.appName");
+  const rpServicePortal = relyingPartyLinkName || appName;
+
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
     language,
   });
@@ -55,13 +64,12 @@ export default function StartIdentityProofingPage() {
       <GcdsGrid columns="1" gap="450">
         <GcdsContainer>
           <GcdsHeading tag="h1">
-            {t("StartIdentityProofing.pageTitle")}
-          </GcdsHeading>
-          <GcdsText>
             {t("StartIdentityProofing.heading", {
-              appName: tLayout("TopNavBar.appName"),
+              rpServicePortal,
             })}
-          </GcdsText>
+          </GcdsHeading>
+          <GcdsText>{t("StartIdentityProofing.description1")}</GcdsText>
+          <GcdsText>{t("StartIdentityProofing.description2")}</GcdsText>
 
           <GcdsLink href="#" external size="regular">
             {t("StartIdentityProofing.learnMoreDescription")}

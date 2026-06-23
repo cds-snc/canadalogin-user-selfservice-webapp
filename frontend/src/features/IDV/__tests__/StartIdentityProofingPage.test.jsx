@@ -8,6 +8,15 @@ import StartIdentityProofingPage from "../StartIdentityProofingPage";
 // ────────────────────────────────────────────────
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
+let mockUserState = {
+  relyingPartyInfo: {
+    linkName: "Test Service",
+    localized: {
+      en: { name: "Test Service EN", url: "https://test.com/en" },
+      fr: { name: "Service Test FR", url: "https://test.com/fr" },
+    },
+  },
+};
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -17,6 +26,13 @@ vi.mock("react-router", async () => {
     useNavigate: () => mockNavigate,
   };
 });
+
+vi.mock("../../../components/Providers/useUser", () => ({
+  useUser: () => ({
+    state: mockUserState,
+    dispatch: vi.fn(),
+  }),
+}));
 
 vi.mock("../../../utils/constants", () => ({
   get DEV_ONLY_FEATURE() {
@@ -99,6 +115,15 @@ describe("StartIdentityProofingPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
+    mockUserState = {
+      relyingPartyInfo: {
+        linkName: "Test Service",
+        localized: {
+          en: { name: "Test Service EN", url: "https://test.com/en" },
+          fr: { name: "Service Test FR", url: "https://test.com/fr" },
+        },
+      },
+    };
     // Reset window.location.href
     delete window.location;
     window.location = { href: "" };
@@ -119,11 +144,26 @@ describe("StartIdentityProofingPage", () => {
     expect(screen.getByText("Start identity proofing")).toBeInTheDocument();
   });
 
-  it("renders the heading with app name", () => {
+  it("renders the heading with rpServicePortal", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByText(/needs to confirm your identity/),
+      screen.getByText("Test Service EN needs you to prove your identity."),
+    ).toBeInTheDocument();
+  });
+
+  it("renders description paragraphs", () => {
+    render(<StartIdentityProofingPage />);
+
+    expect(
+      screen.getByText(
+        "Identity proofing confirms who you are, protects against fraud, and lets you recover your CanadaLogin if needed.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "You will only need to do this once for all services that require identity proofing.",
+      ),
     ).toBeInTheDocument();
   });
 

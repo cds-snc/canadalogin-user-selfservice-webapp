@@ -109,7 +109,9 @@
   },
   "StartIdentityProofing": {
     "pageTitle": "Start identity proofing",
-    "heading": "You're updating verified information. {{appName}} needs to confirm your identity before this change can be made.",
+    "heading": "{{rpServicePortal}} a besoin que vous prouviez votre identité.",
+    "description1": "La vérification d'identité confirme qui vous êtes, protège contre la fraude et vous permet de récupérer votre CanadaLogin si nécessaire.",
+    "description2": "Vous n'aurez besoin de faire cela qu'une seule fois pour tous les services qui exigent une vérification d'identité.",
     "learnMoreDescription": "Learn more about identity proofing",
     "howToProveHeading": "How do you want to prove your identity?",
     "onlineInstantOption": "Prove identity online and get instant access",
