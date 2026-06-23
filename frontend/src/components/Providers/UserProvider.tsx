@@ -10,7 +10,6 @@ import {
   CONTEXT_ACTIONS,
   SUBMIT_END_POINTS,
   RP_CLIENT_ID_KEY,
-  OIDC_REDIRECT,
 } from "../../utils/constants";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService";
@@ -386,14 +385,6 @@ export function UserProvider({
         }
       } catch (err) {
         console.error("User not authenticated:", err);
-        // After a deliberate logout, redirect immediately with prompt=login so IBM
-        // Verify shows the login form instead of silently re-authenticating.
-        if (sessionStorage.getItem("post_logout") === "true") {
-          sessionStorage.removeItem("post_logout");
-          const returnToPage = `${window.location.pathname}${window.location.search}`;
-          window.location.href = `${OIDC_REDIRECT.login}?prompt=login&returnToPage=${encodeURIComponent(returnToPage)}`;
-          return;
-        }
       } finally {
         userDispatch({
           type: CONTEXT_ACTIONS.set_loading,

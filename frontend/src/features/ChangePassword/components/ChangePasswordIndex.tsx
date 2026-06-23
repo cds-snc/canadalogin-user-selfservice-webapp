@@ -7,7 +7,7 @@ import Loader from "../../../components/Layout/Loading";
 import Password from "./Password";
 import PasswordChangedConfirmation from "./PasswordChangedConfirmation";
 
-import { PAGES } from "../../../utils/constants";
+import { PAGES, OIDC_REDIRECT } from "../../../utils/constants";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { getErrorMessage } from "../../../utils/errorUtils";
 import { authService } from "../../../services/authService";
@@ -97,6 +97,7 @@ export default function ChangePasswordIndex() {
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language,
   });
+  const loginWithSecuritySettingsReturn = `${OIDC_REDIRECT.login}?returnToPage=${encodeURIComponent(backToSecuritySettingsPage)}`;
 
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
@@ -255,7 +256,7 @@ export default function ChangePasswordIndex() {
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
           step: CHANGE_PASSWORD_ANALYTICS.STEPS.LOGOUT,
         });
-        window.location.href = "/";
+        window.location.href = loginWithSecuritySettingsReturn;
       }
     } catch (error) {
       console.error("Logout failed:", error);
@@ -268,7 +269,7 @@ export default function ChangePasswordIndex() {
       });
       setLoading(true, t("TopNavBar.signOutFailed", { ns: "layout" }));
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = loginWithSecuritySettingsReturn;
       }, 2000);
     }
   };
