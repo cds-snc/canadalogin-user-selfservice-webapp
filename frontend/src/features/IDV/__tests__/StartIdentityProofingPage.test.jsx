@@ -141,7 +141,11 @@ describe("StartIdentityProofingPage", () => {
   it("renders the page title", () => {
     render(<StartIdentityProofingPage />);
 
-    expect(screen.getByText("Start identity proofing")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: "Test Service EN needs you to prove your identity.",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("renders the heading with rpServicePortal", () => {
