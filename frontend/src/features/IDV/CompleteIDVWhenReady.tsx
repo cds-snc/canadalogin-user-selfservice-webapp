@@ -18,7 +18,7 @@ import { userProfileDispatch } from "../../utils/userProfileDispatch";
 
 export default function CompleteIdentityProofingPage() {
   const navigate = useNavigate();
-  const { language } = useParams();
+  const { language, journeyType } = useParams();
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
 
@@ -27,7 +27,9 @@ export default function CompleteIdentityProofingPage() {
   const appName = tLayout("TopNavBar.appName");
 
   const handleStartIdentityProofing = () => {
-    navigate(path(PAGES.idvStartIdentityProofingPage, { language }));
+    navigate(
+      path(PAGES.idvStartIdentityProofingPage, { language, journeyType }),
+    );
   };
 
   const rpInfo = state.relyingPartyInfo;

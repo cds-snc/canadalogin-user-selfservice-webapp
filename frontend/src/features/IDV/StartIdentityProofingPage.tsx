@@ -20,16 +20,23 @@ import {
 
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
-  const { language } = useParams();
+  const { language, journeyType } = useParams();
 
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
     language,
+    journeyType,
   });
   const visitCanadaPostPage = path(PAGES.idvVisitCanadaPostPage, {
     language,
+    journeyType,
+  });
+
+  const cantProveIdentity = path(PAGES.idvCompleteIdentityProofingPage, {
+    language,
+    journeyType,
   });
   // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
@@ -41,6 +48,8 @@ export default function StartIdentityProofingPage() {
         navigate(visitCanadaPostPage);
         break;
       case START_IDENTITY_OPTION.cantProveNow:
+        navigate(cantProveIdentity);
+        break;
       default:
         break;
     }
@@ -62,11 +71,9 @@ export default function StartIdentityProofingPage() {
               appName: tLayout("TopNavBar.appName"),
             })}
           </GcdsText>
-
           <GcdsLink href="#" external size="regular">
             {t("StartIdentityProofing.learnMoreDescription")}
           </GcdsLink>
-
           <GcdsHeading tag="h2" marginTop="300" characterLimit={false}>
             {t("StartIdentityProofing.howToProveHeading")}
           </GcdsHeading>

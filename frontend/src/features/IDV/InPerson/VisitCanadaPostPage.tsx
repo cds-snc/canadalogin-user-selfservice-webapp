@@ -38,7 +38,7 @@ interface VisitCanadaPostFormData {
 export default function VisitCanadaPost() {
   const { t } = useTranslation("idv");
   const navigate = useNavigate();
-  const { language } = useParams();
+  const { language, journeyType } = useParams();
   const currentLanguage =
     language === AVAILABLE_LANGUAGES.fr
       ? AVAILABLE_LANGUAGES.fr
@@ -233,7 +233,10 @@ export default function VisitCanadaPost() {
               onGcdsClick={(event: Event) => {
                 event.preventDefault();
                 navigate(
-                  path(PAGES.idvProofingBarcodeCanadaPostPage, { language }),
+                  path(PAGES.idvProofingBarcodeCanadaPostPage, {
+                    language,
+                    journeyType,
+                  }),
                   {
                     state: {
                       givenName: formData.givenName,
