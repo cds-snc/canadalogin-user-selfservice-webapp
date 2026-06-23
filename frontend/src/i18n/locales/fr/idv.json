@@ -129,7 +129,6 @@
     "serviceCanadaLocationsOption": "Service Canada Centres"
   },
   "CompleteIdentityProofing": {
-    "appName": "CanadaLogin",
     "pageTitle": "Complete identity proofing",
     "heading": "Complete identity proofing when you're ready",
     "accessRPServicePortalTitle": "To access the {{rpServicePortal}}, you need to complete identity proofing first",
