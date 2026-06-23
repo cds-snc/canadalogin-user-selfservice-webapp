@@ -63,7 +63,7 @@ describe("IdentityProofingRadioButtons", () => {
       screen.getByText("Do it in person and sign back in when done"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Can't prove your identity right now?"),
+      screen.getByText("Need more time, or a different way in"),
     ).toBeInTheDocument();
   });
 
@@ -77,12 +77,12 @@ describe("IdentityProofingRadioButtons", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Set up a visit to a Canada Post or Service Canada Centre with one piece of ID.",
+        "Set up a visit to a Canada Post or Service Canada Centre with valid government-issued ID.",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "This service requires identity proofing but you can sign out and complete identity proofing when ready.",
+        "Sign out and come back when you're ready, or find out about other ways to access RP Name.",
       ),
     ).toBeInTheDocument();
   });

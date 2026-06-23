@@ -49,6 +49,19 @@ vi.mock("../../../utils/routeHelpers", () => ({
   },
 }));
 
+vi.mock("../../../components/Providers/useUser", () => ({
+  useUser: () => ({
+    state: {
+      relyingPartyInfo: {
+        linkName: "RP Name",
+        localized: {
+          en: { name: "RP Name" },
+        },
+      },
+    },
+  }),
+}));
+
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
@@ -121,14 +134,18 @@ describe("StartIdentityProofingPage", () => {
   it("renders the page title", () => {
     render(<StartIdentityProofingPage />);
 
-    expect(screen.getByText("Start identity proofing")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: /needs you to prove your identity/i,
+      }),
+    ).toBeInTheDocument();
   });
 
   it("renders the heading with app name", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByText(/needs to confirm your identity/),
+      screen.getByText(/Identity proofing confirms who you are/),
     ).toBeInTheDocument();
   });
 
@@ -169,7 +186,7 @@ describe("StartIdentityProofingPage", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Set up a visit to a Canada Post or Service Canada Centre with one piece of ID.",
+        "Set up a visit to a Canada Post or Service Canada Centre with valid government-issued ID.",
       ),
     ).toBeInTheDocument();
   });
@@ -178,11 +195,11 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByText("Can't prove your identity right now?"),
+      screen.getByText("Need more time, or a different way in"),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "This service requires identity proofing but you can sign out and complete identity proofing when ready.",
+        "Sign out and come back when you're ready, or find out about other ways to access RP Name.",
       ),
     ).toBeInTheDocument();
   });
@@ -259,7 +276,7 @@ describe("StartIdentityProofingPage", () => {
 
     fireEvent.click(
       screen.getByRole("radio", {
-        name: /Can't prove your identity right now\?/,
+        name: /Need more time, or a different way in/,
       }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
