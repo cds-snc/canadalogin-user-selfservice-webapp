@@ -131,6 +131,12 @@ describe("ProofingBarcodeCanadaPostPage", () => {
       screen.getByText("user@example.com", { exact: false }),
     ).toBeInTheDocument();
     expect(screen.getAllByText("--").length).toBeGreaterThan(0);
+    expect(
+      screen.getByText("Provincial/Territorial Driver's Licence"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Secure Certificate of Indian Status"),
+    ).toBeInTheDocument();
   });
 
   it("renders values passed from previous page using location.state", () => {

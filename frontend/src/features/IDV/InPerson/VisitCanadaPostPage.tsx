@@ -2,7 +2,6 @@ import {
   GcdsButton,
   GcdsContainer,
   GcdsDateInput,
-  GcdsDetails,
   GcdsGrid,
   GcdsHeading,
   GcdsInput,
@@ -21,6 +20,7 @@ import {
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
 
 const COUNTRY_OPTIONS = [
   { value: "CA", label: "Canada" },
@@ -112,9 +112,9 @@ export default function VisitCanadaPost() {
                 <li>{t("VisitCanadaPost.step4")}</li>
               </ol>
             </GcdsText>
-            <GcdsDetails detailsTitle={t("VisitCanadaPost.listOfIds")}>
-              <GcdsText>{t("VisitCanadaPost.listOfIds")}</GcdsText>
-            </GcdsDetails>
+            <AcceptableIdsDetails
+              detailsTitle={t("VisitCanadaPost.listOfIds")}
+            />
           </GcdsContainer>
 
           <GcdsContainer>
