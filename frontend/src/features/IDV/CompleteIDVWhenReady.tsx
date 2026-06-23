@@ -100,15 +100,18 @@ export default function CompleteIdentityProofingPage() {
             </GcdsButton>
           </GcdsGrid>
           <GcdsNotice
-            noticeRole="info"
+            noticeRole="warning"
             noticeTitleTag="h2"
             style={{ marginTop: "2rem" }}
-            noticeTitle={t(
-              "CompleteIdentityProofing.forMoreInformationNoticeHeader",
-            )}
+            noticeTitle={t("CompleteIdentityProofing.noDocumentsNoticeHeader")}
           >
+            <GcdsText>
+              {t("CompleteIdentityProofing.noDocumentsNoticeText", {
+                rpServicePortal,
+              })}
+            </GcdsText>
             <GcdsLink href="#" external size="regular">
-              {t("CompleteIdentityProofing.forMoreInformationNoticeText")}
+              {t("CompleteIdentityProofing.contactLink")}
             </GcdsLink>
           </GcdsNotice>
         </GcdsContainer>
