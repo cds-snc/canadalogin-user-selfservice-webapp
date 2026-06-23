@@ -108,16 +108,16 @@
     "learnMoreLink": "Learn more about how selfie and ID check works"
   },
   "StartIdentityProofing": {
-    "pageTitle": "Start identity proofing",
-    "heading": "You're updating verified information. {{appName}} needs to confirm your identity before this change can be made.",
+    "pageTitle": "{{rpName}} needs you to prove your identity",
+    "heading": "Identity proofing confirms who you are, protects against fraud, and lets you recover your {{appName}} if needed. ",
     "learnMoreDescription": "Learn more about identity proofing",
     "howToProveHeading": "How do you want to prove your identity?",
     "onlineInstantOption": "Prove identity online and get instant access",
     "onlineInstantHint": "Do either a selfie and ID check or sign with a provincial account (BC, AB).",
     "inPersonSignBackInOption": "Do it in person and sign back in when done",
-    "inPersonSignBackInHint": "Set up a visit to a Canada Post or Service Canada Centre with one piece of ID.",
-    "cantProveNowOption": "Can't prove your identity right now?",
-    "cantProveNowHint": "This service requires identity proofing but you can sign out and complete identity proofing when ready.",
+    "inPersonSignBackInHint": "Set up a visit to a Canada Post or Service Canada Centre with valid government-issued ID.",
+    "cantProveNowOption": "Need more time, or a different way in",
+    "cantProveNowHint": "Sign out and come back when you're ready, or find out about other ways to access {{rpName}}.",
     "radioOnlineLabel": "Do it online",
     "documentScanningOption": "Selfie and photo of your ID",
     "hintDocumentScanningOption": "Use your phone to take a photo of yourself and your ID for a quick online check.",
@@ -126,7 +126,10 @@
     "hintProvincialPartnerOption": "Use your BC Service Card or Alberta.ca account to verify your identity.",
     "inPersonOption": "or do it in person",
     "canadaPostLocationsOption": "Canada Post locations",
-    "serviceCanadaLocationsOption": "Service Canada Centres"
+    "serviceCanadaLocationsOption": "Service Canada Centres",
+    "signedInSuccessNotice": "You are signed in with CanadaLogin",
+    "fallbackRpName": "RP Name",
+    "bodyText": "You will only need to do this once for all services that require identity proofing."
   },
   "CompleteIdentityProofing": {
     "pageTitle": "Complete identity proofing",
