@@ -138,9 +138,9 @@
     "signOut": "Sign out",
     "signingOut": "Signing you out...",
     "signOutFailed": "Failed to sign you out. Redirecting...",
-    "noDocumentsNoticeHeader": "N'avez-vous pas les documents requis pour la vérification d'identité?",
-    "noDocumentsNoticeText": "Si vous n'avez pas les documents d'identité requis, ou si vous ne pouvez pas terminer le processus de vérification pour une autre raison, vous devrez contacter {{rpServicePortal}} directement pour demander des solutions alternatives de vérification de votre identité et d'accès au service.",
-    "contactLink": "Contact du portail du service RP"
+    "noDocumentsNoticeHeader": "Don't have the required documents for identity proofing?",
+    "noDocumentsNoticeText": "If you do not have the required identity documents, or are unable to complete the proofing process because of some other circumstances, you will need to contact {{rpServicePortal}} directly to ask about alternative ways to verify your identity and access the service.",
+    "contactLink": "RP Service Portal contact"
   },
   "ConfirmIdentityDetails": {
     "pageTitle": "Confirm what will be saved to your CanadaLogin",
