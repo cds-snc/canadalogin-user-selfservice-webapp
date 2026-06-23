@@ -45,7 +45,7 @@ function PrivateRoute() {
         const postLogoutReturnToPage = sessionStorage.getItem(
           "post_logout_return_to_page",
         );
-        // sessionStorage.removeItem("post_logout_return_to_page");
+        sessionStorage.removeItem("post_logout_return_to_page");
         // After deliberate logout, force IBM Verify to show the login form
         // instead of silently re-authenticating from a live session.
         // Do not pass returnToPage here; backend logout already stored one-time
