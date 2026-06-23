@@ -109,6 +109,8 @@
   },
   "StartIdentityProofing": {
     "pageTitle": "{{rpName}} needs you to prove your identity",
+    "startPageTitle": "Start identity proofing",
+    "updatePageTitle": "Update identity proofing",
     "heading": "Identity proofing confirms who you are, protects against fraud, and lets you recover your {{appName}} if needed. ",
     "learnMoreDescription": "Learn more about identity proofing",
     "howToProveHeading": "How do you want to prove your identity?",

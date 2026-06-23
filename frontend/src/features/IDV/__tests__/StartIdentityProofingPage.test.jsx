@@ -8,12 +8,13 @@ import StartIdentityProofingPage from "../StartIdentityProofingPage";
 // ────────────────────────────────────────────────
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
+let mockJourneyType;
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
     ...actual,
-    useParams: () => ({ language: "en" }),
+    useParams: () => ({ language: "en", journeyType: mockJourneyType }),
     useNavigate: () => mockNavigate,
   };
 });
@@ -117,6 +118,7 @@ describe("StartIdentityProofingPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
+    mockJourneyType = undefined;
     // Reset window.location.href
     delete window.location;
     window.location = { href: "" };
@@ -138,6 +140,26 @@ describe("StartIdentityProofingPage", () => {
       screen.getByRole("heading", {
         name: /needs you to prove your identity/i,
       }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders Start identity proofing title when journeyType is start", () => {
+    mockJourneyType = "start";
+
+    render(<StartIdentityProofingPage />);
+
+    expect(
+      screen.getByRole("heading", { name: "Start identity proofing" }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders Update identity proofing title when journeyType is update", () => {
+    mockJourneyType = "update";
+
+    render(<StartIdentityProofingPage />);
+
+    expect(
+      screen.getByRole("heading", { name: "Update identity proofing" }),
     ).toBeInTheDocument();
   });
 

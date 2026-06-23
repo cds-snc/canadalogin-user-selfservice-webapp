@@ -19,6 +19,7 @@ import {
   type StartIdentityOption,
 } from "./components/methods";
 import { useUser } from "../../components/Providers/useUser";
+import { IDV_JOURNEY_TYPE } from "./constants";
 
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
@@ -30,6 +31,18 @@ export default function StartIdentityProofingPage() {
   const rpInfo = state.relyingPartyInfo;
   const localizedDetail = rpInfo?.localized?.[i18n.language];
   const rpName = localizedDetail?.name ?? rpInfo?.linkName;
+  const titleByJourneyType = {
+    [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
+      rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
+    }),
+    [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.startPageTitle"),
+    [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.updatePageTitle"),
+  } as const;
+  const pageTitle =
+    titleByJourneyType[
+      (journeyType as keyof typeof titleByJourneyType) ??
+        IDV_JOURNEY_TYPE.REQUIRED
+    ] ?? titleByJourneyType[IDV_JOURNEY_TYPE.REQUIRED];
   const { t: tLayout } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
@@ -77,11 +90,7 @@ export default function StartIdentityProofingPage() {
           <span aria-hidden="true"></span>
         </GcdsNotice>
         <GcdsContainer>
-          <GcdsHeading tag="h1">
-            {t("StartIdentityProofing.pageTitle", {
-              rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
-            })}
-          </GcdsHeading>
+          <GcdsHeading tag="h1">{pageTitle}</GcdsHeading>
           <GcdsText>
             {t("StartIdentityProofing.heading", {
               appName: tLayout("TopNavBar.appName"),
