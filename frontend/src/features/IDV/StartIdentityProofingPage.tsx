@@ -33,6 +33,11 @@ export default function StartIdentityProofingPage() {
     language,
     journeyType,
   });
+
+  const cantProveIdentity = path(PAGES.idvCompleteIdentityProofingPage, {
+    language,
+    journeyType,
+  });
   // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
     switch (selectedOption) {
@@ -43,6 +48,8 @@ export default function StartIdentityProofingPage() {
         navigate(visitCanadaPostPage);
         break;
       case START_IDENTITY_OPTION.cantProveNow:
+        navigate(cantProveIdentity);
+        break;
       default:
         break;
     }
@@ -64,11 +71,9 @@ export default function StartIdentityProofingPage() {
               appName: tLayout("TopNavBar.appName"),
             })}
           </GcdsText>
-
           <GcdsLink href="#" external size="regular">
             {t("StartIdentityProofing.learnMoreDescription")}
           </GcdsLink>
-
           <GcdsHeading tag="h2" marginTop="300" characterLimit={false}>
             {t("StartIdentityProofing.howToProveHeading")}
           </GcdsHeading>
