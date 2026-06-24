@@ -6,6 +6,7 @@ import type {
   AuthServiceResponse,
   LogoutResponseData,
 } from "../../../types/services";
+import type { OnlineIdentityVerificationMockResponse } from "../../../types/user";
 
 axios.defaults.withCredentials = true;
 
@@ -39,6 +40,17 @@ export const identityVerificationApi = {
         `${config.apiUrl}/v1/identity-verification/target-url`,
       );
       return response.data;
+    } catch (error) {
+      handleApiError(error as ApiErrorLike);
+    }
+  },
+
+  getOnlineIdentityVerificationMockResponse: async () => {
+    try {
+      const response = await axios.get(
+        `${config.apiUrl}/v1/identity-verification/online/mock-success-response`,
+      );
+      return response.data as OnlineIdentityVerificationMockResponse;
     } catch (error) {
       handleApiError(error as ApiErrorLike);
     }

@@ -1,24 +1,31 @@
 import "@testing-library/jest-dom/vitest";
-import { MemoryRouter } from "react-router";
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { MemoryRouter, Route, Routes } from "react-router";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, it, expect, vi } from "vitest";
 import ProofingBarcodeCanadaPostPage from "../InPerson/ProofingBarcodeCanadaPostPage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
+import { PAGES } from "../../../utils/constants";
+
+const mockNavigate = vi.fn();
+
+vi.mock("react-router", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 vi.mock("../../../utils/constants", async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
     DEV_ONLY_FEATURE: true,
-    PAGES: {
-      ...actual.PAGES,
-      idvStartIdentityProofingPage: "idvStartIdentityProofingPage",
-    },
   };
 });
 
 vi.mock("../../../utils/routeHelpers", () => ({
-  path: (_pageId, params) => `/${params.language}/idv`,
+  path: (pageId, params) => `/${params.language}/${pageId}`,
 }));
 
 vi.mock("@gcds-core/components-react", () => ({
@@ -51,13 +58,23 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsLink: ({ children, href, ...props }) => (
+  GcdsLink: ({ children, href, external: _external, ...props }) => (
     <a data-testid="gcds-link" href={href} {...props}>
       {children}
     </a>
   ),
-  GcdsButton: ({ children, ...props }) => (
-    <button data-testid="gcds-button" type="button" {...props}>
+  GcdsButton: ({
+    children,
+    onGcdsClick,
+    buttonRole: _buttonRole,
+    ...props
+  }) => (
+    <button
+      data-testid="gcds-button"
+      type="button"
+      onClick={onGcdsClick}
+      {...props}
+    >
       {children}
     </button>
   ),
@@ -100,11 +117,35 @@ const TestWrapper = ({ children, entryState = null }) => (
       },
     ]}
   >
-    <UserProvider initial={mockUserState}>{children}</UserProvider>
+    <Routes>
+      <Route
+        path="/:language/idv/in-person/canada-post/idv-code"
+        element={
+          <UserProvider initial={mockUserState}>{children}</UserProvider>
+        }
+      />
+    </Routes>
   </MemoryRouter>
 );
 
 describe("ProofingBarcodeCanadaPostPage", () => {
+  beforeEach(() => {
+    mockNavigate.mockReset();
+  });
+
+  it("navigates back to the Canada Post page when update information is clicked", () => {
+    render(
+      <TestWrapper>
+        <ProofingBarcodeCanadaPostPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Update information" }));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      `/en/${PAGES.idvVisitCanadaPostPage}`,
+    );
+  });
+
   it("renders the requested heading", () => {
     render(
       <TestWrapper>
