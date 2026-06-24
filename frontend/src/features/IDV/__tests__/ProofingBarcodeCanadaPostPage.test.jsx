@@ -66,7 +66,12 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </a>
   ),
-  GcdsButton: ({ children, onGcdsClick, buttonRole: _buttonRole, ...props }) => (
+  GcdsButton: ({
+    children,
+    onGcdsClick,
+    buttonRole: _buttonRole,
+    ...props
+  }) => (
     <button
       data-testid="gcds-button"
       type="button"
