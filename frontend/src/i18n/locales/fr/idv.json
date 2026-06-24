@@ -109,9 +109,9 @@
   },
   "StartIdentityProofing": {
     "pageTitle": "Start identity proofing",
-    "heading": "{{rpServicePortal}} a besoin que vous prouviez votre identité.",
-    "description1": "La vérification d'identité confirme qui vous êtes, protège contre la fraude et vous permet de récupérer votre CanadaLogin si nécessaire.",
-    "description2": "Vous n'aurez besoin de faire cela qu'une seule fois pour tous les services qui exigent une vérification d'identité.",
+    "heading": "{{rpServicePortal}} needs you to prove your identity.",
+    "description1": "Identity proofing confirms who you are, protects against fraud, and lets you recover your CanadaLogin if needed.",
+    "description2": "You will only need to do this once for all services that require identity proofing.",
     "learnMoreDescription": "Learn more about identity proofing",
     "howToProveHeading": "How do you want to prove your identity?",
     "onlineInstantOption": "Prove identity online and get instant access",
