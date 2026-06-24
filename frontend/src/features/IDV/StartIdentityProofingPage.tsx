@@ -72,7 +72,7 @@ export default function StartIdentityProofingPage() {
               noticeRole="success"
               noticeTitleTag="h2"
               noticeTitle={t("StartIdentityProofing.signedInNotice")}
-              style={{ marginBottom: "var(--gcds-spacing-300)"}}
+              style={{ marginBottom: "var(--gcds-spacing-300)" }}
             >
               <GcdsText>{""}</GcdsText>
             </GcdsNotice>
