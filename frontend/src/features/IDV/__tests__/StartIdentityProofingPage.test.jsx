@@ -133,33 +133,40 @@ describe("StartIdentityProofingPage", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders the page title", () => {
+  it("renders Prove your identity title by default", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
       screen.getByRole("heading", {
-        name: /needs you to prove your identity/i,
+        name: /prove your identity/i,
+        level: 1,
       }),
     ).toBeInTheDocument();
   });
 
-  it("renders Start identity proofing title when journeyType is start", () => {
+  it("renders Prove your identity title when journeyType is start", () => {
     mockJourneyType = "start";
 
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByRole("heading", { name: "Start identity proofing" }),
+      screen.getByRole("heading", {
+        name: "Prove your identity",
+        level: 1,
+      }),
     ).toBeInTheDocument();
   });
 
-  it("renders Update identity proofing title when journeyType is update", () => {
+  it("renders Prove your identity title when journeyType is update", () => {
     mockJourneyType = "update";
 
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByRole("heading", { name: "Update identity proofing" }),
+      screen.getByRole("heading", {
+        name: "Prove your identity",
+        level: 1,
+      }),
     ).toBeInTheDocument();
   });
 

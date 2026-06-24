@@ -35,14 +35,15 @@ export default function StartIdentityProofingPage() {
     [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
       rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
     }),
-    [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.startPageTitle"),
-    [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.updatePageTitle"),
+    [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.proveYourIdentity"),
+    [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.proveYourIdentity"),
   } as const;
-  const pageTitle =
-    titleByJourneyType[
-      (journeyType as keyof typeof titleByJourneyType) ??
-        IDV_JOURNEY_TYPE.REQUIRED
-    ] ?? titleByJourneyType[IDV_JOURNEY_TYPE.REQUIRED];
+  const requestedJourneyType = journeyType ?? IDV_JOURNEY_TYPE.START;
+  const resolvedJourneyType: keyof typeof titleByJourneyType =
+    requestedJourneyType in titleByJourneyType
+      ? (requestedJourneyType as keyof typeof titleByJourneyType)
+      : IDV_JOURNEY_TYPE.START;
+  const pageTitle = titleByJourneyType[resolvedJourneyType];
   const { t: tLayout } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
@@ -82,13 +83,15 @@ export default function StartIdentityProofingPage() {
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
-        <GcdsNotice
-          noticeRole="success"
-          noticeTitle={t("StartIdentityProofing.signedInSuccessNotice")}
-          noticeTitleTag="h2"
-        >
-          <span aria-hidden="true"></span>
-        </GcdsNotice>
+        {resolvedJourneyType === IDV_JOURNEY_TYPE.REQUIRED && (
+          <GcdsNotice
+            noticeRole="success"
+            noticeTitle={t("StartIdentityProofing.signedInSuccessNotice")}
+            noticeTitleTag="h2"
+          >
+            <GcdsText hidden={true}>{""}</GcdsText>
+          </GcdsNotice>
+        )}
         <GcdsContainer>
           <GcdsHeading tag="h1">{pageTitle}</GcdsHeading>
           <GcdsText>
