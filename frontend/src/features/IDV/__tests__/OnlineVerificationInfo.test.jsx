@@ -53,8 +53,10 @@ vi.mock("../../../utils/constants", async () => {
 });
 
 vi.mock("../../../utils/routeHelpers", () => ({
-  path: (page, { language, journeyType } = {}) =>
-    `/${language ?? "en"}/identity-verification/${journeyType ?? "update"}/details-confirmation/${page}`,
+  path: (_page, { language, journeyType } = {}) => {
+    const jType = journeyType ? `/${journeyType}` : "";
+    return `/${language ?? "en"}/identity-verification${jType}/details-confirmation`;
+  },
 }));
 
 vi.mock("../api/identityVerificationApi", async () => {
@@ -240,7 +242,7 @@ describe("OnlineVerificationInfo", () => {
     });
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/update/details-confirmation/IdvDetailsConfirmationPage",
+      "/en/identity-verification/update/details-confirmation",
     );
   });
 
