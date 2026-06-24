@@ -172,5 +172,12 @@
     "phoneNumber": "Phone number",
     "communication": "Communication",
     "confirmAndContinue": "Confirm and continue"
+  },
+  "IdentityVerificationSuccess": {
+    "pageTitle": "Prove your identity",
+    "heading": "Identity proofing is complete",
+    "continueButton": "Continue",
+    "moreInfoTitle": "Your identity information was successfully verified, and proofing is now complete.",
+    "moreInfoBody": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access."
   }
 }
