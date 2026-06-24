@@ -109,6 +109,7 @@
   },
   "StartIdentityProofing": {
     "pageTitle": "Start identity proofing",
+    "signedInNotice": "You are signed in with CanadaLogin",
     "heading": "You're updating verified information. {{appName}} needs to confirm your identity before this change can be made.",
     "learnMoreDescription": "Learn more about identity proofing",
     "howToProveHeading": "How do you want to prove your identity?",

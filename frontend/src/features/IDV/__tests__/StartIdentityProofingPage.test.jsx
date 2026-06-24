@@ -8,12 +8,13 @@ import StartIdentityProofingPage from "../StartIdentityProofingPage";
 // ────────────────────────────────────────────────
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
+let mockJourneyType;
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
     ...actual,
-    useParams: () => ({ language: "en" }),
+    useParams: () => ({ language: "en", journeyType: mockJourneyType }),
     useNavigate: () => mockNavigate,
   };
 });
@@ -104,6 +105,7 @@ describe("StartIdentityProofingPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
+    mockJourneyType = undefined;
     // Reset window.location.href
     delete window.location;
     window.location = { href: "" };
@@ -122,6 +124,26 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     expect(screen.getByText("Start identity proofing")).toBeInTheDocument();
+  });
+
+  it("shows success notice when journeyType is required", () => {
+    mockJourneyType = "required";
+
+    render(<StartIdentityProofingPage />);
+
+    expect(
+      screen.getByText("You are signed in with CanadaLogin"),
+    ).toBeInTheDocument();
+  });
+
+  it("does not show success notice when journeyType is not required", () => {
+    mockJourneyType = "update";
+
+    render(<StartIdentityProofingPage />);
+
+    expect(
+      screen.queryByText("You are signed in with CanadaLogin"),
+    ).not.toBeInTheDocument();
   });
 
   it("renders the heading with app name", () => {

@@ -8,11 +8,13 @@ import {
   GcdsLink,
   GcdsText,
   GcdsContainer,
+  GcdsNotice,
 } from "@gcds-core/components-react";
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 import IdentityProofingRadioButtons from "./components/IdentityProofingRadioButtons";
+import { IDV_JOURNEY_TYPE } from "./constants";
 import {
   START_IDENTITY_OPTION,
   type StartIdentityOption,
@@ -63,6 +65,15 @@ export default function StartIdentityProofingPage() {
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
         <GcdsContainer>
+          {journeyType === IDV_JOURNEY_TYPE.REQUIRED && (
+            <GcdsNotice
+              noticeRole="success"
+              noticeTitleTag="h2"
+              noticeTitle=" "
+            >
+              {t("StartIdentityProofing.signedInNotice")}
+            </GcdsNotice>
+          )}
           <GcdsHeading tag="h1">
             {t("StartIdentityProofing.pageTitle")}
           </GcdsHeading>
