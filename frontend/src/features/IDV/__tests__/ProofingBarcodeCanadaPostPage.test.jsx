@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, it, expect, vi } from "vitest";
 import ProofingBarcodeCanadaPostPage from "../InPerson/ProofingBarcodeCanadaPostPage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
+import { PAGES } from "../../../utils/constants";
 
 const mockNavigate = vi.fn();
 
@@ -20,10 +21,6 @@ vi.mock("../../../utils/constants", async (importOriginal) => {
   return {
     ...actual,
     DEV_ONLY_FEATURE: true,
-    PAGES: {
-      ...actual.PAGES,
-      idvVisitCanadaPostPage: "idvVisitCanadaPostPage",
-    },
   };
 });
 
@@ -143,9 +140,10 @@ describe("ProofingBarcodeCanadaPostPage", () => {
       </TestWrapper>,
     );
 
-    fireEvent.click(screen.getByText("Update information"));
-
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idvVisitCanadaPostPage");
+    fireEvent.click(screen.getByRole("button", { name: "Update information" }));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      `/en/${PAGES.idvVisitCanadaPostPage}`,
+    );
   });
 
   it("renders the requested heading", () => {
