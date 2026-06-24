@@ -1,8 +1,9 @@
 import logging
 
-from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi import APIRouter, Depends, Request, status
 from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.schemas import ResponseModel
+from app.identity_verification.schemas import StoreTargetUrlRequest
 from app.identity_verification.services.create_identity_verification import (
     idv_mock_success_response,
     create_identity_verification,
@@ -80,10 +81,10 @@ async def send_in_person_verification(
 )
 async def store_target_url(
     request: Request,
-    target_url: str = Query(...),
+    payload: StoreTargetUrlRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await store_identity_verification_target_url(request, target_url)
+    return await store_identity_verification_target_url(request, payload.target_url)
 
 
 @router.get(

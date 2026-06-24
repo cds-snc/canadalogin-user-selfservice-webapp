@@ -27,7 +27,8 @@ export const identityVerificationApi = {
   storeTargetUrl: async (targetUrl: string) => {
     try {
       const response = await axios.post<AuthServiceResponse>(
-        `${config.apiUrl}/v1/identity-verification/target-url?target_url=${encodeURIComponent(targetUrl)}`,
+        `${config.apiUrl}/v1/identity-verification/target-url`,
+        { target_url: targetUrl },
       );
       return response.data;
     } catch (error) {

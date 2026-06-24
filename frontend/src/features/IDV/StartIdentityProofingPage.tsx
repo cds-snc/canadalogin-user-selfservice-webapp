@@ -70,6 +70,7 @@ export default function StartIdentityProofingPage() {
     if (resolvedJourneyType !== IDV_JOURNEY_TYPE.REQUIRED) {
       return;
     }
+    console.log("resolvedJourneyType", resolvedJourneyType);
 
     const targetUrl = searchParams.get(IDV_TARGET_URL_KEY);
     if (!targetUrl) {

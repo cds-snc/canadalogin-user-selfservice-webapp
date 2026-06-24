@@ -230,7 +230,7 @@ export const SUBMIT_END_POINTS = {
 } as const;
 
 export const RP_CLIENT_ID_KEY = "rp_client_id";
-export const IDV_TARGET_URL_KEY = "target_url";
+export const IDV_TARGET_URL_KEY = "Target";
 export const DEFAULT_RP_NAME = "Manage CanadaLogin";
 
 export const VITE_ENVIRONMENTS = {

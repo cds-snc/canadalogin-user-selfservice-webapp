@@ -1,5 +1,4 @@
-from types import SimpleNamespace
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi import HTTPException
@@ -8,14 +7,9 @@ from app.constants.session_keys import SessionKeys
 from app.identity_verification.services import target_url as target_url_service
 
 
-def _build_rp_response(url: str):
-    return SimpleNamespace(
-        data=SimpleNamespace(
-            url=url,
-            localized={
-                "en": SimpleNamespace(url=url),
-            },
-        )
+def _build_config(tenant_url: str):
+    return MagicMock(
+        ibm_verify_config=MagicMock(IBM_VERIFY_TENANT_URL=tenant_url)
     )
 
 
@@ -25,20 +19,40 @@ async def test_store_identity_verification_target_url_sets_session_value():
     mock_request.session = {}
 
     with patch(
-        "app.identity_verification.services.target_url.get_relying_party_info",
-        new=AsyncMock(return_value=_build_rp_response("https://rp.example.com/service")),
+        "app.identity_verification.services.target_url.get_configuration",
+        return_value=_build_config("https://tenant.example.com"),
     ):
         response = await target_url_service.store_identity_verification_target_url(
             mock_request,
-            "https://rp.example.com/service/identity-verification/complete",
+            "https://tenant.example.com/identity-verification/complete",
         )
 
     assert mock_request.session[SessionKeys.IDV_TARGET_URL.value] == (
-        "https://rp.example.com/service/identity-verification/complete"
+        "https://tenant.example.com/identity-verification/complete"
     )
     assert response.data["target_url"] == (
-        "https://rp.example.com/service/identity-verification/complete"
+        "https://tenant.example.com/identity-verification/complete"
     )
+
+
+@pytest.mark.asyncio
+async def test_store_identity_verification_target_url_accepts_wrapped_target_param():
+    mock_request = MagicMock()
+    mock_request.session = {}
+
+    with patch(
+        "app.identity_verification.services.target_url.get_configuration",
+        return_value=_build_config("https://cds-gcsignin-dev.verify.ibm.com"),
+    ):
+        response = await target_url_service.store_identity_verification_target_url(
+            mock_request,
+            "?Target=https%3A%2F%2Fcds-gcsignin-dev.verify.ibm.com",
+        )
+
+    assert mock_request.session[SessionKeys.IDV_TARGET_URL.value] == (
+        "https://cds-gcsignin-dev.verify.ibm.com"
+    )
+    assert response.data["target_url"] == "https://cds-gcsignin-dev.verify.ibm.com"
 
 
 @pytest.mark.asyncio
@@ -47,8 +61,8 @@ async def test_store_identity_verification_target_url_rejects_mismatched_domain(
     mock_request.session = {}
 
     with patch(
-        "app.identity_verification.services.target_url.get_relying_party_info",
-        new=AsyncMock(return_value=_build_rp_response("https://rp.example.com/service")),
+        "app.identity_verification.services.target_url.get_configuration",
+        return_value=_build_config("https://tenant.example.com"),
     ):
         with pytest.raises(HTTPException) as exc_info:
             await target_url_service.store_identity_verification_target_url(
@@ -64,18 +78,18 @@ async def test_store_identity_verification_target_url_rejects_mismatched_domain(
 async def test_get_identity_verification_redirect_url_returns_and_clears_target():
     mock_request = MagicMock()
     mock_request.session = {
-        SessionKeys.IDV_TARGET_URL.value: "https://rp.example.com/service/return"
+        SessionKeys.IDV_TARGET_URL.value: "https://tenant.example.com/return"
     }
 
     with patch(
-        "app.identity_verification.services.target_url.get_relying_party_info",
-        new=AsyncMock(return_value=_build_rp_response("https://rp.example.com/service")),
+        "app.identity_verification.services.target_url.get_configuration",
+        return_value=_build_config("https://tenant.example.com"),
     ):
         response = await target_url_service.get_identity_verification_redirect_url(
             mock_request
         )
 
-    assert response.data["redirect_url"] == "https://rp.example.com/service/return"
+    assert response.data["redirect_url"] == "https://tenant.example.com/return"
     assert SessionKeys.IDV_TARGET_URL.value not in mock_request.session
 
 
@@ -85,11 +99,11 @@ async def test_get_identity_verification_redirect_url_falls_back_to_rp_url():
     mock_request.session = {}
 
     with patch(
-        "app.identity_verification.services.target_url.get_relying_party_info",
-        new=AsyncMock(return_value=_build_rp_response("https://rp.example.com/service")),
+        "app.identity_verification.services.target_url.get_configuration",
+        return_value=_build_config("https://tenant.example.com"),
     ):
         response = await target_url_service.get_identity_verification_redirect_url(
             mock_request
         )
 
-    assert response.data["redirect_url"] == "https://rp.example.com/service"
+    assert response.data["redirect_url"] == "https://tenant.example.com"

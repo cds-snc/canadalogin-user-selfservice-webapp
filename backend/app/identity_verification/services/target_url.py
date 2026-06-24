@@ -1,10 +1,10 @@
 import logging
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from fastapi import HTTPException, Request, status
 
+from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
-from app.users.services.rp_info import get_relying_party_info
 from app.utils.schemas import ResponseModel
 
 logger = logging.getLogger(__name__)
@@ -17,8 +17,24 @@ def _normalize_path(path: str) -> str:
     return normalized_path.rstrip("/") or "/"
 
 
+def _extract_target_url(target_url: str) -> str:
+    stripped_target_url = target_url.strip()
+
+    if not stripped_target_url:
+        return ""
+
+    parsed_target_url = urlparse(stripped_target_url)
+    if parsed_target_url.scheme in {"http", "https"} and parsed_target_url.netloc:
+        return stripped_target_url
+
+    query_string = stripped_target_url[1:] if stripped_target_url.startswith("?") else stripped_target_url
+    target_values = parse_qs(query_string).get("Target", [])
+
+    return target_values[0].strip() if target_values else stripped_target_url
+
+
 def _is_matching_target_url(target_url: str, allowed_url: str) -> bool:
-    parsed_target_url = urlparse(target_url)
+    parsed_target_url = urlparse(_extract_target_url(target_url))
     parsed_allowed_url = urlparse(allowed_url)
 
     if parsed_target_url.scheme not in {"http", "https"} or not parsed_target_url.netloc:
@@ -46,73 +62,64 @@ def _is_matching_target_url(target_url: str, allowed_url: str) -> bool:
     )
 
 
-async def _get_allowed_relying_party_urls(request: Request) -> list[str]:
-    rp_response = await get_relying_party_info(request)
-    rp_info = rp_response.data if rp_response else None
-
-    if rp_info is None:
-        return []
-
-    allowed_urls = [rp_info.url]
-    if rp_info.localized:
-        allowed_urls.extend(
-            localized_detail.url
-            for localized_detail in rp_info.localized.values()
-            if localized_detail.url
-        )
-
-    return list(dict.fromkeys(filter(None, allowed_urls)))
+def _get_allowed_tenant_url() -> str | None:
+    config = get_configuration()
+    tenant_url = config.ibm_verify_config.IBM_VERIFY_TENANT_URL
+    return tenant_url or None
 
 
 async def store_identity_verification_target_url(
     request: Request, target_url: str
 ) -> ResponseModel:
+
+    logger.info("IDV redirect URL Target: %s", target_url)
+
     if not target_url:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Target URL is required",
         )
 
-    allowed_urls = await _get_allowed_relying_party_urls(request)
-    if not allowed_urls:
+    normalized_target_url = _extract_target_url(target_url)
+
+    allowed_url = _get_allowed_tenant_url()
+    if not allowed_url:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Relying party URL not found",
+            detail="IBM Verify tenant URL not found",
         )
 
-    if not any(
-        _is_matching_target_url(target_url, allowed_url)
-        for allowed_url in allowed_urls
-    ):
+    if not _is_matching_target_url(normalized_target_url, allowed_url):
         logger.warning("Rejected IDV target URL that does not match RP URL: %s", target_url)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Target URL does not match relying party URL",
         )
 
-    request.session[SessionKeys.IDV_TARGET_URL.value] = target_url
+    request.session[SessionKeys.IDV_TARGET_URL.value] = normalized_target_url
     logger.info("Stored IDV target URL in session")
 
     return ResponseModel(
         success=True,
         message="Identity verification target URL stored successfully.",
-        data={"target_url": target_url},
+        data={"target_url": normalized_target_url},
     )
 
 
 async def get_identity_verification_redirect_url(request: Request) -> ResponseModel:
-    allowed_urls = await _get_allowed_relying_party_urls(request)
-    target_url = request.session.pop(SessionKeys.IDV_TARGET_URL.value, None)
+    allowed_url = _get_allowed_tenant_url()
+    target_url = _extract_target_url(
+        request.session.pop(SessionKeys.IDV_TARGET_URL.value, None) or ""
+    )
 
-    if target_url and any(
-        _is_matching_target_url(target_url, allowed_url)
-        for allowed_url in allowed_urls
-    ):
+    logger.info("IDV redirect URL Target: %s", target_url)
+
+    if target_url and allowed_url and _is_matching_target_url(target_url, allowed_url):
         redirect_url = target_url
     else:
-        redirect_url = allowed_urls[0] if allowed_urls else "/"
+        redirect_url = allowed_url or "/"
 
-    logger.info("Resolved IDV redirect URL after confirmation")
+    logger.info("Resolved IDV redirect URL after confirmation: %s", redirect_url)
 
     return ResponseModel(
         success=True,
