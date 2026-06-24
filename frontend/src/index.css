@@ -153,6 +153,10 @@ body,
   justify-items: center;
 }
 
+.idvNoticeSpacing {
+  margin-bottom: var(--gcds-spacing-300);
+}
+
 .verifiedIcon {
   color: var(--gcds-color-green-500);
 }

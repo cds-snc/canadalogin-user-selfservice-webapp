@@ -41,6 +41,7 @@ vi.mock("../../../utils/constants", () => ({
   PAGES: {
     idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
     idvVisitCanadaPostPage: "IdvVisitCanadaPostPage",
+    idvCompleteIdentityProofingPage: "IdvCompleteIdentityProofingPage",
   },
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
   SERVICES: [
@@ -53,10 +54,14 @@ vi.mock("../../../utils/routeHelpers", () => ({
     const resolvedLanguage = language || "en";
 
     if (page === "IdvOnlineVerificationInfoPage") {
-      return `/${resolvedLanguage}/idv/online`;
+      return `/${resolvedLanguage}/identity-verification/online`;
     }
 
-    return `/${resolvedLanguage}/idv/in-person/canada-post`;
+    if (page === "IdvCompleteIdentityProofingPage") {
+      return `/${resolvedLanguage}/identity-verification/not-ready`;
+    }
+
+    return `/${resolvedLanguage}/identity-verification/in-person/canada-post`;
   },
 }));
 
@@ -273,7 +278,9 @@ describe("StartIdentityProofingPage", () => {
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idv/online");
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/online",
+    );
   });
 
   it("navigates to visit canada post page for in-person option", () => {
@@ -286,10 +293,12 @@ describe("StartIdentityProofingPage", () => {
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idv/in-person/canada-post");
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/in-person/canada-post",
+    );
   });
 
-  it("does not navigate for cant prove now option", () => {
+  it("navigates to not-ready page for cant prove now option", () => {
     render(<StartIdentityProofingPage />);
 
     fireEvent.click(
@@ -299,7 +308,9 @@ describe("StartIdentityProofingPage", () => {
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/not-ready",
+    );
   });
 
   // ── Cancel button ──────────────────────────────

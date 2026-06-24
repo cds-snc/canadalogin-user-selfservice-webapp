@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
 import { identityVerificationApi } from "../api/identityVerificationApi";
+import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 
 export default function OnlineVerificationInfo() {
   const navigate = useNavigate();
@@ -56,7 +57,15 @@ export default function OnlineVerificationInfo() {
               <GcdsDetails
                 detailsTitle={t("OnlineVerificationInfo.listOfAcceptableIds")}
               >
-                {t("OnlineVerificationInfo.listOfAcceptableIds")}
+                <ul
+                  aria-label={t("OnlineVerificationInfo.listOfAcceptableIds")}
+                >
+                  {APPROVED_DOCUMENT_VALUES.filter(
+                    (docValue) => docValue !== "noIds",
+                  ).map((docValue) => (
+                    <li key={docValue}>{t(`ApprovedDocuments.${docValue}`)}</li>
+                  ))}
+                </ul>
               </GcdsDetails>
             </li>
             <li>

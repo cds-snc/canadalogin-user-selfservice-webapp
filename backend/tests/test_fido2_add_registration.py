@@ -161,6 +161,9 @@ class TestGetAttestationOptions:
         sent_body = call_kwargs["json"]
         assert sent_body["displayName"] == "Display Name"
         assert sent_body["userId"] == "user-123"
+        assert sent_body["authenticatorSelection"]["residentKey"] == "preferred"
+        assert sent_body["authenticatorSelection"]["requireResidentKey"] is False
+        assert sent_body["authenticatorSelection"]["userVerification"] == "preferred"
 
     @pytest.mark.asyncio
     @patch.object(add_module, "get_auth_request_headers")

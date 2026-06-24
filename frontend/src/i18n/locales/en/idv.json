@@ -131,17 +131,29 @@
     "serviceCanadaLocationsOption": "Service Canada Centres"
   },
   "CompleteIdentityProofing": {
-    "appName": "CanadaLogin",
     "pageTitle": "Complete identity proofing",
     "heading": "Complete identity proofing when you're ready",
+    "noticeTitle": "Get access to more services",
+    "noticeDescription": "Complete identity proofing to secure your CanadaLogin, make recovery easier, and access more Government of Canada services.",
+    "noticeCta": "Complete identity proofing",
     "accessRPServicePortalTitle": "To access the {{rpServicePortal}}, you need to complete identity proofing first",
     "accessRPServicePortalText": "When you're ready, sign back in to your {{appName}} account and you'll be brought back to this step automatically.",
     "buttonStartIdentity": "Start identity proofing now",
     "signOut": "Sign out",
     "signingOut": "Signing you out...",
     "signOutFailed": "Failed to sign you out. Redirecting...",
-    "forMoreInformationNoticeHeader": "For more information",
-    "forMoreInformationNoticeText": "Learn more about how identity proofing works"
+    "noDocumentsNoticeHeader": "Don't have the required documents for identity proofing?",
+    "noDocumentsNoticeText": "If you do not have the required identity documents, or are unable to complete the proofing process because of some other circumstances, you will need to contact {{rpServicePortal}} directly to ask about alternative ways to verify your identity and access the service.",
+    "contactLink": "RP Service Portal contact"
+  },
+  "ApprovedDocuments": {
+    "driverLicence": "Provincial/Territorial Driver's Licence",
+    "photoIDHealthCard": "Provincial/Territorial Photo ID Health Card",
+    "photoIDServiceCard": "Provincial/Territorial Photo ID Service Card",
+    "passport": "Canadian and International Passport",
+    "canadianPRCard": "Canadian PR Card",
+    "indianStatus": "Secure Certificate of Indian Status",
+    "noIds": "I don't have any of these IDs"
   },
   "ConfirmIdentityDetails": {
     "pageTitle": "Confirm what will be saved to your CanadaLogin",

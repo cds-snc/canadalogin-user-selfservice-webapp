@@ -21,31 +21,7 @@ import {
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-
-const ID_TYPE_OPTIONS = [
-  {
-    value: "driverLicence",
-    labelKey: "ServiceCanadaCentre.driverLicenceOption",
-  },
-  {
-    value: "photoIDHealthCard",
-    labelKey: "ServiceCanadaCentre.photoIDHealthCardOption",
-  },
-  {
-    value: "photoIDServiceCard",
-    labelKey: "ServiceCanadaCentre.photoIDServiceCardOption",
-  },
-  { value: "passport", labelKey: "ServiceCanadaCentre.passportOption" },
-  {
-    value: "canadianPRCard",
-    labelKey: "ServiceCanadaCentre.canadianPRCardOption",
-  },
-  {
-    value: "indianStatus",
-    labelKey: "ServiceCanadaCentre.indianStatusOption",
-  },
-  { value: "noIds", labelKey: "ServiceCanadaCentre.noIds" },
-] as const;
+import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 
 const IDS_REQUIRING_ADDRESS_AND_PROVINCE = new Set([
   "driverLicence",
@@ -55,7 +31,7 @@ const IDS_REQUIRING_ADDRESS_AND_PROVINCE = new Set([
 
 export default function ServiceCanadaCentrePage() {
   const navigate = useNavigate();
-  const { language } = useParams();
+  const { language, journeyType } = useParams();
   const formRef = useRef<HTMLFormElement>(null);
   const [selectedIdType, setSelectedIdType] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
@@ -64,6 +40,7 @@ export default function ServiceCanadaCentrePage() {
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,
+    journeyType: journeyType,
   });
   const currentLanguage =
     language === AVAILABLE_LANGUAGES.fr
@@ -168,9 +145,9 @@ export default function ServiceCanadaCentrePage() {
                 "ServiceCanadaCentre.selectIdDropdownDefaultValue",
               )}
             >
-              {ID_TYPE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {t(option.labelKey)}
+              {APPROVED_DOCUMENT_VALUES.map((docValue) => (
+                <option key={docValue} value={docValue}>
+                  {t(`ApprovedDocuments.${docValue}`)}
                 </option>
               ))}
             </GcdsSelect>

@@ -18,15 +18,18 @@ import { userProfileDispatch } from "../../utils/userProfileDispatch";
 
 export default function CompleteIdentityProofingPage() {
   const navigate = useNavigate();
-  const { language } = useParams();
+  const { language, journeyType } = useParams();
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
 
   const { t, i18n } = useTranslation("idv");
-  const appName = t("CompleteIdentityProofing.appName");
+  const { t: tLayout } = useTranslation("layout");
+  const appName = tLayout("TopNavBar.appName");
 
   const handleStartIdentityProofing = () => {
-    navigate(path(PAGES.idvStartIdentityProofingPage, { language }));
+    navigate(
+      path(PAGES.idvStartIdentityProofingPage, { language, journeyType }),
+    );
   };
 
   const rpInfo = state.relyingPartyInfo;
@@ -100,15 +103,18 @@ export default function CompleteIdentityProofingPage() {
             </GcdsButton>
           </GcdsGrid>
           <GcdsNotice
-            noticeRole="info"
+            noticeRole="warning"
             noticeTitleTag="h2"
             style={{ marginTop: "2rem" }}
-            noticeTitle={t(
-              "CompleteIdentityProofing.forMoreInformationNoticeHeader",
-            )}
+            noticeTitle={t("CompleteIdentityProofing.noDocumentsNoticeHeader")}
           >
+            <GcdsText>
+              {t("CompleteIdentityProofing.noDocumentsNoticeText", {
+                rpServicePortal,
+              })}
+            </GcdsText>
             <GcdsLink href="#" external size="regular">
-              {t("CompleteIdentityProofing.forMoreInformationNoticeText")}
+              {t("CompleteIdentityProofing.contactLink")}
             </GcdsLink>
           </GcdsNotice>
         </GcdsContainer>

@@ -241,7 +241,7 @@ describe("ServiceCanadaCentrePage", () => {
 
     expect(mockNavigate).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/idv/in-person/service-canada-centre/idv-code",
+      "/en/identity-verification/in-person/service-canada-centre/idv-code",
     );
   });
 
