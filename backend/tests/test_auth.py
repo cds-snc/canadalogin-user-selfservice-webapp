@@ -330,6 +330,20 @@ async def test_login_sets_return_to_page_when_valid(app, client):
 
 
 @pytest.mark.asyncio
+async def test_login_does_not_set_return_to_page_for_language_root(app, client):
+    resp = await client.get(
+        "/login",
+        params={"returnToPage": "/en"},
+        follow_redirects=False,
+    )
+    assert resp.status_code in (302, 307)
+
+    dump = await client.get("/session-dump")
+    assert dump.status_code == 200
+    assert dump.json().get(FakeSessionKeys.RETURN_TO_PAGE.value) is None
+
+
+@pytest.mark.asyncio
 async def test_callback_handler_success_flow_sets_session_and_redirects(app, client):
     # Seed session with RETURN_TO_PAGE so the final redirect includes it
     await client.get("/seed-session", params={"path": "/dashboard"})
@@ -338,13 +352,22 @@ async def test_callback_handler_success_flow_sets_session_and_redirects(app, cli
     assert resp.status_code in (302, 307)
     assert (
         resp.headers["location"]
-        == "https://pm.example.com/dashboard?returnToPage=/dashboard"
+        == "https://pm.example.com/dashboard?returnToPage=%2Fdashboard"
     )
 
     # returnToPage is one-time and should be consumed by callback_handler
     dump = await client.get("/session-dump")
     assert dump.status_code == 200
     assert dump.json().get(FakeSessionKeys.RETURN_TO_PAGE.value) is None
+
+
+@pytest.mark.asyncio
+async def test_callback_ignores_language_root_return_to_page(app, client):
+    await client.get("/seed-session", params={"path": "/en"})
+    resp = await client.get("/auth/callback", follow_redirects=False)
+
+    assert resp.status_code in (302, 307)
+    assert resp.headers["location"] == "https://pm.example.com"
 
 
 @pytest.mark.asyncio

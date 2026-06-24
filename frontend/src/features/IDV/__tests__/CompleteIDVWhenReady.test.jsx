@@ -190,8 +190,12 @@ describe("CompleteIdentityProofingPage", () => {
           "When you're ready, sign back in to your CanadaLogin account and you'll be brought back to this step automatically.",
         ),
       ).toBeInTheDocument();
-      expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
-      expect(screen.getByText("For more information")).toBeInTheDocument();
+      expect(screen.getAllByTestId("gcds-notice").length).toBeGreaterThan(0);
+      expect(
+        screen.getByText(
+          "Don't have the required documents for identity proofing?",
+        ),
+      ).toBeInTheDocument();
     });
   });
 
@@ -229,15 +233,48 @@ describe("CompleteIdentityProofingPage", () => {
     });
   });
 
-  describe("Notice link", () => {
-    it("renders the notice link with the correct href", () => {
+  describe("Warning notice for missing documents", () => {
+    it("renders the warning notice header", () => {
       setup();
 
-      const noticeLink = screen.getByRole("link", {
-        name: "Learn more about how identity proofing works",
+      expect(
+        screen.getByText(
+          "Don't have the required documents for identity proofing?",
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it("renders the warning notice text with localized RP name", () => {
+      setup();
+
+      expect(
+        screen.getByText(
+          "If you do not have the required identity documents, or are unable to complete the proofing process because of some other circumstances, you will need to contact Localized RP directly to ask about alternative ways to verify your identity and access the service.",
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it("renders the contact link in the warning notice", () => {
+      setup();
+
+      const contactLink = screen.getByRole("link", {
+        name: "RP Service Portal contact",
       });
-      expect(noticeLink).toBeInTheDocument();
-      expect(noticeLink).toHaveAttribute("href", "#");
+      expect(contactLink).toBeInTheDocument();
+      expect(contactLink).toHaveAttribute("href", "#");
+    });
+
+    it("uses fallback app name when RP info is not available", () => {
+      setup({
+        dispatch: vi.fn(),
+        state: { relyingPartyInfo: null },
+      });
+
+      expect(
+        screen.getByText(
+          /will need to contact CanadaLogin directly to ask about alternative ways/,
+        ),
+      ).toBeInTheDocument();
     });
   });
 
