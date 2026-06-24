@@ -23,10 +23,12 @@ async def idv_mock_success_response(
     profile = await dispatch_get_my_profile_from_ibm(
         global_http_client, user_access_token
     )
+    profile_name = profile.name
+
     mock_identity_response = {
-        "given_name": profile.name.givenName,
-        "family_name": profile.name.familyName,
-        "name": profile.name.formatted,
+        "given_name": profile_name.givenName if profile_name else None,
+        "family_name": profile_name.familyName if profile_name else None,
+        "name": profile_name.formatted if profile_name else None,
         "email": profile.userName,
         "birthdate": date(1990, 5, 15).isoformat(),
         "address": {
