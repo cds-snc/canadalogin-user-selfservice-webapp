@@ -27,6 +27,8 @@ export default function StartIdentityProofingPage() {
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
+  const isRequiredJourney =
+    (journeyType ?? "").toLowerCase() === IDV_JOURNEY_TYPE.REQUIRED;
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
     language,
     journeyType,
@@ -65,13 +67,14 @@ export default function StartIdentityProofingPage() {
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
         <GcdsContainer>
-          {journeyType === IDV_JOURNEY_TYPE.REQUIRED && (
+          {isRequiredJourney && (
             <GcdsNotice
               noticeRole="success"
               noticeTitleTag="h2"
-              noticeTitle=" "
+              noticeTitle={t("StartIdentityProofing.signedInNotice")}
+              style={{ marginBottom: "var(--gcds-spacing-300)"}}
             >
-              {t("StartIdentityProofing.signedInNotice")}
+              <GcdsText>{""}</GcdsText>
             </GcdsNotice>
           )}
           <GcdsHeading tag="h1">

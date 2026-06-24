@@ -2,6 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import StartIdentityProofingPage from "../StartIdentityProofingPage";
+import { IDV_JOURNEY_TYPE } from "../constants";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -70,7 +71,12 @@ vi.mock("@gcds-core/components-react", () => ({
     </button>
   ),
   GcdsLink: ({ children, href }) => <a href={href}>{children}</a>,
-  GcdsNotice: ({ children }) => <div data-testid="gcds-notice">{children}</div>,
+  GcdsNotice: ({ children, noticeTitle }) => (
+    <div data-testid="gcds-notice">
+      {noticeTitle ? <div>{noticeTitle}</div> : null}
+      {children}
+    </div>
+  ),
   GcdsRadios: ({ name, legend, options, onGcdsChange, hideLegend }) => (
     <fieldset data-testid={`radios-${name}`}>
       {!hideLegend && <legend>{legend}</legend>}
@@ -127,7 +133,7 @@ describe("StartIdentityProofingPage", () => {
   });
 
   it("shows success notice when journeyType is required", () => {
-    mockJourneyType = "required";
+    mockJourneyType = IDV_JOURNEY_TYPE.REQUIRED;
 
     render(<StartIdentityProofingPage />);
 
