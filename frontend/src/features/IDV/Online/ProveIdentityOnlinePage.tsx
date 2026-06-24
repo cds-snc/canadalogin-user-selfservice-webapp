@@ -15,7 +15,7 @@ import { ONLINE_IDV_METHOD, type IdvMethod } from "../components/methods";
 
 export default function ProveIdentityOnlinePage() {
   const navigate = useNavigate();
-  const { language, journeyType } = useParams();
+  const { language } = useParams();
   const { t } = useTranslation("idv");
 
   const [selectedMethod, setSelectedMethod] = useState<IdvMethod>();
