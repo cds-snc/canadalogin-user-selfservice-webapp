@@ -7,6 +7,7 @@ import {
   GcdsHeading,
   GcdsLink,
   GcdsText,
+  GcdsNotice,
   GcdsContainer,
 } from "@gcds-core/components-react";
 
@@ -58,10 +59,23 @@ export default function StartIdentityProofingPage() {
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
-
+console.log("journeyType", journeyType);
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
+
+        {journeyType === 'error' && (
+          <GcdsContainer>
+            <GcdsNotice
+              noticeRole="danger"
+              noticeTitleTag="h2"
+              noticeTitle={t("StartIdentityProofing.moreInfoTitle")}
+            >
+              {t("StartIdentityProofing.learnMoreText")}
+            </GcdsNotice>
+          </GcdsContainer>
+        )}
+
         <GcdsContainer>
           <GcdsHeading tag="h1">
             {t("StartIdentityProofing.pageTitle")}
