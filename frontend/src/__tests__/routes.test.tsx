@@ -7,9 +7,10 @@ const { mockComponent } = vi.hoisted(() => ({
 }));
 
 vi.mock("../utils/constants", async () => {
-  const actual = await vi.importActual<typeof import("../utils/constants")>(
-    "../utils/constants",
-  );
+  const actual =
+    await vi.importActual<typeof import("../utils/constants")>(
+      "../utils/constants",
+    );
 
   return {
     ...actual,
@@ -44,33 +45,51 @@ vi.mock("../components/Manage/SecuritySettings/Manage2FAVerifications", () => ({
 vi.mock("../components/Manage/SecuritySettings/SecuritySettings", () => ({
   default: mockComponent,
 }));
-vi.mock("../features/LanguagePreference/components/EditLanguagePreferencePage", () => ({
-  default: mockComponent,
-}));
+vi.mock(
+  "../features/LanguagePreference/components/EditLanguagePreferencePage",
+  () => ({
+    default: mockComponent,
+  }),
+);
 vi.mock("../features/ProfileName/components/EditProfileNamePage", () => ({
   default: mockComponent,
 }));
 vi.mock("../features/ChangePassword/components/ChangePasswordIndex", () => ({
   default: mockComponent,
 }));
-vi.mock("../features/ContactPhoneNumber/components/EditContactPhoneNumberPage", () => ({
-  default: mockComponent,
-}));
-vi.mock("../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage", () => ({
-  default: mockComponent,
-}));
-vi.mock("../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage", () => ({
-  default: mockComponent,
-}));
+vi.mock(
+  "../features/ContactPhoneNumber/components/EditContactPhoneNumberPage",
+  () => ({
+    default: mockComponent,
+  }),
+);
+vi.mock(
+  "../features/MFAPhoneNumber/AddMFAPhoneNumber/component/AddMFAPage",
+  () => ({
+    default: mockComponent,
+  }),
+);
+vi.mock(
+  "../features/MFAPhoneNumber/DeleteMFAPhoneNumber/component/DeleteMFAPage",
+  () => ({
+    default: mockComponent,
+  }),
+);
 vi.mock("../features/EmailAddress/EditEmailAddressPage", () => ({
   default: mockComponent,
 }));
-vi.mock("../features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage", () => ({
-  default: mockComponent,
-}));
-vi.mock("../features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage", () => ({
-  default: mockComponent,
-}));
+vi.mock(
+  "../features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage",
+  () => ({
+    default: mockComponent,
+  }),
+);
+vi.mock(
+  "../features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage",
+  () => ({
+    default: mockComponent,
+  }),
+);
 vi.mock("../features/IDV/InPerson/ServiceCanadaCentrePage", () => ({
   default: mockComponent,
 }));
