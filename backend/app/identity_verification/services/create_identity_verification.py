@@ -17,9 +17,12 @@ ALLOWED_REDIRECT_HOSTS = {"demoeidv.bluink.ca", "demoidv.bluink.ca", "idv.bluink
 BLUINK_API_URL = "https://demoeid.bluink.ca/api/prereg/v2/request-registration"
 
 
-async def idv_mock_success_response(global_http_client: AsyncClient, user_access_token: str) -> ResponseModel:
+async def idv_mock_success_response(
+    global_http_client: AsyncClient, user_access_token: str
+) -> ResponseModel:
     profile = await dispatch_get_my_profile_from_ibm(
-        global_http_client, user_access_token)
+        global_http_client, user_access_token
+    )
     mock_identity_response = {
         "given_name": profile.name.givenName,
         "family_name": profile.name.familyName,
@@ -44,7 +47,8 @@ async def idv_mock_success_response(global_http_client: AsyncClient, user_access
             "verification_status": "success",
             "verification_method": "online",
             "claims": mock_identity_response,
-        })
+        },
+    )
 
 
 async def create_identity_verification(
