@@ -3,7 +3,6 @@ import {
   GcdsHeading,
   GcdsGrid,
   GcdsText,
-  GcdsLink,
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
@@ -13,50 +12,10 @@ import VerifiedBadge from "../Badges/VerifiedBadge";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
+import ViewEmailInfo from "../../features/ProfileName/components/ViewEmailInfo";
 import ProvenInformationCard from "../../features/IDV/ProvenInformationCard";
 import IdentityInfoSuccessNotice from "../../features/IDV/IdentityInfoSuccessNotice";
-
-interface DisplayEmailInfoProps {
-  email: string;
-}
-
-type GcdsNavigationEvent = CustomEvent<string> & {
-  preventDefault: () => void;
-};
-
-const DisplayEmailInfo = ({ email }: DisplayEmailInfoProps) => {
-  const { language } = useParams();
-  const navigate = useNavigate();
-  const { t } = useTranslation("profile");
-  const editEmail = path(PAGES.editEmailPage, {
-    language,
-  });
-
-  return (
-    <>
-      <GcdsHeading tag="h3" marginTop="300">
-        {t("ProfileHome.email")}
-      </GcdsHeading>
-      <GcdsText>{t("ProfileHome.emailDescription")}</GcdsText>
-      <GcdsGrid columns="1fr auto" className="gridInline">
-        <GcdsText>{email}</GcdsText>
-        {DEV_ONLY_FEATURE && (
-          <GcdsLink
-            href={editEmail}
-            size="regular"
-            onGcdsClick={(event: GcdsNavigationEvent) => {
-              event.preventDefault();
-              navigate(event.detail);
-            }}
-          >
-            {t("ProfileHome.edit")}
-          </GcdsLink>
-        )}
-      </GcdsGrid>
-      <VerifiedBadge text={t("ProfileHome.verified")} />
-    </>
-  );
-};
+import CompleteIdentityProofingNotice from "../../features/IDV/components/CompleteIdentityProofingNotice";
 
 export default function ProfileHome({
   showIDVSuccessNotice = false,
@@ -73,9 +32,16 @@ export default function ProfileHome({
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>
-        <IdentityInfoSuccessNotice
-          showIDVSuccessNotice={showIDVSuccessNotice}
-        />
+        {DEV_ONLY_FEATURE && (
+          <GcdsContainer className="idvNoticeSpacing">
+            <CompleteIdentityProofingNotice />
+          </GcdsContainer>
+        )}
+        {DEV_ONLY_FEATURE && (
+          <IdentityInfoSuccessNotice
+            showIDVSuccessNotice={showIDVSuccessNotice}
+          />
+        )}
         {DEV_ONLY_FEATURE && (
           <GcdsContainer>
             <GcdsGrid columns="1fr auto" className="gridInline">
