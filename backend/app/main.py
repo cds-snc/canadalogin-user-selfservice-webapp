@@ -213,9 +213,9 @@ def create_app():
         tags=["FIDO2"],
     )
 
-    if is_local_environment:
+    if configuration.ENVIRONMENT in {"local", "dev"}:
         logger.info(
-            "Running in local environment, Identity Verification routes will be included"
+            "Running in local or dev environment, Identity Verification routes will be included"
         )
         app.include_router(
             v1_identity_verification_router.router,
