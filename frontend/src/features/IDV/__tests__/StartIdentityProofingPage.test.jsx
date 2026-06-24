@@ -2,6 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import StartIdentityProofingPage from "../StartIdentityProofingPage";
+import { IDV_JOURNEY_TYPE } from "../constants";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -156,7 +157,10 @@ describe("StartIdentityProofingPage", () => {
   });
 
   it("renders the heading with the relying party name for a required journey", () => {
-    mockRouteParams = { language: "en", journeyType: "required" };
+    mockRouteParams = {
+      language: "en",
+      journeyType: IDV_JOURNEY_TYPE.REQUIRED,
+    };
 
     render(<StartIdentityProofingPage />);
 

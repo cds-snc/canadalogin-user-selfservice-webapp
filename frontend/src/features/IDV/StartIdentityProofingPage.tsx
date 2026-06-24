@@ -11,6 +11,7 @@ import {
 } from "@gcds-core/components-react";
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import { IDV_JOURNEY_TYPE } from "./constants";
 import { path } from "../../utils/routeHelpers";
 import { useUser } from "../../components/Providers/useUser";
 import IdentityProofingRadioButtons from "./components/IdentityProofingRadioButtons";
@@ -47,7 +48,9 @@ export default function StartIdentityProofingPage() {
   const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
   const appName = tLayout("TopNavBar.appName");
   const rpServicePortal =
-    journeyType === "required" ? relyingPartyLinkName || appName : appName;
+    journeyType === IDV_JOURNEY_TYPE.REQUIRED
+      ? relyingPartyLinkName || appName
+      : appName;
 
   // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
