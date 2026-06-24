@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
@@ -11,7 +11,11 @@ import {
   GcdsNotice,
 } from "@gcds-core/components-react";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import {
+  DEV_ONLY_FEATURE,
+  IDV_TARGET_URL_KEY,
+  PAGES,
+} from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 import IdentityProofingRadioButtons from "./components/IdentityProofingRadioButtons";
 import {
@@ -20,10 +24,12 @@ import {
 } from "./components/methods";
 import { useUser } from "../../components/Providers/useUser";
 import { IDV_JOURNEY_TYPE } from "./constants";
+import { identityVerificationApi } from "./api/identityVerificationApi";
 
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
+  const [searchParams] = useSearchParams();
 
   const { t, i18n } = useTranslation("idv");
   const { state } = useUser();
@@ -59,6 +65,22 @@ export default function StartIdentityProofingPage() {
     language,
     journeyType,
   });
+
+  useEffect(() => {
+    if (resolvedJourneyType !== IDV_JOURNEY_TYPE.REQUIRED) {
+      return;
+    }
+
+    const targetUrl = searchParams.get(IDV_TARGET_URL_KEY);
+    if (!targetUrl) {
+      return;
+    }
+
+    void identityVerificationApi.storeTargetUrl(targetUrl).catch((error) => {
+      console.error("Unable to store IDV target URL:", error);
+    });
+  }, [resolvedJourneyType, searchParams]);
+
   // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
     switch (selectedOption) {

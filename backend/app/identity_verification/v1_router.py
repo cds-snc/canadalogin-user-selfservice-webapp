@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.schemas import ResponseModel
 from app.identity_verification.services.create_identity_verification import (
@@ -8,6 +8,10 @@ from app.identity_verification.services.create_identity_verification import (
 )
 from app.identity_verification.services.send_in_person_verification_code import (
     send_in_person_verification_code,
+)
+from app.identity_verification.services.target_url import (
+    get_identity_verification_redirect_url,
+    store_identity_verification_target_url,
 )
 
 logger = logging.getLogger(__name__)
@@ -46,3 +50,34 @@ async def send_in_person_verification(
     return await send_in_person_verification_code(
         request.app.state.request_client, user_access_token
     )
+
+
+@router.post(
+    "/target-url",
+    response_model=ResponseModel,
+    status_code=status.HTTP_200_OK,
+    tags=["Identity Verification"],
+    summary="Store the relying party target URL for the current IDV session",
+    description="Stores the RP target URL in the Redis-backed session so the user can be returned after completing identity verification.",
+)
+async def store_target_url(
+    request: Request,
+    target_url: str = Query(...),
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await store_identity_verification_target_url(request, target_url)
+
+
+@router.get(
+    "/target-url",
+    response_model=ResponseModel,
+    status_code=status.HTTP_200_OK,
+    tags=["Identity Verification"],
+    summary="Get the post-IDV redirect URL",
+    description="Returns the redirect URL the user should be sent to after confirming identity details.",
+)
+async def get_target_url(
+    request: Request,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await get_identity_verification_redirect_url(request)

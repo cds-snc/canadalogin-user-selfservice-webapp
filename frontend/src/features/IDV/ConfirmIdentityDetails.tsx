@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router";
 import {
   GcdsButton,
   GcdsContainer,
@@ -15,13 +14,16 @@ import ProvenInformationCard from "../IDV/ProvenInformationCard";
 import ViewProfileNameCard from "../ProfileName/components/ViewProfileNameCard";
 import ViewContactPhoneNumber from "../ContactPhoneNumber/components/ViewContactPhoneNumber";
 import DisplayEmailInfo from "../ProfileName/components/ViewEmailInfo";
+import { identityVerificationApi } from "./api/identityVerificationApi";
 
 export default function ConfirmIdentityDetails() {
-  const { t } = useTranslation("idv");
-  const navigate = useNavigate();
+  const { t, i18n } = useTranslation("idv");
   const { state } = useUser();
 
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
+  const localizedDetail = state.relyingPartyInfo?.localized?.[i18n.language];
+  const fallbackRedirectUrl =
+    localizedDetail?.url ?? state.relyingPartyInfo?.url ?? "/";
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -63,10 +65,18 @@ export default function ConfirmIdentityDetails() {
 
         <GcdsButton
           type="button"
-          onGcdsClick={(event) => {
+          onGcdsClick={async (event) => {
             event.preventDefault();
-            // TODO: Replace with final post-confirmation destination.
-            navigate("");
+            try {
+              const response =
+                await identityVerificationApi.getPostIdvRedirectUrl();
+              window.location.assign(
+                response?.data?.redirect_url || fallbackRedirectUrl,
+              );
+            } catch (error) {
+              console.error("Unable to resolve post-IDV redirect URL:", error);
+              window.location.assign(fallbackRedirectUrl);
+            }
           }}
         >
           {t("ConfirmIdentityDetails.confirmAndContinue")}

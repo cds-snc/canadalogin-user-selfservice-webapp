@@ -1,7 +1,8 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import StartIdentityProofingPage from "../StartIdentityProofingPage";
+import { identityVerificationApi } from "../api/identityVerificationApi";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -9,6 +10,7 @@ import StartIdentityProofingPage from "../StartIdentityProofingPage";
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
 let mockJourneyType;
+let mockSearchParams = new URLSearchParams();
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -16,13 +18,21 @@ vi.mock("react-router", async () => {
     ...actual,
     useParams: () => ({ language: "en", journeyType: mockJourneyType }),
     useNavigate: () => mockNavigate,
+    useSearchParams: () => [mockSearchParams, vi.fn()],
   };
 });
+
+vi.mock("../api/identityVerificationApi", () => ({
+  identityVerificationApi: {
+    storeTargetUrl: vi.fn().mockResolvedValue({ success: true }),
+  },
+}));
 
 vi.mock("../../../utils/constants", () => ({
   get DEV_ONLY_FEATURE() {
     return mockDevOnlyFeature;
   },
+  IDV_TARGET_URL_KEY: "target_url",
   PAGES: {
     idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
     idvVisitCanadaPostPage: "IdvVisitCanadaPostPage",
@@ -119,6 +129,7 @@ describe("StartIdentityProofingPage", () => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
     mockJourneyType = undefined;
+    mockSearchParams = new URLSearchParams();
     // Reset window.location.href
     delete window.location;
     window.location = { href: "" };
@@ -168,6 +179,21 @@ describe("StartIdentityProofingPage", () => {
         level: 1,
       }),
     ).toBeInTheDocument();
+  });
+
+  it("stores the target URL when the required journey includes one", async () => {
+    mockJourneyType = "required";
+    mockSearchParams = new URLSearchParams([
+      ["target_url", "https://rp.example.com/service/return"],
+    ]);
+
+    render(<StartIdentityProofingPage />);
+
+    await waitFor(() => {
+      expect(identityVerificationApi.storeTargetUrl).toHaveBeenCalledWith(
+        "https://rp.example.com/service/return",
+      );
+    });
   });
 
   it("renders the heading with app name", () => {

@@ -1,7 +1,8 @@
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ConfirmIdentityDetails from "../ConfirmIdentityDetails";
+import { identityVerificationApi } from "../api/identityVerificationApi";
 
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
@@ -23,6 +24,14 @@ vi.mock("react-router", async () => {
     useNavigate: () => mockNavigate,
   };
 });
+
+vi.mock("../api/identityVerificationApi", () => ({
+  identityVerificationApi: {
+    getPostIdvRedirectUrl: vi.fn().mockResolvedValue({
+      data: { redirect_url: "https://rp.example.com/service/return" },
+    }),
+  },
+}));
 
 vi.mock("../../../components/Providers/useUser", () => ({
   useUser: () => ({
@@ -91,12 +100,25 @@ describe("ConfirmIdentityDetails", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: {
+        ...window.location,
+        assign: vi.fn(),
+      },
+    });
     mockUserState = {
       userProfile: {
         userName: "test@example.com",
         phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
         name: {
           formatted: "Jane Doe",
+        },
+      },
+      relyingPartyInfo: {
+        url: "https://rp.example.com/service",
+        localized: {
+          en: { url: "https://rp.example.com/service" },
         },
       },
     };
@@ -167,13 +189,18 @@ describe("ConfirmIdentityDetails", () => {
     );
   });
 
-  it("navigates with empty destination when Confirm and continue is clicked", () => {
+  it("redirects to the stored RP target when Confirm and continue is clicked", async () => {
     render(<ConfirmIdentityDetails />);
 
     fireEvent.click(
       screen.getByRole("button", { name: "Confirm and continue" }),
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith("");
+    await waitFor(() => {
+      expect(identityVerificationApi.getPostIdvRedirectUrl).toHaveBeenCalled();
+      expect(window.location.assign).toHaveBeenCalledWith(
+        "https://rp.example.com/service/return",
+      );
+    });
   });
 });
