@@ -40,6 +40,11 @@ export default function ProveIdentityOnlinePage() {
     }
   };
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleContinue();
+  };
+
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
@@ -49,30 +54,33 @@ export default function ProveIdentityOnlinePage() {
       <GcdsGrid columns="1" gap="450">
         <GcdsHeading tag="h1">{t("ProveIdentityOnline.heading")}</GcdsHeading>
 
-        <OnlineRadioButtons
-          selectedMethod={selectedMethod}
-          onMethodChange={setSelectedMethod}
-        />
+        <form onSubmit={handleSubmit}>
+          <OnlineRadioButtons
+            selectedMethod={selectedMethod}
+            onMethodChange={setSelectedMethod}
+          />
 
-        <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
-            type="button"
-            disabled={!selectedMethod}
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              handleContinue();
-            }}
+          <GcdsGrid
+            columns="1"
+            columnsDesktop="max-content max-content"
+            gap="200"
           >
-            {t("ProveIdentityOnline.continueButton")}
-          </GcdsButton>
-          <GcdsButton
-            onClick={() => {
-              navigate(path(PAGES.idvStartIdentityProofingPage, { language }));
-            }}
-          >
-            {t("ProveIdentityOnline.backButton")}
-          </GcdsButton>
-        </GcdsGrid>
+            <GcdsButton type="submit" disabled={!selectedMethod}>
+              {t("ProveIdentityOnline.continueButton")}
+            </GcdsButton>
+            <GcdsButton
+              type="button"
+              buttonRole="secondary"
+              onClick={() => {
+                navigate(
+                  path(PAGES.idvStartIdentityProofingPage, { language }),
+                );
+              }}
+            >
+              {t("ProveIdentityOnline.backButton")}
+            </GcdsButton>
+          </GcdsGrid>
+        </form>
       </GcdsGrid>
     </GcdsContainer>
   );

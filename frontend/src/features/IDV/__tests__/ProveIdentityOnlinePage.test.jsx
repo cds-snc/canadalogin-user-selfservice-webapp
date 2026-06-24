@@ -29,6 +29,7 @@ vi.mock("../../../utils/constants", () => ({
     idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
     idvProvincialVerificationPage: "IdvProvincialVerificationPage",
   },
+}));
 
 vi.mock("../../../utils/routeHelpers", () => ({
   path: (page, { language } = {}) => {
@@ -88,10 +89,22 @@ vi.mock("@gcds-core/components-react", () => ({
     const Tag = tag ?? "h2";
     return <Tag>{children}</Tag>;
   },
-  GcdsButton: ({ children, onClick, onGcdsClick, buttonRole, disabled }) => (
+  GcdsButton: ({
+    children,
+    onClick,
+    onGcdsClick,
+    disabled,
+    type,
+    buttonRole,
+  }) => (
     <button
+      type={type}
       data-testid={
-        buttonRole === "secondary" ? "back-button" : "continue-button"
+        type === "submit"
+          ? "continue-button"
+          : buttonRole === "secondary"
+            ? "back-button"
+            : "button"
       }
       disabled={disabled}
       onClick={(e) => (onGcdsClick ? onGcdsClick(e) : onClick?.(e))}

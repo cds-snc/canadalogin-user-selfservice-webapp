@@ -197,7 +197,7 @@ export const appRoutes: RouteObject[] = [
                       handle: {
                         id: PAGES.idvStartIdentityProofingPage,
                         breadcrumbId: "pageTitle",
-                    },
+                      },
                       children: [
                         {
                           index: true,
