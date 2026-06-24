@@ -8,6 +8,7 @@ import StartIdentityProofingPage from "../StartIdentityProofingPage";
 // ────────────────────────────────────────────────
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
+let mockRouteParams = { language: "en", journeyType: undefined };
 let mockUserState = {
   relyingPartyInfo: {
     linkName: "Test Service",
@@ -22,7 +23,7 @@ vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
     ...actual,
-    useParams: () => ({ language: "en" }),
+    useParams: () => mockRouteParams,
     useNavigate: () => mockNavigate,
   };
 });
@@ -120,6 +121,7 @@ describe("StartIdentityProofingPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
+    mockRouteParams = { language: "en", journeyType: undefined };
     mockUserState = {
       relyingPartyInfo: {
         linkName: "Test Service",
@@ -143,17 +145,19 @@ describe("StartIdentityProofingPage", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders the page title", () => {
+  it("renders the page title for a non-required journey", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
       screen.getByRole("heading", {
-        name: "Test Service EN needs you to prove your identity.",
+        name: "CanadaLogin needs you to prove your identity.",
       }),
     ).toBeInTheDocument();
   });
 
-  it("renders the heading with rpServicePortal", () => {
+  it("renders the heading with the relying party name for a required journey", () => {
+    mockRouteParams = { language: "en", journeyType: "required" };
+
     render(<StartIdentityProofingPage />);
 
     expect(

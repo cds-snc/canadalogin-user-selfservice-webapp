@@ -28,12 +28,6 @@ export default function StartIdentityProofingPage() {
   const { t: tLayout, i18n } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
 
-  const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
-  const appName = tLayout("TopNavBar.appName");
-  const rpServicePortal = relyingPartyLinkName || appName;
-
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
     language,
     journeyType,
@@ -47,6 +41,14 @@ export default function StartIdentityProofingPage() {
     language,
     journeyType,
   });
+
+  const rpInfo = state.relyingPartyInfo;
+  const localizedDetail = rpInfo?.localized?.[i18n.language];
+  const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
+  const appName = tLayout("TopNavBar.appName");
+  const rpServicePortal =
+    journeyType === "required" ? relyingPartyLinkName || appName : appName;
+
   // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
     switch (selectedOption) {
@@ -79,7 +81,6 @@ export default function StartIdentityProofingPage() {
           </GcdsHeading>
           <GcdsText>{t("StartIdentityProofing.description1")}</GcdsText>
           <GcdsText>{t("StartIdentityProofing.description2")}</GcdsText>
-
 
           <GcdsLink href="#" external size="regular">
             {t("StartIdentityProofing.learnMoreDescription")}
