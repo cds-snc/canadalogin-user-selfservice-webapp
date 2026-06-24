@@ -7,17 +7,28 @@ import {
   GcdsHeading,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-// import { useNavigate } from "react-router";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { useNavigate, useParams } from "react-router";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 
 export default function IdentityVerificationSuccess() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
+  const { language, journeyType } = useParams();
 
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
+
+  const confirmIdentityDetailsPage = path(PAGES.idvDetailsConfirmationPage, {
+    language,
+    journeyType,
+  });
+
+  const handleContinue = async () => {
+    navigate(confirmIdentityDetailsPage);
+  };
 
   return (
     <GcdsContainer role="main">
@@ -43,12 +54,7 @@ export default function IdentityVerificationSuccess() {
         </GcdsContainer>
 
         <GcdsGrid columns="max-content max-content" gap="200">
-          <GcdsButton
-            type="button"
-            onClick={() => {
-              // TODO: navigate to next IDV step
-            }}
-          >
+          <GcdsButton type="button" onClick={handleContinue}>
             {t("IdentityVerificationSuccess.continueButton")}
           </GcdsButton>
         </GcdsGrid>

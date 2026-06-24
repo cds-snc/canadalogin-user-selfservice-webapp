@@ -24,10 +24,13 @@ export default function OnlineVerificationInfo() {
   const { t } = useTranslation("idv");
   const { state, dispatch } = useUser();
 
-  const confirmIdentityDetailsPage = path(PAGES.idvDetailsConfirmationPage, {
-    language,
-    journeyType,
-  });
+  const confirmIdentityDetailsPage = path(
+    PAGES.idvIdentityVerificationSuccessPage,
+    {
+      language,
+      journeyType,
+    },
+  );
 
   const { updateProfileSuccess } = userProfileDispatch(dispatch);
 
