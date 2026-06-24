@@ -9,21 +9,7 @@ export interface UserProfile {
     verificationId?: string;
     verificationStatus?: string;
     verificationMethod?: string;
-    claims?: {
-      given_name?: string;
-      family_name?: string;
-      name?: string;
-      email?: string;
-      birthdate?: string;
-      address?: {
-        formatted?: string;
-        street_address?: string;
-        locality?: string;
-        region?: string;
-        postal_code?: string;
-        country?: string;
-      } | null;
-    } | null;
+    claims?: OnlineIdentityVerificationClaims | null;
   } | null;
   details?: null | {
     emailVerified: boolean | null;
