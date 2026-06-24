@@ -1,3 +1,4 @@
+from datetime import date
 import logging
 import uuid
 from urllib.parse import urlparse
@@ -14,6 +15,36 @@ _bluink_config = BluinkConfig()
 
 ALLOWED_REDIRECT_HOSTS = {"demoeidv.bluink.ca", "demoidv.bluink.ca", "idv.bluink.ca"}
 BLUINK_API_URL = "https://demoeid.bluink.ca/api/prereg/v2/request-registration"
+
+
+async def idv_mock_success_response(global_http_client: AsyncClient, user_access_token: str) -> ResponseModel:
+    profile = await dispatch_get_my_profile_from_ibm(
+        global_http_client, user_access_token)
+    mock_identity_response = {
+        "given_name": profile.name.givenName,
+        "family_name": profile.name.familyName,
+        "name": profile.name.formatted,
+        "email": profile.userName,
+        "birthdate": date(1990, 5, 15).isoformat(),
+        "address": {
+            "formatted": "123 Main Street, Ottawa, ON K1A 0B1, Canada",
+            "street_address": "123 Main Street",
+            "locality": "Ottawa",
+            "region": "ON",
+            "postal_code": "K1A 0B1",
+            "country": "CA",
+        },
+    }
+
+    return ResponseModel(
+        success=True,
+        message="Online Identity Mock Verification response generated successfully",
+        data={
+            "verification_id": str(uuid.uuid4()),
+            "verification_status": "success",
+            "verification_method": "online",
+            "claims": mock_identity_response,
+        })
 
 
 async def create_identity_verification(

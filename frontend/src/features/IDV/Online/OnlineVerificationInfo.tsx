@@ -9,24 +9,61 @@ import {
   GcdsHeading,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { useNavigate, useParams } from "react-router";
+import { useUser } from "../../../components/Providers/useUser";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
+import type { OnlineIdentityVerificationMockResponse } from "../../../types/user";
 import { identityVerificationApi } from "../api/identityVerificationApi";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
+import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 
 export default function OnlineVerificationInfo() {
   const navigate = useNavigate();
+  const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
+  const { state, dispatch } = useUser();
 
-  const handleContinue = () => {
+  const confirmIdentityDetailsPage = path(PAGES.idvDetailsConfirmationPage, {
+    language,
+    journeyType,
+  });
+
+  const { updateProfileSuccess } = userProfileDispatch(dispatch);
+
+  const handleContinue = async (
+    response: OnlineIdentityVerificationMockResponse | undefined,
+  ) => {
+    if (!response?.data) {
+      return;
+    }
+
+    if (state.userProfile) {
+      const {
+        verification_id,
+        verification_status,
+        verification_method,
+        claims,
+      } = response.data;
+
+      updateProfileSuccess({
+        ...state.userProfile,
+        verifiedClaims: {
+          verificationId: verification_id,
+          verificationStatus: verification_status,
+          verificationMethod: verification_method,
+          claims,
+        },
+      });
+    }
+
+    navigate(confirmIdentityDetailsPage);
+  };
+
+  const onContinue = () => {
     identityVerificationApi
-      .getOnlineIdentityVerificationUrl()
-      .then((response) => {
-        const { redirect_url } = (
-          response as { data: { redirect_url: string } }
-        ).data;
-        window.location.href = redirect_url;
-      })
+      .getOnlineIdentityVerificationMockResponse()
+      .then((response) => handleContinue(response))
       .catch(() => {
         // TODO: handle API error
       });
@@ -87,7 +124,7 @@ export default function OnlineVerificationInfo() {
             type="button"
             onGcdsClick={(ev) => {
               ev.preventDefault();
-              handleContinue();
+              void onContinue();
             }}
           >
             {t("OnlineVerificationInfo.continueButton")}
