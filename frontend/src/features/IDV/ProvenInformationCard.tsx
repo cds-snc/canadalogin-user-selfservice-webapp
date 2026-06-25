@@ -39,36 +39,34 @@ export default function ProvenInformationCard() {
   return (
     <GcdsContainer className="sectionCard">
       <GcdsGrid columns="1" gap="300">
-        <div>
+        <GcdsContainer>
           <GcdsHeading tag="h3" marginTop="300" marginBottom="0">
             {t("ProvenInformationCard.name")}
           </GcdsHeading>
           <GcdsText marginTop="200" marginBottom="0">
             {name}
           </GcdsText>
-        </div>
+        </GcdsContainer>
 
-        <div className="separator" style={{ margin: "0" }} />
+        <GcdsContainer className="separator" style={{ margin: "0" }} />
 
-        <div>
+        <GcdsContainer>
           <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
             {t("ProvenInformationCard.dateOfBirth")}
           </GcdsHeading>
           <GcdsText marginTop="200" marginBottom="0">
             {dateOfBirth}
           </GcdsText>
-        </div>
+        </GcdsContainer>
 
         <div className="separator" style={{ margin: "0" }} />
 
-        <div>
-          <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-            {t("ProvenInformationCard.idDocument")}
-          </GcdsHeading>
-          <GcdsText marginTop="200" marginBottom="0">
-            {idDocument}
-          </GcdsText>
-        </div>
+        <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+          {t("ProvenInformationCard.idDocument")}
+        </GcdsHeading>
+        <GcdsText marginTop="200" marginBottom="0">
+          {idDocument}
+        </GcdsText>
 
         <div className="separator" style={{ margin: "0" }} />
 

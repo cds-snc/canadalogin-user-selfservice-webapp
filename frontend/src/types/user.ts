@@ -5,6 +5,12 @@ import { CONTEXT_ACTIONS, SERVICES } from "../utils/constants";
 export interface UserProfile {
   id: string;
   active: boolean;
+  verifiedClaims?: {
+    verificationId?: string;
+    verificationStatus?: string;
+    verificationMethod?: string;
+    claims?: OnlineIdentityVerificationClaims | null;
+  } | null;
   details?: null | {
     emailVerified: boolean | null;
     lastLogin: string | null;
@@ -138,4 +144,31 @@ export const initialSessionTimeoutState: SessionTimeoutState = {
   isLoading: false,
   expirationTime: null,
   newServerSideExpirationTime: null,
+};
+
+export type OnlineIdentityVerificationClaims = {
+  given_name?: string;
+  family_name?: string;
+  name?: string;
+  email?: string;
+  birthdate?: string;
+  address?: {
+    formatted?: string;
+    street_address?: string;
+    locality?: string;
+    region?: string;
+    postal_code?: string;
+    country?: string;
+  } | null;
+};
+
+export type OnlineIdentityVerificationMockResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    verification_id: string;
+    verification_status: string;
+    verification_method: string;
+    claims: OnlineIdentityVerificationClaims;
+  };
 };

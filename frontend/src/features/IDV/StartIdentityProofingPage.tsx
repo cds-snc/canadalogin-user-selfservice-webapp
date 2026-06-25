@@ -9,6 +9,7 @@ import {
   GcdsText,
   GcdsNotice,
   GcdsContainer,
+  GcdsNotice,
 } from "@gcds-core/components-react";
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
@@ -18,12 +19,32 @@ import {
   START_IDENTITY_OPTION,
   type StartIdentityOption,
 } from "./components/methods";
+import { useUser } from "../../components/Providers/useUser";
+import { IDV_JOURNEY_TYPE } from "./constants";
 
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
 
-  const { t } = useTranslation("idv");
+  const { t, i18n } = useTranslation("idv");
+  const { state } = useUser();
+
+  const rpInfo = state.relyingPartyInfo;
+  const localizedDetail = rpInfo?.localized?.[i18n.language];
+  const rpName = localizedDetail?.name ?? rpInfo?.linkName;
+  const titleByJourneyType = {
+    [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
+      rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
+    }),
+    [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.proveYourIdentity"),
+    [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.proveYourIdentity"),
+  } as const;
+  const requestedJourneyType = journeyType ?? IDV_JOURNEY_TYPE.START;
+  const resolvedJourneyType: keyof typeof titleByJourneyType =
+    requestedJourneyType in titleByJourneyType
+      ? (requestedJourneyType as keyof typeof titleByJourneyType)
+      : IDV_JOURNEY_TYPE.START;
+  const pageTitle = titleByJourneyType[resolvedJourneyType];
   const { t: tLayout } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
@@ -76,14 +97,14 @@ export default function StartIdentityProofingPage() {
         )}
 
         <GcdsContainer>
-          <GcdsHeading tag="h1">
-            {t("StartIdentityProofing.pageTitle")}
-          </GcdsHeading>
+          <GcdsHeading tag="h1">{pageTitle}</GcdsHeading>
           <GcdsText>
             {t("StartIdentityProofing.heading", {
               appName: tLayout("TopNavBar.appName"),
             })}
           </GcdsText>
+          <GcdsText>{t("StartIdentityProofing.bodyText")}</GcdsText>
+
           <GcdsLink href="#" external size="regular">
             {t("StartIdentityProofing.learnMoreDescription")}
           </GcdsLink>
@@ -93,10 +114,11 @@ export default function StartIdentityProofingPage() {
           <IdentityProofingRadioButtons
             selectedOption={selectedOption}
             onOptionChange={setSelectedOption}
+            rpName={rpName}
           />
         </GcdsContainer>
 
-        <GcdsGrid columns="max-content max-content" gap="200">
+        <GcdsGrid columns="1" columnsDesktop="max-content max-content">
           <GcdsButton
             type="button"
             disabled={!selectedOption}

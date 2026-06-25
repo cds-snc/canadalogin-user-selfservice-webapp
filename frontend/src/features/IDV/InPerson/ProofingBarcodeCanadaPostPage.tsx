@@ -38,7 +38,7 @@ export default function ProofingBarcodeCanadaPostPage() {
 
   const barcodeValue = "CP387DHROGJ";
 
-  const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
+  const visitCanadaPostPage = path(PAGES.idvVisitCanadaPostPage, {
     language,
     journeyType,
   });
@@ -156,7 +156,7 @@ export default function ProofingBarcodeCanadaPostPage() {
                   type="button"
                   onGcdsClick={(event) => {
                     event.preventDefault();
-                    navigate(startIdentityProofingPage);
+                    navigate(visitCanadaPostPage);
                   }}
                 >
                   {t("ProofingBarcodeCanadaPost.updateInformationButton")}
