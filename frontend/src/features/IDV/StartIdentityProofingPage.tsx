@@ -97,7 +97,7 @@ export default function StartIdentityProofingPage() {
 
         <GcdsContainer>
           <GcdsHeading tag="h1">
-            {t("StartIdentityProofing.pageTitle")}
+            {pageTitle}
           </GcdsHeading>
           <GcdsText>
             {t("StartIdentityProofing.heading", {
