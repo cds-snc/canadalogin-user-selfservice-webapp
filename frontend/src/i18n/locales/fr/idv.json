@@ -108,6 +108,8 @@
     "learnMoreLink": "Learn more about how selfie and ID check works"
   },
   "StartIdentityProofing": {
+    "errorNoticeTitle": "Your identity could not be verified",
+    "errorNoticeDescription": "You will need to try again with another method",
     "pageTitle": "{{rpName}} needs you to prove your identity",
     "proveYourIdentity": "Prove your identity",
     "heading": "Identity proofing confirms who you are, protects against fraud, and lets you recover your {{appName}} if needed. ",
