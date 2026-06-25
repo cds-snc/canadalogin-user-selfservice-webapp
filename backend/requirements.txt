@@ -1,7 +1,7 @@
 fastapi==0.136.3
 uvicorn==0.48.0
 requests==2.34.2
-python-multipart==0.0.31
+python-multipart==0.0.32
 python-dotenv==1.2.2
 webauthn==1.11.1
 cryptography==48.0.1
@@ -10,7 +10,7 @@ pydantic==2.13.4
 httpx==0.28.1
 email-validator==2.3.0
 pydantic-extra-types==2.11.1
-phonenumbers==9.0.31
+phonenumbers==9.0.32
 cachetools==5.5.2
 authlib==1.7.2
 itsdangerous==2.2.0
