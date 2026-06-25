@@ -83,7 +83,7 @@ export default function StartIdentityProofingPage() {
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
-        {journeyType === "error" && (
+        {journeyType === "verification-error" && (
           <GcdsContainer>
             <GcdsNotice
               noticeRole="danger"

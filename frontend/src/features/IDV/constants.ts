@@ -2,5 +2,5 @@ export const IDV_JOURNEY_TYPE = {
   REQUIRED: "required",
   START: "start",
   UPDATE: "update",
-  ERROR: "error",
+  VERIFICATION_ERROR: "verification-error",
 } as const;
