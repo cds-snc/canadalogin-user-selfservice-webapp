@@ -96,7 +96,9 @@ export default function StartIdentityProofingPage() {
         )}
 
         <GcdsContainer>
-          <GcdsHeading tag="h1">{t("StartIdentityProofing.pageTitle")}</GcdsHeading>
+          <GcdsHeading tag="h1">
+            {t("StartIdentityProofing.pageTitle")}
+          </GcdsHeading>
           <GcdsText>
             {t("StartIdentityProofing.heading", {
               appName: tLayout("TopNavBar.appName"),
