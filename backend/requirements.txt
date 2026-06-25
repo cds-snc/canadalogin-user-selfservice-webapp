@@ -15,7 +15,7 @@ cachetools==5.5.2
 authlib==1.7.2
 itsdangerous==2.2.0
 starsessions==2.2.1
-PyJWT==2.12.1
+PyJWT==2.13.0
 redis==6.4.0
 fido2==2.2.0
 Secweb==1.30.10
