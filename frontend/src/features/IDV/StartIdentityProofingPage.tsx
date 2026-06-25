@@ -79,7 +79,7 @@ export default function StartIdentityProofingPage() {
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
-  console.log("journeyType", journeyType);
+  
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
