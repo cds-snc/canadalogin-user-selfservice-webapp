@@ -12,7 +12,11 @@ def get_all_route_paths(app):
             if hasattr(route, "path"):
                 paths.add(prefix + route.path)
             # Handle _IncludedRouter objects introduced in FastAPI >= 0.137
-            if hasattr(route, "original_router") and hasattr(route, "include_context"):
+            elif (
+                hasattr(route, "original_router")
+                and hasattr(route, "include_context")
+                and hasattr(route.original_router, "routes")
+            ):
                 sub_prefix = getattr(route.include_context, "prefix", "")
                 collect(route.original_router.routes, sub_prefix)
 
