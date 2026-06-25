@@ -76,7 +76,7 @@
     "msw-storybook-addon": "^2.0.4",
     "patch-package": "^8.0.0",
     "playwright": "^1.57.0",
-    "prettier": "3.8.3",
+    "prettier": "3.8.4",
     "prop-types": "^15.8.1",
     "storybook": "^10.4.2",
     "storybook-addon-remix-react-router": "^6.1.0",
