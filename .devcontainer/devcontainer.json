@@ -1,6 +1,6 @@
 {
   "name": "gcsignin-devcontainer",
-  "image": "mcr.microsoft.com/devcontainers/python:3.14-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/python:3.14-bookworm@sha256:52cfd0e889dfd0c84fd828b45c967714b7b93bc1a881748f4eea2f90ccadc544",
 
   "containerEnv": {
     "SHELL": "/bin/zsh"
