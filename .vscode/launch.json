@@ -29,18 +29,18 @@
       "name": "Python Debugger: FastAPI (HTTP)",
       "type": "debugpy",
       "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
       "module": "uvicorn",
       "args": [
         "app.main:app",
+        "--app-dir",
+        "backend",
         "--reload",
         "--port",
         "8000",
         "--host",
         "127.0.0.1"
       ],
-      "env": {
-        "PYTHONPATH": "backend"
-      },
       "jinja": true,
       "envFile": "${workspaceFolder}/backend/.env"
     },
@@ -62,11 +62,9 @@
       "name": "Python Debugger: Current Test File",
       "type": "debugpy",
       "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
       "module": "pytest",
-      "args": [
-        "${file}",
-        "-v"
-      ],
+      "args": ["${file}", "-v"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
       "envFile": "${workspaceFolder}/backend/tests/.env",
@@ -78,11 +76,9 @@
       "name": "Python Debugger: All Tests",
       "type": "debugpy",
       "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
       "module": "pytest",
-      "args": [
-        "backend/tests/",
-        "-v"
-      ],
+      "args": ["backend/tests/", "-v"],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
       "envFile": "${workspaceFolder}/backend/tests/.env",
