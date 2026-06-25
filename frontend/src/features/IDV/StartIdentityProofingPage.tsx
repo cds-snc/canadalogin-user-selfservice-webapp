@@ -9,7 +9,6 @@ import {
   GcdsText,
   GcdsNotice,
   GcdsContainer,
-  GcdsNotice,
 } from "@gcds-core/components-react";
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
@@ -89,9 +88,9 @@ export default function StartIdentityProofingPage() {
             <GcdsNotice
               noticeRole="danger"
               noticeTitleTag="h2"
-              noticeTitle={t("StartIdentityProofing.moreInfoTitle")}
+              noticeTitle={t("StartIdentityProofing.errorNoticeTitle")}
             >
-              {t("StartIdentityProofing.learnMoreText")}
+              {t("StartIdentityProofing.errorNoticeDescription")}
             </GcdsNotice>
           </GcdsContainer>
         )}
