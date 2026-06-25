@@ -108,8 +108,8 @@
     "learnMoreLink": "Learn more about how selfie and ID check works"
   },
   "StartIdentityProofing": {
-    "moreInfoTitle": "Your identity could not be verified",
-    "learnMoreText": "You will need to try again with another method",
+    "errorNoticeTitle": "Your identity could not be verified",
+    "errorNoticeDescription": "You will need to try again with another method",
     "pageTitle": "Start identity proofing",
     "heading": "You're updating verified information. {{appName}} needs to confirm your identity before this change can be made.",
     "learnMoreDescription": "Learn more about identity proofing",
