@@ -89,14 +89,24 @@ vi.mock("@gcds-core/components-react", () => {
         onChange={(e) => onGcdsChange && onGcdsChange(e)}
       />
     ),
-    GcdsDateInput: React.forwardRef(({ legend, onGcdsChange }, ref) => (
+    GcdsDateInput: React.forwardRef(({ legend, onGcdsChange, onBlur }, ref) => (
       <input
         ref={ref}
         aria-label={legend}
         data-testid="dateOfBirth"
         onChange={(e) => onGcdsChange && onGcdsChange(e)}
+        onBlur={(e) => onBlur && onBlur(e)}
       />
     )),
+    GcdsErrorMessage: ({ children }) => <div>{children}</div>,
+    GcdsErrorSummary: ({ heading, errorLinks }) => (
+      <div data-testid="errorSummary">
+        <h2>{heading}</h2>
+        {Object.values(errorLinks ?? {}).map((message, index) => (
+          <div key={index}>{message}</div>
+        ))}
+      </div>
+    ),
     GcdsSelect,
     GcdsButton: ({ children, buttonRole, onGcdsClick, disabled }) => (
       <button
@@ -153,10 +163,10 @@ describe("VisitCanadaPost", () => {
   it("renders province and country option values", () => {
     render(<VisitCanadaPost />);
 
-    expect(screen.getByText("Ontario")).toBeInTheDocument();
-    expect(screen.getByText("Quebec")).toBeInTheDocument();
-    expect(screen.getByText("Canada")).toBeInTheDocument();
-    expect(screen.getByText("United States")).toBeInTheDocument();
+    expect(screen.getAllByText("Ontario").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Quebec").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Canada").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("United States").length).toBeGreaterThan(0);
   });
 
   it("renders the complete acceptable ID list", () => {
@@ -275,11 +285,37 @@ describe("VisitCanadaPost", () => {
     );
   });
 
-  it("disables Continue until all required fields are valid", () => {
+  it("shows error summary on invalid continue and allows submit once valid", () => {
     render(<VisitCanadaPost />);
 
     const continueButton = screen.getByTestId("continue-button");
-    expect(continueButton).toBeDisabled();
+    expect(continueButton).toBeEnabled();
+
+    fireEvent.click(continueButton);
+
+    const summary = screen.getByTestId("errorSummary");
+    expect(summary).toHaveTextContent("Given name is required or invalid.");
+    expect(summary).toHaveTextContent("Family name is required or invalid.");
+    expect(summary).toHaveTextContent("Date of birth is required.");
+    expect(summary).toHaveTextContent("Address is required.");
+    expect(summary).toHaveTextContent("Province / State is required.");
+    expect(summary).toHaveTextContent("Country is required.");
+
+    expect(
+      screen.getAllByText("Given name is required or invalid.").length,
+    ).toBeGreaterThan(1);
+    expect(
+      screen.getAllByText("Family name is required or invalid.").length,
+    ).toBeGreaterThan(1);
+    expect(screen.getAllByText("Address is required.").length).toBeGreaterThan(
+      1,
+    );
+    expect(
+      screen.getAllByText("Province / State is required.").length,
+    ).toBeGreaterThan(1);
+    expect(screen.getAllByText("Country is required.").length).toBeGreaterThan(
+      1,
+    );
 
     fireEvent.change(screen.getByTestId("givenName"), {
       target: { value: "Jane" },
@@ -297,16 +333,16 @@ describe("VisitCanadaPost", () => {
       target: { value: "CA" },
     });
 
-    expect(continueButton).toBeDisabled();
-
     fireEvent.change(screen.getByTestId("dateOfBirth"), {
       target: { value: "1990-05-15" },
     });
 
-    expect(continueButton).toBeEnabled();
+    fireEvent.click(continueButton);
+
+    expect(mockNavigate).toHaveBeenCalled();
   });
 
-  it("keeps Continue disabled for invalid name and impossible date", () => {
+  it("blocks navigation and shows summary for invalid name and impossible date", () => {
     render(<VisitCanadaPost />);
 
     const continueButton = screen.getByTestId("continue-button");
@@ -330,10 +366,13 @@ describe("VisitCanadaPost", () => {
       target: { value: "2025-02-30" },
     });
 
-    expect(continueButton).toBeDisabled();
+    fireEvent.click(continueButton);
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(screen.getByTestId("errorSummary")).toBeInTheDocument();
   });
 
-  it("keeps Continue disabled when date of birth year is 1900 or earlier", () => {
+  it("blocks navigation and shows summary when date of birth year is 1900 or earlier", () => {
     render(<VisitCanadaPost />);
 
     const continueButton = screen.getByTestId("continue-button");
@@ -357,6 +396,19 @@ describe("VisitCanadaPost", () => {
       target: { value: "1900-01-01" },
     });
 
-    expect(continueButton).toBeDisabled();
+    fireEvent.click(continueButton);
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(screen.getByTestId("errorSummary")).toBeInTheDocument();
+  });
+
+  it("shows a date validation error after date of birth blur", () => {
+    render(<VisitCanadaPost />);
+
+    const dateInput = screen.getByTestId("dateOfBirth");
+    fireEvent.change(dateInput, { target: { value: "1900-01-01" } });
+    fireEvent.blur(dateInput);
+
+    expect(screen.getByText("Year must be after 1900.")).toBeInTheDocument();
   });
 });

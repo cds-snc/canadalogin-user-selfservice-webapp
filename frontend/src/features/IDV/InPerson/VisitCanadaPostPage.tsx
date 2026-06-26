@@ -2,6 +2,8 @@ import {
   GcdsButton,
   GcdsContainer,
   GcdsDateInput,
+  GcdsErrorMessage,
+  GcdsErrorSummary,
   GcdsGrid,
   GcdsHeading,
   GcdsInput,
@@ -10,7 +12,7 @@ import {
   GcdsSelect,
   GcdsText,
 } from "@gcds-core/components-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -22,25 +24,18 @@ import {
 import { path } from "../../../utils/routeHelpers";
 import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
 import {
-  isNonEmptyTrimmed,
-  isValidDateOfBirth,
-  isValidName,
+  getVisitCanadaPostValidation,
+  MAX_NAME_LENGTH,
+  type VisitCanadaPostFormData,
 } from "./VisitCanadaPost.validation";
-import useGcdsSelectWidth from "./useGcdsSelectWidth";
+import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
 
 const COUNTRY_OPTIONS = [
   { value: "CA", label: "Canada" },
   { value: "US", label: "United States" },
 ];
 
-interface VisitCanadaPostFormData {
-  givenName: string;
-  familyName: string;
-  dateOfBirth: string;
-  address: string;
-  province: string;
-  country: string;
-}
+const ERROR_SUMMARY_ID = "visit-canada-post-error-summary";
 
 export default function VisitCanadaPost() {
   const { t } = useTranslation("idv");
@@ -59,14 +54,46 @@ export default function VisitCanadaPost() {
     province: "",
     country: "",
   });
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [isDateOfBirthTouched, setIsDateOfBirthTouched] = useState(false);
+  const [showErrorSummary, setShowErrorSummary] = useState(false);
+  const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
 
   useGcdsSelectWidth();
 
   const updateField = (field: keyof VisitCanadaPostFormData, value: string) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
 
-  const createChangeHandler = (field: keyof VisitCanadaPostFormData) =>
-    (event: CustomEvent) => {
+  useEffect(() => {
+    if (!showErrorSummary) {
+      return;
+    }
+
+    const summaryElement = document.getElementById(
+      ERROR_SUMMARY_ID,
+    ) as HTMLElement | null;
+
+    if (!summaryElement) {
+      return;
+    }
+
+    summaryElement.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const firstLink = summaryElement.querySelector(
+      "a[href]",
+    ) as HTMLElement | null;
+
+    if (firstLink && typeof firstLink.focus === "function") {
+      firstLink.focus();
+      return;
+    }
+
+    summaryElement.setAttribute("tabindex", "-1");
+    summaryElement.focus();
+  }, [showErrorSummary, summaryFocusTrigger]);
+
+  const createChangeHandler =
+    (field: keyof VisitCanadaPostFormData) => (event: CustomEvent) => {
       const target = event.target as
         | HTMLInputElement
         | HTMLSelectElement
@@ -75,13 +102,87 @@ export default function VisitCanadaPost() {
       updateField(field, target?.value ?? "");
     };
 
-  const isFormValid =
-    isValidName(formData.givenName) &&
-    isValidName(formData.familyName) &&
-    isValidDateOfBirth(formData.dateOfBirth) &&
-    isNonEmptyTrimmed(formData.address) &&
-    isNonEmptyTrimmed(formData.province) &&
-    isNonEmptyTrimmed(formData.country);
+  const { isFormValid, dateOfBirthValidationError, summaryErrorCodes } =
+    getVisitCanadaPostValidation(formData);
+
+  const dobMessages = {
+    required: {
+      inline: t("VisitCanadaPost.dobErrorRequired"),
+      summary: t("VisitCanadaPost.summaryDobRequired"),
+    },
+    year: {
+      inline: t("VisitCanadaPost.dobErrorYear"),
+      summary: t("VisitCanadaPost.summaryDobYear"),
+    },
+    future: {
+      inline: t("VisitCanadaPost.dobErrorFuture"),
+      summary: t("VisitCanadaPost.summaryDobFuture"),
+    },
+    invalid: {
+      inline: t("VisitCanadaPost.dobErrorInvalid"),
+      summary: t("VisitCanadaPost.summaryDobInvalid"),
+    },
+  };
+
+  const dateOfBirthErrorMessage =
+    (isDateOfBirthTouched || hasSubmitted) && dateOfBirthValidationError
+      ? dobMessages[dateOfBirthValidationError].inline
+      : "";
+
+  const dateOfBirthSummaryMessage = dateOfBirthValidationError
+    ? dobMessages[dateOfBirthValidationError].summary
+    : "";
+
+  const summaryErrors: Record<string, string> = {};
+
+  if (summaryErrorCodes.givenName) {
+    summaryErrors["#givenName"] = t("VisitCanadaPost.summaryGivenName");
+  }
+
+  if (summaryErrorCodes.familyName) {
+    summaryErrors["#familyName"] = t("VisitCanadaPost.summaryFamilyName");
+  }
+
+  if (summaryErrorCodes.dateOfBirth) {
+    summaryErrors["#dateOfBirth"] = dateOfBirthSummaryMessage;
+  }
+
+  if (summaryErrorCodes.address) {
+    summaryErrors["#address"] = t("VisitCanadaPost.summaryAddress");
+  }
+
+  if (summaryErrorCodes.province) {
+    summaryErrors["#province"] = t("VisitCanadaPost.summaryProvince");
+  }
+
+  if (summaryErrorCodes.country) {
+    summaryErrors["#country"] = t("VisitCanadaPost.summaryCountry");
+  }
+
+  const givenNameErrorMessage =
+    hasSubmitted && summaryErrorCodes.givenName
+      ? t("VisitCanadaPost.summaryGivenName")
+      : "";
+
+  const familyNameErrorMessage =
+    hasSubmitted && summaryErrorCodes.familyName
+      ? t("VisitCanadaPost.summaryFamilyName")
+      : "";
+
+  const addressErrorMessage =
+    hasSubmitted && summaryErrorCodes.address
+      ? t("VisitCanadaPost.summaryAddress")
+      : "";
+
+  const provinceErrorMessage =
+    hasSubmitted && summaryErrorCodes.province
+      ? t("VisitCanadaPost.summaryProvince")
+      : "";
+
+  const countryErrorMessage =
+    hasSubmitted && summaryErrorCodes.country
+      ? t("VisitCanadaPost.summaryCountry")
+      : "";
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -93,6 +194,14 @@ export default function VisitCanadaPost() {
         <GcdsGrid columns="1" gap="450">
           <GcdsContainer>
             <GcdsHeading tag="h1">{t("VisitCanadaPost.heading")}</GcdsHeading>
+
+            {showErrorSummary ? (
+              <GcdsErrorSummary
+                id={ERROR_SUMMARY_ID}
+                heading={t("VisitCanadaPost.validationSummaryHeading")}
+                errorLinks={summaryErrors}
+              />
+            ) : null}
 
             <GcdsText>
               <strong>{t("VisitCanadaPost.followSteps")}</strong>
@@ -117,37 +226,59 @@ export default function VisitCanadaPost() {
             </GcdsHeading>
 
             <GcdsInput
+              id="givenName"
               inputId="givenName"
               name="givenName"
               label={t("VisitCanadaPost.givenNameLabel")}
               hint={t("VisitCanadaPost.givenNameHint")}
               required
+              maxlength={MAX_NAME_LENGTH}
               autocomplete="given-name"
               validateOn="blur"
               onGcdsChange={createChangeHandler("givenName")}
             />
+            {givenNameErrorMessage ? (
+              <GcdsErrorMessage messageId="visit-canada-post-given-name-error">
+                {givenNameErrorMessage}
+              </GcdsErrorMessage>
+            ) : null}
 
             <GcdsInput
+              id="familyName"
               inputId="familyName"
               name="familyName"
               label={t("VisitCanadaPost.familyNameLabel")}
               hint={t("VisitCanadaPost.familyNameHint")}
               required
+              maxlength={MAX_NAME_LENGTH}
               autocomplete="family-name"
               validateOn="blur"
               onGcdsChange={createChangeHandler("familyName")}
             />
+            {familyNameErrorMessage ? (
+              <GcdsErrorMessage messageId="visit-canada-post-family-name-error">
+                {familyNameErrorMessage}
+              </GcdsErrorMessage>
+            ) : null}
 
             <GcdsDateInput
+              id="dateOfBirth"
               name="dateOfBirth"
               legend={t("VisitCanadaPost.dobLabel")}
               required
               format="full"
               validateOn="blur"
               onGcdsChange={createChangeHandler("dateOfBirth")}
+              onBlur={() => setIsDateOfBirthTouched(true)}
             />
+            {dateOfBirthErrorMessage ? (
+              <GcdsErrorMessage messageId="visit-canada-post-dob-error">
+                {dateOfBirthErrorMessage}
+              </GcdsErrorMessage>
+            ) : null}
 
             <GcdsInput
+              id="address"
               inputId="address"
               name="address"
               label={t("VisitCanadaPost.addressLabel")}
@@ -157,8 +288,14 @@ export default function VisitCanadaPost() {
               validateOn="blur"
               onGcdsChange={createChangeHandler("address")}
             />
+            {addressErrorMessage ? (
+              <GcdsErrorMessage messageId="visit-canada-post-address-error">
+                {addressErrorMessage}
+              </GcdsErrorMessage>
+            ) : null}
 
             <GcdsSelect
+              id="province"
               className="visit-canada-post-select"
               selectId="province"
               name="province"
@@ -175,8 +312,14 @@ export default function VisitCanadaPost() {
                 </option>
               ))}
             </GcdsSelect>
+            {provinceErrorMessage ? (
+              <GcdsErrorMessage messageId="visit-canada-post-province-error">
+                {provinceErrorMessage}
+              </GcdsErrorMessage>
+            ) : null}
 
             <GcdsSelect
+              id="country"
               className="visit-canada-post-select"
               selectId="country"
               name="country"
@@ -193,6 +336,11 @@ export default function VisitCanadaPost() {
                 </option>
               ))}
             </GcdsSelect>
+            {countryErrorMessage ? (
+              <GcdsErrorMessage messageId="visit-canada-post-country-error">
+                {countryErrorMessage}
+              </GcdsErrorMessage>
+            ) : null}
           </GcdsContainer>
 
           <GcdsGrid
@@ -202,13 +350,18 @@ export default function VisitCanadaPost() {
           >
             <GcdsButton
               type="button"
-              disabled={!isFormValid}
               onGcdsClick={(event: Event) => {
                 event.preventDefault();
+                setHasSubmitted(true);
 
                 if (!isFormValid) {
+                  setShowErrorSummary(true);
+                  setIsDateOfBirthTouched(true);
+                  setSummaryFocusTrigger((previous) => previous + 1);
                   return;
                 }
+
+                setShowErrorSummary(false);
 
                 navigate(
                   path(PAGES.idvProofingBarcodeCanadaPostPage, {
