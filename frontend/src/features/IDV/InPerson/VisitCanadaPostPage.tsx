@@ -10,7 +10,7 @@ import {
   GcdsSelect,
   GcdsText,
 } from "@gcds-core/components-react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -21,6 +21,12 @@ import {
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
+import {
+  isNonEmptyTrimmed,
+  isValidDateOfBirth,
+  isValidName,
+} from "./VisitCanadaPost.validation";
+import useGcdsSelectWidth from "./useGcdsSelectWidth";
 
 const COUNTRY_OPTIONS = [
   { value: "CA", label: "Canada" },
@@ -30,6 +36,7 @@ const COUNTRY_OPTIONS = [
 interface VisitCanadaPostFormData {
   givenName: string;
   familyName: string;
+  dateOfBirth: string;
   address: string;
   province: string;
   country: string;
@@ -47,47 +54,34 @@ export default function VisitCanadaPost() {
   const [formData, setFormData] = useState<VisitCanadaPostFormData>({
     givenName: "",
     familyName: "",
+    dateOfBirth: "",
     address: "",
     province: "",
     country: "",
   });
 
-  const dateInputRef = useRef<HTMLGcdsDateInputElement>(null);
+  useGcdsSelectWidth();
 
   const updateField = (field: keyof VisitCanadaPostFormData, value: string) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
 
-  useEffect(() => {
-    const applySelectShadowWidth = () => {
-      const selects = document.querySelectorAll(
-        "gcds-select.visit-canada-post-select",
-      );
-      selects.forEach((element) => {
-        const shadowRoot = element.shadowRoot;
+  const createChangeHandler = (field: keyof VisitCanadaPostFormData) =>
+    (event: CustomEvent) => {
+      const target = event.target as
+        | HTMLInputElement
+        | HTMLSelectElement
+        | null;
 
-        if (!shadowRoot) {
-          return;
-        }
-
-        const wrapper = shadowRoot.querySelector(
-          ".gcds-select__wrapper",
-        ) as HTMLElement | null;
-
-        if (wrapper) {
-          wrapper.style.maxWidth = "75ch"; // This follows GC Design System for their wrapper over GcdsInput
-        }
-        // CSS Classes are not applied to the internal select element, so we need to query and apply styles directly to it
-        const internalSelect = shadowRoot.querySelector(
-          "select",
-        ) as HTMLSelectElement | null;
-        if (internalSelect) {
-          internalSelect.style.width = "100%"; // Make the internal select take the full width of the wrapper
-        }
-      });
+      updateField(field, target?.value ?? "");
     };
 
-    applySelectShadowWidth();
-  }, []);
+  const isFormValid =
+    isValidName(formData.givenName) &&
+    isValidName(formData.familyName) &&
+    isValidDateOfBirth(formData.dateOfBirth) &&
+    isNonEmptyTrimmed(formData.address) &&
+    isNonEmptyTrimmed(formData.province) &&
+    isNonEmptyTrimmed(formData.country);
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -128,13 +122,9 @@ export default function VisitCanadaPost() {
               label={t("VisitCanadaPost.givenNameLabel")}
               hint={t("VisitCanadaPost.givenNameHint")}
               required
-              validateOn="other"
-              onGcdsChange={(e: CustomEvent) =>
-                updateField(
-                  "givenName",
-                  (e.target as HTMLInputElement)?.value ?? "",
-                )
-              }
+              autocomplete="given-name"
+              validateOn="blur"
+              onGcdsChange={createChangeHandler("givenName")}
             />
 
             <GcdsInput
@@ -143,22 +133,18 @@ export default function VisitCanadaPost() {
               label={t("VisitCanadaPost.familyNameLabel")}
               hint={t("VisitCanadaPost.familyNameHint")}
               required
-              validateOn="other"
-              onGcdsChange={(e: CustomEvent) =>
-                updateField(
-                  "familyName",
-                  (e.target as HTMLInputElement)?.value ?? "",
-                )
-              }
+              autocomplete="family-name"
+              validateOn="blur"
+              onGcdsChange={createChangeHandler("familyName")}
             />
 
             <GcdsDateInput
-              ref={dateInputRef}
               name="dateOfBirth"
               legend={t("VisitCanadaPost.dobLabel")}
               required
               format="full"
-              validateOn="other"
+              validateOn="blur"
+              onGcdsChange={createChangeHandler("dateOfBirth")}
             />
 
             <GcdsInput
@@ -167,13 +153,9 @@ export default function VisitCanadaPost() {
               label={t("VisitCanadaPost.addressLabel")}
               hint={t("VisitCanadaPost.addressHint")}
               required
-              validateOn="other"
-              onGcdsChange={(e: CustomEvent) =>
-                updateField(
-                  "address",
-                  (e.target as HTMLInputElement)?.value ?? "",
-                )
-              }
+              autocomplete="street-address"
+              validateOn="blur"
+              onGcdsChange={createChangeHandler("address")}
             />
 
             <GcdsSelect
@@ -183,13 +165,8 @@ export default function VisitCanadaPost() {
               label={t("VisitCanadaPost.provinceLabel")}
               required
               defaultValue=""
-              validateOn="other"
-              onGcdsChange={(e: CustomEvent) =>
-                updateField(
-                  "province",
-                  (e.target as HTMLSelectElement)?.value ?? "",
-                )
-              }
+              validateOn="blur"
+              onGcdsChange={createChangeHandler("province")}
             >
               <option value="">Select option</option>
               {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
@@ -206,13 +183,8 @@ export default function VisitCanadaPost() {
               label={t("VisitCanadaPost.countryLabel")}
               required
               defaultValue=""
-              validateOn="other"
-              onGcdsChange={(e: CustomEvent) =>
-                updateField(
-                  "country",
-                  (e.target as HTMLSelectElement)?.value ?? "",
-                )
-              }
+              validateOn="blur"
+              onGcdsChange={createChangeHandler("country")}
             >
               <option value="">Select option</option>
               {COUNTRY_OPTIONS.map((option) => (
@@ -230,8 +202,14 @@ export default function VisitCanadaPost() {
           >
             <GcdsButton
               type="button"
+              disabled={!isFormValid}
               onGcdsClick={(event: Event) => {
                 event.preventDefault();
+
+                if (!isFormValid) {
+                  return;
+                }
+
                 navigate(
                   path(PAGES.idvProofingBarcodeCanadaPostPage, {
                     language,
@@ -241,7 +219,7 @@ export default function VisitCanadaPost() {
                     state: {
                       givenName: formData.givenName,
                       lastName: formData.familyName,
-                      dateOfBirth: dateInputRef.current?.value ?? "",
+                      dateOfBirth: formData.dateOfBirth,
                       address: formData.address,
                       province: formData.province,
                       country: formData.country,

@@ -28,7 +28,14 @@ vi.mock("../../../utils/constants", async () => {
 });
 
 vi.mock("@gcds-core/components-react", () => {
-  const GcdsSelect = ({ children, className }) => {
+  const GcdsSelect = ({
+    children,
+    className,
+    onGcdsChange,
+    selectId,
+    label,
+    defaultValue,
+  }) => {
     const hostRef = useRef(null);
 
     useEffect(() => {
@@ -45,9 +52,19 @@ vi.mock("@gcds-core/components-react", () => {
     }, []);
 
     return (
-      <gcds-select ref={hostRef} className={className}>
-        {children}
-      </gcds-select>
+      <>
+        <gcds-select ref={hostRef} className={className}>
+          {children}
+        </gcds-select>
+        <select
+          aria-label={label}
+          data-testid={selectId}
+          defaultValue={defaultValue}
+          onChange={(e) => onGcdsChange && onGcdsChange(e)}
+        >
+          {children}
+        </select>
+      </>
     );
   };
 
@@ -72,15 +89,21 @@ vi.mock("@gcds-core/components-react", () => {
         onChange={(e) => onGcdsChange && onGcdsChange(e)}
       />
     ),
-    GcdsDateInput: React.forwardRef(({ legend }, ref) => (
-      <input ref={ref} aria-label={legend} data-testid="dateOfBirth" />
+    GcdsDateInput: React.forwardRef(({ legend, onGcdsChange }, ref) => (
+      <input
+        ref={ref}
+        aria-label={legend}
+        data-testid="dateOfBirth"
+        onChange={(e) => onGcdsChange && onGcdsChange(e)}
+      />
     )),
     GcdsSelect,
-    GcdsButton: ({ children, buttonRole, onGcdsClick }) => (
+    GcdsButton: ({ children, buttonRole, onGcdsClick, disabled }) => (
       <button
         data-testid={
           buttonRole === "secondary" ? "back-button" : "continue-button"
         }
+        disabled={disabled}
         onClick={(event) => onGcdsClick && onGcdsClick(event)}
       >
         {children}
@@ -194,6 +217,15 @@ describe("VisitCanadaPost", () => {
     fireEvent.change(screen.getByTestId("address"), {
       target: { value: "123 Main St" },
     });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+      target: { value: "1990-05-15" },
+    });
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
@@ -212,6 +244,22 @@ describe("VisitCanadaPost", () => {
   it("reads dateOfBirth from the date input ref on continue", () => {
     render(<VisitCanadaPost />);
 
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+
     const dateInput = screen.getByTestId("dateOfBirth");
     fireEvent.change(dateInput, { target: { value: "1990-05-15" } });
 
@@ -225,5 +273,90 @@ describe("VisitCanadaPost", () => {
         }),
       }),
     );
+  });
+
+  it("disables Continue until all required fields are valid", () => {
+    render(<VisitCanadaPost />);
+
+    const continueButton = screen.getByTestId("continue-button");
+    expect(continueButton).toBeDisabled();
+
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+
+    expect(continueButton).toBeDisabled();
+
+    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+      target: { value: "1990-05-15" },
+    });
+
+    expect(continueButton).toBeEnabled();
+  });
+
+  it("keeps Continue disabled for invalid name and impossible date", () => {
+    render(<VisitCanadaPost />);
+
+    const continueButton = screen.getByTestId("continue-button");
+
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: " Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+      target: { value: "2025-02-30" },
+    });
+
+    expect(continueButton).toBeDisabled();
+  });
+
+  it("keeps Continue disabled when date of birth year is 1900 or earlier", () => {
+    render(<VisitCanadaPost />);
+
+    const continueButton = screen.getByTestId("continue-button");
+
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+      target: { value: "1900-01-01" },
+    });
+
+    expect(continueButton).toBeDisabled();
   });
 });
