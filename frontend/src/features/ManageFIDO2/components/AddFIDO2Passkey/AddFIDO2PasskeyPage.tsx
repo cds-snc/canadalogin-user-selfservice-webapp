@@ -425,7 +425,7 @@ export default function AddFIDO2PasskeyPage({
     ),
     verifyFIDO2Passkey: (
       <VerifyFIDO2Passkey
-        assertionOptionsRequest={{ userVerification: "required" }}
+        assertionOptionsRequest={{ userVerification: "preferred" }}
         submitAttestationResult={true}
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}

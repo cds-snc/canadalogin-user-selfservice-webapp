@@ -447,7 +447,7 @@ export default function DeleteMFAPage() {
       <VerifyFIDO2Passkey
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}
-        assertionOptionsRequest={{ userVerification: "required" }}
+        assertionOptionsRequest={{ userVerification: "preferred" }}
         setAssertionResult={setAssertionResult}
         selectedPasskey={selected2FAPasskey}
         onCallback={() => {
