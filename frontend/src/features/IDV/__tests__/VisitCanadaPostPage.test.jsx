@@ -99,11 +99,13 @@ vi.mock("@gcds-core/components-react", () => {
       />
     )),
     GcdsErrorMessage: ({ children }) => <div>{children}</div>,
-    GcdsErrorSummary: ({ heading, errorLinks }) => (
-      <div data-testid="errorSummary">
+    GcdsErrorSummary: ({ id, heading, errorLinks }) => (
+      <div id={id} data-testid="errorSummary">
         <h2>{heading}</h2>
-        {Object.values(errorLinks ?? {}).map((message, index) => (
-          <div key={index}>{message}</div>
+        {Object.entries(errorLinks ?? {}).map(([href, message], index) => (
+          <a key={index} href={href}>
+            {message}
+          </a>
         ))}
       </div>
     ),
@@ -133,6 +135,10 @@ describe("VisitCanadaPost", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: vi.fn(),
+    });
   });
 
   it("renders nothing when DEV_ONLY_FEATURE is false", () => {
@@ -239,16 +245,22 @@ describe("VisitCanadaPost", () => {
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
+    const [targetPath, navigationOptions] = mockNavigate.mock.calls[0];
+    expect(targetPath).toContain("in-person/canada-post/idv-code");
     expect(mockNavigate).toHaveBeenCalledWith(
       expect.any(String),
-      expect.objectContaining({
-        state: expect.objectContaining({
+      {
+        state: {
           givenName: "Jane",
           lastName: "Doe",
+          dateOfBirth: "1990-05-15",
           address: "123 Main St",
-        }),
-      }),
+          province: "ON",
+          country: "CA",
+        },
+      },
     );
+    expect(navigationOptions).toBeDefined();
   });
 
   it("reads dateOfBirth from the date input ref on continue", () => {
@@ -340,9 +352,10 @@ describe("VisitCanadaPost", () => {
     fireEvent.click(continueButton);
 
     expect(mockNavigate).toHaveBeenCalled();
+    expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
   });
 
-  it("blocks navigation and shows summary for invalid name and impossible date", () => {
+  it("blocks navigation and shows invalid date summary for impossible date", () => {
     render(<VisitCanadaPost />);
 
     const continueButton = screen.getByTestId("continue-button");
@@ -369,7 +382,9 @@ describe("VisitCanadaPost", () => {
     fireEvent.click(continueButton);
 
     expect(mockNavigate).not.toHaveBeenCalled();
-    expect(screen.getByTestId("errorSummary")).toBeInTheDocument();
+    const summary = screen.getByTestId("errorSummary");
+    expect(summary).toBeInTheDocument();
+    expect(summary).toHaveTextContent("Date of birth must be a valid date.");
   });
 
   it("blocks navigation and shows summary when date of birth year is 1900 or earlier", () => {
@@ -410,5 +425,53 @@ describe("VisitCanadaPost", () => {
     fireEvent.blur(dateInput);
 
     expect(screen.getByText("Year must be after 1900.")).toBeInTheDocument();
+  });
+
+  it("shows future date errors and keeps user on page", () => {
+    render(<VisitCanadaPost />);
+
+    const continueButton = screen.getByTestId("continue-button");
+
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+      target: { value: "2999-01-01" },
+    });
+
+    fireEvent.click(continueButton);
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+    const summary = screen.getByTestId("errorSummary");
+    expect(summary).toHaveTextContent("Date of birth cannot be in the future.");
+    expect(
+      screen.getAllByText("Date of birth cannot be in the future.").length,
+    ).toBeGreaterThan(1);
+  });
+
+  it("focuses the first summary link after invalid submit", async () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    await waitFor(() => {
+      const summary = screen.getByTestId("errorSummary");
+      const firstLink = summary.querySelector("a");
+
+      expect(firstLink).toBeTruthy();
+      expect(document.activeElement).toBe(firstLink);
+    });
   });
 });

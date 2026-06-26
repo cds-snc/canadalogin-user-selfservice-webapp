@@ -59,6 +59,7 @@ export default function VisitCanadaPost() {
   const [showErrorSummary, setShowErrorSummary] = useState(false);
   const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
 
+  // GCDS select renders inside shadow DOM, so width styles are applied by a helper hook.
   useGcdsSelectWidth();
 
   const updateField = (field: keyof VisitCanadaPostFormData, value: string) =>
@@ -77,7 +78,9 @@ export default function VisitCanadaPost() {
       return;
     }
 
+    // Move user attention to the summary after failed submit to match a11y error UX patterns.
     summaryElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    
 
     const firstLink = summaryElement.querySelector(
       "a[href]",
@@ -357,6 +360,7 @@ export default function VisitCanadaPost() {
                 if (!isFormValid) {
                   setShowErrorSummary(true);
                   setIsDateOfBirthTouched(true);
+                  // Re-trigger focus/scroll if user submits invalid data multiple times.
                   setSummaryFocusTrigger((previous) => previous + 1);
                   return;
                 }
