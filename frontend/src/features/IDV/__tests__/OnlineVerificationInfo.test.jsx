@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import OnlineVerificationInfo from "../Online/OnlineVerificationInfo";
 
@@ -7,6 +7,8 @@ import OnlineVerificationInfo from "../Online/OnlineVerificationInfo";
 // Mocks
 // ────────────────────────────────────────────────
 const mockNavigate = vi.fn();
+const mockDispatch = vi.fn();
+const mockGetOnlineIdentityVerificationMockResponse = vi.hoisted(() => vi.fn());
 let mockDevOnlyFeature = true;
 
 vi.mock("react-router", async () => {
@@ -14,8 +16,27 @@ vi.mock("react-router", async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+    useParams: () => ({ language: "en", journeyType: "update" }),
   };
 });
+
+vi.mock("../../../components/Providers/useUser", () => ({
+  useUser: () => ({
+    state: {
+      userProfile: {
+        id: "user-1",
+        active: true,
+        userName: "test@example.com",
+        name: {
+          givenName: "Existing",
+          familyName: "User",
+          formatted: "Existing User",
+        },
+      },
+    },
+    dispatch: mockDispatch,
+  }),
+}));
 
 vi.mock("../../../utils/constants", async () => {
   const actual = await vi.importActual("../../../utils/constants");
@@ -24,8 +45,28 @@ vi.mock("../../../utils/constants", async () => {
     get DEV_ONLY_FEATURE() {
       return mockDevOnlyFeature;
     },
-    PAGES: {},
+    PAGES: {
+      idvDetailsConfirmationPage: "IdvDetailsConfirmationPage",
+    },
     VITE_ENVIRONMENTS: { dev: "development", test: "test" },
+  };
+});
+
+vi.mock("../../../utils/routeHelpers", () => ({
+  path: (_page, { language, journeyType } = {}) => {
+    const jType = journeyType ? `/${journeyType}` : "";
+    return `/${language ?? "en"}/identity-verification${jType}/details-confirmation`;
+  },
+}));
+
+vi.mock("../api/identityVerificationApi", async () => {
+  const actual = await vi.importActual("../api/identityVerificationApi");
+  return {
+    ...actual,
+    identityVerificationApi: {
+      getOnlineIdentityVerificationMockResponse:
+        mockGetOnlineIdentityVerificationMockResponse,
+    },
   };
 });
 
@@ -37,12 +78,15 @@ vi.mock("@gcds-core/components-react", () => ({
     const Tag = tag ?? "h2";
     return <Tag>{children}</Tag>;
   },
-  GcdsButton: ({ children, onClick, buttonRole }) => (
+  GcdsButton: ({ children, onClick, onGcdsClick, buttonRole }) => (
     <button
       data-testid={
         buttonRole === "secondary" ? "back-button" : "continue-button"
       }
-      onClick={onClick}
+      onClick={(event) => {
+        onGcdsClick?.(event);
+        onClick?.(event);
+      }}
     >
       {children}
     </button>
@@ -73,6 +117,25 @@ describe("OnlineVerificationInfo", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
+    mockGetOnlineIdentityVerificationMockResponse.mockResolvedValue({
+      success: true,
+      message: "ok",
+      data: {
+        verification_id: "verification-123",
+        verification_status: "success",
+        verification_method: "online",
+        claims: {
+          given_name: "Jane",
+          family_name: "Doe",
+          name: "Jane Doe",
+          email: "jane@example.com",
+          birthdate: "1990-05-15",
+          address: {
+            formatted: "123 Main Street, Ottawa, ON K1A 0B1, Canada",
+          },
+        },
+      },
+    });
   });
 
   it("renders the main heading", () => {
@@ -157,12 +220,30 @@ describe("OnlineVerificationInfo", () => {
     expect(mockNavigate).toHaveBeenCalledTimes(1);
   });
 
-  it("does not call navigate when Continue button is clicked", () => {
+  it("stores verified claims and navigates when Continue button is clicked", async () => {
     render(<OnlineVerificationInfo />);
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: "UPDATE_PROFILE_SUCCESS",
+        payload: expect.objectContaining({
+          verifiedClaims: {
+            verificationId: "verification-123",
+            verificationStatus: "success",
+            verificationMethod: "online",
+            claims: expect.objectContaining({
+              birthdate: "1990-05-15",
+            }),
+          },
+        }),
+      });
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/update/details-confirmation",
+    );
   });
 
   it("renders the more information notice", () => {

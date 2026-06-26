@@ -14,11 +14,13 @@ interface RadioOption {
 interface IdentityProofingRadioButtonsProps {
   selectedOption: StartIdentityOption | undefined;
   onOptionChange: (option: StartIdentityOption) => void;
+  rpName?: string;
 }
 
 export default function IdentityProofingRadioButtons({
   selectedOption,
   onOptionChange,
+  rpName,
 }: IdentityProofingRadioButtonsProps): JSX.Element {
   const { t } = useTranslation("idv");
 
@@ -41,7 +43,9 @@ export default function IdentityProofingRadioButtons({
       label: t("StartIdentityProofing.cantProveNowOption"),
       id: `radio-${START_IDENTITY_OPTION.cantProveNow}`,
       value: START_IDENTITY_OPTION.cantProveNow,
-      hint: t("StartIdentityProofing.cantProveNowHint"),
+      hint: t("StartIdentityProofing.cantProveNowHint", {
+        rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
+      }),
       checked: selectedOption === START_IDENTITY_OPTION.cantProveNow,
     },
   ];
