@@ -425,6 +425,7 @@ export default function AddFIDO2PasskeyPage({
     ),
     verifyFIDO2Passkey: (
       <VerifyFIDO2Passkey
+        submitAttestationResult={true}
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}
         selectedPasskey={selected2FAPasskey}
