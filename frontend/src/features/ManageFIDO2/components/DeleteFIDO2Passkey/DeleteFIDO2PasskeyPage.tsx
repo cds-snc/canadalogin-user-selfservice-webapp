@@ -67,6 +67,9 @@ export default function DeleteFIDO2PasskeyPage({
 
   const [selected2FAPasskey, setSelected2FAPasskey] =
     useState<Fido2Credential | null>(null);
+  const [passkeyAssertionResult, setPasskeyAssertionResult] = useState<
+    unknown | null
+  >(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
@@ -180,6 +183,7 @@ export default function DeleteFIDO2PasskeyPage({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
       step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
     });
+    setPasskeyAssertionResult(null);
     setErrorCode("");
     setCustomErrorMessage("");
     setWizardStep("deleteFIDO2PasskeyConfirmation");
@@ -226,7 +230,7 @@ export default function DeleteFIDO2PasskeyPage({
 
       const response = (await fido2Api.deleteRegistration(
         passkeyId,
-        undefined,
+        passkeyAssertionResult ?? undefined,
         otpPayload,
       )) as { success?: boolean } | undefined;
 
@@ -308,6 +312,7 @@ export default function DeleteFIDO2PasskeyPage({
             event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
             step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
           });
+          setPasskeyAssertionResult(null);
           setSelected2FAPasskey(passkey);
           setWizardStep("verifyFIDO2Passkey");
         }}
@@ -349,6 +354,8 @@ export default function DeleteFIDO2PasskeyPage({
       <VerifyFIDO2Passkey
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}
+        assertionOptionsRequest={{ userVerification: "preferred" }}
+        setAssertionResult={setPasskeyAssertionResult}
         selectedPasskey={selected2FAPasskey}
         onCallback={() => {
           trackEvent({
@@ -362,6 +369,7 @@ export default function DeleteFIDO2PasskeyPage({
           setWizardStep("deleteFIDO2PasskeyConfirmation");
         }}
         onTryAnotherWayHandler={() => {
+          setPasskeyAssertionResult(null);
           setSelected2FAPasskey(null);
           setWizardStep("otpSelection");
         }}

@@ -651,6 +651,8 @@ export default function AddMFAPage() {
     ),
     verifyFIDO2Passkey: (
       <VerifyFIDO2Passkey
+        submitAttestationResult={true}
+        assertionOptionsRequest={{ userVerification: "preferred" }}
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}
         selectedPasskey={selected2FAPasskey}
