@@ -24,7 +24,7 @@ export interface VisitCanadaPostValidationResult {
   summaryErrorCodes: VisitCanadaPostSummaryErrorCodes;
 }
 
-const NAME_REGEX = /^\p{L}[\p{L}\p{M}' -]{0,79}$/u;
+const NAME_REGEX = /^\p{L}[\p{L}\p{M}' -]*$/u;
 
 export const isNonEmptyTrimmed = (value: string): boolean =>
   value.trim().length > 0;

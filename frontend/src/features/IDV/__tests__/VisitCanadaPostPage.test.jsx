@@ -247,23 +247,20 @@ describe("VisitCanadaPost", () => {
 
     const [targetPath, navigationOptions] = mockNavigate.mock.calls[0];
     expect(targetPath).toContain("in-person/canada-post/idv-code");
-    expect(mockNavigate).toHaveBeenCalledWith(
-      expect.any(String),
-      {
-        state: {
-          givenName: "Jane",
-          lastName: "Doe",
-          dateOfBirth: "1990-05-15",
-          address: "123 Main St",
-          province: "ON",
-          country: "CA",
-        },
+    expect(mockNavigate).toHaveBeenCalledWith(expect.any(String), {
+      state: {
+        givenName: "Jane",
+        lastName: "Doe",
+        dateOfBirth: "1990-05-15",
+        address: "123 Main St",
+        province: "ON",
+        country: "CA",
       },
-    );
+    });
     expect(navigationOptions).toBeDefined();
   });
 
-  it("reads dateOfBirth from the date input ref on continue", () => {
+  it("passes dateOfBirth from form state on continue", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.change(screen.getByTestId("givenName"), {

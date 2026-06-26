@@ -79,8 +79,12 @@ export default function VisitCanadaPost() {
     }
 
     // Move user attention to the summary after failed submit to match a11y error UX patterns.
-    summaryElement.scrollIntoView({ behavior: "smooth", block: "start" });
-    
+    const prefersReducedMotion =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+    summaryElement.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
 
     const firstLink = summaryElement.querySelector(
       "a[href]",
