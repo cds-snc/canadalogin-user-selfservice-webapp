@@ -163,7 +163,7 @@ class TestGetAttestationOptions:
         assert sent_body["userId"] == "user-123"
         assert sent_body["authenticatorSelection"]["residentKey"] == "preferred"
         assert sent_body["authenticatorSelection"]["requireResidentKey"] is False
-        assert sent_body["authenticatorSelection"]["userVerification"] == "preferred"
+        assert sent_body["authenticatorSelection"]["userVerification"] == "required"
 
     @pytest.mark.asyncio
     @patch.object(add_module, "get_auth_request_headers")
