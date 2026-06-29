@@ -28,6 +28,10 @@ export default function ProveIdentityOnlinePage() {
     language,
     journeyType,
   });
+  const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
+    language,
+    journeyType,
+  });
 
   const handleContinue = () => {
     switch (selectedMethod) {
@@ -74,12 +78,7 @@ export default function ProveIdentityOnlinePage() {
               type="button"
               buttonRole="secondary"
               onClick={() => {
-                navigate(
-                  path(PAGES.idvStartIdentityProofingPage, {
-                    language,
-                    journeyType,
-                  }),
-                );
+                navigate(startIdentityProofingPage);
               }}
             >
               {t("ProveIdentityOnline.backButton")}
