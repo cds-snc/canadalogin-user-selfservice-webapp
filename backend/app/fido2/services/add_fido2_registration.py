@@ -48,7 +48,7 @@ async def get_attestation_options(
         "authenticatorSelection": {
             "residentKey": "preferred",
             "requireResidentKey": False,
-            "userVerification": "preferred",
+            "userVerification": "required",
         },
     }
 

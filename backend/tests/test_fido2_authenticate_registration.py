@@ -182,7 +182,7 @@ class TestGetAssertionOptions:
         # Verify userVerification is set to preferred
         call_kwargs = mock_http_client.post.call_args[1]
         sent_body = call_kwargs["json"]
-        assert sent_body["userVerification"] == "preferred"
+        assert sent_body["userVerification"] == "required"
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_auth_request_headers")
