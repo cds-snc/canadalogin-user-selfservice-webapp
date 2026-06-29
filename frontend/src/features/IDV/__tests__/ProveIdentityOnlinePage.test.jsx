@@ -9,12 +9,13 @@ import { ONLINE_IDV_METHOD } from "../components/methods";
 // ────────────────────────────────────────────────
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
+let mockJourneyType = "signup";
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
     ...actual,
-    useParams: () => ({ language: "en" }),
+    useParams: () => ({ language: "en", journeyType: mockJourneyType }),
     useNavigate: () => mockNavigate,
   };
 });
@@ -32,22 +33,23 @@ vi.mock("../../../utils/constants", () => ({
 }));
 
 vi.mock("../../../utils/routeHelpers", () => ({
-  path: (page, { language } = {}) => {
+  path: (page, { language, journeyType } = {}) => {
     const resolvedLanguage = language || "en";
+    const resolvedJourneyType = journeyType || "signup";
 
     if (page === "IdvStartIdentityProofingPage") {
-      return `/${resolvedLanguage}/idv/`;
+      return `/${resolvedLanguage}/${resolvedJourneyType}/idv/`;
     }
 
     if (page === "IdvOnlineVerificationInfoPage") {
-      return `/${resolvedLanguage}/idv/online`;
+      return `/${resolvedLanguage}/${resolvedJourneyType}/idv/online`;
     }
 
     if (page === "IdvProvincialVerificationPage") {
-      return `/${resolvedLanguage}/idv/online/provincial`;
+      return `/${resolvedLanguage}/${resolvedJourneyType}/idv/online/provincial`;
     }
 
-    return `/${resolvedLanguage}/idv/online/prove`;
+    return `/${resolvedLanguage}/${resolvedJourneyType}/idv/online/prove`;
   },
 }));
 
@@ -121,6 +123,7 @@ describe("ProveIdentityOnlinePage", () => {
   beforeEach(() => {
     mockNavigate.mockClear();
     mockDevOnlyFeature = true;
+    mockJourneyType = "signup";
   });
 
   it("renders the page heading", () => {
@@ -163,6 +166,8 @@ describe("ProveIdentityOnlinePage", () => {
   });
 
   it("navigates to OnlineVerificationInfo when document scanning is selected and Continue is clicked", () => {
+    mockJourneyType = "manage-account";
+
     render(<ProveIdentityOnlinePage />);
 
     const documentScanningRadio = screen.getByLabelText(
@@ -173,10 +178,12 @@ describe("ProveIdentityOnlinePage", () => {
     const continueButton = screen.getByTestId("continue-button");
     fireEvent.click(continueButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idv/online");
+    expect(mockNavigate).toHaveBeenCalledWith("/en/manage-account/idv/online");
   });
 
   it("navigates to ProvincialVerificationPage when provincial partner is selected and Continue is clicked", () => {
+    mockJourneyType = "manage-account";
+
     render(<ProveIdentityOnlinePage />);
 
     const provincialPartnerRadio = screen.getByLabelText(
@@ -187,16 +194,20 @@ describe("ProveIdentityOnlinePage", () => {
     const continueButton = screen.getByTestId("continue-button");
     fireEvent.click(continueButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idv/online/provincial");
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/manage-account/idv/online/provincial",
+    );
   });
 
   it("navigates back to StartIdentityProofingPage when Back button is clicked", () => {
+    mockJourneyType = "manage-account";
+
     render(<ProveIdentityOnlinePage />);
 
     const backButton = screen.getByTestId("back-button");
     fireEvent.click(backButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idv/");
+    expect(mockNavigate).toHaveBeenCalledWith("/en/manage-account/idv/");
   });
 
   it("does not render when DEV_ONLY_FEATURE is false", () => {
