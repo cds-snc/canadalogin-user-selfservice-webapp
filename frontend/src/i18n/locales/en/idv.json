@@ -130,7 +130,9 @@
     "serviceCanadaLocationsOption": "Service Canada Centres",
     "signedInSuccessNotice": "You are signed in with CanadaLogin",
     "fallbackRpName": "RP Name",
-    "bodyText": "You will only need to do this once for all services that require identity proofing."
+    "bodyText": "You will only need to do this once for all services that require identity proofing.",
+    "errorNoticeTitle": "Your identity could not be verified",
+    "errorNoticeDescription": "You will need to try again with another method"
   },
   "CompleteIdentityProofing": {
     "pageTitle": "Complete identity proofing",

@@ -92,6 +92,15 @@ export default function StartIdentityProofingPage() {
             <GcdsText hidden={true}>{""}</GcdsText>
           </GcdsNotice>
         )}
+        {journeyType === IDV_JOURNEY_TYPE.VERIFICATION_ERROR && (
+          <GcdsNotice
+            noticeRole="danger"
+            noticeTitle={t("StartIdentityProofing.errorNoticeTitle")}
+            noticeTitleTag="h2"
+          >
+            {t("StartIdentityProofing.errorNoticeDescription")}
+          </GcdsNotice>
+        )}
         <GcdsContainer>
           <GcdsHeading tag="h1">{pageTitle}</GcdsHeading>
           <GcdsText>
