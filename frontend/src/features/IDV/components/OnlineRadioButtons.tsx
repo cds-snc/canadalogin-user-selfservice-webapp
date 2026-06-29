@@ -42,6 +42,7 @@ export default function OnlineRadioButtons({
     <GcdsRadios
       name="online-idv-method"
       legend={t("StartIdentityProofing.radioOnlineLabel")}
+      hideLegend
       options={radioOptions}
       value={selectedMethod ?? ""}
       onGcdsChange={(e: CustomEvent<string>) => {

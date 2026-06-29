@@ -68,6 +68,7 @@ export const pageIds = [
   "IdvServiceCanadaCentreCodePage",
   "IdvProofingBarcodeCanadaPostPage",
   "IdvStartIdentityProofingPage",
+  "IdvProveIdentityOnlinePage",
   "IdvOnlineVerificationInfoPage",
   "IdvProvincialVerificationPage",
   "IdvDetailsConfirmationPage",

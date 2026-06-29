@@ -67,10 +67,14 @@ describe("OnlineRadioButtons", () => {
     render(<OnlineRadioButtons {...defaultProps} />);
 
     expect(
-      screen.getByText(/take a photo of yourself and your ID/),
+      screen.getByText(
+        /You will be asked to take a photo of yourself and then your government issued photo ID with your phone camera/,
+      ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/BC Service Card or Alberta\.ca account/),
+      screen.getByText(
+        /BC Service Card or Alberta\.ca account to prove your identity/,
+      ),
     ).toBeInTheDocument();
   });
 
