@@ -242,16 +242,18 @@ export const appRoutes: RouteObject[] = [
                           handle: { id: PAGES.idvProvincialVerificationPage },
                         },
                         {
+                          path: "online/bluink/confirmation",
+                          element: <IdentityVerificationSuccess />,
+                          handle: {
+                            id: PAGES.idvIdentityVerificationSuccessPage,
+                          },
+                        },
+                        {
                           path: "details-confirmation",
                           element: <ConfirmIdentityDetails />,
                           handle: { id: PAGES.idvDetailsConfirmationPage },
                         },
                       ],
-                    },
-                    {
-                      path: "idv/online/bluink/confirmation",
-                      element: <IdentityVerificationSuccess />,
-                      handle: { id: PAGES.idvIdentityVerificationSuccessPage },
                     },
                   ]
                 : []),
