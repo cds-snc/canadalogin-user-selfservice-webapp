@@ -106,7 +106,7 @@ async def http_status_error_handler(request: Request, exc: HTTPStatusError):
         )
 
     response = JSONResponse(
-        status_code=status.HTTP_502_BAD_GATEWAY,
+        status_code=status_code,
         content={
             "correlation_id": correlation_id,
             "success": False,
