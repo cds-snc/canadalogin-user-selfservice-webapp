@@ -112,7 +112,7 @@ export const PAGE_NAMESPACE_MAP: Record<string, I18nNamespace> = {
   PasswordVerification: "otp",
   NoticeFactory: "otp",
   // idv
-  IdvStartIdentityProofingPage: "idv",
+  StartIdentityProofing: "idv",
   IdvCompleteIdentityProofingPage: "idv",
   IdvServiceCanadaCentrePage: "idv",
   IdvVisitCanadaPostPage: "idv",

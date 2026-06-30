@@ -168,7 +168,7 @@ export const PAGES = {
   idvVisitCanadaPostPage: "IdvVisitCanadaPostPage",
   idvServiceCanadaCentreCodePage: "IdvServiceCanadaCentreCodePage",
   idvProofingBarcodeCanadaPostPage: "IdvProofingBarcodeCanadaPostPage",
-  idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
+  idvStartIdentityProofingPage: "StartIdentityProofing",
   idvCompleteIdentityProofingPage: "IdvCompleteIdentityProofingPage",
   idvProvenInformationCard: "IdvProvenInformationCard",
   idvProvincialVerificationPage: "IdvProvincialVerificationPage",

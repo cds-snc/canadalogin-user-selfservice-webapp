@@ -216,9 +216,7 @@ describe("CompleteIdentityProofingPage", () => {
         screen.getByTestId("start-button").click();
       });
 
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/IdvStartIdentityProofingPage",
-      );
+      expect(mockNavigate).toHaveBeenCalledWith("/en/StartIdentityProofing");
     });
 
     it("does not trigger logout when start identity button is clicked", async () => {
