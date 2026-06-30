@@ -131,7 +131,9 @@ describe("ConfirmIdentityDetails", () => {
       screen.getByText("This email is used for signing in and contacting you:"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("This number is used for 2-step verification and contacting you:"),
+      screen.getByText(
+        "This number is used for 2-step verification and contacting you:",
+      ),
     ).toBeInTheDocument();
   });
 
