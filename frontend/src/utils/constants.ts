@@ -590,6 +590,7 @@ export const countryMapping = {
     zw: "Zimbabwe",
   },
 } as const;
+
 export const gcHelpCentreLinks = {
   twoStepVerification: {
     en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/get-started/two-step-verification-methods/`,
@@ -597,4 +598,16 @@ export const gcHelpCentreLinks = {
   },
   cannotAccessPhone:
     "https://login.alpha.canada.ca/en/users/trouble-signing-in/problems-signing-in-with-2-step-verification/#cannot-access-your-2step-verification-phone",
+  helpSigningInWithPasskey: {
+    en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/trouble-signing-in/problems-signing-in-with-2-step-verification/`,
+    fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/problemes-connexion/problemes-connexion-verification-deux-etapes/`,
+  },
+  helpCreatingPasskey: {
+    en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/trouble-signing-up/issues-2-step-verification/#problems-creating-passkey-or-security-key`,
+    fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/problemes-inscription/problemes-configuration-verification-deux-etapes/#problemes-creation-cle-d-acces`,
+  },
+  learnAboutPasskeys: {
+    en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/get-started/two-step-verification-methods/#passkeys`,
+    fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/se-lancer-connexioncanada/verification-deux-etapes/#cles-acces`,
+  },
 } as const;

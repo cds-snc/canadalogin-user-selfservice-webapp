@@ -26,6 +26,12 @@ vi.mock("../../../../../utils/constants", () => ({
   SERVICES: [],
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
   DEV_ONLY_FEATURE: false,
+  gcHelpCentreLinks: {
+    helpCreatingPasskey: {
+      en: "https://example.test/en/create-passkey-help",
+      fr: "https://example.test/fr/create-passkey-help",
+    },
+  },
 }));
 
 vi.mock("../../../../../assets/icons/passkey_collage.svg?react", () => ({
