@@ -46,7 +46,7 @@ export default function StartIdentityProofingPage() {
   const pageTitle = titleByJourneyType[resolvedJourneyType];
   const { t: tLayout } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
-  const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
+  const onlineSelectionPage = path(PAGES.idvProveIdentityOnlinePage, {
     language,
     journeyType,
   });
@@ -63,7 +63,7 @@ export default function StartIdentityProofingPage() {
   const handleContinue = () => {
     switch (selectedOption) {
       case START_IDENTITY_OPTION.online:
-        navigate(onlineVerificationInfoPage);
+        navigate(onlineSelectionPage);
         break;
       case START_IDENTITY_OPTION.inPerson:
         navigate(visitCanadaPostPage);
