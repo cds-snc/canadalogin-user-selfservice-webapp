@@ -43,6 +43,12 @@ vi.mock("../../../../../utils/constants", () => ({
     manage2FAVerifications: "Manage2FAVerifications",
     error: "Error",
   },
+  gcHelpCentreLinks: {
+    helpSigningInWithPasskey: {
+      en: "https://example.test/en/passkey-help",
+      fr: "https://example.test/fr/passkey-help",
+    },
+  },
   SERVICES: [],
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
   DEV_ONLY_FEATURE: false,
