@@ -119,7 +119,7 @@ describe("ConfirmIdentityDetails", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Contact info" }),
+      screen.getByRole("heading", { name: "Contact information" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Communication" }),
@@ -131,7 +131,7 @@ describe("ConfirmIdentityDetails", () => {
       screen.getByText("This email is used for signing in and contacting you:"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("This number is used for contacting you:"),
+      screen.getByText("This number is used for 2-step verification and contacting you:"),
     ).toBeInTheDocument();
   });
 
