@@ -145,7 +145,7 @@ export const appRoutes: RouteObject[] = [
                     {
                       path: "identity-verification/:journeyType?",
                       handle: {
-                        id: PAGES.idvStartIdentityProofingPage,
+                        id: PAGES.idvStartIdentityProofingPage, // take a look at this
                         breadcrumbId: "pageTitle",
                       },
                       children: [

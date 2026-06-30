@@ -39,7 +39,7 @@ vi.mock("../../../utils/constants", () => ({
     editProfileNamePage: "EditProfileNamePage",
     editEmailPage: "EditEmailPage",
     editContactPhoneNumberPage: "EditContactPhoneNumberPage",
-    idvStartIdentityProofingPage: "StartIdentityProofing",
+    idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
   },
 }));
 
@@ -162,7 +162,9 @@ describe("ConfirmIdentityDetails", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Update information" }));
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/StartIdentityProofing");
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/IdvStartIdentityProofingPage",
+    );
   });
 
   it("navigates with empty destination when Confirm and continue is clicked", () => {
