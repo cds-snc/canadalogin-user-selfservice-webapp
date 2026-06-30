@@ -10,10 +10,10 @@
     "email": "Email",
     "emailDescription": "This email is used for signing in and contacting you:",
     "verified": "Verified",
-    "contactPhone": "Contact phone number",
-    "phoneDescription": "This number is used for contacting you:",
+    "contactPhone": "Phone number",
+    "phoneDescription": "This number is used for 2-step verification and contacting you:",
     "communication": "Communication",
-    "languagePreference": "Language Preference",
+    "languagePreference": "Language preference",
     "english": "English",
     "notifications": "Notifications",
     "notificationDescription": "We will send account-related notifications to the email registered to your account.",
@@ -28,7 +28,7 @@
     "name": "Name",
     "dateOfBirth": "Date of birth",
     "idDocument": "ID document saved to CanadaLogin",
-    "updateInfo": "To update this information you will need to complete another identity proofing process.",
+    "updateInfo": "To update this information, you'll need to complete identity proofing again.",
     "updateButton": "Update information"
   },
   "ProfileUpdateName": {

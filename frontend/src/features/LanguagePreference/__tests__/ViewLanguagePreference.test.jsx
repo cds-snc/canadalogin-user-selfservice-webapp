@@ -94,7 +94,7 @@ describe("ViewLanguagePreferences Component", () => {
       render(<ViewLanguagePreferences />);
 
       expect(screen.getByTestId("gcds-heading")).toBeInTheDocument();
-      expect(screen.getByText("Language Preference")).toBeInTheDocument();
+      expect(screen.getByText("Language preference")).toBeInTheDocument();
     });
 
     it("renders edit link with correct text", () => {
