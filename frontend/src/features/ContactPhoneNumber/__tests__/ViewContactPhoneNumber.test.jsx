@@ -140,7 +140,7 @@ describe("ViewContactPhoneNumber Component", () => {
 
     expect(screen.getByTestId("gcds-container")).toBeInTheDocument();
     expect(screen.getByTestId("gcds-heading")).toHaveTextContent(
-      "Contact phone number",
+      "Phone number",
     );
   });
 
@@ -183,7 +183,9 @@ describe("ViewContactPhoneNumber Component", () => {
     );
 
     expect(
-      screen.getByText("This number is used for contacting you:"),
+      screen.getByText(
+        "This number is used for 2-step verification and contacting you:",
+      ),
     ).toBeInTheDocument();
     expect(screen.getByText("Edit")).toBeInTheDocument();
     expect(screen.getByTestId("verified-badge")).toHaveTextContent("Verified");

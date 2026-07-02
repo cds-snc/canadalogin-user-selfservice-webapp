@@ -25,6 +25,7 @@ vi.mock("../../../utils/constants", () => ({
   },
   PAGES: {
     idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
+    idvProveIdentityOnlinePage: "IdvProveIdentityOnlinePage",
     idvVisitCanadaPostPage: "IdvVisitCanadaPostPage",
     idvCompleteIdentityProofingPage: "IdvCompleteIdentityProofingPage",
   },
@@ -38,7 +39,10 @@ vi.mock("../../../utils/routeHelpers", () => ({
   path: (page, { language } = {}) => {
     const resolvedLanguage = language || "en";
 
-    if (page === "IdvOnlineVerificationInfoPage") {
+    if (
+      page === "IdvOnlineVerificationInfoPage" ||
+      page === "IdvProveIdentityOnlinePage"
+    ) {
       return `/${resolvedLanguage}/identity-verification/online`;
     }
 

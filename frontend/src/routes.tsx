@@ -145,61 +145,6 @@ export const appRoutes: RouteObject[] = [
               ...(DEV_ONLY_FEATURE
                 ? [
                     {
-                      path: "idv/",
-                      element: <StartIdentityProofingPage />,
-                      handle: { id: PAGES.idvStartIdentityProofingPage },
-                    },
-                    {
-                      path: "idv/required/",
-                      element: <CompleteIdentityProofingPage />,
-                      handle: { id: PAGES.idvCompleteIdentityProofingPage },
-                    },
-                    {
-                      path: "idv/in-person/canada-post",
-                      element: <VisitCanadaPost />,
-                      handle: { id: PAGES.idvVisitCanadaPostPage },
-                    },
-                    {
-                      path: "idv/in-person/service-canada-centre",
-                      element: <ServiceCanadaCentrePage />,
-                      handle: { id: PAGES.idvServiceCanadaCentrePage },
-                    },
-                    {
-                      path: "idv/in-person/service-canada-centre/idv-code",
-                      element: <ServiceCanadaCentreIDVCodePage />,
-                      handle: { id: PAGES.idvServiceCanadaCentreCodePage },
-                    },
-                    {
-                      path: "idv/in-person/canada-post/idv-code",
-                      element: <ProofingBarcodeCanadaPostPage />,
-                      handle: { id: PAGES.idvProofingBarcodeCanadaPostPage },
-                    },
-                    {
-                      path: "idv/in-person/pending",
-                      element: <InPersonProofingInProgress />,
-                      handle: { id: PAGES.idvInPersonProofingInProgressPage },
-                    },
-                    {
-                      path: "idv/online",
-                      element: <OnlineVerificationInfo />,
-                      handle: { id: PAGES.idvOnlineVerificationInfoPage },
-                    },
-                    {
-                      path: "idv/online/prove",
-                      element: <ProveIdentityOnlinePage />,
-                      handle: { id: PAGES.idvProveIdentityOnlinePage },
-                    },
-                    {
-                      path: "idv/online/provincial",
-                      element: <ProvincialVerificationPage />,
-                      handle: { id: PAGES.idvProvincialVerificationPage },
-                    },
-                    {
-                      path: "idv/details-confirmation",
-                      element: <ConfirmIdentityDetails />,
-                      handle: { id: PAGES.idvDetailsConfirmationPage },
-                    },
-                    {
                       path: "identity-verification/:journeyType?",
                       handle: {
                         id: PAGES.idvStartIdentityProofingPage,
@@ -246,6 +191,11 @@ export const appRoutes: RouteObject[] = [
                         },
                         {
                           path: "online",
+                          element: <ProveIdentityOnlinePage />,
+                          handle: { id: PAGES.idvProveIdentityOnlinePage },
+                        },
+                        {
+                          path: "online/identity-verification-info",
                           element: <OnlineVerificationInfo />,
                           handle: { id: PAGES.idvOnlineVerificationInfoPage },
                         },

@@ -28,7 +28,14 @@ vi.mock("../../../utils/constants", async () => {
 });
 
 vi.mock("@gcds-core/components-react", () => {
-  const GcdsSelect = ({ children, className }) => {
+  const GcdsSelect = ({
+    children,
+    className,
+    onGcdsChange,
+    selectId,
+    label,
+    defaultValue,
+  }) => {
     const hostRef = useRef(null);
 
     useEffect(() => {
@@ -45,9 +52,19 @@ vi.mock("@gcds-core/components-react", () => {
     }, []);
 
     return (
-      <gcds-select ref={hostRef} className={className}>
-        {children}
-      </gcds-select>
+      <>
+        <gcds-select ref={hostRef} className={className}>
+          {children}
+        </gcds-select>
+        <select
+          aria-label={label}
+          data-testid={selectId}
+          defaultValue={defaultValue}
+          onChange={(e) => onGcdsChange && onGcdsChange(e)}
+        >
+          {children}
+        </select>
+      </>
     );
   };
 
@@ -72,15 +89,33 @@ vi.mock("@gcds-core/components-react", () => {
         onChange={(e) => onGcdsChange && onGcdsChange(e)}
       />
     ),
-    GcdsDateInput: React.forwardRef(({ legend }, ref) => (
-      <input ref={ref} aria-label={legend} data-testid="dateOfBirth" />
+    GcdsDateInput: React.forwardRef(({ legend, onGcdsChange, onBlur }, ref) => (
+      <input
+        ref={ref}
+        aria-label={legend}
+        data-testid="dateOfBirth"
+        onChange={(e) => onGcdsChange && onGcdsChange(e)}
+        onBlur={(e) => onBlur && onBlur(e)}
+      />
     )),
+    GcdsErrorMessage: ({ children }) => <div>{children}</div>,
+    GcdsErrorSummary: ({ id, heading, errorLinks }) => (
+      <div id={id} data-testid="errorSummary">
+        <h2>{heading}</h2>
+        {Object.entries(errorLinks ?? {}).map(([href, message], index) => (
+          <a key={index} href={href}>
+            {message}
+          </a>
+        ))}
+      </div>
+    ),
     GcdsSelect,
-    GcdsButton: ({ children, buttonRole, onGcdsClick }) => (
+    GcdsButton: ({ children, buttonRole, onGcdsClick, disabled }) => (
       <button
         data-testid={
           buttonRole === "secondary" ? "back-button" : "continue-button"
         }
+        disabled={disabled}
         onClick={(event) => onGcdsClick && onGcdsClick(event)}
       >
         {children}
@@ -100,6 +135,10 @@ describe("VisitCanadaPost", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: vi.fn(),
+    });
   });
 
   it("renders nothing when DEV_ONLY_FEATURE is false", () => {
@@ -130,10 +169,10 @@ describe("VisitCanadaPost", () => {
   it("renders province and country option values", () => {
     render(<VisitCanadaPost />);
 
-    expect(screen.getByText("Ontario")).toBeInTheDocument();
-    expect(screen.getByText("Quebec")).toBeInTheDocument();
-    expect(screen.getByText("Canada")).toBeInTheDocument();
-    expect(screen.getByText("United States")).toBeInTheDocument();
+    expect(screen.getAllByText("Ontario").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Quebec").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Canada").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("United States").length).toBeGreaterThan(0);
   });
 
   it("renders the complete acceptable ID list", () => {
@@ -194,23 +233,51 @@ describe("VisitCanadaPost", () => {
     fireEvent.change(screen.getByTestId("address"), {
       target: { value: "123 Main St" },
     });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+      target: { value: "1990-05-15" },
+    });
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        state: expect.objectContaining({
-          givenName: "Jane",
-          lastName: "Doe",
-          address: "123 Main St",
-        }),
-      }),
-    );
+    const [targetPath, navigationOptions] = mockNavigate.mock.calls[0];
+    expect(targetPath).toContain("in-person/canada-post/idv-code");
+    expect(mockNavigate).toHaveBeenCalledWith(expect.any(String), {
+      state: {
+        givenName: "Jane",
+        lastName: "Doe",
+        dateOfBirth: "1990-05-15",
+        address: "123 Main St",
+        province: "ON",
+        country: "CA",
+      },
+    });
+    expect(navigationOptions).toBeDefined();
   });
 
-  it("reads dateOfBirth from the date input ref on continue", () => {
+  it("passes dateOfBirth from form state on continue", () => {
     render(<VisitCanadaPost />);
+
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
 
     const dateInput = screen.getByTestId("dateOfBirth");
     fireEvent.change(dateInput, { target: { value: "1990-05-15" } });
@@ -225,5 +292,183 @@ describe("VisitCanadaPost", () => {
         }),
       }),
     );
+  });
+
+  it("shows error summary on invalid continue and allows submit once valid", () => {
+    render(<VisitCanadaPost />);
+
+    const continueButton = screen.getByTestId("continue-button");
+    expect(continueButton).toBeEnabled();
+
+    fireEvent.click(continueButton);
+
+    const summary = screen.getByTestId("errorSummary");
+    expect(summary).toHaveTextContent("Given name is required or invalid.");
+    expect(summary).toHaveTextContent("Family name is required or invalid.");
+    expect(summary).toHaveTextContent("Date of birth is required.");
+    expect(summary).toHaveTextContent("Address is required.");
+    expect(summary).toHaveTextContent("Province / State is required.");
+    expect(summary).toHaveTextContent("Country is required.");
+
+    expect(
+      screen.getAllByText("Given name is required or invalid.").length,
+    ).toBeGreaterThan(1);
+    expect(
+      screen.getAllByText("Family name is required or invalid.").length,
+    ).toBeGreaterThan(1);
+    expect(screen.getAllByText("Address is required.").length).toBeGreaterThan(
+      1,
+    );
+    expect(
+      screen.getAllByText("Province / State is required.").length,
+    ).toBeGreaterThan(1);
+    expect(screen.getAllByText("Country is required.").length).toBeGreaterThan(
+      1,
+    );
+
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+
+    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+      target: { value: "1990-05-15" },
+    });
+
+    fireEvent.click(continueButton);
+
+    expect(mockNavigate).toHaveBeenCalled();
+    expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
+  });
+
+  it("blocks navigation and shows invalid date summary for impossible date", () => {
+    render(<VisitCanadaPost />);
+
+    const continueButton = screen.getByTestId("continue-button");
+
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: " Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+      target: { value: "2025-02-30" },
+    });
+
+    fireEvent.click(continueButton);
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+    const summary = screen.getByTestId("errorSummary");
+    expect(summary).toBeInTheDocument();
+    expect(summary).toHaveTextContent("Date of birth must be a valid date.");
+  });
+
+  it("blocks navigation and shows summary when date of birth year is 1900 or earlier", () => {
+    render(<VisitCanadaPost />);
+
+    const continueButton = screen.getByTestId("continue-button");
+
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+      target: { value: "1900-01-01" },
+    });
+
+    fireEvent.click(continueButton);
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(screen.getByTestId("errorSummary")).toBeInTheDocument();
+  });
+
+  it("shows a date validation error after date of birth blur", () => {
+    render(<VisitCanadaPost />);
+
+    const dateInput = screen.getByTestId("dateOfBirth");
+    fireEvent.change(dateInput, { target: { value: "1900-01-01" } });
+    fireEvent.blur(dateInput);
+
+    expect(screen.getByText("Year must be after 1900.")).toBeInTheDocument();
+  });
+
+  it("shows future date errors and keeps user on page", () => {
+    render(<VisitCanadaPost />);
+
+    const continueButton = screen.getByTestId("continue-button");
+
+    fireEvent.change(screen.getByTestId("givenName"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("familyName"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("address"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("province"), {
+      target: { value: "ON" },
+    });
+    fireEvent.change(screen.getByTestId("country"), {
+      target: { value: "CA" },
+    });
+    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+      target: { value: "2999-01-01" },
+    });
+
+    fireEvent.click(continueButton);
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+    const summary = screen.getByTestId("errorSummary");
+    expect(summary).toHaveTextContent("Date of birth cannot be in the future.");
+    expect(
+      screen.getAllByText("Date of birth cannot be in the future.").length,
+    ).toBeGreaterThan(1);
+  });
+
+  it("focuses the first summary link after invalid submit", async () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    await waitFor(() => {
+      const summary = screen.getByTestId("errorSummary");
+      const firstLink = summary.querySelector("a");
+
+      expect(firstLink).toBeTruthy();
+      expect(document.activeElement).toBe(firstLink);
+    });
   });
 });
