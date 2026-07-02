@@ -107,8 +107,11 @@
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about how selfie and ID check works"
   },
+  "IdvStartIdentityProofingPage": {
+    "pageTitle": "Prove your identity"
+  },
   "StartIdentityProofing": {
-    "pageTitle": "{{rpName}} needs you to prove your identity ",
+    "pageTitle": "{{rpName}} needs you to prove your identity",
     "proveYourIdentity": "Prove your identity",
     "heading": "Identity proofing confirms who you are, protects against fraud, and lets you recover your {{appName}} if needed. ",
     "learnMoreDescription": "Learn more about identity proofing",
