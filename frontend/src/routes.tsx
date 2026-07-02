@@ -25,7 +25,9 @@ import ServiceCanadaCentrePage from "./features/IDV/InPerson/ServiceCanadaCentre
 import ServiceCanadaCentreIDVCodePage from "./features/IDV/InPerson/ServiceCanadaCentreIDVCodePage";
 import VisitCanadaPost from "./features/IDV/InPerson/VisitCanadaPostPage";
 import ProofingBarcodeCanadaPostPage from "./features/IDV/InPerson/ProofingBarcodeCanadaPostPage";
+import InPersonProofingInProgress from "./features/IDV/InPerson/InPersonProofingInProgress";
 import StartIdentityProofingPage from "./features/IDV/StartIdentityProofingPage";
+import ProveIdentityOnlinePage from "./features/IDV/Online/ProveIdentityOnlinePage";
 import ProvincialVerificationPage from "./features/IDV/Online/ProvincialVerificationPage";
 import OnlineVerificationInfo from "./features/IDV/Online/OnlineVerificationInfo";
 import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
@@ -171,6 +173,13 @@ export const appRoutes: RouteObject[] = [
                           },
                         },
                         {
+                          path: "in-person/pending",
+                          element: <InPersonProofingInProgress />,
+                          handle: {
+                            id: PAGES.idvInPersonProofingInProgressPage,
+                          },
+                        },
+                        {
                           path: "in-person/service-canada-centre",
                           element: <ServiceCanadaCentrePage />,
                           handle: { id: PAGES.idvServiceCanadaCentrePage },
@@ -182,6 +191,11 @@ export const appRoutes: RouteObject[] = [
                         },
                         {
                           path: "online",
+                          element: <ProveIdentityOnlinePage />,
+                          handle: { id: PAGES.idvProveIdentityOnlinePage },
+                        },
+                        {
+                          path: "online/identity-verification-info",
                           element: <OnlineVerificationInfo />,
                           handle: { id: PAGES.idvOnlineVerificationInfoPage },
                         },
@@ -191,16 +205,18 @@ export const appRoutes: RouteObject[] = [
                           handle: { id: PAGES.idvProvincialVerificationPage },
                         },
                         {
+                          path: "online/bluink/confirmation",
+                          element: <IdentityVerificationSuccess />,
+                          handle: {
+                            id: PAGES.idvIdentityVerificationSuccessPage,
+                          },
+                        },
+                        {
                           path: "details-confirmation",
                           element: <ConfirmIdentityDetails />,
                           handle: { id: PAGES.idvDetailsConfirmationPage },
                         },
                       ],
-                    },
-                    {
-                      path: "idv/online/bluink/confirmation",
-                      element: <IdentityVerificationSuccess />,
-                      handle: { id: PAGES.idvIdentityVerificationSuccessPage },
                     },
                   ]
                 : []),

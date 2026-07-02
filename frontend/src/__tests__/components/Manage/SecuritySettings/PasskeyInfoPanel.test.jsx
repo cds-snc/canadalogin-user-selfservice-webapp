@@ -77,7 +77,10 @@ describe("PasskeyInfoPanel", () => {
       name: "Learn more about passkeys",
     });
     expect(learnMoreLink).toBeInTheDocument();
-    expect(learnMoreLink).toHaveAttribute("href", "#");
+    expect(learnMoreLink).toHaveAttribute(
+      "href",
+      "https://login.canada.ca/en/users/get-started/two-step-verification-methods/#passkeys",
+    );
   });
 
   it("opens privacy notice link in a new tab", () => {
