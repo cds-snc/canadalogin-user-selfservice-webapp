@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 _gc_notify_config = GCNotifyConfig()
 
-GC_NOTIFY_EMAIL_ENDPOINT = f"{GC_NOTIFY_BASE_URL}{GCNotifyEndpoint.SEND_EMAIL}"
+GC_NOTIFY_EMAIL_ENDPOINT = f"{GC_NOTIFY_BASE_URL}{GCNotifyEndpoint.SEND_EMAIL.value}"
 
 # TODO: Replace with a real generated verification code once that feature exists.
 HARDCODED_VERIFICATION_CODE = "387DHROGJ"
@@ -49,7 +49,7 @@ async def send_in_person_verification_code(
 
     payload = {
         "email_address": email_address,
-        "template_id": GCNotifyTemplateID.IN_PERSON_VERIFICATION,
+        "template_id": GCNotifyTemplateID.IN_PERSON_VERIFICATION.value,
         "personalisation": {
             "verification_code": HARDCODED_VERIFICATION_CODE,
         },

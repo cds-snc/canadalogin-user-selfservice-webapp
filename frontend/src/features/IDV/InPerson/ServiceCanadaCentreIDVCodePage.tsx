@@ -7,21 +7,31 @@ import {
   GcdsGrid,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
 
-interface ServiceCanadaCentreIDVCodePageProps {
+// TODO: Remove this fallback once API integration for code generation is available.
+const FALLBACK_IN_PERSON_IDV_CODE = "387DHROGJ";
+
+type ServiceCanadaCentreIDVCode = {
   // TODO: replace with real code once API integration is in place
   idvCode?: string;
-}
+};
+
+type ServiceCanadaCentreIDVCodePageProps = ServiceCanadaCentreIDVCode;
 
 export default function ServiceCanadaCentreIDVCodePage({
   idvCode,
 }: ServiceCanadaCentreIDVCodePageProps) {
   const { state } = useUser();
+  const location = useLocation();
   const { t } = useTranslation("idv");
 
   const email = state?.userProfile?.userName ?? "";
+  const stateIdvCode =
+    (location.state as ServiceCanadaCentreIDVCode | null)?.idvCode ?? null;
+  const displayCode = idvCode ?? stateIdvCode ?? FALLBACK_IN_PERSON_IDV_CODE;
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -35,7 +45,7 @@ export default function ServiceCanadaCentreIDVCodePage({
         </GcdsHeading>
 
         <GcdsHeading tag="h2" marginBottom="0" marginTop="0">
-          <strong>{idvCode ?? "387DHROGJ"}</strong>
+          <strong>{displayCode}</strong>
         </GcdsHeading>
         <GcdsContainer>
           {" "}
