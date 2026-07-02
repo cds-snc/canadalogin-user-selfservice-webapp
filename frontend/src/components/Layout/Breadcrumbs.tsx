@@ -8,7 +8,6 @@ import type { PageId } from "../../types/utils";
 import { useTranslation } from "react-i18next";
 import { PAGE_NAMESPACE_MAP } from "../../i18n/index";
 import { useUser } from "../Providers/useUser";
-import { DEFAULT_RP_NAME } from "../../utils/constants";
 
 type BreadcrumbHandle = {
   id: PageId;
@@ -27,7 +26,6 @@ export default function Breadcrumbs() {
 
   const rpInfo = state.relyingPartyInfo;
   const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const rpName = localizedDetail?.name ?? rpInfo?.linkName ?? DEFAULT_RP_NAME;
 
   const rp: BreadcrumbLink | null = rpInfo
     ? {
@@ -50,7 +48,7 @@ export default function Breadcrumbs() {
     .map((match) => ({
       name: t(`${match.handle.id}.${match.handle.breadcrumbId}`, {
         ns: PAGE_NAMESPACE_MAP[match.handle.id],
-        rpName,
+        rpName: rp?.name,
         defaultValue: "",
       }),
       url: match.pathname,
