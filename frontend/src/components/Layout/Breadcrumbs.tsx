@@ -48,7 +48,6 @@ export default function Breadcrumbs() {
     .map((match) => ({
       name: t(`${match.handle.id}.${match.handle.breadcrumbId}`, {
         ns: PAGE_NAMESPACE_MAP[match.handle.id],
-        rpName: rp?.name,
         defaultValue: "",
       }),
       url: match.pathname,

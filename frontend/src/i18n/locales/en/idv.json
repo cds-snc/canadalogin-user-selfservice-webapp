@@ -108,7 +108,7 @@
     "learnMoreLink": "Learn more about how selfie and ID check works"
   },
   "IdvStartIdentityProofingPage": {
-    "pageTitle": "{{rpName}} needs you to prove your identity"
+    "pageTitle": "Identity Verification"
   },
   "StartIdentityProofing": {
     "pageTitle": "{{rpName}} needs you to prove your identity",
