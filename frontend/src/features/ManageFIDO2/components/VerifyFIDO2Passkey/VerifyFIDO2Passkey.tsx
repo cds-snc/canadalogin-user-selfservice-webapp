@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
 import Loader from "../../../../components/Layout/Loading";
 import type { Fido2Credential } from "../../../../types/hooks";
+import { gcHelpCentreLinks } from "../../../../utils/constants";
 
 interface VerifyFIDO2PasskeyProps {
   setErrorCode: (code: string) => void;
@@ -44,7 +45,8 @@ export default function VerifyFIDO2Passkey({
   assertionOptionsRequest,
   onError,
 }: VerifyFIDO2PasskeyProps) {
-  const { language } = useParams();
+  const { language: routeLanguage } = useParams<{ language?: string }>();
+  const language: "en" | "fr" = routeLanguage === "fr" ? "fr" : "en";
   const { t } = useTranslation(["fido2", "common"]);
   const hasTriggeredRef = useRef(false);
   const [localLoading, setLocalLoading] = useState(true);
@@ -190,9 +192,11 @@ export default function VerifyFIDO2Passkey({
           {t("VerifyFIDO2Passkey.problemsTitle")}
         </GcdsHeading>
 
-        {/* TODO: add correct hrefs to the links below once domain migrations are done */}
         <GcdsText>
-          <GcdsLink target="_blank">
+          <GcdsLink
+            target="_blank"
+            href={gcHelpCentreLinks.helpSigningInWithPasskey[language]}
+          >
             {t("VerifyFIDO2Passkey.helpLink")}
           </GcdsLink>
         </GcdsText>

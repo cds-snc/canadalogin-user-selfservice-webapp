@@ -68,10 +68,13 @@ export const pageIds = [
   "IdvServiceCanadaCentreCodePage",
   "IdvProofingBarcodeCanadaPostPage",
   "IdvStartIdentityProofingPage",
+  "IdvProveIdentityOnlinePage",
   "IdvOnlineVerificationInfoPage",
+  "IdvInPersonProofingInProgressPage",
   "IdvProvincialVerificationPage",
   "IdvDetailsConfirmationPage",
   "IdvCompleteIdentityProofingPage",
+  "IdvIdentityVerificationSuccessPage",
 ] as const;
 
 export type PageId = (typeof pageIds)[number];

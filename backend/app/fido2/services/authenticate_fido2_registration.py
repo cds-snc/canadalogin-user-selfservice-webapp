@@ -455,7 +455,7 @@ async def get_assertion_options(
 
     # Set proper defaults for FIDO2 assertion
     request_body = {
-        "userVerification": request_data.userVerification or "preferred",
+        "userVerification": request_data.userVerification or "required",
     }
 
     tenant_url = get_tenant_url()

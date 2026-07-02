@@ -11,6 +11,7 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
+import { gcHelpCentreLinks } from "../../../../utils/constants";
 
 interface AddFIDO2PasskeyProps {
   errorMessage: string;
@@ -25,7 +26,8 @@ export default function AddFIDO2Passkey({
   onRegister,
   registrationLoading,
 }: AddFIDO2PasskeyProps) {
-  const { language } = useParams();
+  const { language: routeLanguage } = useParams<{ language?: string }>();
+  const language: "en" | "fr" = routeLanguage === "fr" ? "fr" : "en";
   const { t } = useTranslation("fido2");
 
   return (
@@ -87,9 +89,11 @@ export default function AddFIDO2Passkey({
 
         <GcdsHeading tag="h2">{t("AddFIDO2Passkey.problemsTitle")}</GcdsHeading>
 
-        {/* TODO: add link to create passkey help page once available */}
         <GcdsText>
-          <GcdsLink href="#" target="_blank">
+          <GcdsLink
+            href={gcHelpCentreLinks.helpCreatingPasskey[language]}
+            target="_blank"
+          >
             {t("AddFIDO2Passkey.helpLink")}
           </GcdsLink>
         </GcdsText>

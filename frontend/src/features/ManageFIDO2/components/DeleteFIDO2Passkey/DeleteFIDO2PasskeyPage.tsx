@@ -354,7 +354,7 @@ export default function DeleteFIDO2PasskeyPage({
       <VerifyFIDO2Passkey
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}
-        assertionOptionsRequest={{ userVerification: "preferred" }}
+        assertionOptionsRequest={{ userVerification: "required" }}
         setAssertionResult={setPasskeyAssertionResult}
         selectedPasskey={selected2FAPasskey}
         onCallback={() => {

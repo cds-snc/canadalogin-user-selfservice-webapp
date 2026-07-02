@@ -50,10 +50,24 @@
     "familyNameLabel": "Family name",
     "familyNameHint": "Must match what is on your official ID",
     "dobLabel": "Date of birth",
+    "dobErrorRequired": "Enter your date of birth.",
+    "dobErrorInvalid": "Enter a valid date of birth.",
+    "dobErrorYear": "Year must be after 1900.",
+    "dobErrorFuture": "Date of birth cannot be in the future.",
     "addressLabel": "Address",
     "addressHint": "Enter your street address",
     "provinceLabel": "Province / State",
     "countryLabel": "Country",
+    "validationSummaryHeading": "There is a problem",
+    "summaryGivenName": "Given name is required or invalid.",
+    "summaryFamilyName": "Family name is required or invalid.",
+    "summaryDobRequired": "Date of birth is required.",
+    "summaryDobInvalid": "Date of birth must be a valid date.",
+    "summaryDobYear": "Date of birth year must be after 1900.",
+    "summaryDobFuture": "Date of birth cannot be in the future.",
+    "summaryAddress": "Address is required.",
+    "summaryProvince": "Province / State is required.",
+    "summaryCountry": "Country is required.",
     "continueButton": "Continue",
     "differentMethodButton": "Choose a different method",
     "moreInfoTitle": "For more information",
@@ -93,6 +107,11 @@
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about provincial identity proofing"
   },
+  "ProveIdentityOnline": {
+    "heading": "Prove your identity online",
+    "continueButton": "Continue",
+    "backButton": "Back"
+  },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",
     "heading": "Get ready for selfie and ID check",
@@ -110,6 +129,15 @@
   "IdvStartIdentityProofingPage": {
     "pageTitle": "Identity Verification"
   },
+  "InPersonProofingInProgress": {
+    "pageTitle": "Prove your identity",
+    "heading": "{{rpName}} needs you to prove your identity",
+    "noticeHeading": "You're partway through proofing in person with Canada Post",
+    "noticeText": "Look for an email sent by CanadaLogin on {{date}} with instructions to complete proofing your identity at a Canada Post location. You can click resend email to receive another copy.",
+    "changedMindText": "Changed your mind about in-person proofing at Canada Post? You can reset and choose a different method instead.",
+    "resetButton": "Reset and choose another method",
+    "resendButton": "Resend email"
+  },
   "StartIdentityProofing": {
     "pageTitle": "{{rpName}} needs you to prove your identity",
     "proveYourIdentity": "Prove your identity",
@@ -124,16 +152,18 @@
     "cantProveNowHint": "Sign out and come back when you're ready, or find out about other ways to access {{rpName}}.",
     "radioOnlineLabel": "Do it online",
     "documentScanningOption": "Selfie and photo of your ID",
-    "hintDocumentScanningOption": "Use your phone to take a photo of yourself and your ID for a quick online check.",
+    "hintDocumentScanningOption": "You will be asked to take a photo of yourself and then your government issued photo ID with your phone camera.",
     "signBackInNotice": "You will need to sign back in to your {{appName}} after proving your identity in person to confirm the proofing process.",
     "provincialPartnerOption": "Use your provincial sign in",
-    "hintProvincialPartnerOption": "Use your BC Service Card or Alberta.ca account to verify your identity.",
+    "hintProvincialPartnerOption": "Use your BC Service Card or Alberta.ca account to prove your identity.",
     "inPersonOption": "or do it in person",
     "canadaPostLocationsOption": "Canada Post locations",
     "serviceCanadaLocationsOption": "Service Canada Centres",
     "signedInSuccessNotice": "You are signed in with CanadaLogin",
     "fallbackRpName": "RP Name",
-    "bodyText": "You will only need to do this once for all services that require identity proofing."
+    "bodyText": "You will only need to do this once for all services that require identity proofing.",
+    "errorNoticeTitle": "Your identity could not be verified",
+    "errorNoticeDescription": "You will need to try again with another method"
   },
   "CompleteIdentityProofing": {
     "pageTitle": "Complete identity proofing",
@@ -162,7 +192,7 @@
   },
   "ConfirmIdentityDetails": {
     "pageTitle": "Confirm what will be saved to your CanadaLogin",
-    "description": "Review the details that will be saved to your CanadaLogin. You can edit most information here, or update it later in your CanadaLogin account.",
+    "description": "Review the details that will be saved to your CanadaLogin. You can edit most information here, or update it later.",
     "identityProofingDetails": "Identity proofing details",
     "name": "Name",
     "dateOfBirth": "Date of birth",
@@ -171,7 +201,7 @@
     "idDocumentValue": "Not available",
     "reProofingRequired": "To update this information, you'll need to complete identity proofing again.",
     "updateInformation": "Update information",
-    "contactInfo": "Contact info",
+    "contactInfo": "Contact information",
     "phoneNumber": "Phone number",
     "communication": "Communication",
     "confirmAndContinue": "Confirm and continue"
