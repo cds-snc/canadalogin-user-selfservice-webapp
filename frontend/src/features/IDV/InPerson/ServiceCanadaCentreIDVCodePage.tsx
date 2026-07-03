@@ -7,34 +7,37 @@ import {
   GcdsGrid,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-import { useLocation } from "react-router";
+import { Navigate, useLocation, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 
-// TODO: Remove this fallback once API integration for code generation is available.
-const FALLBACK_IN_PERSON_IDV_CODE = "387DHROGJ";
-
-type ServiceCanadaCentreIDVCode = {
-  // TODO: replace with real code once API integration is in place
+type ServiceCanadaCentreIDVCodePageLocationState = {
   idvCode?: string;
 };
 
-type ServiceCanadaCentreIDVCodePageProps = ServiceCanadaCentreIDVCode;
-
-export default function ServiceCanadaCentreIDVCodePage({
-  idvCode,
-}: ServiceCanadaCentreIDVCodePageProps) {
+export default function ServiceCanadaCentreIDVCodePage() {
   const { state } = useUser();
+  const { language, journeyType } = useParams();
   const location = useLocation();
   const { t } = useTranslation("idv");
 
+  const serviceCanadaCentrePage = path(PAGES.idvServiceCanadaCentrePage, {
+    language,
+    journeyType,
+  });
+
   const email = state?.userProfile?.userName ?? "";
-  const stateIdvCode =
-    (location.state as ServiceCanadaCentreIDVCode | null)?.idvCode ?? null;
-  const displayCode = idvCode ?? stateIdvCode ?? FALLBACK_IN_PERSON_IDV_CODE;
+  const idvCode =
+    (location.state as ServiceCanadaCentreIDVCodePageLocationState | null)
+      ?.idvCode ?? null;
 
   if (!DEV_ONLY_FEATURE) {
     return null;
+  }
+
+  if (!idvCode) {
+    return <Navigate to={serviceCanadaCentrePage} replace />;
   }
 
   return (
@@ -45,7 +48,7 @@ export default function ServiceCanadaCentreIDVCodePage({
         </GcdsHeading>
 
         <GcdsHeading tag="h2" marginBottom="0" marginTop="0">
-          <strong>{displayCode}</strong>
+          <strong>{idvCode}</strong>
         </GcdsHeading>
         <GcdsContainer>
           {" "}
