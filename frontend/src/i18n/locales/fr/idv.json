@@ -126,6 +126,9 @@
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about how selfie and ID check works"
   },
+  "IdvStartIdentityProofingPage": {
+    "pageTitle": "Identity Verification"
+  },
   "InPersonProofingInProgress": {
     "pageTitle": "Prove your identity",
     "heading": "{{rpName}} needs you to prove your identity",
