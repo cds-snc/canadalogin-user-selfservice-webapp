@@ -60,6 +60,17 @@ vi.mock("@gcds-core/components-react", () => ({
     </fieldset>
   ),
   GcdsText: ({ children, ...props }) => <p {...props}>{children}</p>,
+  GcdsErrorSummary: ({ id, heading, errorLinks }) => (
+    <div id={id} data-testid="error-summary">
+      <h2>{heading}</h2>
+      {Object.entries(errorLinks ?? {}).map(([href, message], index) => (
+        <a key={index} href={href}>
+          {message}
+        </a>
+      ))}
+    </div>
+  ),
+  GcdsErrorMessage: ({ children }) => <div>{children}</div>,
   GcdsButton: ({ children, onClick, buttonRole, disabled, ...props }) => (
     <button
       data-testid={
@@ -106,7 +117,7 @@ vi.mock("@gcds-core/components-react", () => ({
       </>
     );
   },
-  GcdsInput: ({ inputId, label, required, name, ...props }) => (
+  GcdsInput: ({ inputId, label, required, name, onGcdsChange, ...props }) => (
     <>
       <label htmlFor={inputId}>{label}</label>
       <input
@@ -114,11 +125,14 @@ vi.mock("@gcds-core/components-react", () => ({
         name={name}
         required={required}
         data-testid={inputId}
+        onChange={(e) => {
+          onGcdsChange?.({ target: e.target });
+        }}
         {...props}
       />
     </>
   ),
-  GcdsDateInput: ({ legend, name, required, ...props }) => (
+  GcdsDateInput: ({ legend, name, required, onGcdsChange, ...props }) => (
     <>
       <label htmlFor={name}>{legend}</label>
       <input
@@ -126,6 +140,9 @@ vi.mock("@gcds-core/components-react", () => ({
         name={name}
         required={required}
         data-testid={name}
+        onChange={(e) => {
+          onGcdsChange?.({ target: e.target });
+        }}
         {...props}
       />
     </>

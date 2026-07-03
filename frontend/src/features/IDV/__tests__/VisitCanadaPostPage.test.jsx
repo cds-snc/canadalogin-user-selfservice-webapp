@@ -421,7 +421,9 @@ describe("VisitCanadaPost", () => {
     fireEvent.change(dateInput, { target: { value: "1900-01-01" } });
     fireEvent.blur(dateInput);
 
-    expect(screen.getByText("Year must be after 1900.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Date of birth year must be after 1900."),
+    ).toBeInTheDocument();
   });
 
   it("shows future date errors and keeps user on page", () => {
