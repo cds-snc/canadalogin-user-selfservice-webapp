@@ -1,9 +1,31 @@
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import ServiceCanadaCentreIDVCodePage from "../InPerson/ServiceCanadaCentreIDVCodePage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
+
+const mockRouteParams = vi.hoisted(() => ({
+  language: "en",
+  journeyType: "update",
+}));
+const mockLocationState = vi.hoisted(() => ({
+  idvCode: "ABC123XYZ",
+}));
+
+vi.mock("react-router", async () => {
+  const actual = await vi.importActual("react-router");
+  return {
+    ...actual,
+    useParams: () => mockRouteParams,
+    useLocation: () => ({ state: mockLocationState }),
+  };
+});
+
+vi.mock("../../../utils/routeHelpers", () => ({
+  path: () =>
+    "/en/identity-verification/update/in-person/service-canada-centre",
+}));
 
 vi.mock("../../../utils/constants", async (importOriginal) => {
   const actual = await importOriginal();
@@ -86,6 +108,13 @@ const TestWrapper = ({ children }) => (
 );
 
 describe("ServiceCanadaCentreIDVCodePage", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRouteParams.language = "en";
+    mockRouteParams.journeyType = "update";
+    mockLocationState.idvCode = "ABC123XYZ";
+  });
+
   it("renders the main heading", () => {
     render(
       <TestWrapper>
@@ -101,24 +130,26 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the provided idvCode", () => {
-    render(
-      <TestWrapper>
-        <ServiceCanadaCentreIDVCodePage idvCode="ABC123XYZ" />
-      </TestWrapper>,
-    );
-
-    expect(screen.getByText("ABC123XYZ")).toBeInTheDocument();
-  });
-
-  it("renders the fallback code when idvCode is not provided", () => {
+  it("renders the idvCode from location state", () => {
     render(
       <TestWrapper>
         <ServiceCanadaCentreIDVCodePage />
       </TestWrapper>,
     );
 
-    expect(screen.getByText("387DHROGJ")).toBeInTheDocument();
+    expect(screen.getByText("ABC123XYZ")).toBeInTheDocument();
+  });
+
+  it("redirects to the previous step when idvCode is missing", async () => {
+    delete mockLocationState.idvCode;
+
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
+    expect(screen.queryByRole("main")).not.toBeInTheDocument();
   });
 
   it("renders the user email from context", () => {

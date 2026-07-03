@@ -22,6 +22,7 @@ import {
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
+import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 
 const IDS_REQUIRING_ADDRESS_AND_PROVINCE = new Set([
   "driverLicence",
@@ -81,7 +82,7 @@ export default function ServiceCanadaCentrePage() {
     };
   }, [showAddressAndProvinceFields]);
 
-  const onContinue = () => {
+  const onContinue = async () => {
     const form = formRef.current;
     if (!form) {
       return;
@@ -92,7 +93,16 @@ export default function ServiceCanadaCentrePage() {
       return;
     }
 
-    navigate(serviceCanadaCodePage);
+    const response =
+      await inPersonIdentityVerificationApi.sendInPersonVerificationCode();
+
+    if (!response?.data?.verificationCode) {
+      return;
+    }
+
+    navigate(serviceCanadaCodePage, {
+      state: { idvCode: response.data.verificationCode },
+    });
   };
 
   if (!DEV_ONLY_FEATURE) {
