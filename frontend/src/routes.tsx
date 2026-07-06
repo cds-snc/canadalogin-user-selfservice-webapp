@@ -145,6 +145,11 @@ export const appRoutes: RouteObject[] = [
               ...(DEV_ONLY_FEATURE
                 ? [
                     {
+                      path: "idv/success",
+                      element: <ProfileHome showIDVSuccessNotice={true} />,
+                      handle: { id: PAGES.idvSuccessPage },
+                    },
+                    {
                       path: "identity-verification/:journeyType?",
                       handle: {
                         id: PAGES.idvStartIdentityProofingPage,
