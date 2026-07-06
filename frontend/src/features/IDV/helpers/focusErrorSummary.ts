@@ -9,7 +9,7 @@ export const focusErrorSummary = (summaryId: string): void => {
 
   const prefersReducedMotion =
     window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
-  summaryElement.scrollIntoView({
+  summaryElement.scrollIntoView?.({
     behavior: prefersReducedMotion ? "auto" : "smooth",
     block: "start",
   });

@@ -1,8 +1,20 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ServiceCanadaCentrePage from "../InPerson/ServiceCanadaCentrePage";
 import i18n from "../../../i18n/test";
+import {
+  getFirstNameRequiredOrInvalidMessage,
+  getIdTypeRequiredMessage,
+  getSharedDateOfBirthMessages,
+  getValidationSummaryHeading,
+} from "../InPerson/validation/ErrorsDefinition";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -173,6 +185,8 @@ vi.mock("@gcds-core/components-react", () => ({
 // Tests
 // ────────────────────────────────────────────────
 describe("ServiceCanadaCentrePage", () => {
+  const t = i18n.getFixedT("en", "idv");
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
@@ -289,6 +303,66 @@ describe("ServiceCanadaCentrePage", () => {
         },
       );
     });
+  });
+
+  it("shows the error summary and inline error when submitted without selecting an ID", async () => {
+    render(<ServiceCanadaCentrePage />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("continue-button"));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole("heading", {
+        name: getValidationSummaryHeading(t),
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText(getIdTypeRequiredMessage(t)).length,
+    ).toBeGreaterThan(1);
+    expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("shows DOB and name validation errors and does not navigate when submitted with invalid fields", async () => {
+    render(<ServiceCanadaCentrePage />);
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2026-12-31" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
+      target: { value: "Jane123" },
+    });
+    fireEvent.change(screen.getByTestId("last-name-input"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
+      target: { value: "1990-02-31" },
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("continue-button"));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+    });
+
+    const dobInvalidMessage = getSharedDateOfBirthMessages(t).invalid.summary;
+
+    expect(
+      screen.getAllByText(getFirstNameRequiredOrInvalidMessage(t)).length,
+    ).toBeGreaterThan(1);
+    expect(screen.getAllByText(dobInvalidMessage).length).toBeGreaterThan(1);
+    expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it("calls navigate(-1) when Back button is clicked", () => {

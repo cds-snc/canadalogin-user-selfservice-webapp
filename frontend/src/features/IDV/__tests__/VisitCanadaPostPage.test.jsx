@@ -460,17 +460,16 @@ describe("VisitCanadaPost", () => {
     ).toBeGreaterThan(1);
   });
 
-  it("focuses the first summary link after invalid submit", async () => {
+  it("focuses the error summary after invalid submit", async () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
     await waitFor(() => {
       const summary = screen.getByTestId("errorSummary");
-      const firstLink = summary.querySelector("a");
 
-      expect(firstLink).toBeTruthy();
-      expect(document.activeElement).toBe(firstLink);
+      expect(summary.querySelector("a")).toBeTruthy();
+      expect(document.activeElement).toBe(summary);
     });
   });
 });
