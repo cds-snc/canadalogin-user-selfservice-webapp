@@ -116,6 +116,7 @@ vi.mock("@gcds-core/components-react", () => ({
     required,
     value,
     defaultValue,
+    errorMessage,
     onGcdsChange,
     ...props
   }) => {
@@ -139,10 +140,19 @@ vi.mock("@gcds-core/components-react", () => ({
         >
           {children}
         </select>
+        {errorMessage ? <div>{errorMessage}</div> : null}
       </>
     );
   },
-  GcdsInput: ({ inputId, label, required, name, onGcdsChange, ...props }) => (
+  GcdsInput: ({
+    inputId,
+    label,
+    required,
+    name,
+    errorMessage,
+    onGcdsChange,
+    ...props
+  }) => (
     <>
       <label htmlFor={inputId}>{label}</label>
       <input
@@ -155,9 +165,17 @@ vi.mock("@gcds-core/components-react", () => ({
         }}
         {...props}
       />
+      {errorMessage ? <div>{errorMessage}</div> : null}
     </>
   ),
-  GcdsDateInput: ({ legend, name, required, onGcdsChange, ...props }) => (
+  GcdsDateInput: ({
+    legend,
+    name,
+    required,
+    errorMessage,
+    onGcdsChange,
+    ...props
+  }) => (
     <>
       <label htmlFor={name}>{legend}</label>
       <input
@@ -170,6 +188,7 @@ vi.mock("@gcds-core/components-react", () => ({
         }}
         {...props}
       />
+      {errorMessage ? <div>{errorMessage}</div> : null}
     </>
   ),
   GcdsLink: ({ children, href }) => <a href={href}>{children}</a>,

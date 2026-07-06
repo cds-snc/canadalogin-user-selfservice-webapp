@@ -35,6 +35,7 @@ vi.mock("@gcds-core/components-react", () => {
     selectId,
     label,
     defaultValue,
+    errorMessage,
   }) => {
     const hostRef = useRef(null);
 
@@ -64,6 +65,7 @@ vi.mock("@gcds-core/components-react", () => {
         >
           {children}
         </select>
+        {errorMessage ? <div>{errorMessage}</div> : null}
       </>
     );
   };
@@ -82,21 +84,32 @@ vi.mock("@gcds-core/components-react", () => {
         {children}
       </details>
     ),
-    GcdsInput: ({ label, onGcdsChange, inputId }) => (
-      <input
-        aria-label={label}
-        data-testid={inputId}
-        onChange={(e) => onGcdsChange && onGcdsChange(e)}
-      />
+    GcdsInput: ({ label, onGcdsChange, inputId, errorMessage }) => (
+      <>
+        <input
+          aria-label={label}
+          data-testid={inputId}
+          onChange={(e) => onGcdsChange && onGcdsChange(e)}
+        />
+        {errorMessage ? <div>{errorMessage}</div> : null}
+      </>
     ),
-    GcdsDateInput: React.forwardRef(({ legend, onGcdsChange, onBlur }, ref) => (
-      <input
-        ref={ref}
-        aria-label={legend}
-        data-testid="dateOfBirth"
-        onChange={(e) => onGcdsChange && onGcdsChange(e)}
-        onBlur={(e) => onBlur && onBlur(e)}
-      />
+    GcdsDateInput: React.forwardRef(({
+      legend,
+      onGcdsChange,
+      onBlur,
+      errorMessage,
+    }, ref) => (
+      <>
+        <input
+          ref={ref}
+          aria-label={legend}
+          data-testid="dateOfBirth"
+          onChange={(e) => onGcdsChange && onGcdsChange(e)}
+          onBlur={(e) => onBlur && onBlur(e)}
+        />
+        {errorMessage ? <div>{errorMessage}</div> : null}
+      </>
     )),
     GcdsErrorMessage: ({ children }) => <div>{children}</div>,
     GcdsErrorSummary: ({ id, heading, errorLinks }) => (
