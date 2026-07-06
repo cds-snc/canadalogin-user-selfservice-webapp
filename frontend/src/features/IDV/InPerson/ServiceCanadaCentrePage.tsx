@@ -8,10 +8,11 @@ import {
   GcdsContainer,
   GcdsSelect,
   GcdsDateInput,
+  GcdsErrorSummary,
   GcdsInput,
   GcdsFieldset,
 } from "@gcds-core/components-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -22,20 +23,41 @@ import {
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
+import {
+  getAddressRequiredMessage,
+  getFirstNameRequiredOrInvalidMessage,
+  getIdExpiryRequiredMessage,
+  getIdTypeRequiredMessage,
+  getLastNameRequiredOrInvalidMessage,
+  getProvinceRequiredMessage,
+  getSharedDateOfBirthMessages,
+  getValidationSummaryHeading,
+} from "./validation/ErrorsDefinition";
+import {
+  getServiceCanadaCentreValidation,
+  type ServiceCanadaCentreFormData,
+} from "./validation/ServiceCanadaCentre.validation";
+import { focusErrorSummary } from "../helpers/focusErrorSummary";
 import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 
-const IDS_REQUIRING_ADDRESS_AND_PROVINCE = new Set([
-  "driverLicence",
-  "photoIDHealthCard",
-  "photoIDServiceCard",
-]);
+const ERROR_SUMMARY_ID = "service-canada-centre-error-summary";
 
 export default function ServiceCanadaCentrePage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
-  const formRef = useRef<HTMLFormElement>(null);
-  const [selectedIdType, setSelectedIdType] = useState("");
-  const [isFormValid, setIsFormValid] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [showErrorSummary, setShowErrorSummary] = useState(false);
+  const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
+  const [isDateOfBirthTouched, setIsDateOfBirthTouched] = useState(false);
+  const [formData, setFormData] = useState<ServiceCanadaCentreFormData>({
+    idType: "",
+    idExpiryDate: "",
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+    address: "",
+    province: "",
+  });
 
   const { t } = useTranslation("idv");
 
@@ -47,51 +69,117 @@ export default function ServiceCanadaCentrePage() {
     language === AVAILABLE_LANGUAGES.fr
       ? AVAILABLE_LANGUAGES.fr
       : AVAILABLE_LANGUAGES.en;
-  const hasSelectedIdType = selectedIdType !== "";
 
-  const showAddressAndProvinceFields =
-    IDS_REQUIRING_ADDRESS_AND_PROVINCE.has(selectedIdType);
-
-  const handleIdTypeChange = (e: CustomEvent<string>) => {
-    const selectedValue = (e.target as HTMLSelectElement).value;
-    setSelectedIdType(selectedValue);
+  const updateField = (
+    field: keyof ServiceCanadaCentreFormData,
+    value: string,
+  ) => {
+    setFormData((previous) => ({ ...previous, [field]: value }));
   };
 
+  const createChangeHandler =
+    (field: keyof ServiceCanadaCentreFormData) => (event: CustomEvent) => {
+      const target = event.target as
+        | HTMLInputElement
+        | HTMLSelectElement
+        | null;
+
+      updateField(field, target?.value ?? "");
+    };
+
   useEffect(() => {
-    const form = formRef.current;
-    if (!form) {
+    if (!showErrorSummary) {
       return;
     }
 
-    const updateFormValidity = () => {
-      setIsFormValid(form.checkValidity());
-    };
+    focusErrorSummary(ERROR_SUMMARY_ID);
+  }, [showErrorSummary, summaryFocusTrigger]);
 
-    updateFormValidity();
-    form.addEventListener("input", updateFormValidity);
-    form.addEventListener("change", updateFormValidity);
-    form.addEventListener("gcdsChange", updateFormValidity as EventListener);
+  const {
+    isFormValid,
+    hasSelectedIdType,
+    showAddressAndProvinceFields,
+    dateOfBirthValidationError,
+    summaryErrorCodes,
+  } = getServiceCanadaCentreValidation(formData);
+  const dateOfBirthMessages = getSharedDateOfBirthMessages(t);
 
-    return () => {
-      form.removeEventListener("input", updateFormValidity);
-      form.removeEventListener("change", updateFormValidity);
-      form.removeEventListener(
-        "gcdsChange",
-        updateFormValidity as EventListener,
-      );
-    };
-  }, [showAddressAndProvinceFields]);
+  const summaryErrors: Record<string, string> = {};
+
+  if (summaryErrorCodes.idType) {
+    summaryErrors["#selectId"] = getIdTypeRequiredMessage(t);
+  }
+
+  if (summaryErrorCodes.idExpiryDate) {
+    summaryErrors["#id-expiration-date-input"] = getIdExpiryRequiredMessage(t);
+  }
+
+  if (summaryErrorCodes.firstName) {
+    summaryErrors["#first-name-input"] =
+      getFirstNameRequiredOrInvalidMessage(t);
+  }
+
+  if (summaryErrorCodes.lastName) {
+    summaryErrors["#last-name-input"] = getLastNameRequiredOrInvalidMessage(t);
+  }
+
+  if (summaryErrorCodes.dateOfBirth) {
+    summaryErrors["#date-of-birth-input"] =
+      dateOfBirthMessages[summaryErrorCodes.dateOfBirth].summary;
+  }
+
+  if (summaryErrorCodes.address) {
+    summaryErrors["#address-input"] = getAddressRequiredMessage(t);
+  }
+
+  if (summaryErrorCodes.province) {
+    summaryErrors["#select-province"] = getProvinceRequiredMessage(t);
+  }
+
+  const idTypeErrorMessage =
+    hasSubmitted && summaryErrorCodes.idType ? getIdTypeRequiredMessage(t) : "";
+
+  const idExpiryErrorMessage =
+    hasSubmitted && summaryErrorCodes.idExpiryDate
+      ? getIdExpiryRequiredMessage(t)
+      : "";
+
+  const firstNameErrorMessage =
+    hasSubmitted && summaryErrorCodes.firstName
+      ? getFirstNameRequiredOrInvalidMessage(t)
+      : "";
+
+  const lastNameErrorMessage =
+    hasSubmitted && summaryErrorCodes.lastName
+      ? getLastNameRequiredOrInvalidMessage(t)
+      : "";
+
+  const dateOfBirthErrorMessage =
+    (isDateOfBirthTouched || hasSubmitted) && dateOfBirthValidationError
+      ? dateOfBirthMessages[dateOfBirthValidationError].inline
+      : "";
+
+  const addressErrorMessage =
+    hasSubmitted && summaryErrorCodes.address
+      ? getAddressRequiredMessage(t)
+      : "";
+
+  const provinceErrorMessage =
+    hasSubmitted && summaryErrorCodes.province
+      ? getProvinceRequiredMessage(t)
+      : "";
 
   const onContinue = async () => {
-    const form = formRef.current;
-    if (!form) {
+    setHasSubmitted(true);
+
+    if (!isFormValid) {
+      setShowErrorSummary(true);
+      setIsDateOfBirthTouched(true);
+      setSummaryFocusTrigger((previous) => previous + 1);
       return;
     }
 
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
+    setShowErrorSummary(false);
 
     const response =
       await inPersonIdentityVerificationApi.sendInPersonVerificationCode();
@@ -111,9 +199,17 @@ export default function ServiceCanadaCentrePage() {
 
   return (
     <GcdsContainer role="main">
-      <form ref={formRef}>
+      <form>
         <GcdsGrid columns="1" gap="200">
           <GcdsHeading tag="h1">{t("ServiceCanadaCentre.heading")}</GcdsHeading>
+
+          {showErrorSummary ? (
+            <GcdsErrorSummary
+              id={ERROR_SUMMARY_ID}
+              heading={getValidationSummaryHeading(t)}
+              errorLinks={summaryErrors}
+            />
+          ) : null}
 
           <GcdsContainer>
             {" "}
@@ -148,9 +244,10 @@ export default function ServiceCanadaCentrePage() {
               label={t("ServiceCanadaCentre.selectIdLabel")}
               name="selectId"
               selectId="selectId"
-              value={selectedIdType}
+              value={formData.idType}
               required
-              onGcdsChange={handleIdTypeChange}
+              errorMessage={idTypeErrorMessage}
+              onGcdsChange={createChangeHandler("idType")}
               defaultValue={t(
                 "ServiceCanadaCentre.selectIdDropdownDefaultValue",
               )}
@@ -164,10 +261,13 @@ export default function ServiceCanadaCentrePage() {
 
             {hasSelectedIdType && (
               <GcdsDateInput
+                id="id-expiration-date-input"
                 legend={t("ServiceCanadaCentre.idExpirationLabel")}
                 name="id-expiration-date-input"
                 format="full"
                 required
+                errorMessage={idExpiryErrorMessage}
+                onGcdsChange={createChangeHandler("idExpiryDate")}
               />
             )}
           </GcdsFieldset>
@@ -182,26 +282,37 @@ export default function ServiceCanadaCentrePage() {
                   inputId="first-name-input"
                   name="first-name-input"
                   label={t("ServiceCanadaCentre.firstNameLabel")}
+                  errorMessage={firstNameErrorMessage}
+                  onGcdsChange={createChangeHandler("firstName")}
                 />
                 <GcdsInput
                   required
                   inputId="last-name-input"
                   name="last-name-input"
                   label={t("ServiceCanadaCentre.lastNameLabel")}
+                  errorMessage={lastNameErrorMessage}
+                  onGcdsChange={createChangeHandler("lastName")}
                 />
                 <GcdsDateInput
+                  id="date-of-birth-input"
                   legend={t("ServiceCanadaCentre.dateOfBirthdayLabel")}
                   name="date-of-birth-input"
                   format="full"
                   required
+                  errorMessage={dateOfBirthErrorMessage}
+                  onGcdsChange={createChangeHandler("dateOfBirth")}
+                  onBlur={() => setIsDateOfBirthTouched(true)}
                 />
                 {showAddressAndProvinceFields && (
                   <>
                     <GcdsInput
+                      required
                       inputId="address-input"
                       name="address-input"
                       label={t("ServiceCanadaCentre.addressLabel")}
                       hint={t("ServiceCanadaCentre.addressHint")}
+                      errorMessage={addressErrorMessage}
+                      onGcdsChange={createChangeHandler("address")}
                     />
 
                     <GcdsSelect
@@ -211,7 +322,10 @@ export default function ServiceCanadaCentrePage() {
                         "ServiceCanadaCentre.selectIdDropdownDefaultValue",
                       )}
                       label={t("ServiceCanadaCentre.proviceLabel")}
+                      required
                       style={{ maxWidth: "100%" }}
+                      errorMessage={provinceErrorMessage}
+                      onGcdsChange={createChangeHandler("province")}
                     >
                       {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
                         <option key={province.code} value={province.code}>
@@ -230,11 +344,7 @@ export default function ServiceCanadaCentrePage() {
             columnsDesktop="max-content max-content"
             gap="200"
           >
-            <GcdsButton
-              type="button"
-              disabled={!isFormValid}
-              onClick={onContinue}
-            >
+            <GcdsButton type="button" onClick={onContinue}>
               {t("ServiceCanadaCentre.continueButton")}
             </GcdsButton>
             <GcdsButton

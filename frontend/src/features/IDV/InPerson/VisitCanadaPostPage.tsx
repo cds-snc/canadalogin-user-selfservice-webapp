@@ -2,7 +2,6 @@ import {
   GcdsButton,
   GcdsContainer,
   GcdsDateInput,
-  GcdsErrorMessage,
   GcdsErrorSummary,
   GcdsGrid,
   GcdsHeading,
@@ -23,12 +22,22 @@ import {
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
+import { MAX_NAME_LENGTH } from "./validation/InPersonIdentity.validation";
 import {
   getVisitCanadaPostValidation,
-  MAX_NAME_LENGTH,
   type VisitCanadaPostFormData,
-} from "./VisitCanadaPost.validation";
+} from "./validation/VisitCanadaPost.validation";
 import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
+import {
+  getAddressRequiredMessage,
+  getCountryRequiredMessage,
+  getFamilyNameRequiredOrInvalidMessage,
+  getGivenNameRequiredOrInvalidMessage,
+  getProvinceRequiredMessage,
+  getSharedDateOfBirthMessages,
+  getValidationSummaryHeading,
+} from "./validation/ErrorsDefinition";
+import { focusErrorSummary } from "../helpers/focusErrorSummary";
 
 const COUNTRY_OPTIONS = [
   { value: "CA", label: "Canada" },
@@ -70,33 +79,7 @@ export default function VisitCanadaPost() {
       return;
     }
 
-    const summaryElement = document.getElementById(
-      ERROR_SUMMARY_ID,
-    ) as HTMLElement | null;
-
-    if (!summaryElement) {
-      return;
-    }
-
-    // Move user attention to the summary after failed submit to match a11y error UX patterns.
-    const prefersReducedMotion =
-      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
-    summaryElement.scrollIntoView({
-      behavior: prefersReducedMotion ? "auto" : "smooth",
-      block: "start",
-    });
-
-    const firstLink = summaryElement.querySelector(
-      "a[href]",
-    ) as HTMLElement | null;
-
-    if (firstLink && typeof firstLink.focus === "function") {
-      firstLink.focus();
-      return;
-    }
-
-    summaryElement.setAttribute("tabindex", "-1");
-    summaryElement.focus();
+    focusErrorSummary(ERROR_SUMMARY_ID);
   }, [showErrorSummary, summaryFocusTrigger]);
 
   const createChangeHandler =
@@ -112,24 +95,7 @@ export default function VisitCanadaPost() {
   const { isFormValid, dateOfBirthValidationError, summaryErrorCodes } =
     getVisitCanadaPostValidation(formData);
 
-  const dobMessages = {
-    required: {
-      inline: t("VisitCanadaPost.dobErrorRequired"),
-      summary: t("VisitCanadaPost.summaryDobRequired"),
-    },
-    year: {
-      inline: t("VisitCanadaPost.dobErrorYear"),
-      summary: t("VisitCanadaPost.summaryDobYear"),
-    },
-    future: {
-      inline: t("VisitCanadaPost.dobErrorFuture"),
-      summary: t("VisitCanadaPost.summaryDobFuture"),
-    },
-    invalid: {
-      inline: t("VisitCanadaPost.dobErrorInvalid"),
-      summary: t("VisitCanadaPost.summaryDobInvalid"),
-    },
-  };
+  const dobMessages = getSharedDateOfBirthMessages(t);
 
   const dateOfBirthErrorMessage =
     (isDateOfBirthTouched || hasSubmitted) && dateOfBirthValidationError
@@ -143,11 +109,11 @@ export default function VisitCanadaPost() {
   const summaryErrors: Record<string, string> = {};
 
   if (summaryErrorCodes.givenName) {
-    summaryErrors["#givenName"] = t("VisitCanadaPost.summaryGivenName");
+    summaryErrors["#givenName"] = getGivenNameRequiredOrInvalidMessage(t);
   }
 
   if (summaryErrorCodes.familyName) {
-    summaryErrors["#familyName"] = t("VisitCanadaPost.summaryFamilyName");
+    summaryErrors["#familyName"] = getFamilyNameRequiredOrInvalidMessage(t);
   }
 
   if (summaryErrorCodes.dateOfBirth) {
@@ -155,40 +121,40 @@ export default function VisitCanadaPost() {
   }
 
   if (summaryErrorCodes.address) {
-    summaryErrors["#address"] = t("VisitCanadaPost.summaryAddress");
+    summaryErrors["#address"] = getAddressRequiredMessage(t);
   }
 
   if (summaryErrorCodes.province) {
-    summaryErrors["#province"] = t("VisitCanadaPost.summaryProvince");
+    summaryErrors["#province"] = getProvinceRequiredMessage(t);
   }
 
   if (summaryErrorCodes.country) {
-    summaryErrors["#country"] = t("VisitCanadaPost.summaryCountry");
+    summaryErrors["#country"] = getCountryRequiredMessage(t);
   }
 
   const givenNameErrorMessage =
     hasSubmitted && summaryErrorCodes.givenName
-      ? t("VisitCanadaPost.summaryGivenName")
+      ? getGivenNameRequiredOrInvalidMessage(t)
       : "";
 
   const familyNameErrorMessage =
     hasSubmitted && summaryErrorCodes.familyName
-      ? t("VisitCanadaPost.summaryFamilyName")
+      ? getFamilyNameRequiredOrInvalidMessage(t)
       : "";
 
   const addressErrorMessage =
     hasSubmitted && summaryErrorCodes.address
-      ? t("VisitCanadaPost.summaryAddress")
+      ? getAddressRequiredMessage(t)
       : "";
 
   const provinceErrorMessage =
     hasSubmitted && summaryErrorCodes.province
-      ? t("VisitCanadaPost.summaryProvince")
+      ? getProvinceRequiredMessage(t)
       : "";
 
   const countryErrorMessage =
     hasSubmitted && summaryErrorCodes.country
-      ? t("VisitCanadaPost.summaryCountry")
+      ? getCountryRequiredMessage(t)
       : "";
 
   if (!DEV_ONLY_FEATURE) {
@@ -205,7 +171,7 @@ export default function VisitCanadaPost() {
             {showErrorSummary ? (
               <GcdsErrorSummary
                 id={ERROR_SUMMARY_ID}
-                heading={t("VisitCanadaPost.validationSummaryHeading")}
+                heading={getValidationSummaryHeading(t)}
                 errorLinks={summaryErrors}
               />
             ) : null}
@@ -242,13 +208,9 @@ export default function VisitCanadaPost() {
               maxlength={MAX_NAME_LENGTH}
               autocomplete="given-name"
               validateOn="blur"
+              errorMessage={givenNameErrorMessage}
               onGcdsChange={createChangeHandler("givenName")}
             />
-            {givenNameErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-given-name-error">
-                {givenNameErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             <GcdsInput
               id="familyName"
@@ -260,13 +222,9 @@ export default function VisitCanadaPost() {
               maxlength={MAX_NAME_LENGTH}
               autocomplete="family-name"
               validateOn="blur"
+              errorMessage={familyNameErrorMessage}
               onGcdsChange={createChangeHandler("familyName")}
             />
-            {familyNameErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-family-name-error">
-                {familyNameErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             <GcdsDateInput
               id="dateOfBirth"
@@ -275,14 +233,10 @@ export default function VisitCanadaPost() {
               required
               format="full"
               validateOn="blur"
+              errorMessage={dateOfBirthErrorMessage}
               onGcdsChange={createChangeHandler("dateOfBirth")}
               onBlur={() => setIsDateOfBirthTouched(true)}
             />
-            {dateOfBirthErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-dob-error">
-                {dateOfBirthErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             <GcdsInput
               id="address"
@@ -293,13 +247,9 @@ export default function VisitCanadaPost() {
               required
               autocomplete="street-address"
               validateOn="blur"
+              errorMessage={addressErrorMessage}
               onGcdsChange={createChangeHandler("address")}
             />
-            {addressErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-address-error">
-                {addressErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             <GcdsSelect
               id="province"
@@ -310,6 +260,7 @@ export default function VisitCanadaPost() {
               required
               defaultValue=""
               validateOn="blur"
+              errorMessage={provinceErrorMessage}
               onGcdsChange={createChangeHandler("province")}
             >
               <option value="">Select option</option>
@@ -319,11 +270,6 @@ export default function VisitCanadaPost() {
                 </option>
               ))}
             </GcdsSelect>
-            {provinceErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-province-error">
-                {provinceErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             <GcdsSelect
               id="country"
@@ -334,6 +280,7 @@ export default function VisitCanadaPost() {
               required
               defaultValue=""
               validateOn="blur"
+              errorMessage={countryErrorMessage}
               onGcdsChange={createChangeHandler("country")}
             >
               <option value="">Select option</option>
@@ -343,11 +290,6 @@ export default function VisitCanadaPost() {
                 </option>
               ))}
             </GcdsSelect>
-            {countryErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-country-error">
-                {countryErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
           </GcdsContainer>
 
           <GcdsGrid

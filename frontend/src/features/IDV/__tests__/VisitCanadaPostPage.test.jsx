@@ -35,6 +35,7 @@ vi.mock("@gcds-core/components-react", () => {
     selectId,
     label,
     defaultValue,
+    errorMessage,
   }) => {
     const hostRef = useRef(null);
 
@@ -64,6 +65,7 @@ vi.mock("@gcds-core/components-react", () => {
         >
           {children}
         </select>
+        {errorMessage ? <div>{errorMessage}</div> : null}
       </>
     );
   };
@@ -82,22 +84,30 @@ vi.mock("@gcds-core/components-react", () => {
         {children}
       </details>
     ),
-    GcdsInput: ({ label, onGcdsChange, inputId }) => (
-      <input
-        aria-label={label}
-        data-testid={inputId}
-        onChange={(e) => onGcdsChange && onGcdsChange(e)}
-      />
+    GcdsInput: ({ label, onGcdsChange, inputId, errorMessage }) => (
+      <>
+        <input
+          aria-label={label}
+          data-testid={inputId}
+          onChange={(e) => onGcdsChange && onGcdsChange(e)}
+        />
+        {errorMessage ? <div>{errorMessage}</div> : null}
+      </>
     ),
-    GcdsDateInput: React.forwardRef(({ legend, onGcdsChange, onBlur }, ref) => (
-      <input
-        ref={ref}
-        aria-label={legend}
-        data-testid="dateOfBirth"
-        onChange={(e) => onGcdsChange && onGcdsChange(e)}
-        onBlur={(e) => onBlur && onBlur(e)}
-      />
-    )),
+    GcdsDateInput: React.forwardRef(
+      ({ legend, onGcdsChange, onBlur, errorMessage }, ref) => (
+        <>
+          <input
+            ref={ref}
+            aria-label={legend}
+            data-testid="dateOfBirth"
+            onChange={(e) => onGcdsChange && onGcdsChange(e)}
+            onBlur={(e) => onBlur && onBlur(e)}
+          />
+          {errorMessage ? <div>{errorMessage}</div> : null}
+        </>
+      ),
+    ),
     GcdsErrorMessage: ({ children }) => <div>{children}</div>,
     GcdsErrorSummary: ({ id, heading, errorLinks }) => (
       <div id={id} data-testid="errorSummary">
@@ -421,7 +431,9 @@ describe("VisitCanadaPost", () => {
     fireEvent.change(dateInput, { target: { value: "1900-01-01" } });
     fireEvent.blur(dateInput);
 
-    expect(screen.getByText("Year must be after 1900.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Date of birth year must be after 1900."),
+    ).toBeInTheDocument();
   });
 
   it("shows future date errors and keeps user on page", () => {
@@ -458,17 +470,16 @@ describe("VisitCanadaPost", () => {
     ).toBeGreaterThan(1);
   });
 
-  it("focuses the first summary link after invalid submit", async () => {
+  it("focuses the error summary after invalid submit", async () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
     await waitFor(() => {
       const summary = screen.getByTestId("errorSummary");
-      const firstLink = summary.querySelector("a");
 
-      expect(firstLink).toBeTruthy();
-      expect(document.activeElement).toBe(firstLink);
+      expect(summary.querySelector("a")).toBeTruthy();
+      expect(document.activeElement).toBe(summary);
     });
   });
 });
