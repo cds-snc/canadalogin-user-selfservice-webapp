@@ -106,6 +106,11 @@ vi.mock(
   }),
 );
 
+vi.mock("../../../features/IDV/IdentityInfoSuccessNotice", () => ({
+  default: ({ showIDVSuccessNotice }) =>
+    showIDVSuccessNotice ? <div data-testid="idv-success-notice" /> : null,
+}));
+
 describe("ProfileHome", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -190,5 +195,21 @@ describe("ProfileHome", () => {
     expect(
       badges.some((b) => b.textContent === "Proven January 27, 2026"),
     ).toBe(true);
+  });
+
+  it("renders the IDV success notice when showIDVSuccessNotice is true and DEV_ONLY_FEATURE is true", () => {
+    render(<ProfileHome showIDVSuccessNotice />);
+    expect(screen.getByTestId("idv-success-notice")).toBeInTheDocument();
+  });
+
+  it("hides the IDV success notice when showIDVSuccessNotice is false", () => {
+    render(<ProfileHome />);
+    expect(screen.queryByTestId("idv-success-notice")).not.toBeInTheDocument();
+  });
+
+  it("hides the IDV success notice when DEV_ONLY_FEATURE is false", () => {
+    mockDevOnlyFeature = false;
+    render(<ProfileHome showIDVSuccessNotice />);
+    expect(screen.queryByTestId("idv-success-notice")).not.toBeInTheDocument();
   });
 });

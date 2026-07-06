@@ -15,8 +15,15 @@ import ViewLanguagePreferences from "../../features/LanguagePreference/component
 import ProvenInformationCard from "../../features/IDV/ProvenInformationCard";
 import ViewEmailInfo from "../../features/ProfileName/components/ViewEmailInfo";
 import CompleteIdentityProofingNotice from "../../features/IDV/components/CompleteIdentityProofingNotice";
+import IdentityInfoSuccessNotice from "../../features/IDV/IdentityInfoSuccessNotice";
 
-export default function ProfileHome() {
+type ProfileHomeProps = {
+  showIDVSuccessNotice?: boolean;
+};
+
+export default function ProfileHome({
+  showIDVSuccessNotice = false,
+}: ProfileHomeProps) {
   const { t } = useTranslation("profile");
   const { state } = useUser();
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
@@ -27,6 +34,11 @@ export default function ProfileHome() {
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>
+        {DEV_ONLY_FEATURE && (
+          <IdentityInfoSuccessNotice
+            showIDVSuccessNotice={showIDVSuccessNotice}
+          />
+        )}
         {DEV_ONLY_FEATURE && (
           <GcdsContainer className="idvNoticeSpacing">
             <CompleteIdentityProofingNotice />

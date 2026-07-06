@@ -174,6 +174,7 @@ export const PAGES = {
   idvProveIdentityOnlinePage: "IdvProveIdentityOnlinePage",
   idvProvincialVerificationPage: "IdvProvincialVerificationPage",
   idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
+  idvSuccessPage: "IdvSuccessPage",
   idvInPersonProofingInProgressPage: "IdvInPersonProofingInProgressPage",
   idvDetailsConfirmationPage: "IdvDetailsConfirmationPage",
   idvIdentityVerificationSuccessPage: "IdvIdentityVerificationSuccessPage",
