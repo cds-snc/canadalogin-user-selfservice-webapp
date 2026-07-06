@@ -171,10 +171,7 @@ export default function ServiceCanadaCentrePage() {
       : "";
 
   const onContinue = async () => {
-    const form = formRef.current;
-    if (!form) {
-      return;
-    }
+    setHasSubmitted(true);
 
     if (!isFormValid) {
       setShowErrorSummary(true);
