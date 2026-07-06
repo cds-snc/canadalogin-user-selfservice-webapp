@@ -39,6 +39,7 @@ import {
   type ServiceCanadaCentreFormData,
 } from "./validation/ServiceCanadaCentre.validation";
 import { focusErrorSummary } from "../helpers/focusErrorSummary";
+import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 
 const ERROR_SUMMARY_ID = "service-canada-centre-error-summary";
 
@@ -169,8 +170,11 @@ export default function ServiceCanadaCentrePage() {
       ? getProvinceRequiredMessage(t)
       : "";
 
-  const onContinue = () => {
-    setHasSubmitted(true);
+  const onContinue = async () => {
+    const form = formRef.current;
+    if (!form) {
+      return;
+    }
 
     if (!isFormValid) {
       setShowErrorSummary(true);
@@ -181,7 +185,16 @@ export default function ServiceCanadaCentrePage() {
 
     setShowErrorSummary(false);
 
-    navigate(serviceCanadaCodePage);
+    const response =
+      await inPersonIdentityVerificationApi.sendInPersonVerificationCode();
+
+    if (!response?.data?.verificationCode) {
+      return;
+    }
+
+    navigate(serviceCanadaCodePage, {
+      state: { idvCode: response.data.verificationCode },
+    });
   };
 
   if (!DEV_ONLY_FEATURE) {

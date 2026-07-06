@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ServiceCanadaCentrePage from "../InPerson/ServiceCanadaCentrePage";
 import i18n from "../../../i18n/test";
@@ -12,6 +12,7 @@ const mockRouteParams = vi.hoisted(() => ({ language: "en" }));
 const mockFlags = vi.hoisted(() => ({
   devOnlyFeature: true,
 }));
+const mockSendInPersonVerificationCode = vi.hoisted(() => vi.fn());
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -32,6 +33,18 @@ vi.mock("../../../components/Providers/useUser", () => ({
     dispatch: vi.fn(),
   }),
 }));
+
+vi.mock("../api/inPersonIdentityVerificationApi", async () => {
+  const actual = await vi.importActual(
+    "../api/inPersonIdentityVerificationApi",
+  );
+  return {
+    ...actual,
+    inPersonIdentityVerificationApi: {
+      sendInPersonVerificationCode: mockSendInPersonVerificationCode,
+    },
+  };
+});
 
 vi.mock("../../../utils/constants", async () => {
   const actual = await vi.importActual("../../../utils/constants");
@@ -164,6 +177,14 @@ describe("ServiceCanadaCentrePage", () => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
     mockRouteParams.language = "en";
+    mockSendInPersonVerificationCode.mockResolvedValue({
+      success: true,
+      message: "In-person verification email sent",
+      data: {
+        email_address: "test@example.com",
+        verificationCode: "387DHROGJ",
+      },
+    });
     i18n.changeLanguage("en");
   });
 
@@ -234,7 +255,7 @@ describe("ServiceCanadaCentrePage", () => {
     expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
   });
 
-  it("navigates to the next page only when form is valid", () => {
+  it("calls in-person verification API and navigates to the next page when form is valid", async () => {
     render(<ServiceCanadaCentrePage />);
 
     const continueButton = screen.getByTestId("continue-button");
@@ -256,10 +277,18 @@ describe("ServiceCanadaCentrePage", () => {
 
     fireEvent.click(continueButton);
 
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/in-person/service-canada-centre/idv-code",
-    );
+    await waitFor(() => {
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/identity-verification/in-person/service-canada-centre/idv-code",
+        {
+          state: {
+            idvCode: "387DHROGJ",
+          },
+        },
+      );
+    });
   });
 
   it("calls navigate(-1) when Back button is clicked", () => {

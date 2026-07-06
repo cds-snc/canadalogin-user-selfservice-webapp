@@ -7,24 +7,37 @@ import {
   GcdsGrid,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
+import { Navigate, useLocation, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 
-interface ServiceCanadaCentreIDVCodePageProps {
-  // TODO: replace with real code once API integration is in place
+type ServiceCanadaCentreIDVCodePageLocationState = {
   idvCode?: string;
-}
+};
 
-export default function ServiceCanadaCentreIDVCodePage({
-  idvCode,
-}: ServiceCanadaCentreIDVCodePageProps) {
+export default function ServiceCanadaCentreIDVCodePage() {
   const { state } = useUser();
+  const { language, journeyType } = useParams();
+  const location = useLocation();
   const { t } = useTranslation("idv");
 
+  const serviceCanadaCentrePage = path(PAGES.idvServiceCanadaCentrePage, {
+    language,
+    journeyType,
+  });
+
   const email = state?.userProfile?.userName ?? "";
+  const idvCode =
+    (location.state as ServiceCanadaCentreIDVCodePageLocationState | null)
+      ?.idvCode ?? null;
 
   if (!DEV_ONLY_FEATURE) {
     return null;
+  }
+
+  if (!idvCode) {
+    return <Navigate to={serviceCanadaCentrePage} replace />;
   }
 
   return (
@@ -35,7 +48,7 @@ export default function ServiceCanadaCentreIDVCodePage({
         </GcdsHeading>
 
         <GcdsHeading tag="h2" marginBottom="0" marginTop="0">
-          <strong>{idvCode ?? "387DHROGJ"}</strong>
+          <strong>{idvCode}</strong>
         </GcdsHeading>
         <GcdsContainer>
           {" "}
