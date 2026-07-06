@@ -38,9 +38,8 @@ export const getValidationSummaryHeading = (t: TranslateFn): string =>
 export const getGivenNameRequiredOrInvalidMessage = (t: TranslateFn): string =>
   t("ErrorsDefinition.givenNameRequiredOrInvalid");
 
-export const getFamilyNameRequiredOrInvalidMessage = (
-  t: TranslateFn,
-): string => t("ErrorsDefinition.familyNameRequiredOrInvalid");
+export const getFamilyNameRequiredOrInvalidMessage = (t: TranslateFn): string =>
+  t("ErrorsDefinition.familyNameRequiredOrInvalid");
 
 export const getFirstNameRequiredOrInvalidMessage = (t: TranslateFn): string =>
   t("ErrorsDefinition.firstNameRequiredOrInvalid");

@@ -35,39 +35,12 @@ import {
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
 import {
-  getDateOfBirthValidationError,
-  isNonEmptyTrimmed,
-  isValidName,
-} from "./validation/InPersonIdentity.validation";
+  getServiceCanadaCentreValidation,
+  type ServiceCanadaCentreFormData,
+} from "./validation/ServiceCanadaCentre.validation";
 import { focusErrorSummary } from "../helpers/focusErrorSummary";
 
-const IDS_REQUIRING_ADDRESS_AND_PROVINCE = new Set([
-  "driverLicence",
-  "photoIDHealthCard",
-  "photoIDServiceCard",
-]);
-
 const ERROR_SUMMARY_ID = "service-canada-centre-error-summary";
-
-interface ServiceCanadaCentreFormData {
-  idType: string;
-  idExpiryDate: string;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  address: string;
-  province: string;
-}
-
-interface ServiceCanadaCentreSummaryErrorCodes {
-  idType?: "required";
-  idExpiryDate?: "required";
-  firstName?: "required_or_invalid";
-  lastName?: "required_or_invalid";
-  dateOfBirth?: "required" | "invalid" | "year" | "future";
-  address?: "required";
-  province?: "required";
-}
 
 export default function ServiceCanadaCentrePage() {
   const navigate = useNavigate();
@@ -96,10 +69,6 @@ export default function ServiceCanadaCentrePage() {
     language === AVAILABLE_LANGUAGES.fr
       ? AVAILABLE_LANGUAGES.fr
       : AVAILABLE_LANGUAGES.en;
-  const hasSelectedIdType = formData.idType !== "";
-
-  const showAddressAndProvinceFields =
-    IDS_REQUIRING_ADDRESS_AND_PROVINCE.has(formData.idType);
 
   const updateField = (
     field: keyof ServiceCanadaCentreFormData,
@@ -126,41 +95,13 @@ export default function ServiceCanadaCentrePage() {
     focusErrorSummary(ERROR_SUMMARY_ID);
   }, [showErrorSummary, summaryFocusTrigger]);
 
-  const summaryErrorCodes: ServiceCanadaCentreSummaryErrorCodes = {};
-
-  if (!isNonEmptyTrimmed(formData.idType)) {
-    summaryErrorCodes.idType = "required";
-  }
-
-  if (hasSelectedIdType && !isNonEmptyTrimmed(formData.idExpiryDate)) {
-    summaryErrorCodes.idExpiryDate = "required";
-  }
-
-  if (hasSelectedIdType && !isValidName(formData.firstName)) {
-    summaryErrorCodes.firstName = "required_or_invalid";
-  }
-
-  if (hasSelectedIdType && !isValidName(formData.lastName)) {
-    summaryErrorCodes.lastName = "required_or_invalid";
-  }
-
-  const dateOfBirthValidationError = hasSelectedIdType
-    ? getDateOfBirthValidationError(formData.dateOfBirth)
-    : null;
-
-  if (hasSelectedIdType && dateOfBirthValidationError) {
-    summaryErrorCodes.dateOfBirth = dateOfBirthValidationError;
-  }
-
-  if (showAddressAndProvinceFields && !isNonEmptyTrimmed(formData.address)) {
-    summaryErrorCodes.address = "required";
-  }
-
-  if (showAddressAndProvinceFields && !isNonEmptyTrimmed(formData.province)) {
-    summaryErrorCodes.province = "required";
-  }
-
-  const isFormValid = Object.keys(summaryErrorCodes).length === 0;
+  const {
+    isFormValid,
+    hasSelectedIdType,
+    showAddressAndProvinceFields,
+    dateOfBirthValidationError,
+    summaryErrorCodes,
+  } = getServiceCanadaCentreValidation(formData);
   const dateOfBirthMessages = getSharedDateOfBirthMessages(t);
 
   const summaryErrors: Record<string, string> = {};
@@ -174,7 +115,8 @@ export default function ServiceCanadaCentrePage() {
   }
 
   if (summaryErrorCodes.firstName) {
-    summaryErrors["#first-name-input"] = getFirstNameRequiredOrInvalidMessage(t);
+    summaryErrors["#first-name-input"] =
+      getFirstNameRequiredOrInvalidMessage(t);
   }
 
   if (summaryErrorCodes.lastName) {
@@ -218,7 +160,9 @@ export default function ServiceCanadaCentrePage() {
       : "";
 
   const addressErrorMessage =
-    hasSubmitted && summaryErrorCodes.address ? getAddressRequiredMessage(t) : "";
+    hasSubmitted && summaryErrorCodes.address
+      ? getAddressRequiredMessage(t)
+      : "";
 
   const provinceErrorMessage =
     hasSubmitted && summaryErrorCodes.province
@@ -419,10 +363,7 @@ export default function ServiceCanadaCentrePage() {
             columnsDesktop="max-content max-content"
             gap="200"
           >
-            <GcdsButton
-              type="button"
-              onClick={onContinue}
-            >
+            <GcdsButton type="button" onClick={onContinue}>
               {t("ServiceCanadaCentre.continueButton")}
             </GcdsButton>
             <GcdsButton

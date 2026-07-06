@@ -1,5 +1,7 @@
 export const focusErrorSummary = (summaryId: string): void => {
-  const summaryElement = document.getElementById(summaryId) as HTMLElement | null;
+  const summaryElement = document.getElementById(
+    summaryId,
+  ) as HTMLElement | null;
 
   if (!summaryElement) {
     return;
@@ -11,13 +13,6 @@ export const focusErrorSummary = (summaryId: string): void => {
     behavior: prefersReducedMotion ? "auto" : "smooth",
     block: "start",
   });
-
-  const firstLink = summaryElement.querySelector("a[href]") as HTMLElement | null;
-
-  if (firstLink && typeof firstLink.focus === "function") {
-    firstLink.focus();
-    return;
-  }
 
   summaryElement.setAttribute("tabindex", "-1");
   summaryElement.focus();

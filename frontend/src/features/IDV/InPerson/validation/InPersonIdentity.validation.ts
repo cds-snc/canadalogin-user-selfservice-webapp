@@ -1,27 +1,13 @@
 export const MAX_NAME_LENGTH = 80; // Move this to constants.ts if needed (if we wanted to use it in other places, but for now it's only used here)
 
-export interface VisitCanadaPostFormData {
-  givenName: string;
-  familyName: string;
-  dateOfBirth: string;
-  address: string;
-  province: string;
-  country: string;
-}
+export type NameValidationError = "required_or_invalid";
 
-export interface VisitCanadaPostSummaryErrorCodes {
-  givenName?: "required_or_invalid";
-  familyName?: "required_or_invalid";
+export type RequiredValidationError = "required";
+
+export interface InPersonSharedSummaryErrorCodes {
   dateOfBirth?: DateOfBirthValidationError;
-  address?: "required";
-  province?: "required";
-  country?: "required";
-}
-
-export interface VisitCanadaPostValidationResult {
-  isFormValid: boolean;
-  dateOfBirthValidationError: DateOfBirthValidationError | null;
-  summaryErrorCodes: VisitCanadaPostSummaryErrorCodes;
+  address?: RequiredValidationError;
+  province?: RequiredValidationError;
 }
 
 const NAME_REGEX = /^\p{L}[\p{L}\p{M}' -]*$/u;
@@ -114,43 +100,4 @@ export const getDateOfBirthValidationError = (
 
 export const isValidDateOfBirth = (value: string): boolean => {
   return getDateOfBirthValidationError(value) === null;
-};
-
-export const getVisitCanadaPostValidation = (
-  formData: VisitCanadaPostFormData,
-): VisitCanadaPostValidationResult => {
-  const summaryErrorCodes: VisitCanadaPostSummaryErrorCodes = {};
-
-  if (!isValidName(formData.givenName)) {
-    summaryErrorCodes.givenName = "required_or_invalid";
-  }
-
-  if (!isValidName(formData.familyName)) {
-    summaryErrorCodes.familyName = "required_or_invalid";
-  }
-
-  const dateOfBirthValidationError = getDateOfBirthValidationError(
-    formData.dateOfBirth,
-  );
-  if (dateOfBirthValidationError) {
-    summaryErrorCodes.dateOfBirth = dateOfBirthValidationError;
-  }
-
-  if (!isNonEmptyTrimmed(formData.address)) {
-    summaryErrorCodes.address = "required";
-  }
-
-  if (!isNonEmptyTrimmed(formData.province)) {
-    summaryErrorCodes.province = "required";
-  }
-
-  if (!isNonEmptyTrimmed(formData.country)) {
-    summaryErrorCodes.country = "required";
-  }
-
-  return {
-    isFormValid: Object.keys(summaryErrorCodes).length === 0,
-    dateOfBirthValidationError,
-    summaryErrorCodes,
-  };
 };

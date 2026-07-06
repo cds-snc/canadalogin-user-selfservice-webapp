@@ -23,11 +23,11 @@ import {
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
+import { MAX_NAME_LENGTH } from "./validation/InPersonIdentity.validation";
 import {
   getVisitCanadaPostValidation,
-  MAX_NAME_LENGTH,
   type VisitCanadaPostFormData,
-} from "./validation/InPersonIdentity.validation";
+} from "./validation/VisitCanadaPost.validation";
 import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
 import {
   getAddressRequiredMessage,
