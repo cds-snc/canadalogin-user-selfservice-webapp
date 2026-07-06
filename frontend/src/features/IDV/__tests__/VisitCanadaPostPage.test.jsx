@@ -94,23 +94,20 @@ vi.mock("@gcds-core/components-react", () => {
         {errorMessage ? <div>{errorMessage}</div> : null}
       </>
     ),
-    GcdsDateInput: React.forwardRef(({
-      legend,
-      onGcdsChange,
-      onBlur,
-      errorMessage,
-    }, ref) => (
-      <>
-        <input
-          ref={ref}
-          aria-label={legend}
-          data-testid="dateOfBirth"
-          onChange={(e) => onGcdsChange && onGcdsChange(e)}
-          onBlur={(e) => onBlur && onBlur(e)}
-        />
-        {errorMessage ? <div>{errorMessage}</div> : null}
-      </>
-    )),
+    GcdsDateInput: React.forwardRef(
+      ({ legend, onGcdsChange, onBlur, errorMessage }, ref) => (
+        <>
+          <input
+            ref={ref}
+            aria-label={legend}
+            data-testid="dateOfBirth"
+            onChange={(e) => onGcdsChange && onGcdsChange(e)}
+            onBlur={(e) => onBlur && onBlur(e)}
+          />
+          {errorMessage ? <div>{errorMessage}</div> : null}
+        </>
+      ),
+    ),
     GcdsErrorMessage: ({ children }) => <div>{children}</div>,
     GcdsErrorSummary: ({ id, heading, errorLinks }) => (
       <div id={id} data-testid="errorSummary">
