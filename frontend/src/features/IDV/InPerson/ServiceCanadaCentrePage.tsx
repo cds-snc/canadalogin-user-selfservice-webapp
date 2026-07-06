@@ -291,25 +291,17 @@ export default function ServiceCanadaCentrePage() {
                   inputId="first-name-input"
                   name="first-name-input"
                   label={t("ServiceCanadaCentre.firstNameLabel")}
+                  errorMessage={firstNameErrorMessage}
                   onGcdsChange={createChangeHandler("firstName")}
                 />
-                {firstNameErrorMessage ? (
-                  <GcdsErrorMessage messageId="service-canada-centre-first-name-error">
-                    {firstNameErrorMessage}
-                  </GcdsErrorMessage>
-                ) : null}
                 <GcdsInput
                   required
                   inputId="last-name-input"
                   name="last-name-input"
                   label={t("ServiceCanadaCentre.lastNameLabel")}
+                  errorMessage={lastNameErrorMessage}
                   onGcdsChange={createChangeHandler("lastName")}
                 />
-                {lastNameErrorMessage ? (
-                  <GcdsErrorMessage messageId="service-canada-centre-last-name-error">
-                    {lastNameErrorMessage}
-                  </GcdsErrorMessage>
-                ) : null}
                 <GcdsDateInput
                   id="date-of-birth-input"
                   legend={t("ServiceCanadaCentre.dateOfBirthdayLabel")}
@@ -332,13 +324,9 @@ export default function ServiceCanadaCentrePage() {
                       name="address-input"
                       label={t("ServiceCanadaCentre.addressLabel")}
                       hint={t("ServiceCanadaCentre.addressHint")}
+                      errorMessage={addressErrorMessage}
                       onGcdsChange={createChangeHandler("address")}
                     />
-                    {addressErrorMessage ? (
-                      <GcdsErrorMessage messageId="service-canada-centre-address-error">
-                        {addressErrorMessage}
-                      </GcdsErrorMessage>
-                    ) : null}
 
                     <GcdsSelect
                       name="select-province"

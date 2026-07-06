@@ -209,13 +209,9 @@ export default function VisitCanadaPost() {
               maxlength={MAX_NAME_LENGTH}
               autocomplete="given-name"
               validateOn="blur"
+              errorMessage={givenNameErrorMessage}
               onGcdsChange={createChangeHandler("givenName")}
             />
-            {givenNameErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-given-name-error">
-                {givenNameErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             <GcdsInput
               id="familyName"
@@ -227,13 +223,9 @@ export default function VisitCanadaPost() {
               maxlength={MAX_NAME_LENGTH}
               autocomplete="family-name"
               validateOn="blur"
+              errorMessage={familyNameErrorMessage}
               onGcdsChange={createChangeHandler("familyName")}
             />
-            {familyNameErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-family-name-error">
-                {familyNameErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             <GcdsDateInput
               id="dateOfBirth"
@@ -260,13 +252,9 @@ export default function VisitCanadaPost() {
               required
               autocomplete="street-address"
               validateOn="blur"
+              errorMessage={addressErrorMessage}
               onGcdsChange={createChangeHandler("address")}
             />
-            {addressErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-address-error">
-                {addressErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             <GcdsSelect
               id="province"
