@@ -34,7 +34,6 @@ export default function ConfirmIdentityDetails() {
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
-
         <GcdsContainer>
           <GcdsNotice
             noticeRole="success"
