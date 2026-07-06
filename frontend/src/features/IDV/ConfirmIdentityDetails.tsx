@@ -4,6 +4,7 @@ import {
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
+  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
 
@@ -18,6 +19,9 @@ import DisplayEmailInfo from "../ProfileName/components/ViewEmailInfo";
 
 export default function ConfirmIdentityDetails() {
   const { t } = useTranslation("idv");
+
+  const { t: tLayout } = useTranslation("layout");
+
   const navigate = useNavigate();
   const { state } = useUser();
 
@@ -30,6 +34,20 @@ export default function ConfirmIdentityDetails() {
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
+        <GcdsContainer>
+          <GcdsNotice
+            noticeRole="success"
+            noticeTitleTag="h2"
+            noticeTitle={t("ConfirmIdentityDetails.successNoticeTitle")}
+          >
+            <GcdsText>
+              {t("ConfirmIdentityDetails.successNoticeDescription", {
+                appName: tLayout("TopNavBar.appName"),
+              })}
+            </GcdsText>
+          </GcdsNotice>
+        </GcdsContainer>
+
         <GcdsContainer>
           <GcdsHeading tag="h1" marginTop="0">
             {t("ConfirmIdentityDetails.pageTitle")}

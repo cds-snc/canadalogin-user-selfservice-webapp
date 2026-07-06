@@ -85,6 +85,9 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </button>
   ),
+  GcdsNotice: ({ children, type }) => (
+    <div data-testid={`notice-${type}`}>{children}</div>
+  ),
 }));
 
 describe("ConfirmIdentityDetails", () => {
