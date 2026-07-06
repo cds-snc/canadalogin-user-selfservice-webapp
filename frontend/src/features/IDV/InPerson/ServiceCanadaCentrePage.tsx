@@ -9,7 +9,6 @@ import {
   GcdsSelect,
   GcdsDateInput,
   GcdsErrorSummary,
-  GcdsErrorMessage,
   GcdsInput,
   GcdsFieldset,
 } from "@gcds-core/components-react";
@@ -247,6 +246,7 @@ export default function ServiceCanadaCentrePage() {
               selectId="selectId"
               value={formData.idType}
               required
+              errorMessage={idTypeErrorMessage}
               onGcdsChange={createChangeHandler("idType")}
               defaultValue={t(
                 "ServiceCanadaCentre.selectIdDropdownDefaultValue",
@@ -258,11 +258,6 @@ export default function ServiceCanadaCentrePage() {
                 </option>
               ))}
             </GcdsSelect>
-            {idTypeErrorMessage ? (
-              <GcdsErrorMessage messageId="service-canada-centre-id-type-error">
-                {idTypeErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             {hasSelectedIdType && (
               <GcdsDateInput
@@ -271,14 +266,10 @@ export default function ServiceCanadaCentrePage() {
                 name="id-expiration-date-input"
                 format="full"
                 required
+                errorMessage={idExpiryErrorMessage}
                 onGcdsChange={createChangeHandler("idExpiryDate")}
               />
             )}
-            {idExpiryErrorMessage ? (
-              <GcdsErrorMessage messageId="service-canada-centre-id-expiry-error">
-                {idExpiryErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
           </GcdsFieldset>
           {hasSelectedIdType && (
             <>
@@ -308,14 +299,10 @@ export default function ServiceCanadaCentrePage() {
                   name="date-of-birth-input"
                   format="full"
                   required
+                  errorMessage={dateOfBirthErrorMessage}
                   onGcdsChange={createChangeHandler("dateOfBirth")}
                   onBlur={() => setIsDateOfBirthTouched(true)}
                 />
-                {dateOfBirthErrorMessage ? (
-                  <GcdsErrorMessage messageId="service-canada-centre-date-of-birth-error">
-                    {dateOfBirthErrorMessage}
-                  </GcdsErrorMessage>
-                ) : null}
                 {showAddressAndProvinceFields && (
                   <>
                     <GcdsInput
@@ -337,6 +324,7 @@ export default function ServiceCanadaCentrePage() {
                       label={t("ServiceCanadaCentre.proviceLabel")}
                       required
                       style={{ maxWidth: "100%" }}
+                      errorMessage={provinceErrorMessage}
                       onGcdsChange={createChangeHandler("province")}
                     >
                       {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
@@ -345,11 +333,6 @@ export default function ServiceCanadaCentrePage() {
                         </option>
                       ))}
                     </GcdsSelect>
-                    {provinceErrorMessage ? (
-                      <GcdsErrorMessage messageId="service-canada-centre-province-error">
-                        {provinceErrorMessage}
-                      </GcdsErrorMessage>
-                    ) : null}
                   </>
                 )}
               </GcdsFieldset>

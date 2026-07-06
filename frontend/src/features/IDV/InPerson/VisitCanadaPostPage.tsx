@@ -2,7 +2,6 @@ import {
   GcdsButton,
   GcdsContainer,
   GcdsDateInput,
-  GcdsErrorMessage,
   GcdsErrorSummary,
   GcdsGrid,
   GcdsHeading,
@@ -234,14 +233,10 @@ export default function VisitCanadaPost() {
               required
               format="full"
               validateOn="blur"
+              errorMessage={dateOfBirthErrorMessage}
               onGcdsChange={createChangeHandler("dateOfBirth")}
               onBlur={() => setIsDateOfBirthTouched(true)}
             />
-            {dateOfBirthErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-dob-error">
-                {dateOfBirthErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             <GcdsInput
               id="address"
@@ -265,6 +260,7 @@ export default function VisitCanadaPost() {
               required
               defaultValue=""
               validateOn="blur"
+              errorMessage={provinceErrorMessage}
               onGcdsChange={createChangeHandler("province")}
             >
               <option value="">Select option</option>
@@ -274,11 +270,6 @@ export default function VisitCanadaPost() {
                 </option>
               ))}
             </GcdsSelect>
-            {provinceErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-province-error">
-                {provinceErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
 
             <GcdsSelect
               id="country"
@@ -289,6 +280,7 @@ export default function VisitCanadaPost() {
               required
               defaultValue=""
               validateOn="blur"
+              errorMessage={countryErrorMessage}
               onGcdsChange={createChangeHandler("country")}
             >
               <option value="">Select option</option>
@@ -298,11 +290,6 @@ export default function VisitCanadaPost() {
                 </option>
               ))}
             </GcdsSelect>
-            {countryErrorMessage ? (
-              <GcdsErrorMessage messageId="visit-canada-post-country-error">
-                {countryErrorMessage}
-              </GcdsErrorMessage>
-            ) : null}
           </GcdsContainer>
 
           <GcdsGrid
