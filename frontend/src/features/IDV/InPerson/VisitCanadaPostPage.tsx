@@ -26,6 +26,7 @@ import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 import {
   getVisitCanadaPostValidation,
+  requiresAddressAndProvince,
   type VisitCanadaPostFormData,
 } from "./validation/VisitCanadaPost.validation";
 import {
@@ -329,19 +330,23 @@ export default function VisitCanadaPost() {
 
                 setShowErrorSummary(false);
 
+                const navigationState = {
+                  givenName: formData.firstName,
+                  lastName: formData.lastName,
+                  dateOfBirth: formData.dateOfBirth,
+                  idSelected: formData.idType,
+                  ...(requiresAddressAndProvince(formData.idType)
+                    ? { address: formData.address }
+                    : {}),
+                };
+
                 navigate(
                   path(PAGES.idvProofingBarcodeCanadaPostPage, {
                     language,
                     journeyType,
                   }),
                   {
-                    state: {
-                      givenName: formData.firstName,
-                      lastName: formData.lastName,
-                      dateOfBirth: formData.dateOfBirth,
-                      address: formData.address,
-                      idSelected: formData.idType,
-                    },
+                    state: navigationState,
                   },
                 );
               }}

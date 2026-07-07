@@ -39,7 +39,7 @@ export interface VisitCanadaPostValidationResult {
   summaryErrorCodes: VisitCanadaPostSummaryErrorCodes;
 }
 
-const requiresAddressAndProvince = (idType: string): boolean => {
+export const requiresAddressAndProvince = (idType: string): boolean => {
   return IDS_REQUIRING_ADDRESS_AND_PROVINCE.has(idType);
 };
 

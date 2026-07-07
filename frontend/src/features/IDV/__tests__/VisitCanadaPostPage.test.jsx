@@ -5,7 +5,13 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import VisitCanadaPost from "../InPerson/VisitCanadaPostPage";
 import {
+  getAddressRequiredMessage,
+  getFirstNameRequiredOrInvalidMessage,
+  getIdExpiryRequiredMessage,
   getIdTypeRequiredMessage,
+  getLastNameRequiredOrInvalidMessage,
+  getProvinceRequiredMessage,
+  getSharedDateOfBirthMessages,
   getValidationSummaryHeading,
 } from "../InPerson/validation/ErrorsDefinition";
 import i18n from "../../../i18n/test";
@@ -362,6 +368,53 @@ describe("VisitCanadaPost", () => {
     );
   });
 
+  it("omits address and province from submit state when the selected ID does not require them", () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "driverLicence" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2028-01-01" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("last-name-input"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
+      target: { value: "1990-05-15" },
+    });
+    fireEvent.change(screen.getByTestId("address-input"), {
+      target: { value: "123 Main St" },
+    });
+    fireEvent.change(screen.getByTestId("select-province"), {
+      target: { value: "ON" },
+    });
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        state: expect.objectContaining({
+          dateOfBirth: "1990-05-15",
+          givenName: "Jane",
+          idSelected: "passport",
+          lastName: "Doe",
+        }),
+      }),
+    );
+
+    expect(mockNavigate.mock.calls[0][1].state).not.toHaveProperty("address");
+    expect(mockNavigate.mock.calls[0][1].state).not.toHaveProperty("province");
+  });
+
   it("shows error summary on invalid continue and allows submit once valid", () => {
     render(<VisitCanadaPost />);
 
@@ -399,6 +452,27 @@ describe("VisitCanadaPost", () => {
 
     expect(mockNavigate).toHaveBeenCalled();
     expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
+  });
+
+  it("shows the follow-up required field errors after selecting an ID type", () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "driverLicence" },
+    });
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    const summary = screen.getByTestId("errorSummary");
+    expect(summary).toHaveTextContent(getValidationSummaryHeading(t));
+    expect(summary).toHaveTextContent(getIdExpiryRequiredMessage(t));
+    expect(summary).toHaveTextContent(getFirstNameRequiredOrInvalidMessage(t));
+    expect(summary).toHaveTextContent(getLastNameRequiredOrInvalidMessage(t));
+    expect(summary).toHaveTextContent(
+      getSharedDateOfBirthMessages(t).required.summary,
+    );
+    expect(summary).toHaveTextContent(getAddressRequiredMessage(t));
+    expect(summary).toHaveTextContent(getProvinceRequiredMessage(t));
   });
 
   it("blocks navigation and shows invalid date summary for impossible date", () => {
