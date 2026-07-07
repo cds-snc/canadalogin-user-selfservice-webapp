@@ -8,7 +8,7 @@ interface IdentityInfoSuccessNoticeProps {
 }
 
 export default function IdentityInfoSuccessNotice({
-  showIDVSuccessNotice = true,
+  showIDVSuccessNotice = false,
 }: IdentityInfoSuccessNoticeProps) {
   const { t } = useTranslation("profile");
 
@@ -19,7 +19,7 @@ export default function IdentityInfoSuccessNotice({
   return (
     <GcdsNotice
       noticeRole="success"
-      noticeTitleTag="h3"
+      noticeTitleTag="h2"
       noticeTitle={t("ProfileHome.successNoticeTitle")}
     >
       &nbsp;

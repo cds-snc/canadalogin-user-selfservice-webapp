@@ -26,15 +26,18 @@ vi.mock("@gcds-core/components-react", () => ({
     children,
     noticeRole,
     noticeTitle,
+    noticeTitleTag,
   }: {
     children: React.ReactNode;
     noticeRole?: string;
     noticeTitle?: string;
+    noticeTitleTag?: string;
   }) => (
     <div
       data-testid="success-notice"
       data-notice-role={noticeRole}
       data-notice-title={noticeTitle}
+      data-notice-title-tag={noticeTitleTag}
     >
       {children}
     </div>
@@ -46,6 +49,12 @@ afterEach(() => {
 });
 
 describe("IdentityInfoSuccessNotice", () => {
+  it("does not render by default", () => {
+    render(<IdentityInfoSuccessNotice />);
+
+    expect(screen.queryByTestId("success-notice")).toBeNull();
+  });
+
   it("renders the translated success notice when enabled", () => {
     render(<IdentityInfoSuccessNotice showIDVSuccessNotice={true} />);
 
@@ -54,6 +63,7 @@ describe("IdentityInfoSuccessNotice", () => {
     expect(notice.getAttribute("data-notice-title")).toBe(
       "Your information was successfully updated in CanadaLogin",
     );
+    expect(notice.getAttribute("data-notice-title-tag")).toBe("h2");
   });
 
   it("does not render when the notice flag is off", () => {
