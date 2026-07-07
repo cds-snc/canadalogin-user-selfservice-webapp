@@ -25,6 +25,7 @@ const mockFlags = vi.hoisted(() => ({
   devOnlyFeature: true,
 }));
 const mockSendInPersonVerificationCode = vi.hoisted(() => vi.fn());
+const MOCK_GENERATED_VERIFICATION_CODE = "ZX91AB34CD";
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -214,8 +215,7 @@ describe("ServiceCanadaCentrePage", () => {
       success: true,
       message: "In-person verification email sent",
       data: {
-        email_address: "test@example.com",
-        verificationCode: "387DHROGJ",
+        verificationCode: MOCK_GENERATED_VERIFICATION_CODE,
       },
     });
     i18n.changeLanguage("en");
@@ -317,7 +317,7 @@ describe("ServiceCanadaCentrePage", () => {
         "/en/identity-verification/in-person/service-canada-centre/idv-code",
         {
           state: {
-            idvCode: "387DHROGJ",
+            idvCode: MOCK_GENERATED_VERIFICATION_CODE,
           },
         },
       );
