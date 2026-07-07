@@ -258,6 +258,20 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     );
   });
 
+  it("renders print page button and clicking it does not navigate", () => {
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
+    const printButton = screen.getByRole("button", { name: "Print page" });
+    expect(printButton).toBeInTheDocument();
+
+    fireEvent.click(printButton);
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
   it("renders an empty email when user profile has no userName", () => {
     const stateWithNoEmail = {
       ...mockUserState,

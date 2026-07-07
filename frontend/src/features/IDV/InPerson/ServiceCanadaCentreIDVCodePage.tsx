@@ -43,6 +43,8 @@ export default function ServiceCanadaCentreIDVCodePage() {
   const dateOfBirth = locationState?.dateOfBirth?.trim() || "--";
   const idSelected = locationState?.idType?.trim() || "--";
 
+  const handlePrintPage = () => {};
+
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
@@ -78,21 +80,25 @@ export default function ServiceCanadaCentreIDVCodePage() {
           </GcdsHeading>
 
           <GcdsContainer>
-            <GcdsGrid columns="1" gap="300">
+            <GcdsGrid columns="1" gap="150">
               <div>
-                <GcdsText>
+                <GcdsText marginTop="300" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.firstName")}</strong>
                 </GcdsText>
-                <GcdsText>{firstName}</GcdsText>
+                <GcdsText marginTop="200" marginBottom="0">
+                  {firstName}
+                </GcdsText>
               </div>
 
               <div className="separator" style={{ margin: "0" }} />
 
               <div>
-                <GcdsText>
+                <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.lastName")}</strong>
                 </GcdsText>
-                <GcdsText>{lastName}</GcdsText>
+                <GcdsText marginTop="200" marginBottom="0">
+                  {lastName}
+                </GcdsText>
               </div>
 
               <div className="separator" style={{ margin: "0" }} />
@@ -101,7 +107,9 @@ export default function ServiceCanadaCentreIDVCodePage() {
                 <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.dateOfBirth")}</strong>
                 </GcdsText>
-                <GcdsText>{dateOfBirth}</GcdsText>
+                <GcdsText marginTop="200" marginBottom="0">
+                  {dateOfBirth}
+                </GcdsText>
               </div>
 
               <div className="separator" style={{ margin: "0" }} />
@@ -110,12 +118,25 @@ export default function ServiceCanadaCentreIDVCodePage() {
                 <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.idSelected")}</strong>
                 </GcdsText>
-                <GcdsText>{idSelected}</GcdsText>
+                <GcdsText marginTop="200" marginBottom="0">
+                  {idSelected}
+                </GcdsText>
               </div>
 
               <div className="separator" style={{ margin: "0" }} />
 
-              <GcdsGrid columns="1fr auto" className="gridInline">
+              <GcdsGrid
+                columns="1"
+                columnsDesktop="max-content max-content"
+                gap="200"
+              >
+                <GcdsButton
+                  buttonRole="primary"
+                  type="button"
+                  onGcdsClick={handlePrintPage}
+                >
+                  {t("ServiceCanadaCentreCode.printPageButton")}
+                </GcdsButton>
                 <GcdsButton
                   buttonRole="secondary"
                   type="button"

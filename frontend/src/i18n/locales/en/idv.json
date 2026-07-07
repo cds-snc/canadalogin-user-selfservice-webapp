@@ -53,6 +53,7 @@
     "lastName": "Last name",
     "dateOfBirth": "Date of birth",
     "idSelected": "ID selected",
+    "printPageButton": "Print page",
     "updateInformationButton": "Update information",
     "findNearestTitle": "Find your nearest Service Canada Centre",
     "findNearestBody": "Complete your identity proofing at an available",
