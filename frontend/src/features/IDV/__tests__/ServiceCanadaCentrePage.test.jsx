@@ -315,11 +315,16 @@ describe("ServiceCanadaCentrePage", () => {
       expect(mockNavigate).toHaveBeenCalledTimes(1);
       expect(mockNavigate).toHaveBeenCalledWith(
         "/en/identity-verification/in-person/service-canada-centre/idv-code",
-        {
-          state: {
+        expect.objectContaining({
+          state: expect.objectContaining({
             idvCode: MOCK_GENERATED_VERIFICATION_CODE,
-          },
-        },
+            firstName: "Jane",
+            lastName: "Doe",
+            dateOfBirth: "1990-01-01",
+            idType: "passport",
+            idExpiryDate: "2026-12-31",
+          }),
+        }),
       );
     });
   });
