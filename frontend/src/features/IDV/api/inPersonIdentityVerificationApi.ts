@@ -5,13 +5,13 @@ import type { ApiErrorLike } from "../../../types/utils";
 
 axios.defaults.withCredentials = true;
 
-const HARDCODED_VERIFICATION_CODE = "387DHROGJ";
-
 type InPersonVerificationApiResponse = {
   success: boolean;
   message: string;
   data?: {
-    email_address?: string;
+    verification_code?: string;
+    verification_expires_at?: string;
+    verification_validity_days?: number;
   };
 };
 
@@ -19,14 +19,15 @@ export type InPersonVerificationCodeResponse = {
   success: boolean;
   message: string;
   data: {
-    email_address?: string;
-    verificationCode: string;
+    verificationCode?: string;
+    verificationExpiresAt?: string;
+    verificationValidityDays?: number;
   };
 };
 
 export const inPersonIdentityVerificationApi = {
   /**
-   * Sends in-person verification email and returns a temporary hardcoded verification code.
+   * Sends in-person verification email and returns generated verification metadata.
    */
   sendInPersonVerificationCode: async () => {
     try {
@@ -39,8 +40,10 @@ export const inPersonIdentityVerificationApi = {
       return {
         ...responseData,
         data: {
-          ...(responseData.data ?? {}),
-          verificationCode: HARDCODED_VERIFICATION_CODE,
+          verificationCode: responseData.data?.verification_code,
+          verificationExpiresAt: responseData.data?.verification_expires_at,
+          verificationValidityDays:
+            responseData.data?.verification_validity_days,
         },
       } as InPersonVerificationCodeResponse;
     } catch (error) {

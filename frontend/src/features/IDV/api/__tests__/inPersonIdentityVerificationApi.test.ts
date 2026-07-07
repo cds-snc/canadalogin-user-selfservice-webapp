@@ -29,13 +29,15 @@ describe("inPersonIdentityVerificationApi", () => {
     expect(mockedAxios.defaults.withCredentials).toBe(true);
   });
 
-  it("calls POST /v1/identity-verification/in-person and returns response data with hardcoded verification code", async () => {
+  it("calls POST /v1/identity-verification/in-person and maps generated verification fields", async () => {
     mockedAxios.post.mockResolvedValue({
       data: {
         success: true,
         message: "In-person verification email sent",
         data: {
-          email_address: "user@example.com",
+          verification_code: "ZX91AB34CD",
+          verification_expires_at: "2026-08-06T00:00:00+00:00",
+          verification_validity_days: 30,
         },
       },
     });
@@ -50,14 +52,15 @@ describe("inPersonIdentityVerificationApi", () => {
       success: true,
       message: "In-person verification email sent",
       data: {
-        email_address: "user@example.com",
-        verificationCode: "387DHROGJ",
+        verificationCode: "ZX91AB34CD",
+        verificationExpiresAt: "2026-08-06T00:00:00+00:00",
+        verificationValidityDays: 30,
       },
     });
     expect(handleApiError).not.toHaveBeenCalled();
   });
 
-  it("returns hardcoded verification code even when backend response has no data object", async () => {
+  it("returns undefined verification fields when backend response has no data object", async () => {
     mockedAxios.post.mockResolvedValue({
       data: {
         success: true,
@@ -72,7 +75,9 @@ describe("inPersonIdentityVerificationApi", () => {
       success: true,
       message: "In-person verification email sent",
       data: {
-        verificationCode: "387DHROGJ",
+        verificationCode: undefined,
+        verificationExpiresAt: undefined,
+        verificationValidityDays: undefined,
       },
     });
   });
