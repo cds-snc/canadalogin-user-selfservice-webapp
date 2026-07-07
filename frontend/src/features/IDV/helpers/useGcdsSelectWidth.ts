@@ -1,14 +1,28 @@
 import { useEffect } from "react";
 
-export default function useGcdsSelectWidth(
-  selector = "gcds-select.visit-canada-post-select",
-): void {
+export default function useGcdsSelectWidth(selectIds: string[]): void {
   useEffect(() => {
+    const getSelectElements = (): HTMLElement[] => {
+      const selectElements = new Set<HTMLElement>();
+
+      selectIds.forEach((selectId) => {
+        const elements = document.querySelectorAll(
+          `gcds-select#${selectId}, gcds-select[select-id=\"${selectId}\"]`,
+        );
+
+        elements.forEach((element) => {
+          selectElements.add(element as HTMLElement);
+        });
+      });
+
+      return Array.from(selectElements);
+    };
+
     const applySelectShadowWidth = () => {
-      const selects = document.querySelectorAll(selector);
+      const selects = getSelectElements();
 
       selects.forEach((element) => {
-        const shadowRoot = (element as HTMLElement).shadowRoot;
+        const shadowRoot = element.shadowRoot;
 
         if (!shadowRoot) {
           return;
@@ -34,6 +48,23 @@ export default function useGcdsSelectWidth(
       });
     };
 
+    if (!selectIds.length) {
+      return;
+    }
+
     applySelectShadowWidth();
-  }, [selector]);
+
+    const observer = new MutationObserver(() => {
+      applySelectShadowWidth();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [selectIds]);
 }

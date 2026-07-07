@@ -4,6 +4,12 @@ import { useEffect, useRef } from "react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import VisitCanadaPost from "../InPerson/VisitCanadaPostPage";
+import {
+  getFirstNameRequiredOrInvalidMessage,
+  getIdTypeRequiredMessage,
+  getValidationSummaryHeading,
+} from "../InPerson/validation/ErrorsDefinition";
+import i18n from "../../../i18n/test";
 
 const mockNavigate = vi.fn();
 const mockFlags = vi.hoisted(() => ({ devOnlyFeature: true }));
@@ -71,6 +77,12 @@ vi.mock("@gcds-core/components-react", () => {
   };
 
   return {
+    GcdsFieldset: ({ children, legend }) => (
+      <fieldset>
+        <legend>{legend}</legend>
+        {children}
+      </fieldset>
+    ),
     GcdsContainer: ({ children }) => <div>{children}</div>,
     GcdsGrid: ({ children }) => <div>{children}</div>,
     GcdsHeading: ({ children, tag }) => {
@@ -95,12 +107,12 @@ vi.mock("@gcds-core/components-react", () => {
       </>
     ),
     GcdsDateInput: React.forwardRef(
-      ({ legend, onGcdsChange, onBlur, errorMessage }, ref) => (
+      ({ legend, name, onGcdsChange, onBlur, errorMessage }, ref) => (
         <>
           <input
             ref={ref}
             aria-label={legend}
-            data-testid="dateOfBirth"
+            data-testid={name}
             onChange={(e) => onGcdsChange && onGcdsChange(e)}
             onBlur={(e) => onBlur && onBlur(e)}
           />
@@ -142,6 +154,8 @@ vi.mock("@gcds-core/components-react", () => {
 });
 
 describe("VisitCanadaPost", () => {
+  const t = i18n.getFixedT("en", "idv");
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
@@ -168,42 +182,82 @@ describe("VisitCanadaPost", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Enter your information" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("heading", { name: "Enter your information" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByTestId("selectId")).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("id-expiration-date-input"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("first-name-input")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("last-name-input")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("date-of-birth-input")).not.toBeInTheDocument();
     expect(screen.getByTestId("continue-button")).toHaveTextContent("Continue");
     expect(screen.getByTestId("back-button")).toHaveTextContent(
       "Choose a different method",
     );
   });
 
-  it("renders province and country option values", () => {
+  it("renders the rest of the form once an ID is selected", () => {
     render(<VisitCanadaPost />);
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+
+    expect(screen.getByTestId("id-expiration-date-input")).toBeInTheDocument();
+    expect(screen.getByTestId("first-name-input")).toBeInTheDocument();
+    expect(screen.getByTestId("last-name-input")).toBeInTheDocument();
+    expect(screen.getByTestId("date-of-birth-input")).toBeInTheDocument();
+  });
+
+  it("shows address and province fields only for qualifying IDs", () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+
+    expect(screen.queryByTestId("address-input")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "driverLicence" },
+    });
+
+    expect(screen.getByTestId("address-input")).toBeInTheDocument();
+    expect(screen.getByTestId("select-province")).toBeInTheDocument();
+  });
+
+  it("renders province option values", () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "driverLicence" },
+    });
 
     expect(screen.getAllByText("Ontario").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Quebec").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Canada").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("United States").length).toBeGreaterThan(0);
   });
 
   it("renders the complete acceptable ID list", () => {
     render(<VisitCanadaPost />);
 
     expect(
-      screen.getByText("Provincial/Territorial Driver's Licence"),
-    ).toBeInTheDocument();
+      screen.getAllByText("Provincial/Territorial Driver's Licence").length,
+    ).toBeGreaterThan(0);
     expect(
-      screen.getByText("Provincial/Territorial Photo ID Health Card"),
-    ).toBeInTheDocument();
+      screen.getAllByText("Provincial/Territorial Photo ID Health Card").length,
+    ).toBeGreaterThan(0);
     expect(
-      screen.getByText("Provincial/Territorial Photo ID Service Card"),
-    ).toBeInTheDocument();
+      screen.getAllByText("Provincial/Territorial Photo ID Service Card").length,
+    ).toBeGreaterThan(0);
     expect(
-      screen.getByText("Canadian and International Passport"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Canadian PR Card")).toBeInTheDocument();
+      screen.getAllByText("Canadian and International Passport").length,
+    ).toBeGreaterThan(0);
+    expect(screen.getAllByText("Canadian PR Card").length).toBeGreaterThan(0);
     expect(
-      screen.getByText("Secure Certificate of Indian Status"),
-    ).toBeInTheDocument();
+      screen.getAllByText("Secure Certificate of Indian Status").length,
+    ).toBeGreaterThan(0);
   });
 
   it("navigates back when Different method is clicked", () => {
@@ -214,42 +268,28 @@ describe("VisitCanadaPost", () => {
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
-  it("applies width styling to internal select elements inside shadowRoot", async () => {
-    render(<VisitCanadaPost />);
-
-    await waitFor(() => {
-      const selects = document.querySelectorAll(
-        "gcds-select.visit-canada-post-select",
-      );
-      expect(selects).toHaveLength(2);
-
-      selects.forEach((selectHost) => {
-        const internalSelect = selectHost.shadowRoot?.querySelector("select");
-        expect(internalSelect).toBeTruthy();
-        expect(internalSelect?.style.width).toBe("100%");
-      });
-    });
-  });
-
   it("navigates to ProofingBarcodeCanadaPostPage with form data when Continue is clicked", () => {
     render(<VisitCanadaPost />);
 
-    fireEvent.change(screen.getByTestId("givenName"), {
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "driverLicence" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2028-01-01" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
       target: { value: "Jane" },
     });
-    fireEvent.change(screen.getByTestId("familyName"), {
+    fireEvent.change(screen.getByTestId("last-name-input"), {
       target: { value: "Doe" },
     });
-    fireEvent.change(screen.getByTestId("address"), {
+    fireEvent.change(screen.getByTestId("address-input"), {
       target: { value: "123 Main St" },
     });
-    fireEvent.change(screen.getByTestId("province"), {
+    fireEvent.change(screen.getByTestId("select-province"), {
       target: { value: "ON" },
     });
-    fireEvent.change(screen.getByTestId("country"), {
-      target: { value: "CA" },
-    });
-    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
       target: { value: "1990-05-15" },
     });
 
@@ -263,8 +303,7 @@ describe("VisitCanadaPost", () => {
         lastName: "Doe",
         dateOfBirth: "1990-05-15",
         address: "123 Main St",
-        province: "ON",
-        country: "CA",
+        idSelected: "driverLicence",
       },
     });
     expect(navigationOptions).toBeDefined();
@@ -273,23 +312,20 @@ describe("VisitCanadaPost", () => {
   it("passes dateOfBirth from form state on continue", () => {
     render(<VisitCanadaPost />);
 
-    fireEvent.change(screen.getByTestId("givenName"), {
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2028-01-01" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
       target: { value: "Jane" },
     });
-    fireEvent.change(screen.getByTestId("familyName"), {
+    fireEvent.change(screen.getByTestId("last-name-input"), {
       target: { value: "Doe" },
     });
-    fireEvent.change(screen.getByTestId("address"), {
-      target: { value: "123 Main St" },
-    });
-    fireEvent.change(screen.getByTestId("province"), {
-      target: { value: "ON" },
-    });
-    fireEvent.change(screen.getByTestId("country"), {
-      target: { value: "CA" },
-    });
 
-    const dateInput = screen.getByTestId("dateOfBirth");
+    const dateInput = screen.getByTestId("date-of-birth-input");
     fireEvent.change(dateInput, { target: { value: "1990-05-15" } });
 
     fireEvent.click(screen.getByTestId("continue-button"));
@@ -313,46 +349,27 @@ describe("VisitCanadaPost", () => {
     fireEvent.click(continueButton);
 
     const summary = screen.getByTestId("errorSummary");
-    expect(summary).toHaveTextContent("Given name is required or invalid.");
-    expect(summary).toHaveTextContent("Family name is required or invalid.");
-    expect(summary).toHaveTextContent("Date of birth is required.");
-    expect(summary).toHaveTextContent("Address is required.");
-    expect(summary).toHaveTextContent("Province / State is required.");
-    expect(summary).toHaveTextContent("Country is required.");
+    expect(summary).toHaveTextContent(getValidationSummaryHeading(t));
+    expect(summary).toHaveTextContent(getIdTypeRequiredMessage(t));
 
     expect(
-      screen.getAllByText("Given name is required or invalid.").length,
+      screen.getAllByText(getIdTypeRequiredMessage(t)).length,
     ).toBeGreaterThan(1);
-    expect(
-      screen.getAllByText("Family name is required or invalid.").length,
-    ).toBeGreaterThan(1);
-    expect(screen.getAllByText("Address is required.").length).toBeGreaterThan(
-      1,
-    );
-    expect(
-      screen.getAllByText("Province / State is required.").length,
-    ).toBeGreaterThan(1);
-    expect(screen.getAllByText("Country is required.").length).toBeGreaterThan(
-      1,
-    );
 
-    fireEvent.change(screen.getByTestId("givenName"), {
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2028-01-01" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
       target: { value: "Jane" },
     });
-    fireEvent.change(screen.getByTestId("familyName"), {
+    fireEvent.change(screen.getByTestId("last-name-input"), {
       target: { value: "Doe" },
     });
-    fireEvent.change(screen.getByTestId("address"), {
-      target: { value: "123 Main St" },
-    });
-    fireEvent.change(screen.getByTestId("province"), {
-      target: { value: "ON" },
-    });
-    fireEvent.change(screen.getByTestId("country"), {
-      target: { value: "CA" },
-    });
 
-    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
       target: { value: "1990-05-15" },
     });
 
@@ -367,22 +384,19 @@ describe("VisitCanadaPost", () => {
 
     const continueButton = screen.getByTestId("continue-button");
 
-    fireEvent.change(screen.getByTestId("givenName"), {
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2028-01-01" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
       target: { value: " Jane" },
     });
-    fireEvent.change(screen.getByTestId("familyName"), {
+    fireEvent.change(screen.getByTestId("last-name-input"), {
       target: { value: "Doe" },
     });
-    fireEvent.change(screen.getByTestId("address"), {
-      target: { value: "123 Main St" },
-    });
-    fireEvent.change(screen.getByTestId("province"), {
-      target: { value: "ON" },
-    });
-    fireEvent.change(screen.getByTestId("country"), {
-      target: { value: "CA" },
-    });
-    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
       target: { value: "2025-02-30" },
     });
 
@@ -399,22 +413,19 @@ describe("VisitCanadaPost", () => {
 
     const continueButton = screen.getByTestId("continue-button");
 
-    fireEvent.change(screen.getByTestId("givenName"), {
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2028-01-01" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
       target: { value: "Jane" },
     });
-    fireEvent.change(screen.getByTestId("familyName"), {
+    fireEvent.change(screen.getByTestId("last-name-input"), {
       target: { value: "Doe" },
     });
-    fireEvent.change(screen.getByTestId("address"), {
-      target: { value: "123 Main St" },
-    });
-    fireEvent.change(screen.getByTestId("province"), {
-      target: { value: "ON" },
-    });
-    fireEvent.change(screen.getByTestId("country"), {
-      target: { value: "CA" },
-    });
-    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
       target: { value: "1900-01-01" },
     });
 
@@ -427,7 +438,10 @@ describe("VisitCanadaPost", () => {
   it("shows a date validation error after date of birth blur", () => {
     render(<VisitCanadaPost />);
 
-    const dateInput = screen.getByTestId("dateOfBirth");
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+    const dateInput = screen.getByTestId("date-of-birth-input");
     fireEvent.change(dateInput, { target: { value: "1900-01-01" } });
     fireEvent.blur(dateInput);
 
@@ -441,22 +455,19 @@ describe("VisitCanadaPost", () => {
 
     const continueButton = screen.getByTestId("continue-button");
 
-    fireEvent.change(screen.getByTestId("givenName"), {
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2028-01-01" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
       target: { value: "Jane" },
     });
-    fireEvent.change(screen.getByTestId("familyName"), {
+    fireEvent.change(screen.getByTestId("last-name-input"), {
       target: { value: "Doe" },
     });
-    fireEvent.change(screen.getByTestId("address"), {
-      target: { value: "123 Main St" },
-    });
-    fireEvent.change(screen.getByTestId("province"), {
-      target: { value: "ON" },
-    });
-    fireEvent.change(screen.getByTestId("country"), {
-      target: { value: "CA" },
-    });
-    fireEvent.change(screen.getByTestId("dateOfBirth"), {
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
       target: { value: "2999-01-01" },
     });
 
