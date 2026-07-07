@@ -132,6 +132,12 @@
     "continueButton": "Continue",
     "backButton": "Back"
   },
+  "ProveIdentityInPerson": {
+    "heading": "Prouvez votre identité en personne",
+    "description": "Vous n'aurez accès à ce {{rpName}} qu'après avoir prouvé votre identité en personne et vous être reconnecté avec votre ConnexionCanada.",
+    "continueButton": "Continuer",
+    "backButton": "Retour"
+  },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",
     "heading": "Get ready for selfie and ID check",
