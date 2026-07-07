@@ -249,7 +249,8 @@ describe("VisitCanadaPost", () => {
       screen.getAllByText("Provincial/Territorial Photo ID Health Card").length,
     ).toBeGreaterThan(0);
     expect(
-      screen.getAllByText("Provincial/Territorial Photo ID Service Card").length,
+      screen.getAllByText("Provincial/Territorial Photo ID Service Card")
+        .length,
     ).toBeGreaterThan(0);
     expect(
       screen.getAllByText("Canadian and International Passport").length,
