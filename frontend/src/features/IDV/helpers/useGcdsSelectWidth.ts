@@ -3,8 +3,6 @@ import { useEffect } from "react";
 export default function useGcdsSelectWidth(
   selectElementIds: readonly string[],
 ): void {
-  const selectElementIdsKey = selectElementIds.join(",");
-
   useEffect(() => {
     const applySelectShadowWidth = () => {
       selectElementIds.forEach((elementId) => {
@@ -43,5 +41,5 @@ export default function useGcdsSelectWidth(
     };
 
     applySelectShadowWidth();
-  }, [selectElementIdsKey]);
+  }, [selectElementIds]);
 }
