@@ -5,7 +5,6 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import VisitCanadaPost from "../InPerson/VisitCanadaPostPage";
 import {
-  getFirstNameRequiredOrInvalidMessage,
   getIdTypeRequiredMessage,
   getValidationSummaryHeading,
 } from "../InPerson/validation/ErrorsDefinition";
