@@ -8,7 +8,9 @@ export default function useGcdsSelectWidth(
   useEffect(() => {
     const applySelectShadowWidth = () => {
       selectElementIds.forEach((elementId) => {
-        const element = document.getElementById(elementId) as HTMLElement | null;
+        const element = document.getElementById(
+          elementId,
+        ) as HTMLElement | null;
 
         if (!element) {
           return;

@@ -36,6 +36,7 @@ vi.mock("@gcds-core/components-react", () => {
   const GcdsSelect = ({
     children,
     className,
+    id,
     onGcdsChange,
     selectId,
     label,
@@ -59,7 +60,7 @@ vi.mock("@gcds-core/components-react", () => {
 
     return (
       <>
-        <gcds-select ref={hostRef} className={className}>
+        <gcds-select ref={hostRef} id={id} className={className}>
           {children}
         </gcds-select>
         <select
@@ -217,7 +218,9 @@ describe("VisitCanadaPost", () => {
     });
 
     await waitFor(() => {
-      const provinceHost = document.querySelector("gcds-select#select-province");
+      const provinceHost = document.querySelector(
+        "gcds-select#select-province",
+      );
       const wrapper = provinceHost?.shadowRoot?.querySelector(
         ".gcds-select__wrapper",
       );
