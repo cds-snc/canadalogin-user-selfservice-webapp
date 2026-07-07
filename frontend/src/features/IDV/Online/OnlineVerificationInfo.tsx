@@ -91,10 +91,13 @@ export default function OnlineVerificationInfo() {
               <GcdsText marginBottom="0">
                 {t("OnlineVerificationInfo.step1")}
               </GcdsText>
+              <ol type="a">
+                <li>{t("OnlineVerificationInfo.expiredIdsAccepted")}</li>
+              </ol>
               <GcdsDetails
                 detailsTitle={t("OnlineVerificationInfo.listOfAcceptableIds")}
               >
-                <ul
+                <ol
                   aria-label={t("OnlineVerificationInfo.listOfAcceptableIds")}
                 >
                   {APPROVED_DOCUMENT_VALUES.filter(
@@ -102,7 +105,7 @@ export default function OnlineVerificationInfo() {
                   ).map((docValue) => (
                     <li key={docValue}>{t(`ApprovedDocuments.${docValue}`)}</li>
                   ))}
-                </ul>
+                </ol>
               </GcdsDetails>
             </li>
             <li>
@@ -136,7 +139,7 @@ export default function OnlineVerificationInfo() {
               navigate(-1);
             }}
           >
-            {t("OnlineVerificationInfo.backButton")}
+            {t("OnlineVerificationInfo.chooseDifferentMethodButton")}
           </GcdsButton>
         </GcdsGrid>
 
