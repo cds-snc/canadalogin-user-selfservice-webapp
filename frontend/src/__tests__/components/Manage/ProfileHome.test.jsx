@@ -202,8 +202,25 @@ describe("ProfileHome", () => {
     expect(screen.getByTestId("idv-success-notice")).toBeInTheDocument();
   });
 
+  it("hides the complete identity proofing notice when showIDVSuccessNotice is true", () => {
+    render(<ProfileHome showIDVSuccessNotice />);
+    expect(screen.queryByTestId("idv-complete-notice")).not.toBeInTheDocument();
+  });
+
   it("hides the IDV success notice when showIDVSuccessNotice is false", () => {
     render(<ProfileHome />);
+    expect(screen.queryByTestId("idv-success-notice")).not.toBeInTheDocument();
+  });
+
+  it("shows only IdentityInfoSuccessNotice when showIDVSuccessNotice is true", () => {
+    render(<ProfileHome showIDVSuccessNotice />);
+    expect(screen.getByTestId("idv-success-notice")).toBeInTheDocument();
+    expect(screen.queryByTestId("idv-complete-notice")).not.toBeInTheDocument();
+  });
+
+  it("shows only CompleteIdentityProofingNotice when showIDVSuccessNotice is false", () => {
+    render(<ProfileHome showIDVSuccessNotice={false} />);
+    expect(screen.getByTestId("idv-complete-notice")).toBeInTheDocument();
     expect(screen.queryByTestId("idv-success-notice")).not.toBeInTheDocument();
   });
 
