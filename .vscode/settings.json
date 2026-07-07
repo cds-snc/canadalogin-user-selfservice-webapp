@@ -8,7 +8,10 @@
   // Test Explorer: use pytest, run from repo root so pytest.ini is picked up
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestArgs": [],
+  "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
+  // Disable capture/cov in Test Explorer runs/debug sessions so prints and breakpoints are reliable.
+  // Coverage is still available via explicit terminal commands (see backend/README.md).
+  "python.testing.pytestArgs": ["-s", "--no-cov"],
   "python.testing.cwd": "${workspaceFolder}",
-  "python-envs.defaultEnvManager": "ms-python.python:system"
+  "python-envs.defaultEnvManager": "ms-python.python:venv"
 }

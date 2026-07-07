@@ -89,6 +89,8 @@ async def dispatch_otp_enrollment(
     formatted_phone = prepare_pydantic_phone_number_for_verify(
         enrollment_request.destination
     )
+    if not formatted_phone.startswith("+"):
+        formatted_phone = f"+{formatted_phone}"
 
     enrollment_data = {
         "userId": user_id,

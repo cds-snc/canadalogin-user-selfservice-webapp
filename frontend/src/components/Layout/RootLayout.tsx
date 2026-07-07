@@ -51,10 +51,6 @@ export default function RootLayout() {
   const { langHref, currentLang } = getLangValues(effectiveLang, pathname);
   const rpParams = useRelyingPartyAnalyticsParams();
 
-  // Synchronously update <html lang> so GCDS web components pick up the
-  // correct language via their assignLanguage() DOM walk on first render.
-  document.documentElement.lang = currentLang;
-
   const pageId = [...matches]
     .reverse()
     .map((match) => (match.handle as { id?: string } | undefined)?.id)

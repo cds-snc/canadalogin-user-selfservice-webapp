@@ -1,5 +1,105 @@
 # Changelog
 
+## [1.27.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.26.0...v1.27.0) (2026-07-06)
+
+
+### Features
+
+* **identity-verification:** Adding validation for visit canada post form ([#1721](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1721)) ([8cf8aec](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/8cf8aec040e0b993013e3afc3a4316466711c328))
+* **identity-verification:** Confirm what will be saved to your CanadaLogin ([#1747](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1747)) ([b02ac4b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b02ac4bd42c73e16e3878b4439ade417a41cb900))
+* **identity-verification:** implement in-person verification email flow with hardcoded code ([#1782](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1782)) ([8695ce0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/8695ce01839c7e0ff53297ac356667fde73059ba))
+* **identity-verification:** Partway Through Proofing In Person ([#1779](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1779)) ([e183d75](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e183d755b28046a5c8b47bdc9196a348949971bb))
+* **identity-verification:** re usable component validation visit canada post ([#1784](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1784)) ([443c4f0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/443c4f0922124908d410ad372ef35d630930f094))
+
+
+### Bug Fixes
+
+* correct French link for two-step verification methods ([#1796](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1796)) ([eaaea89](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/eaaea894582606de440f8cf30bc13277a3b17ba5))
+* **identity-verification:** Fixing screen breadcrumbs ([#1750](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1750)) ([2352e04](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2352e0460c73c725090b1a30eef3a5606c87c1f2))
+
+
+### Code Refactoring
+
+* **identity-verification:** [FE] Add a success notice to Confirm what will be saved to your CanadaLogin page ([#1792](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1792)) ([94b69ed](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/94b69ed05c0a75fa3a7ef0f465a91043a2a533b5))
+
+
+### Miscellaneous Chores
+
+* bump production version to 1.26.0 ([f6f19a3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f6f19a3a0a1e89d63b69fa234e186a2e23f5a167))
+* bump production version to 1.26.0 passkey release ([#1787](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1787)) ([f6f19a3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f6f19a3a0a1e89d63b69fa234e186a2e23f5a167))
+* **version:** bump staging version to 1.26.0 ([#1786](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1786)) ([6c63673](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6c636734f42f7a1adc1451cb17ece95699eda306))
+
+## [1.26.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.25.0...v1.26.0) (2026-06-30)
+
+
+### Features
+
+* added verification error alert on how do you want to prove your identity ([393f751](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/393f751c0b0a7c664b21c8de36e9bda6d625255b))
+* **identity-verification:** Error state - added error alert message on how do you want to prove your identity page ([#1742](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1742)) ([393f751](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/393f751c0b0a7c664b21c8de36e9bda6d625255b))
+* **identity-verification:** Prove your identity online ([#1695](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1695)) ([89dfa6d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/89dfa6d7128685c75c8246336bf59b428ab3daf2))
+
+
+### Bug Fixes
+
+* add help center links for passkey and two-step verification ([#1755](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1755)) ([7ce6107](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7ce6107daf3c83a77e68532fa4bdfbed614518d6))
+
+
+### Code Refactoring
+
+* **identity-verification:** routes updated to direct user to the correct screen ([#1749](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1749)) ([447d506](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/447d506e4efb899d8952522221ee19573cc1aa15))
+* **identity-verification:** update route for identityverificationsuccess component ([#1718](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1718)) ([fdae248](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fdae248d19fa32c3b5127361d16f926877c7e730))
+
+
+### Miscellaneous Chores
+
+* bump staging version to 1.25.0 ([#1745](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1745)) ([41d9954](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/41d995441795cf12ab09b9a9ae52ea1a13fe9a49))
+
+## [1.25.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.24.0...v1.25.0) (2026-06-29)
+
+
+### Features
+
+* **identify verification:** create generic identity proofing complete page  ([#1648](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1648)) ([5f11239](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5f112397dc2851f917aa28eb94c06e4f63cfd506))
+* **identity verification:** mock success response for online verification  ([#1711](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1711)) ([dd0a526](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/dd0a5269c62d34f9e46a06174e3b45b7a051198a))
+* **identity-verification:** Add notice for "Complete Identity Proofing" ([#1676](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1676)) ([922ace1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/922ace18ae502f8cd3f67ae67f0a34954e41da93))
+* **identity-verification:** Added a new utility component for acceptable IDs ([#1664](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1664)) ([cb844cb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/cb844cb79462bc230239e479095f73ab2c13fe06))
+* **identity-verification:** Take proofing barcode to canada post ([#1706](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1706)) ([0e4f50e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0e4f50ec29285f70888d47871d340bdb7c6eaab7))
+* **identity-verification:** Update  How do you want to prove your identity? ([#1673](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1673)) ([b10197d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b10197d2fc6ff35619a05a0af7976117708b2816))
+* **identity-verification:** Update Complete Identity Proofing Content ([#1693](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1693)) ([8913492](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/891349201a70599c1f086d11d91e05241eaeb645))
+
+
+### Bug Fixes
+
+* 400 error when trying to delete mfas with passkey validation ([#1724](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1724)) ([0ec75c7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0ec75c7d97493918cc0168f952b9f70637f30444))
+* change userVerification setting to required in FIDO2 flows ([#1744](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1744)) ([5ac5c09](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5ac5c09d76d072601b979a725d26ce418a52f154))
+* **fido2:** Update attestation options to prefer resident key and user verification ([#1701](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1701)) ([8add456](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/8add45681b82b27ddcff04f9561441a366ddb0f6))
+* **identity-verification:** Enhance identity proofing UI with dynamic content  ([#1703](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1703)) ([cedc9e3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/cedc9e361f29e0fc87898b375272ecc317906338))
+* **otp:** add '+' prefix to phone numbers in OTP enrollment ([#1720](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1720)) ([574a12b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/574a12b0921fb28d911bc6a59565c8e7c7a7173c))
+* Preserve query parameters in session storage on search param change ([#1686](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1686)) ([4253f1d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4253f1df6cee67f6a4b469d3a50bf6e829806d84))
+
+
+### Code Refactoring
+
+* **identity-verification:** Duplicate use of definition appName ([#1694](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1694)) ([e165da9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e165da9449a73c774fe6de722a37bd392e8b9d2b))
+* **identity-verification:** restructure UI routes based on user journey types: start, update, required or error ([#1697](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1697)) ([978a473](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/978a473e7bb2410c4e02963635dc2afe59dfb908))
+
+
+### Miscellaneous Chores
+
+* bump staging version to 1.24.0 ([#1684](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1684)) ([df4477f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/df4477fd923b9ab0a1a00839542c831169a88959))
+* **dependencies:** update [@gcds-core](https://github.com/gcds-core) component library packages  ([#1716](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1716)) ([f31a454](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f31a45473e28827b09028960593ad0b1bc3a48ec))
+* **dependencies:** update [@gcds-core](https://github.com/gcds-core) component library packages to latest versions ([f31a454](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f31a45473e28827b09028960593ad0b1bc3a48ec))
+* **deps-dev:** bump form-data from 4.0.5 to 4.0.6 in /frontend ([#1631](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1631)) ([fc12b8e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fc12b8e82d53e734cf38a14e3fa2b5197181e0c7))
+* **deps:** bump cryptography from 46.0.7 to 48.0.1 in /backend ([#1630](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1630)) ([2fd4327](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2fd432773dc04c55ac0a252007648eafbfa309f1))
+* **deps:** bump pydantic-settings from 2.14.1 to 2.14.2 in /backend ([#1672](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1672)) ([0bd24b9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0bd24b915adade1950030bc2604e3d0fd9930095))
+* **deps:** bump pyjwt from 2.12.1 to 2.13.0 in /backend ([#1624](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1624)) ([fd3630d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fd3630d0eba262f769b060d78b6bd154ab4c33b1))
+* **deps:** bump python-multipart from 0.0.30 to 0.0.31 in /backend ([#1629](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1629)) ([f674d0c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f674d0ca48c6be56024f817ef3e6bcae6f32b04a))
+* **deps:** pin mcr.microsoft.com/devcontainers/python docker tag to 52cfd0e ([#1617](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1617)) ([fe75332](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fe75332e98e3cf86a4345798d54f58d77811239d))
+* **deps:** update all minor dependencies ([#1620](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1620)) ([3254322](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3254322f778491a5e608a991092051a12a7e11ce))
+* **deps:** update all non-major github action dependencies ([#1618](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1618)) ([0e982e4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0e982e44ea9bf84d550de5b04b74f283e9bcae01))
+* **deps:** update all patch dependencies ([#1619](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1619)) ([c8bd0a2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/c8bd0a231b6480f21413e932aa1a27576e00eec4))
+* **deps:** update dependency prettier to v3.8.4 ([#1671](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1671)) ([3a6160b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3a6160bcf96dc2aa2079d1ab62218fe0439d3c4d))
+
 ## [1.24.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.23.4...v1.24.0) (2026-06-22)
 
 

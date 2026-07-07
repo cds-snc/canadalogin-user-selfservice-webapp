@@ -1,8 +1,20 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ServiceCanadaCentrePage from "../InPerson/ServiceCanadaCentrePage";
 import i18n from "../../../i18n/test";
+import {
+  getFirstNameRequiredOrInvalidMessage,
+  getIdTypeRequiredMessage,
+  getSharedDateOfBirthMessages,
+  getValidationSummaryHeading,
+} from "../InPerson/validation/ErrorsDefinition";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -12,6 +24,8 @@ const mockRouteParams = vi.hoisted(() => ({ language: "en" }));
 const mockFlags = vi.hoisted(() => ({
   devOnlyFeature: true,
 }));
+const mockSendInPersonVerificationCode = vi.hoisted(() => vi.fn());
+const MOCK_GENERATED_VERIFICATION_CODE = "ZX91AB34CD";
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -32,6 +46,18 @@ vi.mock("../../../components/Providers/useUser", () => ({
     dispatch: vi.fn(),
   }),
 }));
+
+vi.mock("../api/inPersonIdentityVerificationApi", async () => {
+  const actual = await vi.importActual(
+    "../api/inPersonIdentityVerificationApi",
+  );
+  return {
+    ...actual,
+    inPersonIdentityVerificationApi: {
+      sendInPersonVerificationCode: mockSendInPersonVerificationCode,
+    },
+  };
+});
 
 vi.mock("../../../utils/constants", async () => {
   const actual = await vi.importActual("../../../utils/constants");
@@ -60,6 +86,17 @@ vi.mock("@gcds-core/components-react", () => ({
     </fieldset>
   ),
   GcdsText: ({ children, ...props }) => <p {...props}>{children}</p>,
+  GcdsErrorSummary: ({ id, heading, errorLinks }) => (
+    <div id={id} data-testid="error-summary">
+      <h2>{heading}</h2>
+      {Object.entries(errorLinks ?? {}).map(([href, message], index) => (
+        <a key={index} href={href}>
+          {message}
+        </a>
+      ))}
+    </div>
+  ),
+  GcdsErrorMessage: ({ children }) => <div>{children}</div>,
   GcdsButton: ({ children, onClick, buttonRole, disabled, ...props }) => (
     <button
       data-testid={
@@ -80,6 +117,7 @@ vi.mock("@gcds-core/components-react", () => ({
     required,
     value,
     defaultValue,
+    errorMessage,
     onGcdsChange,
     ...props
   }) => {
@@ -103,10 +141,19 @@ vi.mock("@gcds-core/components-react", () => ({
         >
           {children}
         </select>
+        {errorMessage ? <div>{errorMessage}</div> : null}
       </>
     );
   },
-  GcdsInput: ({ inputId, label, required, name, ...props }) => (
+  GcdsInput: ({
+    inputId,
+    label,
+    required,
+    name,
+    errorMessage,
+    onGcdsChange,
+    ...props
+  }) => (
     <>
       <label htmlFor={inputId}>{label}</label>
       <input
@@ -114,11 +161,22 @@ vi.mock("@gcds-core/components-react", () => ({
         name={name}
         required={required}
         data-testid={inputId}
+        onChange={(e) => {
+          onGcdsChange?.({ target: e.target });
+        }}
         {...props}
       />
+      {errorMessage ? <div>{errorMessage}</div> : null}
     </>
   ),
-  GcdsDateInput: ({ legend, name, required, ...props }) => (
+  GcdsDateInput: ({
+    legend,
+    name,
+    required,
+    errorMessage,
+    onGcdsChange,
+    ...props
+  }) => (
     <>
       <label htmlFor={name}>{legend}</label>
       <input
@@ -126,8 +184,12 @@ vi.mock("@gcds-core/components-react", () => ({
         name={name}
         required={required}
         data-testid={name}
+        onChange={(e) => {
+          onGcdsChange?.({ target: e.target });
+        }}
         {...props}
       />
+      {errorMessage ? <div>{errorMessage}</div> : null}
     </>
   ),
   GcdsLink: ({ children, href }) => <a href={href}>{children}</a>,
@@ -143,10 +205,19 @@ vi.mock("@gcds-core/components-react", () => ({
 // Tests
 // ────────────────────────────────────────────────
 describe("ServiceCanadaCentrePage", () => {
+  const t = i18n.getFixedT("en", "idv");
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
     mockRouteParams.language = "en";
+    mockSendInPersonVerificationCode.mockResolvedValue({
+      success: true,
+      message: "In-person verification email sent",
+      data: {
+        verificationCode: MOCK_GENERATED_VERIFICATION_CODE,
+      },
+    });
     i18n.changeLanguage("en");
   });
 
@@ -217,7 +288,7 @@ describe("ServiceCanadaCentrePage", () => {
     expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
   });
 
-  it("navigates to the next page only when form is valid", () => {
+  it("calls in-person verification API and navigates to the next page when form is valid", async () => {
     render(<ServiceCanadaCentrePage />);
 
     const continueButton = screen.getByTestId("continue-button");
@@ -239,10 +310,78 @@ describe("ServiceCanadaCentrePage", () => {
 
     fireEvent.click(continueButton);
 
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/in-person/service-canada-centre/idv-code",
-    );
+    await waitFor(() => {
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/identity-verification/in-person/service-canada-centre/idv-code",
+        {
+          state: {
+            idvCode: MOCK_GENERATED_VERIFICATION_CODE,
+          },
+        },
+      );
+    });
+  });
+
+  it("shows the error summary and inline error when submitted without selecting an ID", async () => {
+    render(<ServiceCanadaCentrePage />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("continue-button"));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole("heading", {
+        name: getValidationSummaryHeading(t),
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText(getIdTypeRequiredMessage(t)).length,
+    ).toBeGreaterThan(1);
+    expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("shows DOB and name validation errors and does not navigate when submitted with invalid fields", async () => {
+    render(<ServiceCanadaCentrePage />);
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2026-12-31" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
+      target: { value: "Jane123" },
+    });
+    fireEvent.change(screen.getByTestId("last-name-input"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
+      target: { value: "1990-02-31" },
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("continue-button"));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+    });
+
+    const dobInvalidMessage = getSharedDateOfBirthMessages(t).invalid.summary;
+
+    expect(
+      screen.getAllByText(getFirstNameRequiredOrInvalidMessage(t)).length,
+    ).toBeGreaterThan(1);
+    expect(screen.getAllByText(dobInvalidMessage).length).toBeGreaterThan(1);
+    expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it("calls navigate(-1) when Back button is clicked", () => {

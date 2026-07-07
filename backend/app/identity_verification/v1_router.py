@@ -67,7 +67,9 @@ async def send_in_person_verification(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await send_in_person_verification_code(
-        request.app.state.request_client, user_access_token
+        request.app.state.request_client,
+        user_access_token,
+        request=request,
     )
 
 

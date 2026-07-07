@@ -1,9 +1,9 @@
 -r requirements.txt
-pytest==9.0.3
+pytest==9.1.0
 pytest-cov==4.1.0
-fastapi-cli==0.0.24
+fastapi-cli==0.0.27
 flake8==7.3.0
 black==26.5.1
 pytest-asyncio==1.4.0
 respx==0.23.1
-semgrep==1.164.0
+semgrep==1.168.0

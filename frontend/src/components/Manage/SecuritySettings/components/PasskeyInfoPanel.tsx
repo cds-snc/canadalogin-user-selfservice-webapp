@@ -1,6 +1,9 @@
 import { GcdsContainer, GcdsLink, GcdsText } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-import { PRIVACY_NOTICE_LINKS } from "../../../../utils/constants";
+import {
+  gcHelpCentreLinks,
+  PRIVACY_NOTICE_LINKS,
+} from "../../../../utils/constants";
 
 export default function PasskeyInfoPanel() {
   const { t, i18n } = useTranslation("mfa");
@@ -44,10 +47,12 @@ export default function PasskeyInfoPanel() {
           </GcdsText>
         </li>
       </ul>
-      {/* TODO: add correct href once URL is available */}
       <GcdsText marginBottom="0">
         {" "}
-        <GcdsLink href="#" target="_blank">
+        <GcdsLink
+          href={gcHelpCentreLinks.learnAboutPasskeys[language]}
+          target="_blank"
+        >
           {t("Manage2FAVerifications.learnMorePasskeys")}
         </GcdsLink>
       </GcdsText>
