@@ -48,6 +48,12 @@
     "heading": "Here is your unique identification code for your identity proofing",
     "codeValidDays": "This code is valid for 30 days and has been emailed to",
     "visitInstruction": "Visit a Service Canada Centre with your code and one valid ID document.",
+    "yourInformationHeading": "Your information",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "dateOfBirth": "Date of birth",
+    "idSelected": "ID selected",
+    "updateInformationButton": "Update information",
     "findNearestTitle": "Find your nearest Service Canada Centre",
     "findNearestBody": "Complete your identity proofing at an available",
     "findNearestLink": "Service Canada Centre near you"

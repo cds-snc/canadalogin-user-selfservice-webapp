@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import ServiceCanadaCentreIDVCodePage from "../InPerson/ServiceCanadaCentreIDVCodePage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
@@ -11,7 +11,13 @@ const mockRouteParams = vi.hoisted(() => ({
 }));
 const mockLocationState = vi.hoisted(() => ({
   idvCode: "ABC123XYZ",
+  firstName: "Jane",
+  lastName: "Doe",
+  dateOfBirth: "1990-01-01",
+  idType: "passport",
 }));
+
+const mockNavigate = vi.hoisted(() => vi.fn());
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -19,6 +25,7 @@ vi.mock("react-router", async () => {
     ...actual,
     useParams: () => mockRouteParams,
     useLocation: () => ({ state: mockLocationState }),
+    useNavigate: () => mockNavigate,
   };
 });
 
@@ -59,6 +66,11 @@ vi.mock("@gcds-core/components-react", () => ({
     <p data-testid="gcds-text" {...props}>
       {children}
     </p>
+  ),
+  GcdsButton: ({ children, onGcdsClick, ...props }) => (
+    <button data-testid="gcds-button" onClick={onGcdsClick} {...props}>
+      {children}
+    </button>
   ),
   GcdsNotice: ({
     children,
@@ -113,6 +125,10 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     mockRouteParams.language = "en";
     mockRouteParams.journeyType = "update";
     mockLocationState.idvCode = "ABC123XYZ";
+    mockLocationState.firstName = "Jane";
+    mockLocationState.lastName = "Doe";
+    mockLocationState.dateOfBirth = "1990-01-01";
+    mockLocationState.idType = "passport";
   });
 
   it("renders the main heading", () => {
@@ -207,6 +223,39 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", "#");
     expect(link).toHaveTextContent("Service Canada Centre near you");
+  });
+
+  it("renders the your information details without address", () => {
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText("Your information")).toBeInTheDocument();
+    expect(screen.getByText("First name")).toBeInTheDocument();
+    expect(screen.getByText("Last name")).toBeInTheDocument();
+    expect(screen.getByText("Date of birth")).toBeInTheDocument();
+    expect(screen.getByText("ID selected")).toBeInTheDocument();
+    expect(screen.getByText("Jane")).toBeInTheDocument();
+    expect(screen.getByText("Doe")).toBeInTheDocument();
+    expect(screen.getByText("1990-01-01")).toBeInTheDocument();
+    expect(screen.getByText("passport")).toBeInTheDocument();
+    expect(screen.queryByText("Address")).not.toBeInTheDocument();
+  });
+
+  it("navigates back to service canada form when update information is clicked", () => {
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Update information" }));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/update/in-person/service-canada-centre",
+    );
   });
 
   it("renders an empty email when user profile has no userName", () => {

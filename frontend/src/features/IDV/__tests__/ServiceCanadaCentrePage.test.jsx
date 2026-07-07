@@ -318,6 +318,13 @@ describe("ServiceCanadaCentrePage", () => {
         {
           state: {
             idvCode: "387DHROGJ",
+            firstName: "Jane",
+            lastName: "Doe",
+            dateOfBirth: "1990-01-01",
+            address: "",
+            province: "",
+            idType: "passport",
+            idExpiryDate: "2026-12-31",
           },
         },
       );
