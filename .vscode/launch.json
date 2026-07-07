@@ -5,6 +5,21 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Python Debugger: Test Explorer (Debug Test)",
+      "type": "debugpy",
+      "request": "launch",
+      "purpose": ["debug-test"],
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": false,
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/backend",
+        "PYTEST_ADDOPTS": "-s --no-cov"
+      },
+      "envFile": "${workspaceFolder}/backend/tests/.env"
+    },
+    {
       "name": "Python Debugger: FastAPI",
       "type": "debugpy",
       "request": "launch",

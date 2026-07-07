@@ -62,10 +62,9 @@
   "VisitCanadaPost": {
     "heading": "Get ready to visit a Canada Post location",
     "followSteps": "Follow the steps to complete the process",
-    "step1": "Enter the requested details below",
-    "step2": "A unique identification barcode will be generated on the next page and sent to your email",
-    "step3": "Visit a Canada Post location",
-    "step4": "Once the service agent confirms proofing is complete, you will get a confirmation email and you can sign back into the service",
+    "step1": "Select and enter your ID details.",
+    "step2": "Continue and get your unique barcode which is valid for 30 days.",
+    "step3": "Visit your nearest Canada Post with your barcode and the selected government-issued photo ID for a service agent to verify.",
     "listOfIds": "List of acceptable IDs",
     "enterInfoHeading": "Enter your information",
     "givenNameLabel": "Given name",

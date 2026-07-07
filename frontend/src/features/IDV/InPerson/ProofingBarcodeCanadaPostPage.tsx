@@ -14,6 +14,10 @@ import { useUser } from "../../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
+import {
+  APPROVED_DOCUMENT_VALUES,
+  type ApprovedDocumentValue,
+} from "../data/approvedDocuments";
 
 type ProofingBarcodeCanadaPostState = {
   idvCode?: string;
@@ -25,6 +29,12 @@ type ProofingBarcodeCanadaPostState = {
   idSelected?: string;
   acceptableIds?: string[];
 };
+
+const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
+
+const isApprovedDocumentValue = (
+  value: string,
+): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
 
 export default function ProofingBarcodeCanadaPostPage() {
   const { t } = useTranslation("idv");
@@ -48,7 +58,12 @@ export default function ProofingBarcodeCanadaPostPage() {
   const lastName = locationState?.lastName?.trim() || "--";
   const dateOfBirth = locationState?.dateOfBirth?.trim() || "--";
   const address = locationState?.address?.trim() || "--";
-  const idSelected = locationState?.idSelected?.trim() || "--";
+  const rawIdSelected = locationState?.idSelected?.trim() || "";
+  const idSelected = rawIdSelected
+    ? isApprovedDocumentValue(rawIdSelected)
+      ? t(`ApprovedDocuments.${rawIdSelected}`)
+      : rawIdSelected
+    : "--";
 
   const acceptableIds = locationState?.acceptableIds;
 

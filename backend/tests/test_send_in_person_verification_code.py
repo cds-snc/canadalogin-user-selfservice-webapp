@@ -3,6 +3,8 @@ Unit tests for send_in_person_verification_code service.
 """
 
 import importlib
+import json
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from fastapi import HTTPException
@@ -20,7 +22,20 @@ MOCK_GC_NOTIFY_CONFIG.GC_NOTIFY_API_KEY = "test-api-key"
 
 GC_NOTIFY_EMAIL_ENDPOINT = idv_module.GC_NOTIFY_EMAIL_ENDPOINT
 GC_NOTIFY_TEMPLATE_ID = idv_module.GCNotifyTemplateID.IN_PERSON_VERIFICATION
-HARDCODED_VERIFICATION_CODE = idv_module.HARDCODED_VERIFICATION_CODE
+GENERATED_VERIFICATION_CODE = "AB12CD34EF"
+
+
+def make_generated_payload() -> MagicMock:
+    payload = MagicMock()
+    payload.identifier = GENERATED_VERIFICATION_CODE
+    payload.identifier_hash = "hash"
+    payload.salt = "salt"
+    payload.created_at = datetime.now(UTC)
+    payload.expires_at = payload.created_at + timedelta(days=30)
+    payload.validity_days = 30
+    payload.hash_algorithm = "PBKDF2-HMAC-SHA256"
+    payload.pbkdf2_iterations = 210_000
+    return payload
 
 
 def make_http_status_error(
@@ -52,17 +67,43 @@ def mock_success_response():
     return response
 
 
+@pytest.fixture
+def mock_request():
+    request = MagicMock()
+    request.headers = {}
+    request.client = MagicMock()
+    request.client.host = "203.0.113.10"
+
+    redis_client = AsyncMock()
+    redis_client.incr = AsyncMock(return_value=1)
+    redis_client.expire = AsyncMock(return_value=True)
+    redis_client.get = AsyncMock(return_value=None)
+    redis_client.ttl = AsyncMock(return_value=-1)
+    redis_client.setex = AsyncMock(return_value=True)
+    redis_client.delete = AsyncMock(return_value=1)
+
+    request.app.state.redis_client = redis_client
+    return request
+
+
 class TestSendInPersonVerificationCode:
     """Tests for send_in_person_verification_code function."""
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_successful_email_send(
-        self, mock_dispatch, mock_http_client, mock_profile, mock_success_response
+        self,
+        mock_dispatch,
+        mock_generate_code,
+        mock_http_client,
+        mock_profile,
+        mock_success_response,
     ):
         """Should return a success ResponseModel when GC Notify accepts the request."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         mock_http_client.post = AsyncMock(return_value=mock_success_response)
 
         result = await send_in_person_verification_code(
@@ -71,16 +112,27 @@ class TestSendInPersonVerificationCode:
 
         assert result.success is True
         assert result.message == "In-person verification email sent"
-        assert result.data["email_address"] == "user@example.com"
+        assert result.data["verification_code"] == GENERATED_VERIFICATION_CODE
+        assert result.data["verification_expires_at"] == (
+            mock_generate_code.return_value.expires_at.isoformat()
+        )
+        assert result.data["verification_validity_days"] == 30
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_posts_to_correct_endpoint(
-        self, mock_dispatch, mock_http_client, mock_profile, mock_success_response
+        self,
+        mock_dispatch,
+        mock_generate_code,
+        mock_http_client,
+        mock_profile,
+        mock_success_response,
     ):
         """Should POST to the GC Notify email endpoint."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         mock_http_client.post = AsyncMock(return_value=mock_success_response)
 
         await send_in_person_verification_code(mock_http_client, "mock-access-token")
@@ -91,12 +143,19 @@ class TestSendInPersonVerificationCode:
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_sends_correct_authorization_header(
-        self, mock_dispatch, mock_http_client, mock_profile, mock_success_response
+        self,
+        mock_dispatch,
+        mock_generate_code,
+        mock_http_client,
+        mock_profile,
+        mock_success_response,
     ):
         """Should set the Authorization header in the ApiKey-v1 format."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         mock_http_client.post = AsyncMock(return_value=mock_success_response)
 
         await send_in_person_verification_code(mock_http_client, "mock-access-token")
@@ -111,12 +170,19 @@ class TestSendInPersonVerificationCode:
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_sends_correct_payload(
-        self, mock_dispatch, mock_http_client, mock_profile, mock_success_response
+        self,
+        mock_dispatch,
+        mock_generate_code,
+        mock_http_client,
+        mock_profile,
+        mock_success_response,
     ):
         """Should send the user email, correct template ID, and verification code."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         mock_http_client.post = AsyncMock(return_value=mock_success_response)
 
         await send_in_person_verification_code(mock_http_client, "mock-access-token")
@@ -129,17 +195,25 @@ class TestSendInPersonVerificationCode:
         assert payload["template_id"] == GC_NOTIFY_TEMPLATE_ID
         assert (
             payload["personalisation"]["verification_code"]
-            == HARDCODED_VERIFICATION_CODE
+            == GENERATED_VERIFICATION_CODE
         )
+        mock_generate_code.assert_called_once()
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_fetches_email_from_user_profile(
-        self, mock_dispatch, mock_http_client, mock_profile, mock_success_response
+        self,
+        mock_dispatch,
+        mock_generate_code,
+        mock_http_client,
+        mock_profile,
+        mock_success_response,
     ):
         """Should resolve the recipient email from the user's IBM Verify profile."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         mock_http_client.post = AsyncMock(return_value=mock_success_response)
 
         await send_in_person_verification_code(mock_http_client, "mock-access-token")
@@ -165,12 +239,14 @@ class TestSendInPersonVerificationCode:
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_raises_on_400_from_gc_notify(
-        self, mock_dispatch, mock_http_client, mock_profile
+        self, mock_dispatch, mock_generate_code, mock_http_client, mock_profile
     ):
         """Should raise HTTP 400 when GC Notify rejects the request."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         exc = make_http_status_error(400, {"messageId": "BadRequestError"})
         mock_http_client.post = AsyncMock(side_effect=exc)
 
@@ -183,12 +259,14 @@ class TestSendInPersonVerificationCode:
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_raises_on_429_from_gc_notify(
-        self, mock_dispatch, mock_http_client, mock_profile
+        self, mock_dispatch, mock_generate_code, mock_http_client, mock_profile
     ):
         """Should raise HTTP 429 when GC Notify rate-limits the request."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         exc = make_http_status_error(429, {"messageId": "RateLimitError"})
         mock_http_client.post = AsyncMock(side_effect=exc)
 
@@ -201,12 +279,14 @@ class TestSendInPersonVerificationCode:
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_raises_on_5xx_from_gc_notify(
-        self, mock_dispatch, mock_http_client, mock_profile
+        self, mock_dispatch, mock_generate_code, mock_http_client, mock_profile
     ):
         """Should raise an HTTPException when GC Notify returns a server error."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         exc = make_http_status_error(500)
         mock_http_client.post = AsyncMock(side_effect=exc)
 
@@ -219,12 +299,14 @@ class TestSendInPersonVerificationCode:
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_raises_on_timeout(
-        self, mock_dispatch, mock_http_client, mock_profile
+        self, mock_dispatch, mock_generate_code, mock_http_client, mock_profile
     ):
         """Should raise HTTP 504 when the GC Notify request times out."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         mock_http_client.post = AsyncMock(side_effect=TimeoutException("timed out"))
 
         with pytest.raises(HTTPException) as exc_info:
@@ -236,12 +318,14 @@ class TestSendInPersonVerificationCode:
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_raises_on_unexpected_exception(
-        self, mock_dispatch, mock_http_client, mock_profile
+        self, mock_dispatch, mock_generate_code, mock_http_client, mock_profile
     ):
         """Should raise HTTP 500 on any unexpected exception during the GC Notify call."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         mock_http_client.post = AsyncMock(side_effect=Exception("unexpected"))
 
         with pytest.raises(HTTPException) as exc_info:
@@ -253,12 +337,19 @@ class TestSendInPersonVerificationCode:
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
     @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
     async def test_uses_timeout_on_post(
-        self, mock_dispatch, mock_http_client, mock_profile, mock_success_response
+        self,
+        mock_dispatch,
+        mock_generate_code,
+        mock_http_client,
+        mock_profile,
+        mock_success_response,
     ):
         """Should set a request timeout when calling GC Notify."""
         mock_dispatch.return_value = mock_profile
+        mock_generate_code.return_value = make_generated_payload()
         mock_http_client.post = AsyncMock(return_value=mock_success_response)
 
         await send_in_person_verification_code(mock_http_client, "mock-access-token")
@@ -279,4 +370,124 @@ class TestSendInPersonVerificationCode:
                 )
 
         assert exc_info.value.status_code == 500
+        mock_http_client.post.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
+    @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
+    async def test_reuses_active_unexpired_code_when_available(
+        self,
+        mock_dispatch,
+        mock_generate_code,
+        mock_http_client,
+        mock_profile,
+        mock_success_response,
+        mock_request,
+    ):
+        """Should reuse an active Redis-cached code instead of generating a new one."""
+        mock_dispatch.return_value = mock_profile
+        mock_http_client.post = AsyncMock(return_value=mock_success_response)
+
+        future_expiry = datetime.now(UTC) + timedelta(days=10)
+        cached_payload = {
+            "verification_code": "CACHED12345",
+            "expires_at": future_expiry.isoformat(),
+            "validity_days": 30,
+        }
+        mock_request.app.state.redis_client.get = AsyncMock(
+            side_effect=[None, json.dumps(cached_payload)]
+        )
+
+        result = await send_in_person_verification_code(
+            mock_http_client,
+            "mock-access-token",
+            request=mock_request,
+        )
+
+        assert result.data["verification_code"] == "CACHED12345"
+        assert result.data["verification_expires_at"] == future_expiry.isoformat()
+        mock_generate_code.assert_not_called()
+
+        request_payload = mock_http_client.post.call_args.kwargs["json"]
+        assert request_payload["personalisation"]["verification_code"] == "CACHED12345"
+
+    @pytest.mark.asyncio
+    @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
+    async def test_blocks_when_ip_rate_limit_exceeded(
+        self,
+        mock_dispatch,
+        mock_http_client,
+        mock_request,
+    ):
+        """Should return 429 and skip downstream calls when IP limit is exceeded."""
+        mock_request.app.state.redis_client.incr = AsyncMock(return_value=25)
+        mock_request.app.state.redis_client.ttl = AsyncMock(return_value=30)
+
+        with pytest.raises(HTTPException) as exc_info:
+            await send_in_person_verification_code(
+                mock_http_client,
+                "mock-access-token",
+                request=mock_request,
+            )
+
+        assert exc_info.value.status_code == 429
+        assert exc_info.value.detail["reason"] == "ip_limit"
+        assert exc_info.value.detail["retry_after_seconds"] == 30
+        mock_dispatch.assert_not_called()
+        mock_http_client.post.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
+    async def test_blocks_when_user_cooldown_is_active(
+        self,
+        mock_dispatch,
+        mock_http_client,
+        mock_profile,
+        mock_request,
+    ):
+        """Should return 429 when user requests another code during cooldown."""
+        mock_dispatch.return_value = mock_profile
+        mock_request.app.state.redis_client.get = AsyncMock(return_value=None)
+        mock_request.app.state.redis_client.ttl = AsyncMock(return_value=45)
+
+        with pytest.raises(HTTPException) as exc_info:
+            await send_in_person_verification_code(
+                mock_http_client,
+                "mock-access-token",
+                request=mock_request,
+            )
+
+        assert exc_info.value.status_code == 429
+        assert exc_info.value.detail["reason"] == "user_cooldown"
+        assert exc_info.value.detail["retry_after_seconds"] == 45
+        mock_http_client.post.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
+    async def test_blocks_when_user_daily_limit_is_reached(
+        self,
+        mock_dispatch,
+        mock_http_client,
+        mock_profile,
+        mock_request,
+    ):
+        """Should return 429 when user exceeds daily send allowance."""
+        mock_dispatch.return_value = mock_profile
+        mock_request.app.state.redis_client.get = AsyncMock(return_value="10")
+        mock_request.app.state.redis_client.ttl = AsyncMock(return_value=3600)
+
+        with pytest.raises(HTTPException) as exc_info:
+            await send_in_person_verification_code(
+                mock_http_client,
+                "mock-access-token",
+                request=mock_request,
+            )
+
+        assert exc_info.value.status_code == 429
+        assert exc_info.value.detail["reason"] == "user_daily_limit"
+        assert exc_info.value.detail["retry_after_seconds"] == 3600
         mock_http_client.post.assert_not_called()
