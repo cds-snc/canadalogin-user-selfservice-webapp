@@ -1,27 +1,19 @@
 import { useEffect } from "react";
 
-export default function useGcdsSelectWidth(selectIds: string[]): void {
+export default function useGcdsSelectWidth(
+  selectElementIds: readonly string[],
+): void {
+  const selectElementIdsKey = selectElementIds.join(",");
+
   useEffect(() => {
-    const getSelectElements = (): HTMLElement[] => {
-      const selectElements = new Set<HTMLElement>();
-
-      selectIds.forEach((selectId) => {
-        const elements = document.querySelectorAll(
-          `gcds-select#${selectId}, gcds-select[select-id=\"${selectId}\"]`,
-        );
-
-        elements.forEach((element) => {
-          selectElements.add(element as HTMLElement);
-        });
-      });
-
-      return Array.from(selectElements);
-    };
-
     const applySelectShadowWidth = () => {
-      const selects = getSelectElements();
+      selectElementIds.forEach((elementId) => {
+        const element = document.getElementById(elementId) as HTMLElement | null;
 
-      selects.forEach((element) => {
+        if (!element) {
+          return;
+        }
+
         const shadowRoot = element.shadowRoot;
 
         if (!shadowRoot) {
@@ -48,23 +40,6 @@ export default function useGcdsSelectWidth(selectIds: string[]): void {
       });
     };
 
-    if (!selectIds.length) {
-      return;
-    }
-
     applySelectShadowWidth();
-
-    const observer = new MutationObserver(() => {
-      applySelectShadowWidth();
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [selectIds]);
+  }, [selectElementIdsKey]);
 }

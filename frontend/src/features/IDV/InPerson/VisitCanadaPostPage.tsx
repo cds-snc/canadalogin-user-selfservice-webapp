@@ -52,8 +52,6 @@ export default function VisitCanadaPost() {
       ? AVAILABLE_LANGUAGES.fr
       : AVAILABLE_LANGUAGES.en;
 
-  useGcdsSelectWidth(["selectId", "select-province"]);
-
   const [formData, setFormData] = useState<VisitCanadaPostFormData>({
     idType: "",
     idExpiryDate: "",
@@ -96,6 +94,12 @@ export default function VisitCanadaPost() {
     dateOfBirthValidationError,
     summaryErrorCodes,
   } = getVisitCanadaPostValidation(formData);
+
+  const selectElementIds = showAddressAndProvinceFields
+    ? ["selectId", "select-province"]
+    : ["selectId"];
+
+  useGcdsSelectWidth(selectElementIds);
 
   const dobMessages = getSharedDateOfBirthMessages(t);
 

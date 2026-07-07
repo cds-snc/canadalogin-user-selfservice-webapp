@@ -209,6 +209,25 @@ describe("VisitCanadaPost", () => {
     expect(screen.getByTestId("date-of-birth-input")).toBeInTheDocument();
   });
 
+  it("applies select width styles to the province select when it is rendered later", async () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "driverLicence" },
+    });
+
+    await waitFor(() => {
+      const provinceHost = document.querySelector("gcds-select#select-province");
+      const wrapper = provinceHost?.shadowRoot?.querySelector(
+        ".gcds-select__wrapper",
+      );
+      const internalSelect = provinceHost?.shadowRoot?.querySelector("select");
+
+      expect(wrapper).toHaveStyle({ maxWidth: "75ch" });
+      expect(internalSelect).toHaveStyle({ width: "100%" });
+    });
+  });
+
   it("shows address and province fields only for qualifying IDs", () => {
     render(<VisitCanadaPost />);
 
