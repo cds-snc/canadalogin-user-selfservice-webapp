@@ -19,11 +19,8 @@ import { identityVerificationApi } from "./api/identityVerificationApi";
 
 export default function ConfirmIdentityDetails() {
   const { t, i18n } = useTranslation("idv");
-  const { t } = useTranslation("idv");
-
   const { t: tLayout } = useTranslation("layout");
 
-  const navigate = useNavigate();
   const { state } = useUser();
 
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
