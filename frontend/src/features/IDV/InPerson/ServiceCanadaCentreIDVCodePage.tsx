@@ -80,23 +80,19 @@ export default function ServiceCanadaCentreIDVCodePage() {
           <GcdsContainer>
             <GcdsGrid columns="1" gap="300">
               <div>
-                <GcdsText marginTop="300" marginBottom="0">
+                <GcdsText>
                   <strong>{t("ServiceCanadaCentreCode.firstName")}</strong>
                 </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {firstName}
-                </GcdsText>
+                <GcdsText>{firstName}</GcdsText>
               </div>
 
               <div className="separator" style={{ margin: "0" }} />
 
               <div>
-                <GcdsText marginTop="0" marginBottom="0">
+                <GcdsText>
                   <strong>{t("ServiceCanadaCentreCode.lastName")}</strong>
                 </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {lastName}
-                </GcdsText>
+                <GcdsText>{lastName}</GcdsText>
               </div>
 
               <div className="separator" style={{ margin: "0" }} />
@@ -105,9 +101,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
                 <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.dateOfBirth")}</strong>
                 </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {dateOfBirth}
-                </GcdsText>
+                <GcdsText>{dateOfBirth}</GcdsText>
               </div>
 
               <div className="separator" style={{ margin: "0" }} />
@@ -116,9 +110,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
                 <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.idSelected")}</strong>
                 </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {idSelected}
-                </GcdsText>
+                <GcdsText>{idSelected}</GcdsText>
               </div>
 
               <div className="separator" style={{ margin: "0" }} />
