@@ -1,14 +1,20 @@
 import { useEffect } from "react";
 
 export default function useGcdsSelectWidth(
-  selector = "gcds-select.visit-canada-post-select",
+  selectElementIds: readonly string[],
 ): void {
   useEffect(() => {
     const applySelectShadowWidth = () => {
-      const selects = document.querySelectorAll(selector);
+      selectElementIds.forEach((elementId) => {
+        const element = document.getElementById(
+          elementId,
+        ) as HTMLElement | null;
 
-      selects.forEach((element) => {
-        const shadowRoot = (element as HTMLElement).shadowRoot;
+        if (!element) {
+          return;
+        }
+
+        const shadowRoot = element.shadowRoot;
 
         if (!shadowRoot) {
           return;
@@ -35,5 +41,5 @@ export default function useGcdsSelectWidth(
     };
 
     applySelectShadowWidth();
-  }, [selector]);
+  }, [selectElementIds]);
 }

@@ -3,6 +3,7 @@ import {
   GcdsContainer,
   GcdsDateInput,
   GcdsErrorSummary,
+  GcdsFieldset,
   GcdsGrid,
   GcdsHeading,
   GcdsInput,
@@ -22,27 +23,24 @@ import {
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
-import { MAX_NAME_LENGTH } from "./validation/InPersonIdentity.validation";
+import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 import {
   getVisitCanadaPostValidation,
+  requiresAddressAndProvince,
   type VisitCanadaPostFormData,
 } from "./validation/VisitCanadaPost.validation";
-import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
 import {
   getAddressRequiredMessage,
-  getCountryRequiredMessage,
-  getFamilyNameRequiredOrInvalidMessage,
-  getGivenNameRequiredOrInvalidMessage,
+  getFirstNameRequiredOrInvalidMessage,
+  getIdExpiryRequiredMessage,
+  getIdTypeRequiredMessage,
+  getLastNameRequiredOrInvalidMessage,
   getProvinceRequiredMessage,
   getSharedDateOfBirthMessages,
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
 import { focusErrorSummary } from "../helpers/focusErrorSummary";
-
-const COUNTRY_OPTIONS = [
-  { value: "CA", label: "Canada" },
-  { value: "US", label: "United States" },
-];
+import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
 
 const ERROR_SUMMARY_ID = "visit-canada-post-error-summary";
 
@@ -56,20 +54,18 @@ export default function VisitCanadaPost() {
       : AVAILABLE_LANGUAGES.en;
 
   const [formData, setFormData] = useState<VisitCanadaPostFormData>({
-    givenName: "",
-    familyName: "",
+    idType: "",
+    idExpiryDate: "",
+    firstName: "",
+    lastName: "",
     dateOfBirth: "",
     address: "",
     province: "",
-    country: "",
   });
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isDateOfBirthTouched, setIsDateOfBirthTouched] = useState(false);
   const [showErrorSummary, setShowErrorSummary] = useState(false);
   const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
-
-  // GCDS select renders inside shadow DOM, so width styles are applied by a helper hook.
-  useGcdsSelectWidth();
 
   const updateField = (field: keyof VisitCanadaPostFormData, value: string) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -92,8 +88,19 @@ export default function VisitCanadaPost() {
       updateField(field, target?.value ?? "");
     };
 
-  const { isFormValid, dateOfBirthValidationError, summaryErrorCodes } =
-    getVisitCanadaPostValidation(formData);
+  const {
+    isFormValid,
+    hasSelectedIdType,
+    showAddressAndProvinceFields,
+    dateOfBirthValidationError,
+    summaryErrorCodes,
+  } = getVisitCanadaPostValidation(formData);
+
+  const selectElementIds = showAddressAndProvinceFields
+    ? ["selectId", "select-province"]
+    : ["selectId"];
+
+  useGcdsSelectWidth(selectElementIds);
 
   const dobMessages = getSharedDateOfBirthMessages(t);
 
@@ -102,44 +109,54 @@ export default function VisitCanadaPost() {
       ? dobMessages[dateOfBirthValidationError].inline
       : "";
 
-  const dateOfBirthSummaryMessage = dateOfBirthValidationError
-    ? dobMessages[dateOfBirthValidationError].summary
-    : "";
-
   const summaryErrors: Record<string, string> = {};
 
-  if (summaryErrorCodes.givenName) {
-    summaryErrors["#givenName"] = getGivenNameRequiredOrInvalidMessage(t);
+  if (summaryErrorCodes.idType) {
+    summaryErrors["#selectId"] = getIdTypeRequiredMessage(t);
   }
 
-  if (summaryErrorCodes.familyName) {
-    summaryErrors["#familyName"] = getFamilyNameRequiredOrInvalidMessage(t);
+  if (summaryErrorCodes.idExpiryDate) {
+    summaryErrors["#id-expiration-date-input"] = getIdExpiryRequiredMessage(t);
+  }
+
+  if (summaryErrorCodes.firstName) {
+    summaryErrors["#first-name-input"] =
+      getFirstNameRequiredOrInvalidMessage(t);
+  }
+
+  if (summaryErrorCodes.lastName) {
+    summaryErrors["#last-name-input"] = getLastNameRequiredOrInvalidMessage(t);
   }
 
   if (summaryErrorCodes.dateOfBirth) {
-    summaryErrors["#dateOfBirth"] = dateOfBirthSummaryMessage;
+    summaryErrors["#date-of-birth-input"] =
+      dobMessages[summaryErrorCodes.dateOfBirth].summary;
   }
 
   if (summaryErrorCodes.address) {
-    summaryErrors["#address"] = getAddressRequiredMessage(t);
+    summaryErrors["#address-input"] = getAddressRequiredMessage(t);
   }
 
   if (summaryErrorCodes.province) {
-    summaryErrors["#province"] = getProvinceRequiredMessage(t);
+    summaryErrors["#select-province"] = getProvinceRequiredMessage(t);
   }
 
-  if (summaryErrorCodes.country) {
-    summaryErrors["#country"] = getCountryRequiredMessage(t);
-  }
+  const idTypeErrorMessage =
+    hasSubmitted && summaryErrorCodes.idType ? getIdTypeRequiredMessage(t) : "";
 
-  const givenNameErrorMessage =
-    hasSubmitted && summaryErrorCodes.givenName
-      ? getGivenNameRequiredOrInvalidMessage(t)
+  const idExpiryErrorMessage =
+    hasSubmitted && summaryErrorCodes.idExpiryDate
+      ? getIdExpiryRequiredMessage(t)
       : "";
 
-  const familyNameErrorMessage =
-    hasSubmitted && summaryErrorCodes.familyName
-      ? getFamilyNameRequiredOrInvalidMessage(t)
+  const firstNameErrorMessage =
+    hasSubmitted && summaryErrorCodes.firstName
+      ? getFirstNameRequiredOrInvalidMessage(t)
+      : "";
+
+  const lastNameErrorMessage =
+    hasSubmitted && summaryErrorCodes.lastName
+      ? getLastNameRequiredOrInvalidMessage(t)
       : "";
 
   const addressErrorMessage =
@@ -152,18 +169,13 @@ export default function VisitCanadaPost() {
       ? getProvinceRequiredMessage(t)
       : "";
 
-  const countryErrorMessage =
-    hasSubmitted && summaryErrorCodes.country
-      ? getCountryRequiredMessage(t)
-      : "";
-
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
 
   return (
     <GcdsContainer role="main">
-      <form style={{ width: "100%" }}>
+      <form>
         <GcdsGrid columns="1" gap="450">
           <GcdsContainer>
             <GcdsHeading tag="h1">{t("VisitCanadaPost.heading")}</GcdsHeading>
@@ -185,7 +197,6 @@ export default function VisitCanadaPost() {
                 <li>{t("VisitCanadaPost.step1")}</li>
                 <li>{t("VisitCanadaPost.step2")}</li>
                 <li>{t("VisitCanadaPost.step3")}</li>
-                <li>{t("VisitCanadaPost.step4")}</li>
               </ol>
             </GcdsText>
             <AcceptableIdsDetails
@@ -194,102 +205,108 @@ export default function VisitCanadaPost() {
           </GcdsContainer>
 
           <GcdsContainer>
-            <GcdsHeading tag="h2" marginTop="0">
-              {t("VisitCanadaPost.enterInfoHeading")}
-            </GcdsHeading>
-
-            <GcdsInput
-              id="givenName"
-              inputId="givenName"
-              name="givenName"
-              label={t("VisitCanadaPost.givenNameLabel")}
-              hint={t("VisitCanadaPost.givenNameHint")}
-              required
-              maxlength={MAX_NAME_LENGTH}
-              autocomplete="given-name"
-              validateOn="blur"
-              errorMessage={givenNameErrorMessage}
-              onGcdsChange={createChangeHandler("givenName")}
-            />
-
-            <GcdsInput
-              id="familyName"
-              inputId="familyName"
-              name="familyName"
-              label={t("VisitCanadaPost.familyNameLabel")}
-              hint={t("VisitCanadaPost.familyNameHint")}
-              required
-              maxlength={MAX_NAME_LENGTH}
-              autocomplete="family-name"
-              validateOn="blur"
-              errorMessage={familyNameErrorMessage}
-              onGcdsChange={createChangeHandler("familyName")}
-            />
-
-            <GcdsDateInput
-              id="dateOfBirth"
-              name="dateOfBirth"
-              legend={t("VisitCanadaPost.dobLabel")}
-              required
-              format="full"
-              validateOn="blur"
-              errorMessage={dateOfBirthErrorMessage}
-              onGcdsChange={createChangeHandler("dateOfBirth")}
-              onBlur={() => setIsDateOfBirthTouched(true)}
-            />
-
-            <GcdsInput
-              id="address"
-              inputId="address"
-              name="address"
-              label={t("VisitCanadaPost.addressLabel")}
-              hint={t("VisitCanadaPost.addressHint")}
-              required
-              autocomplete="street-address"
-              validateOn="blur"
-              errorMessage={addressErrorMessage}
-              onGcdsChange={createChangeHandler("address")}
-            />
-
-            <GcdsSelect
-              id="province"
-              className="visit-canada-post-select"
-              selectId="province"
-              name="province"
-              label={t("VisitCanadaPost.provinceLabel")}
-              required
-              defaultValue=""
-              validateOn="blur"
-              errorMessage={provinceErrorMessage}
-              onGcdsChange={createChangeHandler("province")}
+            <GcdsFieldset
+              legend={t("ServiceCanadaCentre.enterDetailsHeading")}
+              legendSize="h2"
             >
-              <option value="">Select option</option>
-              {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
-                <option key={province.code || "blank"} value={province.code}>
-                  {province.labels[currentLanguage]}
-                </option>
-              ))}
-            </GcdsSelect>
+              <GcdsSelect
+                id="selectId"
+                label={t("ServiceCanadaCentre.selectIdLabel")}
+                name="selectId"
+                selectId="selectId"
+                value={formData.idType}
+                required
+                errorMessage={idTypeErrorMessage}
+                onGcdsChange={createChangeHandler("idType")}
+                defaultValue={t(
+                  "ServiceCanadaCentre.selectIdDropdownDefaultValue",
+                )}
+              >
+                {APPROVED_DOCUMENT_VALUES.map((docValue) => (
+                  <option key={docValue} value={docValue}>
+                    {t(`ApprovedDocuments.${docValue}`)}
+                  </option>
+                ))}
+              </GcdsSelect>
 
-            <GcdsSelect
-              id="country"
-              className="visit-canada-post-select"
-              selectId="country"
-              name="country"
-              label={t("VisitCanadaPost.countryLabel")}
-              required
-              defaultValue=""
-              validateOn="blur"
-              errorMessage={countryErrorMessage}
-              onGcdsChange={createChangeHandler("country")}
-            >
-              <option value="">Select option</option>
-              {COUNTRY_OPTIONS.map((option) => (
-                <option key={option.value || "blank"} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </GcdsSelect>
+              {hasSelectedIdType && (
+                <GcdsDateInput
+                  id="id-expiration-date-input"
+                  legend={t("ServiceCanadaCentre.idExpirationLabel")}
+                  name="id-expiration-date-input"
+                  format="full"
+                  required
+                  errorMessage={idExpiryErrorMessage}
+                  onGcdsChange={createChangeHandler("idExpiryDate")}
+                />
+              )}
+            </GcdsFieldset>
+
+            {hasSelectedIdType && (
+              <>
+                <GcdsInput
+                  required
+                  inputId="first-name-input"
+                  name="first-name-input"
+                  label={t("ServiceCanadaCentre.firstNameLabel")}
+                  errorMessage={firstNameErrorMessage}
+                  onGcdsChange={createChangeHandler("firstName")}
+                />
+
+                <GcdsInput
+                  required
+                  inputId="last-name-input"
+                  name="last-name-input"
+                  label={t("ServiceCanadaCentre.lastNameLabel")}
+                  errorMessage={lastNameErrorMessage}
+                  onGcdsChange={createChangeHandler("lastName")}
+                />
+
+                <GcdsDateInput
+                  id="date-of-birth-input"
+                  legend={t("ServiceCanadaCentre.dateOfBirthdayLabel")}
+                  name="date-of-birth-input"
+                  format="full"
+                  required
+                  errorMessage={dateOfBirthErrorMessage}
+                  onGcdsChange={createChangeHandler("dateOfBirth")}
+                  onBlur={() => setIsDateOfBirthTouched(true)}
+                />
+
+                {showAddressAndProvinceFields && (
+                  <>
+                    <GcdsInput
+                      required
+                      inputId="address-input"
+                      name="address-input"
+                      label={t("ServiceCanadaCentre.addressLabel")}
+                      hint={t("ServiceCanadaCentre.addressHint")}
+                      errorMessage={addressErrorMessage}
+                      onGcdsChange={createChangeHandler("address")}
+                    />
+
+                    <GcdsSelect
+                      id="select-province"
+                      name="select-province"
+                      selectId="select-province"
+                      defaultValue={t(
+                        "ServiceCanadaCentre.selectIdDropdownDefaultValue",
+                      )}
+                      label={t("ServiceCanadaCentre.proviceLabel")}
+                      required
+                      errorMessage={provinceErrorMessage}
+                      onGcdsChange={createChangeHandler("province")}
+                    >
+                      {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
+                        <option key={province.code} value={province.code}>
+                          {province.labels[currentLanguage]}
+                        </option>
+                      ))}
+                    </GcdsSelect>
+                  </>
+                )}
+              </>
+            )}
           </GcdsContainer>
 
           <GcdsGrid
@@ -313,20 +330,23 @@ export default function VisitCanadaPost() {
 
                 setShowErrorSummary(false);
 
+                const navigationState = {
+                  givenName: formData.firstName,
+                  lastName: formData.lastName,
+                  dateOfBirth: formData.dateOfBirth,
+                  idSelected: formData.idType,
+                  ...(requiresAddressAndProvince(formData.idType)
+                    ? { address: formData.address }
+                    : {}),
+                };
+
                 navigate(
                   path(PAGES.idvProofingBarcodeCanadaPostPage, {
                     language,
                     journeyType,
                   }),
                   {
-                    state: {
-                      givenName: formData.givenName,
-                      lastName: formData.familyName,
-                      dateOfBirth: formData.dateOfBirth,
-                      address: formData.address,
-                      province: formData.province,
-                      country: formData.country,
-                    },
+                    state: navigationState,
                   },
                 );
               }}
