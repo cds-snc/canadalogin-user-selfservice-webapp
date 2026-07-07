@@ -39,7 +39,7 @@ export default function ProfileHome({
             showIDVSuccessNotice={showIDVSuccessNotice}
           />
         )}
-        {DEV_ONLY_FEATURE && (
+        {DEV_ONLY_FEATURE && !showIDVSuccessNotice && (
           <GcdsContainer className="idvNoticeSpacing">
             <CompleteIdentityProofingNotice />
           </GcdsContainer>
