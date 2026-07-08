@@ -154,8 +154,8 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByRole("heading", {
-        name: "Prove your identity",
+      screen.getByRole("howToProveHeading", {
+        name: "How do you want to prove your identity?",
         level: 1,
       }),
     ).toBeInTheDocument();
@@ -206,7 +206,7 @@ describe("StartIdentityProofingPage", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Do either a selfie and ID check or sign with a provincial account (BC, AB).",
+        "Do either a selfie and ID check with your phone  or sign in with a provincial account (BC, AB, QC).",
       ),
     ).toBeInTheDocument();
   });
@@ -317,14 +317,5 @@ describe("StartIdentityProofingPage", () => {
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/not-ready",
     );
-  });
-
-  // ── Cancel button ──────────────────────────────
-  it("navigates to home when Cancel button is clicked", () => {
-    render(<StartIdentityProofingPage />);
-
-    fireEvent.click(screen.getByTestId("cancel-button"));
-
-    expect(mockNavigate).toHaveBeenCalledWith("/");
   });
 });

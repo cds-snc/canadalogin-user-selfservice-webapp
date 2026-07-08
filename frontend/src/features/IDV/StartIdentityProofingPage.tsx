@@ -100,7 +100,9 @@ export default function StartIdentityProofingPage() {
             noticeTitle={t("StartIdentityProofing.errorNoticeTitle")}
             noticeTitleTag="h2"
           >
-            <GcdsText>{t("StartIdentityProofing.errorNoticeDescription")}</GcdsText>
+            <GcdsText>
+              {t("StartIdentityProofing.errorNoticeDescription")}
+            </GcdsText>
           </GcdsNotice>
         )}
         {journeyType === IDV_JOURNEY_TYPE.START && (
