@@ -50,7 +50,7 @@ async def idv_mock_success(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await idv_mock_success_response(
-        request.app.state.request_client, user_access_token
+        request, user_access_token
     )
 
 

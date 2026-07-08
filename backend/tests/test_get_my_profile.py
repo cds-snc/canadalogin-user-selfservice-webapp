@@ -380,3 +380,44 @@ def test_ibm_profile_schema_prioritizes_details_over_urn_when_both_present():
     assert parsed.details.pwdChangedTime == "2026-06-10T15:22:05Z"
     assert parsed.details.customAttributes is not None
     assert parsed.details.customAttributes[0].values == ["details"]
+
+
+@pytest.mark.asyncio
+@patch("app.users.services.get_my_profile.mask_profile_details")
+@patch(GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH)
+async def test_my_profile_exposes_identity_verified_in_details(
+    mock_dispatch_get, mock_mask_profile
+):
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "jane.doe@example.com",
+        "emails": [{"value": "jane.doe@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-09-22T12:30:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-identity-verified",
+        SCIM_IBM_USER_EXT: {
+            "customAttributes": [
+                {"name": "identityVerified", "values": ["true"]},
+            ]
+        },
+    }
+
+    mock_profile = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_get.return_value = mock_profile
+    mock_mask_profile.side_effect = lambda payload: payload
+
+    http_client = AsyncClient()
+    response = await my_profile(http_client, user_access_token="mock-token")
+
+    assert response.success is True
+    assert response.data is not None
+    assert response.data.details is not None
+    assert response.data.details.model_dump().get("identityVerified") is True

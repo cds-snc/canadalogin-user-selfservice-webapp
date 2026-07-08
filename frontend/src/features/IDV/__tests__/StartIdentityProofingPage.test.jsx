@@ -200,6 +200,29 @@ describe("StartIdentityProofingPage", () => {
     });
   });
 
+  it("stores the full raw target URL with nested query params", async () => {
+    mockJourneyType = "required";
+    const fullTargetUrl =
+      "https://cds-gcsignin-dev.verify.ibm.com/oauth2/authorize" +
+      "?client_id=d109133c-6984-4705-ac5c-eb3538b4c67d" +
+      "&requestId=ed98aac7-9816-4206-bbaa-1fb6ccc8107e" +
+      "&stateId=992423a4-fe88-4d49-9cb4-ef9f2626e74c";
+
+    mockSearchParams = new URLSearchParams(`target_url=${fullTargetUrl}`);
+    window.location = {
+      href: "",
+      search: `?target_url=${fullTargetUrl}`,
+    };
+
+    render(<StartIdentityProofingPage />);
+
+    await waitFor(() => {
+      expect(identityVerificationApi.storeTargetUrl).toHaveBeenCalledWith(
+        fullTargetUrl,
+      );
+    });
+  });
+
   it("renders the heading with app name", () => {
     render(<StartIdentityProofingPage />);
 

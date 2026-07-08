@@ -8,6 +8,7 @@ from app.users.schemas import (
     ProfileResponse,
     UserProfileUpdateRequest,
     IBMVerifyUpdateUserProfile,
+    SCIM_IBM_USER_EXT,
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
@@ -31,6 +32,40 @@ def merge_profile_updates(current_profile: dict, updated_fields: dict) -> dict:
             merged_profile[key] = value
 
     return merged_profile
+
+
+def set_identity_verified(profile: dict, is_verified: bool) -> dict:
+    # Upsert only identityVerified so we do not overwrite unrelated customAttributes.
+    """Ensure IBM extension customAttributes contains identityVerified with requested value."""
+    extension = profile.get("details")
+    if not isinstance(extension, dict):
+        extension = profile.get(SCIM_IBM_USER_EXT)
+    if not isinstance(extension, dict):
+        extension = {}
+
+    custom_attributes = extension.get("customAttributes")
+    if not isinstance(custom_attributes, list):
+        custom_attributes = []
+
+    attribute_updated = False
+    for attribute in custom_attributes:
+        if isinstance(attribute, dict) and attribute.get("name") == "identityVerified":
+            attribute["values"] = ["true" if is_verified else "false"]
+            attribute_updated = True
+            break
+
+    if not attribute_updated:
+        custom_attributes.append(
+            {
+                "name": "identityVerified",
+                "values": ["true" if is_verified else "false"],
+            }
+        )
+
+    extension["customAttributes"] = custom_attributes
+    profile["details"] = extension
+    profile.pop(SCIM_IBM_USER_EXT, None)
+    return profile
 
 
 async def update_profile_for_verified_changes(
@@ -65,6 +100,7 @@ async def update_profile_for_verified_changes(
     logger.info("Starting verified profile update")
 
     updated_user_data_dict = sanitize_user_profile_data(user_data)
+    identity_verified = updated_user_data_dict.pop("identityVerified", None)
 
     # Get current profile to merge with updates
     ibm_user_profile_response = await dispatch_get_my_profile_from_ibm(
@@ -75,6 +111,8 @@ async def update_profile_for_verified_changes(
     # For email changes, we allow the userName and emails to be updated
     # since OTP verification has already been completed
     merged_profile = merge_profile_updates(ibm_user_profile, updated_user_data_dict)
+    if identity_verified is not None:
+        merged_profile = set_identity_verified(merged_profile, identity_verified)
 
     validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
 
@@ -197,6 +235,7 @@ async def update_my_profile(
     validate_name_update(user_data)
 
     updated_user_data_dict = sanitize_user_profile_data(user_data)
+    identity_verified = updated_user_data_dict.pop("identityVerified", None)
 
     ibm_user_profile_response = await dispatch_get_my_profile_from_ibm(
         request.app.state.request_client, user_access_token
@@ -209,6 +248,8 @@ async def update_my_profile(
     updated_user_data_dict.pop(USER_ID_FIELD, None)
 
     merged_profile = merge_profile_updates(ibm_user_profile, updated_user_data_dict)
+    if identity_verified is not None:
+        merged_profile = set_identity_verified(merged_profile, identity_verified)
 
     validate_merged_profile = IBMVerifyUpdateUserProfile(**merged_profile)
 

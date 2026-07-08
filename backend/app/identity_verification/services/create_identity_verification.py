@@ -4,8 +4,11 @@ import uuid
 from urllib.parse import urlparse
 
 from httpx import AsyncClient
+from fastapi import Request
 
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
+from app.users.services.update_my_profile import update_profile_for_verified_changes
+from app.users.schemas import UserProfileUpdateRequest
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
 from app.config import BluinkConfig
@@ -18,12 +21,16 @@ BLUINK_API_URL = "https://demoeid.bluink.ca/api/prereg/v2/request-registration"
 
 
 async def idv_mock_success_response(
-    global_http_client: AsyncClient, user_access_token: str
+    request: Request, user_access_token: str
 ) -> ResponseModel:
     profile = await dispatch_get_my_profile_from_ibm(
-        global_http_client, user_access_token
+        request.app.state.request_client, user_access_token
     )
     profile_name = profile.name
+    user_data = UserProfileUpdateRequest(identityVerified=True)
+    await update_profile_for_verified_changes(
+        request, user_data=user_data, user_access_token=user_access_token
+    )
 
     mock_identity_response = {
         "given_name": profile_name.givenName if profile_name else None,

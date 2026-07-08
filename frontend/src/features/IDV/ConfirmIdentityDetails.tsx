@@ -8,7 +8,8 @@ import {
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
-import { DEV_ONLY_FEATURE } from "../../utils/constants";
+import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import { IDV_JOURNEY_TYPE } from "./constants";
 import { useUser } from "../../components/Providers/useUser";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import ProvenInformationCard from "../IDV/ProvenInformationCard";
@@ -16,21 +17,46 @@ import ViewProfileNameCard from "../ProfileName/components/ViewProfileNameCard";
 import ViewContactPhoneNumber from "../ContactPhoneNumber/components/ViewContactPhoneNumber";
 import DisplayEmailInfo from "../ProfileName/components/ViewEmailInfo";
 import { identityVerificationApi } from "./api/identityVerificationApi";
+import { useNavigate, useParams } from "react-router";
+import { path } from "../../utils/routeHelpers";
 
 export default function ConfirmIdentityDetails() {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
-
+  const { language, journeyType } = useParams();
   const { state } = useUser();
 
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
   const localizedDetail = state.relyingPartyInfo?.localized?.[i18n.language];
   const fallbackRedirectUrl =
     localizedDetail?.url ?? state.relyingPartyInfo?.url ?? "/";
+  const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
 
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
+  const redirectToRelyingParty = async () => {
+    try {
+      const response = await identityVerificationApi.getPostIdvRedirectUrl();
+      window.location.assign(response?.data?.redirect_url || fallbackRedirectUrl);
+    } catch (error) {
+      console.error("Unable to resolve post-IDV redirect URL:", error);
+      window.location.assign(fallbackRedirectUrl);
+    }
+  };
+
+  const handleContinue = async () => {
+    switch (journeyType) {
+      case IDV_JOURNEY_TYPE.REQUIRED:
+        redirectToRelyingParty();
+        break;
+      default:
+        navigate(backtoProfilePage, {
+          state: { showIDVSuccessNotice: true },
+        });
+    }
+  };
 
   return (
     <GcdsContainer role="main">
@@ -84,16 +110,7 @@ export default function ConfirmIdentityDetails() {
           type="button"
           onGcdsClick={async (event) => {
             event.preventDefault();
-            try {
-              const response =
-                await identityVerificationApi.getPostIdvRedirectUrl();
-              window.location.assign(
-                response?.data?.redirect_url || fallbackRedirectUrl,
-              );
-            } catch (error) {
-              console.error("Unable to resolve post-IDV redirect URL:", error);
-              window.location.assign(fallbackRedirectUrl);
-            }
+            handleContinue();
           }}
         >
           {t("ConfirmIdentityDetails.confirmAndContinue")}

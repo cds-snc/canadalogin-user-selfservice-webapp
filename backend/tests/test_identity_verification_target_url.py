@@ -56,6 +56,30 @@ async def test_store_identity_verification_target_url_accepts_wrapped_target_par
 
 
 @pytest.mark.asyncio
+async def test_store_identity_verification_target_url_preserves_full_wrapped_target_with_query_params():
+    mock_request = MagicMock()
+    mock_request.session = {}
+    full_target_url = (
+        "https://cds-gcsignin-dev.verify.ibm.com/oauth2/authorize"
+        "?client_id=d109133c-6984-4705-ac5c-eb3538b4c67d"
+        "&requestId=ed98aac7-9816-4206-bbaa-1fb6ccc8107e"
+        "&stateId=992423a4-fe88-4d49-9cb4-ef9f2626e74c"
+    )
+
+    with patch(
+        "app.identity_verification.services.target_url.get_configuration",
+        return_value=_build_config("https://cds-gcsignin-dev.verify.ibm.com"),
+    ):
+        response = await target_url_service.store_identity_verification_target_url(
+            mock_request,
+            f"?Target={full_target_url}",
+        )
+
+    assert mock_request.session[SessionKeys.IDV_TARGET_URL.value] == full_target_url
+    assert response.data["target_url"] == full_target_url
+
+
+@pytest.mark.asyncio
 async def test_store_identity_verification_target_url_rejects_mismatched_domain():
     mock_request = MagicMock()
     mock_request.session = {}

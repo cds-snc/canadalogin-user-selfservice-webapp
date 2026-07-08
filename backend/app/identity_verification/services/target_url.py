@@ -1,5 +1,5 @@
 import logging
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from fastapi import HTTPException, Request, status
 
@@ -28,6 +28,14 @@ def _extract_target_url(target_url: str) -> str:
         return stripped_target_url
 
     query_string = stripped_target_url[1:] if stripped_target_url.startswith("?") else stripped_target_url
+
+    # Preserve the full nested URL when input is raw query format, e.g.
+    # Target=https://.../oauth2/authorize?client_id=...&requestId=...&stateId=...
+    for key in ("Target", "target_url"):
+        prefix = f"{key}="
+        if query_string.startswith(prefix):
+            return unquote(query_string[len(prefix) :]).strip()
+
     target_values = parse_qs(query_string).get("Target", [])
 
     return target_values[0].strip() if target_values else stripped_target_url

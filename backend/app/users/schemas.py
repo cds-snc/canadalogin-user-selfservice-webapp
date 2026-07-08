@@ -13,6 +13,7 @@ from pydantic import (
     Field,
     ValidationInfo,
     field_validator,
+    model_validator,
 )
 
 SCIM_CORE_USER = "urn:ietf:params:scim:schemas:core:2.0:User"
@@ -77,12 +78,32 @@ class CustomAttribute(BaseModel):
 
 class SCIMUserDetails(BaseModel):
     emailVerified: Optional[str] = None
+    identityVerified: Optional[bool] = None
     lastLogin: Optional[str] = None
     lastMFA: Optional[List[MetaDataTypeValue]] = None
     twoFactorAuthentication: Optional[bool] = None
     pwdChangedTime: Optional[str] = None
     customAttributes: Optional[List[CustomAttribute]] = None
     model_config = ConfigDict(extra="allow")
+
+    @model_validator(mode="after")
+    def set_identity_verified_from_custom_attributes(self):
+        if self.identityVerified is not None or not self.customAttributes:
+            return self
+
+        for attribute in self.customAttributes:
+            if attribute.name != "identityVerified" or not attribute.values:
+                continue
+
+            value = attribute.values[0]
+            normalized = value.strip().lower()
+            if normalized == "true":
+                self.identityVerified = True
+            elif normalized == "false":
+                self.identityVerified = False
+            return self
+
+        return self
 
 
 class Meta(BaseModel):
@@ -203,6 +224,7 @@ class IBMVerifyUserProfileSchema(BaseModel):
 class UserProfileUpdateRequest(BaseModel):
     preferredLanguage: Optional[str] = None
     name: Optional[UserProfileName] = None
+    identityVerified: Optional[bool] = None
     user_id: Optional[str] = None
     userName: Optional[EmailStr] = (
         None  # refactor required so that userID is not confused with userName

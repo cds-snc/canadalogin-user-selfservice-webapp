@@ -26,6 +26,34 @@ import { useUser } from "../../components/Providers/useUser";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import { identityVerificationApi } from "./api/identityVerificationApi";
 
+function extractTargetUrl(searchParams: URLSearchParams): string | null {
+  const structuredTarget = searchParams.get(IDV_TARGET_URL_KEY);
+  if (structuredTarget) {
+    return structuredTarget;
+  }
+
+  const rawSearch =
+    typeof window !== "undefined" ? (window.location.search ?? "") : "";
+  const query = rawSearch.startsWith("?") ? rawSearch.slice(1) : rawSearch;
+  const rawPrefix = `${IDV_TARGET_URL_KEY}=`;
+
+  if (query.startsWith(rawPrefix)) {
+    const rawTargetValue = query.slice(rawPrefix.length);
+
+    if (!rawTargetValue) {
+      return null;
+    }
+
+    try {
+      return decodeURIComponent(rawTargetValue);
+    } catch {
+      return rawTargetValue;
+    }
+  }
+
+  return searchParams.get(IDV_TARGET_URL_KEY);
+}
+
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
@@ -72,7 +100,7 @@ export default function StartIdentityProofingPage() {
     }
     console.log("resolvedJourneyType", resolvedJourneyType);
 
-    const targetUrl = searchParams.get(IDV_TARGET_URL_KEY);
+    const targetUrl = extractTargetUrl(searchParams);
     if (!targetUrl) {
       return;
     }
