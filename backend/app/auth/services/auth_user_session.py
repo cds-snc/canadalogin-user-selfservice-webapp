@@ -120,6 +120,26 @@ async def get_user_info(request: Request):
     return token.get("userinfo")
 
 
+def get_session_user_info(request: Request):
+    """
+    Read user info directly from the server session without triggering token refresh.
+
+    This is used by session-management endpoints (SSE/keep-alive) where we only
+    need session identity (e.g., sid) and should not force an OAuth token refresh.
+    """
+    user_token = request.session.get(SessionKeys.SESSION_USER_TOKEN.value)
+    if not user_token:
+        logger.info("Not authenticated - no user token found")
+        raise OAuthError("user token not found")
+
+    user_info = user_token.get("userinfo")
+    if not user_info:
+        logger.info("Not authenticated - no user info found in session token")
+        raise OAuthError("user info not found")
+
+    return user_info
+
+
 async def get_user_access_token(request: Request):
     token = await ensure_user_token(request)
     return token.get("access_token")
@@ -203,7 +223,7 @@ async def session_event_sse_generator(request: Request):
     config = get_configuration()
     user_info = None
     try:
-        user_info = await get_user_info(request)
+        user_info = get_session_user_info(request)
     except OAuthError as oe:
         logger.error(f"OAuth error while fetching user info: {str(oe)}")
         return StreamingResponse(
@@ -300,8 +320,12 @@ async def session_extend(request: Request):
     remove it and return termination status with login URL.
     """
     config = get_configuration()
-    # Get user info from current session
-    user_info = await get_user_info(request)
+    # Validate/refresh token once on explicit keep-alive action.
+    # This keeps OAuth tokens fresh without doing refresh work in SSE polling.
+    try:
+        user_info = await get_user_info(request)
+    except OAuthError:
+        user_info = None
     if user_info is None:
         session_status = KeepAliveData(status="non-authenticated", login="re-login")
         return ResponseModel(
