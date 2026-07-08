@@ -207,6 +207,22 @@ async def test_ensure_user_token_errors_and_token_wrappers():
         assert rt == "rt"
 
 
+def test_get_session_user_info_raises_when_session_token_missing():
+    mock_request = MagicMock()
+    mock_request.session = {}
+
+    with pytest.raises(OAuthError, match="user token not found"):
+        auth_user_session.get_session_user_info(mock_request)
+
+
+def test_get_session_user_info_raises_when_userinfo_missing():
+    mock_request = MagicMock()
+    mock_request.session = {SessionKeys.SESSION_USER_TOKEN.value: {"access_token": "a"}}
+
+    with pytest.raises(OAuthError, match="user info not found"):
+        auth_user_session.get_session_user_info(mock_request)
+
+
 @pytest.mark.asyncio
 async def test_session_event_sse_generator_oautherror_and_no_sid():
     # oauth error path
