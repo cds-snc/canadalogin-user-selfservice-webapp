@@ -7,3 +7,4 @@ class SessionKeys(str, Enum):
     CALLBACK_ROUTE_NAME = "callback_route"
     SESSION_USER_TOKEN = "token"
     RP_CLIENT_ID_KEY = "rp_client_id"
+    IDV_TARGET_URL = "target_url"
