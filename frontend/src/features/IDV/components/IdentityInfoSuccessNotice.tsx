@@ -1,7 +1,7 @@
 import { GcdsNotice } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 
-import { DEV_ONLY_FEATURE } from "../../utils/constants";
+import { DEV_ONLY_FEATURE } from "../../../utils/constants";
 
 interface IdentityInfoSuccessNoticeProps {
   showIDVSuccessNotice?: boolean;

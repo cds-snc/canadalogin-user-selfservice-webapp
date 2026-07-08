@@ -15,7 +15,7 @@ import ViewLanguagePreferences from "../../features/LanguagePreference/component
 import ProvenInformationCard from "../../features/IDV/ProvenInformationCard";
 import ViewEmailInfo from "../../features/ProfileName/components/ViewEmailInfo";
 import CompleteIdentityProofingNotice from "../../features/IDV/components/CompleteIdentityProofingNotice";
-import IdentityInfoSuccessNotice from "../../features/IDV/IdentityInfoSuccessNotice";
+import IdentityInfoSuccessNotice from "../../features/IDV/components/IdentityInfoSuccessNotice";
 
 type ProfileHomeProps = {
   showIDVSuccessNotice?: boolean;
