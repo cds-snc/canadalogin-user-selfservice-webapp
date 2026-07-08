@@ -155,7 +155,7 @@ describe("StartIdentityProofingPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "How do you want to prove your identity?",
+        name: "Identity proofing confirms who you are, protects against fraud, and lets you recover your {{appName}} if needed.",
         level: 1,
       }),
     ).toBeInTheDocument();
