@@ -88,8 +88,7 @@ async def store_target_url(
 ):
     return await store_identity_verification_target_url(
         request.app.state.request_client,
-        payload.target_url,
-        user_access_token=user_access_token,
+        payload.target_url
     )
 
 
@@ -106,5 +105,5 @@ async def get_target_url(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await get_identity_verification_redirect_url(
-        request.app.state.request_client, user_access_token=user_access_token
+        request.app.state.request_client
     )
