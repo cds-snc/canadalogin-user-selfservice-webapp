@@ -216,8 +216,8 @@ async def test_session_event_sse_generator_oautherror_and_no_sid():
         "app.auth.services.auth_user_session.get_configuration", return_value=config
     ):
         with patch(
-            "app.auth.services.auth_user_session.get_user_info",
-            new=AsyncMock(side_effect=OAuthError("no")),
+            "app.auth.services.auth_user_session.get_session_user_info",
+            new=MagicMock(side_effect=OAuthError("no")),
         ):
             resp = await auth_user_session.session_event_sse_generator(mock_request)
             assert isinstance(resp, StreamingResponse)
@@ -228,8 +228,8 @@ async def test_session_event_sse_generator_oautherror_and_no_sid():
         "app.auth.services.auth_user_session.get_configuration", return_value=config
     ):
         with patch(
-            "app.auth.services.auth_user_session.get_user_info",
-            new=AsyncMock(return_value={}),
+            "app.auth.services.auth_user_session.get_session_user_info",
+            new=MagicMock(return_value={}),
         ):
             resp2 = await auth_user_session.session_event_sse_generator(mock_request)
             assert isinstance(resp2, StreamingResponse)
@@ -243,8 +243,11 @@ async def test_session_extend_active():
     with (
         patch(
             "app.auth.services.auth_user_session.get_user_info",
-            new_callable=AsyncMock,
-            return_value={"sid": "s1"},
+            new=AsyncMock(return_value={"sid": "s1"}),
+        ) as mock_get_user_info,
+        patch(
+            "app.auth.services.auth_user_session.get_session_user_info",
+            new=MagicMock(side_effect=AssertionError("should not be called")),
         ),
         patch(
             "app.auth.services.auth_user_session.get_session_metadata",
@@ -258,6 +261,7 @@ async def test_session_extend_active():
             resp = await auth_user_session.session_extend(mock_request)
             assert resp.success is True
             assert resp.message == "Session is active"
+            mock_get_user_info.assert_called_once_with(mock_request)
 
 
 @pytest.mark.asyncio
@@ -272,8 +276,8 @@ async def test_session_event_stream_active_and_expired():
             "app.auth.services.auth_user_session.get_configuration", return_value=config
         ),
         patch(
-            "app.auth.services.auth_user_session.get_user_info",
-            new=AsyncMock(return_value={"sid": "s1"}),
+            "app.auth.services.auth_user_session.get_session_user_info",
+            new=MagicMock(return_value={"sid": "s1"}),
         ),
         patch(
             "app.auth.services.auth_user_session.get_session_data_by_id",
@@ -315,8 +319,8 @@ async def test_session_event_stream_terminated_on_backchannel():
             "app.auth.services.auth_user_session.get_configuration", return_value=config
         ),
         patch(
-            "app.auth.services.auth_user_session.get_user_info",
-            new=AsyncMock(return_value={"sid": "s1"}),
+            "app.auth.services.auth_user_session.get_session_user_info",
+            new=MagicMock(return_value={"sid": "s1"}),
         ),
         patch(
             "app.auth.services.auth_user_session.get_session_data_by_id",
@@ -352,8 +356,8 @@ async def test_session_event_stream_handles_internal_error():
             "app.auth.services.auth_user_session.get_configuration", return_value=config
         ),
         patch(
-            "app.auth.services.auth_user_session.get_user_info",
-            new=AsyncMock(return_value={"sid": "s1"}),
+            "app.auth.services.auth_user_session.get_session_user_info",
+            new=MagicMock(return_value={"sid": "s1"}),
         ),
         patch(
             "app.auth.services.auth_user_session.get_session_data_by_id",
@@ -431,8 +435,7 @@ async def test_session_extend_terminated_when_too_old():
     with (
         patch(
             "app.auth.services.auth_user_session.get_user_info",
-            new_callable=AsyncMock,
-            return_value={"sid": "s1"},
+            new=AsyncMock(return_value={"sid": "s1"}),
         ),
         patch(
             "app.auth.services.auth_user_session.get_session_metadata",
@@ -447,3 +450,20 @@ async def test_session_extend_terminated_when_too_old():
             resp = await auth_user_session.session_extend(mock_request)
             assert resp.success is False
             assert resp.message == "Session terminated"
+
+
+@pytest.mark.asyncio
+async def test_session_extend_non_authenticated_when_refresh_fails():
+    mock_request = MagicMock()
+
+    with patch(
+        "app.auth.services.auth_user_session.get_user_info",
+        new=AsyncMock(side_effect=OAuthError("refresh failed")),
+    ):
+        with patch(
+            "app.auth.services.auth_user_session.get_configuration",
+            return_value=MagicMock(session_config=MagicMock(SESSION_LIFETIME=3600)),
+        ):
+            resp = await auth_user_session.session_extend(mock_request)
+            assert resp.success is False
+            assert resp.message == "User not authenticated"
