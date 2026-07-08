@@ -106,7 +106,7 @@ vi.mock(
   }),
 );
 
-vi.mock("../../../features/IDV/IdentityInfoSuccessNotice", () => ({
+vi.mock("../../../features/IDV/components/IdentityInfoSuccessNotice", () => ({
   default: ({ showIDVSuccessNotice }) =>
     showIDVSuccessNotice ? <div data-testid="idv-success-notice" /> : null,
 }));

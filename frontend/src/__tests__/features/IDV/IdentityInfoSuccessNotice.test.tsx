@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import IdentityInfoSuccessNotice from "../../../features/IDV/IdentityInfoSuccessNotice";
+import IdentityInfoSuccessNotice from "../../../features/IDV/components/IdentityInfoSuccessNotice";
 
 let mockDevOnlyFeature = true;
 
