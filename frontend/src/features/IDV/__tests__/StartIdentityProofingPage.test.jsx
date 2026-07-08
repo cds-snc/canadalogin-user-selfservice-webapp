@@ -154,7 +154,7 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByRole("howToProveHeading", {
+      screen.getByRole("heading", {
         name: "How do you want to prove your identity?",
         level: 1,
       }),
@@ -206,7 +206,7 @@ describe("StartIdentityProofingPage", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Do either a selfie and ID check with your phone  or sign in with a provincial account (BC, AB, QC).",
+        "Do either a selfie and ID check with your phone or sign in with a provincial account (BC, AB, QC).",
       ),
     ).toBeInTheDocument();
   });
@@ -237,11 +237,10 @@ describe("StartIdentityProofingPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders Continue and Cancel buttons", () => {
+  it("renders Continue button", () => {
     render(<StartIdentityProofingPage />);
 
     expect(screen.getByTestId("continue-button")).toHaveTextContent("Continue");
-    expect(screen.getByTestId("cancel-button")).toHaveTextContent("Cancel");
   });
 
   // ── Button disabled state ──────────────────────

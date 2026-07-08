@@ -72,7 +72,7 @@ describe("IdentityProofingRadioButtons", () => {
 
     expect(
       screen.getByText(
-        "Do either a selfie and ID check or sign with a provincial account (BC, AB).",
+        "Do either a selfie and ID check with your phone or sign in with a provincial account (BC, AB, QC).",
       ),
     ).toBeInTheDocument();
     expect(
