@@ -4,7 +4,9 @@ import pytest
 from fastapi import HTTPException
 
 from app.constants.session_keys import SessionKeys
-from app.identity_verification.services import target_url as target_url_service
+from app.identity_verification.services import (
+    redirect_target_url as target_url_service,
+)
 
 
 def _build_config(tenant_url: str):
@@ -17,7 +19,7 @@ async def test_store_identity_verification_target_url_sets_session_value():
     mock_request.session = {}
 
     with patch(
-        "app.identity_verification.services.target_url.get_configuration",
+        "app.identity_verification.services.redirect_target_url.get_configuration",
         return_value=_build_config("https://tenant.example.com"),
     ):
         response = await target_url_service.store_identity_verification_target_url(
@@ -39,7 +41,7 @@ async def test_store_identity_verification_target_url_accepts_wrapped_target_par
     mock_request.session = {}
 
     with patch(
-        "app.identity_verification.services.target_url.get_configuration",
+        "app.identity_verification.services.redirect_target_url.get_configuration",
         return_value=_build_config("https://cds-gcsignin-dev.verify.ibm.com"),
     ):
         response = await target_url_service.store_identity_verification_target_url(
@@ -65,7 +67,7 @@ async def test_store_identity_verification_target_url_preserves_full_wrapped_tar
     )
 
     with patch(
-        "app.identity_verification.services.target_url.get_configuration",
+        "app.identity_verification.services.redirect_target_url.get_configuration",
         return_value=_build_config("https://cds-gcsignin-dev.verify.ibm.com"),
     ):
         response = await target_url_service.store_identity_verification_target_url(
@@ -83,7 +85,7 @@ async def test_store_identity_verification_target_url_rejects_mismatched_domain(
     mock_request.session = {}
 
     with patch(
-        "app.identity_verification.services.target_url.get_configuration",
+        "app.identity_verification.services.redirect_target_url.get_configuration",
         return_value=_build_config("https://tenant.example.com"),
     ):
         with pytest.raises(HTTPException) as exc_info:
@@ -102,7 +104,7 @@ async def test_store_identity_verification_target_url_allows_same_hostname_with_
     mock_request.session = {}
 
     with patch(
-        "app.identity_verification.services.target_url.get_configuration",
+        "app.identity_verification.services.redirect_target_url.get_configuration",
         return_value=_build_config("https://tenant.example.com"),
     ):
         response = await target_url_service.store_identity_verification_target_url(
@@ -126,7 +128,7 @@ async def test_get_identity_verification_redirect_url_returns_and_clears_target(
     }
 
     with patch(
-        "app.identity_verification.services.target_url.get_configuration",
+        "app.identity_verification.services.redirect_target_url.get_configuration",
         return_value=_build_config("https://tenant.example.com"),
     ):
         response = await target_url_service.get_identity_verification_redirect_url(
@@ -143,7 +145,7 @@ async def test_get_identity_verification_redirect_url_falls_back_to_rp_url():
     mock_request.session = {}
 
     with patch(
-        "app.identity_verification.services.target_url.get_configuration",
+        "app.identity_verification.services.redirect_target_url.get_configuration",
         return_value=_build_config("https://tenant.example.com"),
     ):
         response = await target_url_service.get_identity_verification_redirect_url(
