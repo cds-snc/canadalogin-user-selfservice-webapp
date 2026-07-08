@@ -1,7 +1,8 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import StartIdentityProofingPage from "../StartIdentityProofingPage";
+import { identityVerificationApi } from "../api/identityVerificationApi";
 
 // ────────────────────────────────────────────────
 // Mocks
@@ -9,6 +10,7 @@ import StartIdentityProofingPage from "../StartIdentityProofingPage";
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
 let mockJourneyType;
+let mockSearchParams = new URLSearchParams();
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -16,13 +18,21 @@ vi.mock("react-router", async () => {
     ...actual,
     useParams: () => ({ language: "en", journeyType: mockJourneyType }),
     useNavigate: () => mockNavigate,
+    useSearchParams: () => [mockSearchParams, vi.fn()],
   };
 });
+
+vi.mock("../api/identityVerificationApi", () => ({
+  identityVerificationApi: {
+    storeTargetUrl: vi.fn().mockResolvedValue({ success: true }),
+  },
+}));
 
 vi.mock("../../../utils/constants", () => ({
   get DEV_ONLY_FEATURE() {
     return mockDevOnlyFeature;
   },
+  IDV_TARGET_URL_KEY: "target_url",
   PAGES: {
     idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
     idvProveIdentityOnlinePage: "IdvProveIdentityOnlinePage",
@@ -123,6 +133,7 @@ describe("StartIdentityProofingPage", () => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
     mockJourneyType = undefined;
+    mockSearchParams = new URLSearchParams();
     // Reset window.location.href
     delete window.location;
     window.location = { href: "" };
@@ -172,6 +183,44 @@ describe("StartIdentityProofingPage", () => {
         level: 1,
       }),
     ).toBeInTheDocument();
+  });
+
+  it("stores the target URL when the required journey includes one", async () => {
+    mockJourneyType = "required";
+    mockSearchParams = new URLSearchParams([
+      ["target_url", "https://rp.example.com/service/return"],
+    ]);
+
+    render(<StartIdentityProofingPage />);
+
+    await waitFor(() => {
+      expect(identityVerificationApi.storeTargetUrl).toHaveBeenCalledWith(
+        "https://rp.example.com/service/return",
+      );
+    });
+  });
+
+  it("stores the full raw target URL with nested query params", async () => {
+    mockJourneyType = "required";
+    const fullTargetUrl =
+      "https://cds-gcsignin-dev.verify.ibm.com/oauth2/authorize" +
+      "?client_id=d109133c-6984-4705-ac5c-eb3538b4c67d" +
+      "&requestId=ed98aac7-9816-4206-bbaa-1fb6ccc8107e" +
+      "&stateId=992423a4-fe88-4d49-9cb4-ef9f2626e74c";
+
+    mockSearchParams = new URLSearchParams(`target_url=${fullTargetUrl}`);
+    window.location = {
+      href: "",
+      search: `?target_url=${fullTargetUrl}`,
+    };
+
+    render(<StartIdentityProofingPage />);
+
+    await waitFor(() => {
+      expect(identityVerificationApi.storeTargetUrl).toHaveBeenCalledWith(
+        fullTargetUrl,
+      );
+    });
   });
 
   it("renders the heading with app name", () => {
