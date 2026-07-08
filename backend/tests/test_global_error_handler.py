@@ -1663,6 +1663,7 @@ class TestErrorHandlingFido2UpdateRegistrations:
         assert response_json["message"] == "User does not own this registration"
 
     @pytest.mark.asyncio
+    @patch.object(update_fido2_registrations_module, "dispatch_get_my_profile_from_ibm")
     @patch.object(update_fido2_registrations_module, "get_auth_request_headers")
     @patch.object(update_fido2_registrations_module, "verify_registration_ownership")
     @patch.object(update_fido2_registrations_module, "get_user_profile_info")
@@ -1673,6 +1674,7 @@ class TestErrorHandlingFido2UpdateRegistrations:
         mock_get_user_profile_info,
         mock_verify_registration_ownership,
         mock_get_auth_request_headers,
+        mock_dispatch_get_my_profile_from_ibm,
         mock_test_client,
     ):
         """Should handle error when HTTP PUT request fails"""
@@ -1699,6 +1701,9 @@ class TestErrorHandlingFido2UpdateRegistrations:
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin-token-xyz"
         }
+        mock_profile = MagicMock()
+        mock_profile.preferredLanguage = "en"
+        mock_dispatch_get_my_profile_from_ibm.return_value = mock_profile
 
         mock_client = AsyncMock(spec=AsyncClient)
         mock_request = Request(
