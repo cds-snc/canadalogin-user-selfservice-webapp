@@ -7,6 +7,7 @@ from httpx import AsyncClient
 from app.utils.access_token import get_auth_request_headers
 from app.utils.schemas import ResponseModel
 from app.constants.verify_endpoints import VerifyAPIEndpoint
+from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.fido2.schemas import UpdateRegistrationRequest
 from app.fido2.services.helper_utils import (
     get_tenant_url,
@@ -64,7 +65,11 @@ async def update_registration(
     reg_url = (
         f"{tenant_url}{VerifyAPIEndpoint.FIDO2_REGISTRATIONS.value}/{registration_id}"
     )
-    headers = get_auth_request_headers(user_access_token, json_content_type=True)
+    profile = await dispatch_get_my_profile_from_ibm(http_client, user_access_token)
+    user_language = profile.preferredLanguage or "en"
+    headers = get_auth_request_headers(
+        user_access_token, json_content_type=True, language=user_language
+    )
 
     update_response = await http_client.put(
         reg_url, headers=headers, json=update_payload
