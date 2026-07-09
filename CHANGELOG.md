@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.28.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.27.0...v1.28.0) (2026-07-09)
+
+
+### Features
+
+* **identity-verification:** APi to retrieve or store a Target URL ([#1816](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1816)) ([58f3c4d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/58f3c4dc8831b6418bdd732b25f06eb9066730bf))
+* **identity-verification:** get and retrieve target url for IDV flow ([#1826](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1826)) ([cc99011](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/cc99011c69ba05dcc1e6e7cb0be91aa89e01718f))
+* **identity-verification:** Get Ready to visit a canadapost location ([#1802](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1802)) ([72cd0ab](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/72cd0ab9e53e71b41c49bc5f37d76f38f4fb24ef))
+* **identity-verification:** implement endpoint for generating unique verification codes  ([#1801](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1801)) ([1689ad0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1689ad0a74778ac82d41e3000dbe19c371cc7365))
+* **identity-verification:** implement endpoint for generating unique verification codes and corresponding tests ([1689ad0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1689ad0a74778ac82d41e3000dbe19c371cc7365))
+* **identity-verification:** implement rate limiting and caching for in-person verification code ([97387d9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/97387d9dfce65d6dd32b0927872b26efc23b49a4))
+* **identity-verification:** send unique code email to users improvements ([#1804](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1804)) ([97387d9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/97387d9dfce65d6dd32b0927872b26efc23b49a4))
+
+
+### Bug Fixes
+
+* **accessibility:** enhance keyboard navigation focus handling in RootLayout and OTP components ([#1827](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1827)) ([859b378](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/859b378bffcaa0e475351aecef079a415c0572da))
+* **fido2:** rename passkey send email in user's language ([#1814](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1814)) ([d02021a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d02021ae244da85d92f0125b137ccaf10628d33d))
+* **identity-verification:** [FE - Content Update] Prove your Identity component ([#1810](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1810)) ([012a0c3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/012a0c3918fecdd23967ad2948faec21293f4e4e))
+* **session-management:** fix infinite session status endpoint looping when extending session ([#1812](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1812)) ([a5e3965](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a5e3965a1091f62d1eca3bb31b93f648cf123d66))
+
+
+### Miscellaneous Chores
+
+* bump production version to 1.27.0 ([#1800](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1800)) ([adef8cc](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/adef8cc27f9c12b7766b5751c538ee3226091c0a))
+* bump staging version to 1.27.0 ([#1798](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1798)) ([ae0ec06](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ae0ec065ea428122b65b3234664a7d49214dc861))
+
 ## [1.27.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.26.0...v1.27.0) (2026-07-06)
 
 
