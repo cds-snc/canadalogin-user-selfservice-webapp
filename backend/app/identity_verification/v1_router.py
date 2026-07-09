@@ -86,9 +86,7 @@ async def store_target_url(
     payload: StoreTargetUrlRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await store_identity_verification_target_url(
-        request, payload.target_url
-    )
+    return await store_identity_verification_target_url(request, payload.target_url)
 
 
 @router.get(
@@ -103,6 +101,4 @@ async def get_target_url(
     request: Request,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await get_identity_verification_redirect_url(
-        request
-    )
+    return await get_identity_verification_redirect_url(request)
