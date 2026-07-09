@@ -35,7 +35,9 @@ export default function StartIdentityProofingPage() {
     [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
       rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
     }),
-    [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.proveYourIdentity"),
+    [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.pageTitle", {
+      rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
+    }),
     [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.proveYourIdentity"),
   } as const;
   const requestedJourneyType = journeyType ?? IDV_JOURNEY_TYPE.START;
@@ -98,7 +100,18 @@ export default function StartIdentityProofingPage() {
             noticeTitle={t("StartIdentityProofing.errorNoticeTitle")}
             noticeTitleTag="h2"
           >
-            {t("StartIdentityProofing.errorNoticeDescription")}
+            <GcdsText>
+              {t("StartIdentityProofing.errorNoticeDescription")}
+            </GcdsText>
+          </GcdsNotice>
+        )}
+        {journeyType === IDV_JOURNEY_TYPE.START && (
+          <GcdsNotice
+            noticeRole="success"
+            noticeTitle={t("StartIdentityProofing.signedInSuccessNotice")}
+            noticeTitleTag="h2"
+          >
+            <GcdsText hidden={true}>{""}</GcdsText>
           </GcdsNotice>
         )}
         <GcdsContainer>
@@ -133,16 +146,6 @@ export default function StartIdentityProofingPage() {
             }}
           >
             {t("ServiceCanadaCentre.continueButton")}
-          </GcdsButton>
-          <GcdsButton
-            buttonRole="secondary"
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              // back to Relying Party page? For now, navigate to account settings page
-              navigate("/");
-            }}
-          >
-            {t("Button.cancel", { ns: "common" })}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>
