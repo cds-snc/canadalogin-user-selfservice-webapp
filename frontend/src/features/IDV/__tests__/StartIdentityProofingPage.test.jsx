@@ -208,10 +208,11 @@ describe("StartIdentityProofingPage", () => {
       "&requestId=ed98aac7-9816-4206-bbaa-1fb6ccc8107e" +
       "&stateId=992423a4-fe88-4d49-9cb4-ef9f2626e74c";
 
-    mockSearchParams = new URLSearchParams(`target_url=${fullTargetUrl}`);
+    mockSearchParams = new URLSearchParams();
+    mockSearchParams.set("target_url", fullTargetUrl);
     window.location = {
       href: "",
-      search: `?target_url=${fullTargetUrl}`,
+      search: `?target_url=${encodeURIComponent(fullTargetUrl)}`,
     };
 
     render(<StartIdentityProofingPage />);
