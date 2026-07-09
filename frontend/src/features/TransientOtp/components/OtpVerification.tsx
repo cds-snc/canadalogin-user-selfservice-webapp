@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { KeyboardEvent } from "react";
 
 import {
   GcdsButton,
@@ -22,6 +23,15 @@ type CaughtApiError = {
 };
 
 const initialTime = 10;
+
+function handleLinkButtonKeyDown(event: KeyboardEvent, action: () => void) {
+  if (event.key !== "Enter" && event.key !== " ") {
+    return;
+  }
+
+  event.preventDefault();
+  action();
+}
 
 function getRemainingSeconds(expiry?: string | null): number | null {
   if (!expiry) {
@@ -202,6 +212,10 @@ export default function OtpVerification({
     resetAttempts?.();
   };
 
+  const requestNewCodeAction = () => {
+    void handleRequestNewCode();
+  };
+
   return (
     <GcdsContainer role="main">
       {codeRequested ? (
@@ -374,9 +388,10 @@ export default function OtpVerification({
         ) : (
           <GcdsLink
             role="button"
-            onGcdsClick={() => {
-              void handleRequestNewCode();
-            }}
+            onGcdsClick={requestNewCodeAction}
+            onKeyDown={(event) =>
+              handleLinkButtonKeyDown(event, requestNewCodeAction)
+            }
           >
             {!isEmailFactor
               ? t("Verification.requestNewCode")
