@@ -93,7 +93,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
               <div className="separator" style={{ margin: "0" }} />
 
               <div>
-                <GcdsText marginTop="0" marginBottom="0">
+                <GcdsText>
                   <strong>{t("ServiceCanadaCentreCode.lastName")}</strong>
                 </GcdsText>
                 <GcdsText marginTop="200" marginBottom="0">
@@ -125,29 +125,31 @@ export default function ServiceCanadaCentreIDVCodePage() {
 
               <div className="separator" style={{ margin: "0" }} />
 
-              <GcdsGrid
-                columns="1"
-                columnsDesktop="max-content max-content"
-                gap="200"
-              >
-                <GcdsButton
-                  buttonRole="primary"
-                  type="button"
-                  onGcdsClick={handlePrintPage}
+              <div style={{ marginTop: "1.5rem" }}>
+                <GcdsGrid
+                  columns="1"
+                  columnsDesktop="max-content max-content"
+                  gap="200"
                 >
-                  {t("ServiceCanadaCentreCode.printPageButton")}
-                </GcdsButton>
-                <GcdsButton
-                  buttonRole="secondary"
-                  type="button"
-                  onGcdsClick={(event) => {
-                    event.preventDefault();
-                    navigate(serviceCanadaCentrePage);
-                  }}
-                >
-                  {t("ServiceCanadaCentreCode.updateInformationButton")}
-                </GcdsButton>
-              </GcdsGrid>
+                  <GcdsButton
+                    buttonRole="primary"
+                    type="button"
+                    onGcdsClick={handlePrintPage}
+                  >
+                    {t("ServiceCanadaCentreCode.printPageButton")}
+                  </GcdsButton>
+                  <GcdsButton
+                    buttonRole="secondary"
+                    type="button"
+                    onGcdsClick={(event) => {
+                      event.preventDefault();
+                      navigate(serviceCanadaCentrePage);
+                    }}
+                  >
+                    {t("ServiceCanadaCentreCode.updateInformationButton")}
+                  </GcdsButton>
+                </GcdsGrid>
+              </div>
             </GcdsGrid>
           </GcdsContainer>
         </GcdsContainer>
