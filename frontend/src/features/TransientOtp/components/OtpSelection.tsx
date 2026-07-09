@@ -1,4 +1,4 @@
-import type { KeyboardEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   GcdsButton,
   GcdsContainer,
@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { gcHelpCentreLinks } from "../../../utils/constants";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants";
+import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import type { Fido2Credential, OtpFactor } from "../../../types/hooks";
 import SMSIcon from "../../../assets/icons/sms_icon.svg?react";
 import VoiceIcon from "../../../assets/icons/voicecall_icon.svg?react";
@@ -76,15 +77,6 @@ function getMaskedPhoneDestination(destination?: string | null) {
 
   const lastFourDigits = getLastFourDigits(destination);
   return lastFourDigits ? `******-${lastFourDigits}` : destination;
-}
-
-function handleLinkButtonKeyDown(event: KeyboardEvent, action: () => void) {
-  if (event.key !== "Enter" && event.key !== " ") {
-    return;
-  }
-
-  event.preventDefault();
-  action();
 }
 
 export default function OtpSelection({

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import type { KeyboardEvent } from "react";
 
 import {
   GcdsButton,
@@ -15,6 +14,7 @@ import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../utils/constants";
+import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type { OtpFactor } from "../../../types/hooks";
 
@@ -23,15 +23,6 @@ type CaughtApiError = {
 };
 
 const initialTime = 10;
-
-function handleLinkButtonKeyDown(event: KeyboardEvent, action: () => void) {
-  if (event.key !== "Enter" && event.key !== " ") {
-    return;
-  }
-
-  event.preventDefault();
-  action();
-}
 
 function getRemainingSeconds(expiry?: string | null): number | null {
   if (!expiry) {

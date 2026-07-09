@@ -1,4 +1,4 @@
-import type { FormEventHandler, KeyboardEvent } from "react";
+import type { FormEventHandler } from "react";
 import { useState } from "react";
 
 import {
@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../utils/constants";
+import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import { useOtpExpiryCountdown } from "../../../hooks/useOtpExpiryCountdown";
 import type {
@@ -60,15 +61,6 @@ function PageHeader({
       </GcdsText>
     </>
   );
-}
-
-function handleLinkButtonKeyDown(event: KeyboardEvent, action: () => void) {
-  if (event.key !== "Enter" && event.key !== " ") {
-    return;
-  }
-
-  event.preventDefault();
-  action();
 }
 
 export default function OtpVerification({
