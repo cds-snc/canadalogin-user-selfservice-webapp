@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -32,33 +31,27 @@ export default function ConfirmIdentityDetails() {
   const localizedDetail = state.relyingPartyInfo?.localized?.[i18n.language];
   const fallbackRedirectUrl =
     localizedDetail?.url ?? state.relyingPartyInfo?.url ?? "/";
-  const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
+  const backToProfilePage = path(PAGES.ProfileHome, { language });
 
-  let rp_redirect_target_url = "";
-  useEffect(() => {
-    const fetchRedirectUrl = async () => {
-      if (journeyType === IDV_JOURNEY_TYPE.REQUIRED) {
-        try {
-          const response =
-            await identityVerificationApi.getPostIdvRedirectUrl();
-          rp_redirect_target_url =
-            response?.data?.redirect_url || fallbackRedirectUrl;
-        } catch (error) {
-          console.error("Unable to resolve post-IDV redirect URL:", error);
-        }
-      }
-    };
-    fetchRedirectUrl();
-  }, [journeyType]);
+  const redirectToRelyingParty = async () => {
+    try {
+      const response = await identityVerificationApi.getPostIdvRedirectUrl();
+      window.location.assign(
+        response?.data?.redirect_url || fallbackRedirectUrl,
+      );
+    } catch (error) {
+      console.error("Unable to resolve post-IDV redirect URL:", error);
+      window.location.assign(fallbackRedirectUrl);
+    }
+  };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     switch (journeyType) {
       case IDV_JOURNEY_TYPE.REQUIRED:
-        window.location.assign(rp_redirect_target_url);
-
+        await redirectToRelyingParty();
         break;
       default:
-        navigate(backtoProfilePage, {
+        navigate(backToProfilePage, {
           state: { showIDVSuccessNotice: true },
         });
     }
@@ -120,7 +113,7 @@ export default function ConfirmIdentityDetails() {
           type="button"
           onGcdsClick={(event) => {
             event.preventDefault();
-            handleContinue();
+            void handleContinue();
           }}
         >
           {t("ConfirmIdentityDetails.confirmAndContinue")}
