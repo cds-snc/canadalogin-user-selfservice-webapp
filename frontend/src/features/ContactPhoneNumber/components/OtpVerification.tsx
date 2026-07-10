@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../utils/constants";
+import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import { useOtpExpiryCountdown } from "../../../hooks/useOtpExpiryCountdown";
 import type {
@@ -125,6 +126,22 @@ export default function OtpVerification({
 
   const userMfaType = phoneFormData.otpType;
 
+  const switchVerificationMethod = () => {
+    const newOtpType =
+      userMfaType === FLOW_TYPES.sms ? FLOW_TYPES.voice : FLOW_TYPES.sms;
+    onChangePhoneForm("otpType", newOtpType);
+    void requestNewCode(newOtpType);
+  };
+
+  const requestNewCodeAction = () => {
+    void requestNewCode();
+  };
+
+  const tryAnotherWayAction = () => {
+    clearValues();
+    void onBack();
+  };
+
   return (
     <GcdsContainer role="main">
       {codeRequested ? (
@@ -229,14 +246,10 @@ export default function OtpVerification({
       <GcdsText>
         <GcdsLink
           role="button"
-          onGcdsClick={() => {
-            const newOtpType =
-              userMfaType === FLOW_TYPES.sms
-                ? FLOW_TYPES.voice
-                : FLOW_TYPES.sms;
-            onChangePhoneForm("otpType", newOtpType);
-            void requestNewCode(newOtpType);
-          }}
+          onGcdsClick={switchVerificationMethod}
+          onKeyDown={(event) =>
+            handleLinkButtonKeyDown(event, switchVerificationMethod)
+          }
         >
           {userMfaType === FLOW_TYPES.sms
             ? t("Verification.setupVoiceInstead")
@@ -256,9 +269,10 @@ export default function OtpVerification({
         ) : (
           <GcdsLink
             role="button"
-            onGcdsClick={() => {
-              void requestNewCode();
-            }}
+            onGcdsClick={requestNewCodeAction}
+            onKeyDown={(event) =>
+              handleLinkButtonKeyDown(event, requestNewCodeAction)
+            }
           >
             {t("Verification.requestNewCode")}
           </GcdsLink>
@@ -268,10 +282,10 @@ export default function OtpVerification({
       <GcdsText>
         <GcdsLink
           role="button"
-          onGcdsClick={() => {
-            clearValues();
-            void onBack();
-          }}
+          onGcdsClick={tryAnotherWayAction}
+          onKeyDown={(event) =>
+            handleLinkButtonKeyDown(event, tryAnotherWayAction)
+          }
         >
           {t("Verification.tryAnotherWay")}
         </GcdsLink>

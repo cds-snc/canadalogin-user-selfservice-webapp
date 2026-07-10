@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../utils/constants";
+import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type { OtpFactor } from "../../../types/hooks";
 
@@ -202,6 +203,10 @@ export default function OtpVerification({
     resetAttempts?.();
   };
 
+  const requestNewCodeAction = () => {
+    void handleRequestNewCode();
+  };
+
   return (
     <GcdsContainer role="main">
       {codeRequested ? (
@@ -374,9 +379,10 @@ export default function OtpVerification({
         ) : (
           <GcdsLink
             role="button"
-            onGcdsClick={() => {
-              void handleRequestNewCode();
-            }}
+            onGcdsClick={requestNewCodeAction}
+            onKeyDown={(event) =>
+              handleLinkButtonKeyDown(event, requestNewCodeAction)
+            }
           >
             {!isEmailFactor
               ? t("Verification.requestNewCode")

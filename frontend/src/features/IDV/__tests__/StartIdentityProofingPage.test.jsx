@@ -166,7 +166,7 @@ describe("StartIdentityProofingPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Prove your identity",
+        name: "RP Name needs you to prove your identity",
         level: 1,
       }),
     ).toBeInTheDocument();
@@ -208,10 +208,11 @@ describe("StartIdentityProofingPage", () => {
       "&requestId=ed98aac7-9816-4206-bbaa-1fb6ccc8107e" +
       "&stateId=992423a4-fe88-4d49-9cb4-ef9f2626e74c";
 
-    mockSearchParams = new URLSearchParams(`target_url=${fullTargetUrl}`);
+    mockSearchParams = new URLSearchParams();
+    mockSearchParams.set("target_url", fullTargetUrl);
     window.location = {
       href: "",
-      search: `?target_url=${fullTargetUrl}`,
+      search: `?target_url=${encodeURIComponent(fullTargetUrl)}`,
     };
 
     render(<StartIdentityProofingPage />);
@@ -255,7 +256,7 @@ describe("StartIdentityProofingPage", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Do either a selfie and ID check or sign with a provincial account (BC, AB).",
+        "Do either a selfie and ID check with your phone or sign in with a provincial account (BC, AB, QC).",
       ),
     ).toBeInTheDocument();
   });
@@ -286,11 +287,10 @@ describe("StartIdentityProofingPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders Continue and Cancel buttons", () => {
+  it("renders Continue button", () => {
     render(<StartIdentityProofingPage />);
 
     expect(screen.getByTestId("continue-button")).toHaveTextContent("Continue");
-    expect(screen.getByTestId("cancel-button")).toHaveTextContent("Cancel");
   });
 
   // ── Button disabled state ──────────────────────
@@ -366,14 +366,5 @@ describe("StartIdentityProofingPage", () => {
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/not-ready",
     );
-  });
-
-  // ── Cancel button ──────────────────────────────
-  it("navigates to home when Cancel button is clicked", () => {
-    render(<StartIdentityProofingPage />);
-
-    fireEvent.click(screen.getByTestId("cancel-button"));
-
-    expect(mockNavigate).toHaveBeenCalledWith("/");
   });
 });

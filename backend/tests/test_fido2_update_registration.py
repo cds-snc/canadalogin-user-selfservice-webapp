@@ -20,6 +20,19 @@ update_registration = update_module.update_registration
 class TestUpdateRegistration:
     """Tests for update_registration function"""
 
+    @pytest.fixture(autouse=True)
+    def mock_user_profile_language(self):
+        """Mock profile fetch used for localized IBM Verify notifications."""
+        mock_profile = MagicMock()
+        mock_profile.preferredLanguage = "en"
+
+        with patch.object(
+            update_module,
+            "dispatch_get_my_profile_from_ibm",
+            AsyncMock(return_value=mock_profile),
+        ):
+            yield
+
     @pytest.fixture
     def mock_http_client(self):
         """Create a mock HTTP client"""
@@ -495,7 +508,7 @@ class TestUpdateRegistration:
         )
 
         mock_get_auth_request_headers.assert_called_once_with(
-            "user-token-abc", json_content_type=True
+            "user-token-abc", json_content_type=True, language="en"
         )
 
     @pytest.mark.asyncio

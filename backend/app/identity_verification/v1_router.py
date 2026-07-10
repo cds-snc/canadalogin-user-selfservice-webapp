@@ -11,7 +11,7 @@ from app.identity_verification.services.create_identity_verification import (
 from app.identity_verification.services.send_in_person_verification_code import (
     send_in_person_verification_code,
 )
-from app.identity_verification.services.target_url import (
+from app.identity_verification.services.redirect_target_url import (
     get_identity_verification_redirect_url,
     store_identity_verification_target_url,
 )

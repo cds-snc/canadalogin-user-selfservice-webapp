@@ -6,6 +6,7 @@ import { identityVerificationApi } from "../api/identityVerificationApi";
 
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
+let mockJourneyType;
 let mockUserState = {
   userProfile: {
     userName: "test@example.com",
@@ -20,7 +21,7 @@ vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
     ...actual,
-    useParams: () => ({ language: "en" }),
+    useParams: () => ({ language: "en", journeyType: mockJourneyType }),
     useNavigate: () => mockNavigate,
   };
 });
@@ -103,6 +104,7 @@ describe("ConfirmIdentityDetails", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
+    mockJourneyType = undefined;
     Object.defineProperty(window, "location", {
       configurable: true,
       value: {
@@ -195,6 +197,8 @@ describe("ConfirmIdentityDetails", () => {
   });
 
   it("redirects to the stored RP target when Confirm and continue is clicked", async () => {
+    mockJourneyType = "required";
+
     render(<ConfirmIdentityDetails />);
 
     fireEvent.click(
