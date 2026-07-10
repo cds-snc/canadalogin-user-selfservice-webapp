@@ -11,6 +11,7 @@ import {
   CONTEXT_ACTIONS,
   SUBMIT_END_POINTS,
   RP_CLIENT_ID_KEY,
+  IDV_TARGET_URL_KEY,
 } from "../../utils/constants";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService";
@@ -43,7 +44,7 @@ function getRpClientId(searchParams: URLSearchParams): string | undefined {
     return topLevelClientId;
   }
 
-  const target = searchParams.get("Target") ?? searchParams.get("target");
+  const target = searchParams.get(IDV_TARGET_URL_KEY);
   if (!target) {
     return undefined;
   }
