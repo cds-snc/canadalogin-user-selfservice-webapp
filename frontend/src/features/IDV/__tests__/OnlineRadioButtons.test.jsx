@@ -73,7 +73,7 @@ describe("OnlineRadioButtons", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /BC Service Card or Alberta\.ca account to prove your identity/,
+        /BC Service Card, Alberta\.ca account or Quebec.*prove your identity/,
       ),
     ).toBeInTheDocument();
   });
