@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { gcHelpCentreLinks } from "../../../utils/constants";
 
 import { FLOW_TYPES, PAGES } from "../../../utils/constants";
+import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import type { Fido2Credential, OtpFactor } from "../../../types/hooks";
 import SMSIcon from "../../../assets/icons/sms_icon.svg?react";
 import VoiceIcon from "../../../assets/icons/voicecall_icon.svg?react";
@@ -186,6 +187,11 @@ export default function OtpSelection({
                       digits: getLastFourDigits(factor.destination),
                     })}
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
+                    onKeyDown={(event) =>
+                      handleLinkButtonKeyDown(event, () =>
+                        handlePhoneFactorSelect(factor.id),
+                      )
+                    }
                   >
                     {t("TransientOtpSelection.textMe")}
                   </GcdsLink>
@@ -233,6 +239,11 @@ export default function OtpSelection({
                       digits: getLastFourDigits(factor.destination),
                     })}
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
+                    onKeyDown={(event) =>
+                      handleLinkButtonKeyDown(event, () =>
+                        handlePhoneFactorSelect(factor.id),
+                      )
+                    }
                   >
                     {t("TransientOtpSelection.callMe")}
                   </GcdsLink>
@@ -275,7 +286,18 @@ export default function OtpSelection({
                     aria-label={t("TransientOtpSelection.verifyWithPasskey", {
                       name: passkey.attributes?.nickname ?? passkey.id,
                     })}
-                    onGcdsClick={() => onSelectFIDO2 && onSelectFIDO2(passkey)}
+                    onGcdsClick={() => {
+                      if (onSelectFIDO2) {
+                        onSelectFIDO2(passkey);
+                      }
+                    }}
+                    onKeyDown={(event) =>
+                      handleLinkButtonKeyDown(event, () => {
+                        if (onSelectFIDO2) {
+                          onSelectFIDO2(passkey);
+                        }
+                      })
+                    }
                   >
                     {t("TransientOtpSelection.verify")}
                   </GcdsLink>
@@ -317,6 +339,11 @@ export default function OtpSelection({
                     role="button"
                     style={actionLinkStyle}
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
+                    onKeyDown={(event) =>
+                      handleLinkButtonKeyDown(event, () =>
+                        handlePhoneFactorSelect(factor.id),
+                      )
+                    }
                   >
                     {t("TransientOtpSelection.emailMe")}
                   </GcdsLink>

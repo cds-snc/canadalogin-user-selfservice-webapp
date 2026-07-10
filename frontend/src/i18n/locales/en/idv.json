@@ -146,11 +146,11 @@
   "StartIdentityProofing": {
     "pageTitle": "{{rpName}} needs you to prove your identity",
     "proveYourIdentity": "Prove your identity",
-    "heading": "Identity proofing confirms who you are, protects against fraud, and lets you recover your {{appName}} if needed. ",
+    "heading": "Identity proofing confirms who you are, protects against fraud, and lets you recover your {{appName}} if needed.",
     "learnMoreDescription": "Learn more about identity proofing",
     "howToProveHeading": "How do you want to prove your identity?",
     "onlineInstantOption": "Prove identity online and get instant access",
-    "onlineInstantHint": "Do either a selfie and ID check or sign with a provincial account (BC, AB).",
+    "onlineInstantHint": "Do either a selfie and ID check with your phone or sign in with a provincial account (BC, AB, QC).",
     "inPersonSignBackInOption": "Do it in person and sign back in when done",
     "inPersonSignBackInHint": "Set up a visit to a Canada Post or Service Canada Centre with valid government-issued ID.",
     "cantProveNowOption": "Need more time, or a different way in",

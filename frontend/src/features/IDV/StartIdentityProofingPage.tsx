@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
@@ -11,7 +11,11 @@ import {
   GcdsNotice,
 } from "@gcds-core/components-react";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import {
+  DEV_ONLY_FEATURE,
+  IDV_TARGET_URL_KEY,
+  PAGES,
+} from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 import IdentityProofingRadioButtons from "./components/IdentityProofingRadioButtons";
 import {
@@ -20,10 +24,40 @@ import {
 } from "./components/methods";
 import { useUser } from "../../components/Providers/useUser";
 import { IDV_JOURNEY_TYPE } from "./constants";
+import { identityVerificationApi } from "./api/identityVerificationApi";
+
+function extractTargetUrl(searchParams: URLSearchParams): string | null {
+  const structuredTarget = searchParams.get(IDV_TARGET_URL_KEY);
+  if (structuredTarget) {
+    return structuredTarget;
+  }
+
+  const rawSearch =
+    typeof window !== "undefined" ? (window.location.search ?? "") : "";
+  const query = rawSearch.startsWith("?") ? rawSearch.slice(1) : rawSearch;
+  const rawPrefix = `${IDV_TARGET_URL_KEY}=`;
+
+  if (query.startsWith(rawPrefix)) {
+    const rawTargetValue = query.slice(rawPrefix.length);
+
+    if (!rawTargetValue) {
+      return null;
+    }
+
+    try {
+      return decodeURIComponent(rawTargetValue);
+    } catch {
+      return rawTargetValue;
+    }
+  }
+
+  return searchParams.get(IDV_TARGET_URL_KEY);
+}
 
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
+  const [searchParams] = useSearchParams();
 
   const { t, i18n } = useTranslation("idv");
   const { state } = useUser();
@@ -35,7 +69,9 @@ export default function StartIdentityProofingPage() {
     [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
       rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
     }),
-    [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.proveYourIdentity"),
+    [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.pageTitle", {
+      rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
+    }),
     [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.proveYourIdentity"),
   } as const;
   const requestedJourneyType = journeyType ?? IDV_JOURNEY_TYPE.START;
@@ -59,6 +95,22 @@ export default function StartIdentityProofingPage() {
     language,
     journeyType,
   });
+
+  useEffect(() => {
+    if (resolvedJourneyType !== IDV_JOURNEY_TYPE.REQUIRED) {
+      return;
+    }
+
+    const targetUrl = extractTargetUrl(searchParams);
+    if (!targetUrl) {
+      return;
+    }
+
+    void identityVerificationApi.storeTargetUrl(targetUrl).catch((error) => {
+      console.error("Unable to store IDV target URL:", error);
+    });
+  }, [resolvedJourneyType, searchParams]);
+
   // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
     switch (selectedOption) {
@@ -98,7 +150,18 @@ export default function StartIdentityProofingPage() {
             noticeTitle={t("StartIdentityProofing.errorNoticeTitle")}
             noticeTitleTag="h2"
           >
-            {t("StartIdentityProofing.errorNoticeDescription")}
+            <GcdsText>
+              {t("StartIdentityProofing.errorNoticeDescription")}
+            </GcdsText>
+          </GcdsNotice>
+        )}
+        {journeyType === IDV_JOURNEY_TYPE.START && (
+          <GcdsNotice
+            noticeRole="success"
+            noticeTitle={t("StartIdentityProofing.signedInSuccessNotice")}
+            noticeTitleTag="h2"
+          >
+            <GcdsText hidden={true}>{""}</GcdsText>
           </GcdsNotice>
         )}
         <GcdsContainer>
@@ -133,16 +196,6 @@ export default function StartIdentityProofingPage() {
             }}
           >
             {t("ServiceCanadaCentre.continueButton")}
-          </GcdsButton>
-          <GcdsButton
-            buttonRole="secondary"
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              // back to Relying Party page? For now, navigate to account settings page
-              navigate("/");
-            }}
-          >
-            {t("Button.cancel", { ns: "common" })}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>

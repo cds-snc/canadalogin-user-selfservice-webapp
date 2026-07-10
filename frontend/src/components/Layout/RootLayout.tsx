@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation, useMatches } from "react-router";
 import { useLanguage } from "../Providers/LanguageProvider";
 import { useRelyingPartyAnalyticsParams } from "../../hooks/useRelyingPartyAnalyticsParams";
+import { useFirstTabPageFocus } from "../../hooks/useFirstTabPageFocus";
 import { getLangValues } from "../../utils/functions";
 import { setAnalyticsContext, trackPage } from "../../utils/gatag";
 import { PAGES } from "../../utils/constants";
@@ -38,7 +39,7 @@ const DisplayReleaseTag = () => {
 };
 
 export default function RootLayout() {
-  const { pathname } = useLocation();
+  const { pathname, search, hash } = useLocation();
   const matches = useMatches();
   const { state: languageState } = useLanguage();
   const { language } = languageState;
@@ -67,6 +68,13 @@ export default function RootLayout() {
 
     trackPage(pathname, pageId, rpParams);
   }, [pathname, pageId, rpParams]);
+
+  useFirstTabPageFocus({
+    pathname,
+    search,
+    hash,
+    mainContentId: "main-content",
+  });
 
   return (
     <div className="mainBody">
