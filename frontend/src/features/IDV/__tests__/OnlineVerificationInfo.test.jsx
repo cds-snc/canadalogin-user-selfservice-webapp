@@ -160,16 +160,16 @@ describe("OnlineVerificationInfo", () => {
     render(<OnlineVerificationInfo />);
 
     expect(
-      screen.getByText("You will need one government issued photo ID"),
+      screen.getByText("You will need one government issued photo ID."),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Take a selfie and a photo of your ID in a well lit room/,
+        "Take a selfie and then a photo of your ID in a well lit room using a mobile phone camera when prompted.",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Confirm your submission and get your proofing results to continue",
+        "Confirm your submission and get your proofing results to continue.",
       ),
     ).toBeInTheDocument();
   });
@@ -178,7 +178,12 @@ describe("OnlineVerificationInfo", () => {
     render(<OnlineVerificationInfo />);
 
     expect(
-      screen.getByText("Plan for about 5 minutes to complete this process."),
+      screen.getByText((_, element) => {
+        return (
+          element?.textContent?.replace(/\s+/g, " ").trim() ===
+          "Plan for about 5 minutes to complete this process."
+        );
+      }),
     ).toBeInTheDocument();
   });
 
@@ -201,7 +206,9 @@ describe("OnlineVerificationInfo", () => {
     render(<OnlineVerificationInfo />);
 
     expect(screen.getByTestId("continue-button")).toHaveTextContent("Continue");
-    expect(screen.getByTestId("back-button")).toHaveTextContent("Back");
+    expect(screen.getByTestId("back-button")).toHaveTextContent(
+      "Choose a different method",
+    );
   });
 
   it("calls navigate(-1) when Back button is clicked", () => {

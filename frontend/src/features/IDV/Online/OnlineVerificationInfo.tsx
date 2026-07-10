@@ -8,7 +8,7 @@ import {
   GcdsContainer,
   GcdsHeading,
 } from "@gcds-core/components-react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
@@ -86,36 +86,51 @@ export default function OnlineVerificationInfo() {
           <GcdsText>
             <strong>{t("OnlineVerificationInfo.followSteps")}</strong>
           </GcdsText>
-          <ol>
-            <li>
-              <GcdsText marginBottom="0">
-                {t("OnlineVerificationInfo.step1")}
-              </GcdsText>
-              <GcdsDetails
-                detailsTitle={t("OnlineVerificationInfo.listOfAcceptableIds")}
-              >
-                <ul
-                  aria-label={t("OnlineVerificationInfo.listOfAcceptableIds")}
-                >
-                  {APPROVED_DOCUMENT_VALUES.filter(
-                    (docValue) => docValue !== "noIds",
-                  ).map((docValue) => (
-                    <li key={docValue}>{t(`ApprovedDocuments.${docValue}`)}</li>
-                  ))}
-                </ul>
-              </GcdsDetails>
-            </li>
-            <li>
-              <GcdsText marginBottom="0">
-                {t("OnlineVerificationInfo.step2")}
-              </GcdsText>
-            </li>
-            <li>
-              <GcdsText>{t("OnlineVerificationInfo.step3")}</GcdsText>
-            </li>
-          </ol>
           <GcdsText marginBottom="0">
-            {t("OnlineVerificationInfo.planForTime")}
+            <ol>
+              <li>
+                <GcdsText marginBottom="0">
+                  {t("OnlineVerificationInfo.step1")}
+                </GcdsText>
+                <GcdsText marginBottom="0">
+                  <ol type="a">
+                    <li>{t("OnlineVerificationInfo.expiredIdsAccepted")}</li>
+                  </ol>
+                </GcdsText>
+                <GcdsDetails
+                  detailsTitle={t("OnlineVerificationInfo.listOfAcceptableIds")}
+                >
+                  <ol
+                    aria-label={t("OnlineVerificationInfo.listOfAcceptableIds")}
+                  >
+                    {APPROVED_DOCUMENT_VALUES.filter(
+                      (docValue) => docValue !== "noIds",
+                    ).map((docValue) => (
+                      <li key={docValue}>
+                        {t(`ApprovedDocuments.${docValue}`)}
+                      </li>
+                    ))}
+                  </ol>
+                </GcdsDetails>
+              </li>
+              <li>
+                <GcdsText marginBottom="0">
+                  {t("OnlineVerificationInfo.step2")}
+                </GcdsText>
+              </li>
+              <li>
+                <GcdsText>{t("OnlineVerificationInfo.step3")}</GcdsText>
+              </li>
+            </ol>
+          </GcdsText>
+          <GcdsText marginBottom="0">
+            <Trans
+              i18nKey="idv:OnlineVerificationInfo.planForTime"
+              values={{
+                duration: t("idv:OnlineVerificationInfo.timeDuration"),
+              }}
+              components={{ strong: <strong /> }}
+            />
           </GcdsText>
         </GcdsContainer>
 
@@ -136,7 +151,7 @@ export default function OnlineVerificationInfo() {
               navigate(-1);
             }}
           >
-            {t("OnlineVerificationInfo.backButton")}
+            {t("OnlineVerificationInfo.chooseDifferentMethodButton")}
           </GcdsButton>
         </GcdsGrid>
 
