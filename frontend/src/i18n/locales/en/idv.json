@@ -142,10 +142,7 @@
     "changedMindText": "Changed your mind about in-person proofing at Canada Post? You can reset and choose a different method instead.",
     "resetButton": "Reset and choose another method",
     "resendButton": "Resend email",
-    "completedProofingLabel": "Already completed proofing in-person?",
-    "completedProofingDefaultOption": "Select an option",
-    "completedProofingNoOption": "No, not yet",
-    "completedProofingYesOption": "Yes, continue"
+    "completedProofingLabel": "Already completed proofing in-person?"
   },
   "StartIdentityProofing": {
     "pageTitle": "{{rpName}} needs you to prove your identity",

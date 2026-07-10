@@ -119,7 +119,7 @@ export default function InPersonProofingInProgress() {
             buttonRole="secondary"
             onGcdsClick={(event: Event) => {
               event.preventDefault();
-              void handleResendEmail();
+              handleResendEmail();
             }}
           >
             {t("InPersonProofingInProgress.resendButton")}
