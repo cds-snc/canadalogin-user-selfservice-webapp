@@ -100,8 +100,12 @@ async def _enforce_ip_rate_limit(redis_client, client_ip: str) -> None:
 
 
 async def _enforce_user_limits(redis_client, user_hash: str) -> None:
+    await _enforce_user_daily_limit(redis_client, user_hash)
+    await _enforce_user_cooldown(redis_client, user_hash)
+
+
+async def _enforce_user_daily_limit(redis_client, user_hash: str) -> None:
     daily_key = f"{USER_DAILY_KEY_PREFIX}:{user_hash}"
-    cooldown_key = f"{USER_COOLDOWN_KEY_PREFIX}:{user_hash}"
 
     daily_raw = await redis_client.get(daily_key)
     daily_count = int(daily_raw) if daily_raw else 0
@@ -115,6 +119,10 @@ async def _enforce_user_limits(redis_client, user_hash: str) -> None:
             daily_count,
         )
         raise _build_rate_limit_error("user_daily_limit", retry_after)
+
+
+async def _enforce_user_cooldown(redis_client, user_hash: str) -> None:
+    cooldown_key = f"{USER_COOLDOWN_KEY_PREFIX}:{user_hash}"
 
     cooldown_ttl = await redis_client.ttl(cooldown_key)
     if cooldown_ttl > 0:
@@ -193,6 +201,7 @@ async def send_in_person_verification_code(
     global_http_client: AsyncClient,
     user_access_token: str,
     request: Request | None = None,
+    resend_existing_code: bool = False,
 ) -> ResponseModel:
     """Sends an in-person identity verification email via GC Notify containing
     a verification code the user must present at a Service Canada Centre.
@@ -226,7 +235,10 @@ async def send_in_person_verification_code(
     verification_validity_days: int
 
     if redis_client is not None:
-        await _enforce_user_limits(redis_client, user_hash)
+        await _enforce_user_daily_limit(redis_client, user_hash)
+        if not resend_existing_code:
+            await _enforce_user_cooldown(redis_client, user_hash)
+
         cached_code = await _get_cached_active_code(redis_client, user_hash)
         if cached_code is not None:
             verification_code = cached_code["verification_code"]
@@ -236,6 +248,15 @@ async def send_in_person_verification_code(
                 "Reusing active in-person verification code (user_hash=%s, expires_at=%s)",
                 user_hash,
                 verification_expires_at.isoformat(),
+            )
+        elif resend_existing_code:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "messageId": "NotFound",
+                    "reason": "active_code_not_found",
+                    "message": "No active in-person verification code found for resend",
+                },
             )
         else:
             verification_payload = generate_unique_verification_code()
@@ -249,6 +270,15 @@ async def send_in_person_verification_code(
                 verification_expires_at,
                 verification_validity_days,
             )
+    elif resend_existing_code:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "messageId": "ServiceUnavailable",
+                "reason": "code_store_unavailable",
+                "message": "Unable to resend verification code at this time",
+            },
+        )
     else:
         verification_payload = generate_unique_verification_code()
         verification_code = verification_payload.identifier
@@ -303,4 +333,19 @@ async def send_in_person_verification_code(
             "verification_expires_at": verification_expires_at.isoformat(),
             "verification_validity_days": verification_validity_days,
         },
+    )
+
+
+async def resend_in_person_verification_code(
+    global_http_client: AsyncClient,
+    user_access_token: str,
+    request: Request | None = None,
+) -> ResponseModel:
+    """Resend the currently active in-person verification code to the user."""
+
+    return await send_in_person_verification_code(
+        global_http_client=global_http_client,
+        user_access_token=user_access_token,
+        request=request,
+        resend_existing_code=True,
     )

@@ -16,6 +16,7 @@ idv_module = importlib.import_module(
     "app.identity_verification.services.send_in_person_verification_code"
 )
 send_in_person_verification_code = idv_module.send_in_person_verification_code
+resend_in_person_verification_code = idv_module.resend_in_person_verification_code
 
 MOCK_GC_NOTIFY_CONFIG = MagicMock()
 MOCK_GC_NOTIFY_CONFIG.GC_NOTIFY_API_KEY = "test-api-key"
@@ -490,4 +491,105 @@ class TestSendInPersonVerificationCode:
         assert exc_info.value.status_code == 429
         assert exc_info.value.detail["reason"] == "user_daily_limit"
         assert exc_info.value.detail["retry_after_seconds"] == 3600
+        mock_http_client.post.assert_not_called()
+
+
+class TestResendInPersonVerificationCode:
+    """Tests for resend_in_person_verification_code function."""
+
+    @pytest.mark.asyncio
+    @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "generate_unique_verification_code")
+    @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
+    async def test_resend_uses_previously_generated_active_code(
+        self,
+        mock_dispatch,
+        mock_generate_code,
+        mock_http_client,
+        mock_profile,
+        mock_success_response,
+        mock_request,
+    ):
+        """Should resend the active cached code instead of generating a new one."""
+        mock_dispatch.return_value = mock_profile
+        mock_http_client.post = AsyncMock(return_value=mock_success_response)
+
+        future_expiry = datetime.now(UTC) + timedelta(days=10)
+        cached_payload = {
+            "verification_code": "CACHED54321",
+            "expires_at": future_expiry.isoformat(),
+            "validity_days": 30,
+        }
+        mock_request.app.state.redis_client.get = AsyncMock(
+            side_effect=[None, json.dumps(cached_payload)]
+        )
+
+        result = await resend_in_person_verification_code(
+            mock_http_client,
+            "mock-access-token",
+            request=mock_request,
+        )
+
+        assert result.success is True
+        assert result.data["verification_code"] == "CACHED54321"
+        assert result.data["verification_expires_at"] == future_expiry.isoformat()
+        mock_generate_code.assert_not_called()
+
+        request_payload = mock_http_client.post.call_args.kwargs["json"]
+        assert request_payload["personalisation"]["verification_code"] == "CACHED54321"
+
+    @pytest.mark.asyncio
+    @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
+    async def test_resend_raises_404_when_no_active_code_exists(
+        self,
+        mock_dispatch,
+        mock_http_client,
+        mock_profile,
+        mock_request,
+    ):
+        """Should return 404 when there is no active code to resend."""
+        mock_dispatch.return_value = mock_profile
+        mock_request.app.state.redis_client.get = AsyncMock(side_effect=[None, None])
+
+        with pytest.raises(HTTPException) as exc_info:
+            await resend_in_person_verification_code(
+                mock_http_client,
+                "mock-access-token",
+                request=mock_request,
+            )
+
+        assert exc_info.value.status_code == 404
+        assert exc_info.value.detail["reason"] == "active_code_not_found"
+        mock_http_client.post.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
+    @patch.object(idv_module, "dispatch_get_my_profile_from_ibm")
+    @patch.object(idv_module, "get_redis_client")
+    async def test_resend_raises_503_when_code_store_unavailable(
+        self,
+        mock_get_redis_client,
+        mock_dispatch,
+        mock_http_client,
+        mock_profile,
+    ):
+        """Should return 503 when Redis is unavailable for resend."""
+        mock_dispatch.return_value = mock_profile
+        mock_get_redis_client.side_effect = ValueError("redis unavailable")
+
+        request = MagicMock()
+        request.headers = {}
+        request.client = MagicMock()
+        request.client.host = "203.0.113.10"
+
+        with pytest.raises(HTTPException) as exc_info:
+            await resend_in_person_verification_code(
+                mock_http_client,
+                "mock-access-token",
+                request=request,
+            )
+
+        assert exc_info.value.status_code == 503
+        assert exc_info.value.detail["reason"] == "code_store_unavailable"
         mock_http_client.post.assert_not_called()

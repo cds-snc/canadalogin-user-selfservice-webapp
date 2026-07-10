@@ -9,6 +9,7 @@ from app.identity_verification.services.create_identity_verification import (
     create_identity_verification,
 )
 from app.identity_verification.services.send_in_person_verification_code import (
+    resend_in_person_verification_code,
     send_in_person_verification_code,
 )
 from app.identity_verification.services.redirect_target_url import (
@@ -67,6 +68,25 @@ async def send_in_person_verification(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await send_in_person_verification_code(
+        request.app.state.request_client,
+        user_access_token,
+        request=request,
+    )
+
+
+@router.post(
+    "/in-person/resend",
+    response_model=ResponseModel,
+    status_code=status.HTTP_200_OK,
+    tags=["Identity Verification"],
+    summary="Resend the active in-person identity verification code to the user",
+    description="Resends the previously generated in-person verification code via GC Notify.",
+)
+async def resend_in_person_verification(
+    request: Request,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await resend_in_person_verification_code(
         request.app.state.request_client,
         user_access_token,
         request=request,
