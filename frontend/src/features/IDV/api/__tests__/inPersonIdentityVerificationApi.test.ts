@@ -38,6 +38,7 @@ describe("inPersonIdentityVerificationApi", () => {
           verification_code: "ZX91AB34CD",
           verification_expires_at: "2026-08-06T00:00:00+00:00",
           verification_validity_days: 30,
+          sent_at: "2026-07-10T14:30:00+00:00",
         },
       },
     });
@@ -55,6 +56,7 @@ describe("inPersonIdentityVerificationApi", () => {
         verificationCode: "ZX91AB34CD",
         verificationExpiresAt: "2026-08-06T00:00:00+00:00",
         verificationValidityDays: 30,
+        sentAt: "2026-07-10T14:30:00+00:00",
       },
     });
     expect(handleApiError).not.toHaveBeenCalled();
@@ -78,6 +80,7 @@ describe("inPersonIdentityVerificationApi", () => {
         verificationCode: undefined,
         verificationExpiresAt: undefined,
         verificationValidityDays: undefined,
+        sentAt: undefined,
       },
     });
   });

@@ -12,6 +12,7 @@ type InPersonVerificationApiResponse = {
     verification_code?: string;
     verification_expires_at?: string;
     verification_validity_days?: number;
+    sent_at?: string;
   };
 };
 
@@ -22,6 +23,7 @@ export type InPersonVerificationCodeResponse = {
     verificationCode?: string;
     verificationExpiresAt?: string;
     verificationValidityDays?: number;
+    sentAt?: string;
   };
 };
 
@@ -44,6 +46,7 @@ export const inPersonIdentityVerificationApi = {
           verificationExpiresAt: responseData.data?.verification_expires_at,
           verificationValidityDays:
             responseData.data?.verification_validity_days,
+          sentAt: responseData.data?.sent_at,
         },
       } as InPersonVerificationCodeResponse;
     } catch (error) {

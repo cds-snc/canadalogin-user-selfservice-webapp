@@ -3,6 +3,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import InPersonProofingInProgress from "../InPerson/InPersonProofingInProgress";
 
+const mockSendInPersonVerificationCode = vi.fn();
+
 // ────────────────────────────────────────────────
 // Mocks
 // ────────────────────────────────────────────────
@@ -31,6 +33,12 @@ vi.mock("../../../components/Providers/useUser", () => ({
   }),
 }));
 
+vi.mock("../api/inPersonIdentityVerificationApi", () => ({
+  inPersonIdentityVerificationApi: {
+    sendInPersonVerificationCode: () => mockSendInPersonVerificationCode(),
+  },
+}));
+
 vi.mock("../../../utils/constants", () => ({
   get DEV_ONLY_FEATURE() {
     return mockDevOnlyFeature;
@@ -42,9 +50,10 @@ vi.mock("../../../utils/constants", () => ({
 }));
 
 vi.mock("../../../utils/routeHelpers", () => ({
-  path: (_page, { language, journeyType } = {}) => {
+  path: (page, { language, journeyType } = {}) => {
     const lang = language ?? "en";
     const jType = journeyType ? `/${journeyType}` : "";
+
     return `/${lang}/identity-verification${jType}`;
   },
 }));
@@ -52,6 +61,12 @@ vi.mock("../../../utils/routeHelpers", () => ({
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
+  GcdsDetails: ({ children, detailsTitle }) => (
+    <details>
+      <summary>{detailsTitle}</summary>
+      {children}
+    </details>
+  ),
   GcdsHeading: ({ children, tag }) => {
     const Tag = tag ?? "h2";
     return <Tag>{children}</Tag>;
@@ -63,10 +78,13 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsButton: ({ children, onGcdsClick, buttonRole }) => (
+  GcdsButton: ({ children, onGcdsClick, buttonRole, buttonId }) => (
     <button
       data-testid={
-        buttonRole === "danger" ? "reset-method-button" : "resend-email-button"
+        buttonId ??
+        (buttonRole === "danger"
+          ? "reset-method-button"
+          : "resend-email-button")
       }
       onClick={(e) => onGcdsClick?.(e)}
     >
@@ -82,6 +100,7 @@ describe("InPersonProofingInProgress", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
+    mockSendInPersonVerificationCode.mockResolvedValue({ success: true });
   });
 
   it("renders nothing when DEV_ONLY_FEATURE is false", () => {
@@ -135,11 +154,36 @@ describe("InPersonProofingInProgress", () => {
     );
   });
 
-  it("does not navigate when resend button is clicked", () => {
+  it("resends code and does not navigate when resend button is clicked", () => {
     render(<InPersonProofingInProgress />);
 
     fireEvent.click(screen.getByTestId("resend-email-button"));
 
+    expect(mockSendInPersonVerificationCode).toHaveBeenCalledTimes(1);
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("uses sentAt from API response for the notice date when resending", async () => {
+    mockSendInPersonVerificationCode.mockResolvedValue({
+      success: true,
+      data: { sentAt: "2026-07-20T18:00:00+00:00" },
+    });
+
+    render(<InPersonProofingInProgress />);
+
+    fireEvent.click(screen.getByTestId("resend-email-button"));
+
+    expect(await screen.findByText(/July 20, 2026/)).toBeInTheDocument();
+  });
+
+  it("renders the completed proofing collapsible header", () => {
+    render(<InPersonProofingInProgress />);
+
+    expect(
+      screen.getByText("Already completed proofing in-person?"),
+    ).toBeInTheDocument();
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      expect.stringContaining("details-confirmation"),
+    );
   });
 });

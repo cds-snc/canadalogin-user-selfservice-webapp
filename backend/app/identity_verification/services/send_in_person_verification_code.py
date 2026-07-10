@@ -286,6 +286,8 @@ async def send_in_person_verification_code(
         user_hash,
     )
 
+    sent_at = datetime.now(UTC)
+
     if redis_client is not None:
         await _mark_successful_send(redis_client, user_hash)
 
@@ -302,5 +304,6 @@ async def send_in_person_verification_code(
             "verification_code": verification_code,
             "verification_expires_at": verification_expires_at.isoformat(),
             "verification_validity_days": verification_validity_days,
+            "sent_at": sent_at.isoformat(),
         },
     )

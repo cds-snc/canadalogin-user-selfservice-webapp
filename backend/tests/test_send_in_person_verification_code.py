@@ -117,6 +117,8 @@ class TestSendInPersonVerificationCode:
             mock_generate_code.return_value.expires_at.isoformat()
         )
         assert result.data["verification_validity_days"] == 30
+        assert "sent_at" in result.data
+        assert datetime.fromisoformat(result.data["sent_at"]).tzinfo is not None
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
@@ -407,6 +409,8 @@ class TestSendInPersonVerificationCode:
 
         assert result.data["verification_code"] == "CACHED12345"
         assert result.data["verification_expires_at"] == future_expiry.isoformat()
+        assert "sent_at" in result.data
+        assert datetime.fromisoformat(result.data["sent_at"]).tzinfo is not None
         mock_generate_code.assert_not_called()
 
         request_payload = mock_http_client.post.call_args.kwargs["json"]
