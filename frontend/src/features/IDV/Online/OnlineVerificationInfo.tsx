@@ -87,47 +87,48 @@ export default function OnlineVerificationInfo() {
             <strong>{t("OnlineVerificationInfo.followSteps")}</strong>
           </GcdsText>
           <GcdsText marginBottom="0">
-            {t("OnlineVerificationInfo.step1")}
-          </GcdsText>
-          <GcdsText marginBottom="0">
-          <ol>
-            <li>
-              <GcdsText marginBottom="0">
-                {t("OnlineVerificationInfo.step1")}
-              </GcdsText>
-              <GcdsText marginBottom="0">
-                <ol type="a">
-                  <li>{t("OnlineVerificationInfo.expiredIdsAccepted")}</li>
-                </ol>
-              </GcdsText>
-              <GcdsDetails
-                detailsTitle={t("OnlineVerificationInfo.listOfAcceptableIds")}
-              >
-                <ol
-                  aria-label={t("OnlineVerificationInfo.listOfAcceptableIds")}
+            <ol>
+              <li>
+                <GcdsText marginBottom="0">
+                  {t("OnlineVerificationInfo.step1")}
+                </GcdsText>
+                <GcdsText marginBottom="0">
+                  <ol type="a">
+                    <li>{t("OnlineVerificationInfo.expiredIdsAccepted")}</li>
+                  </ol>
+                </GcdsText>
+                <GcdsDetails
+                  detailsTitle={t("OnlineVerificationInfo.listOfAcceptableIds")}
                 >
-                  {APPROVED_DOCUMENT_VALUES.filter(
-                    (docValue) => docValue !== "noIds",
-                  ).map((docValue) => (
-                    <li key={docValue}>{t(`ApprovedDocuments.${docValue}`)}</li>
-                  ))}
-                </ol>
-              </GcdsDetails>
-            </li>
-            <li>
-              <GcdsText marginBottom="0">
-                {t("OnlineVerificationInfo.step2")}
-              </GcdsText>
-            </li>
-            <li>
-              <GcdsText>{t("OnlineVerificationInfo.step3")}</GcdsText>
-            </li>
-          </ol>
+                  <ol
+                    aria-label={t("OnlineVerificationInfo.listOfAcceptableIds")}
+                  >
+                    {APPROVED_DOCUMENT_VALUES.filter(
+                      (docValue) => docValue !== "noIds",
+                    ).map((docValue) => (
+                      <li key={docValue}>
+                        {t(`ApprovedDocuments.${docValue}`)}
+                      </li>
+                    ))}
+                  </ol>
+                </GcdsDetails>
+              </li>
+              <li>
+                <GcdsText marginBottom="0">
+                  {t("OnlineVerificationInfo.step2")}
+                </GcdsText>
+              </li>
+              <li>
+                <GcdsText>{t("OnlineVerificationInfo.step3")}</GcdsText>
+              </li>
+            </ol>
           </GcdsText>
           <GcdsText marginBottom="0">
             <Trans
               i18nKey="idv:OnlineVerificationInfo.planForTime"
-              values={{ duration: t("idv:OnlineVerificationInfo.timeDuration") }}
+              values={{
+                duration: t("idv:OnlineVerificationInfo.timeDuration"),
+              }}
               components={{ strong: <strong /> }}
             />
           </GcdsText>
