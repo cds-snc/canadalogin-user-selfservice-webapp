@@ -7,9 +7,11 @@ import {
 } from "@react-nano/use-event-source";
 import config from "../../config";
 import {
+  CLIENT_ID_KEY,
   CONTEXT_ACTIONS,
   SUBMIT_END_POINTS,
   RP_CLIENT_ID_KEY,
+  IDV_TARGET_URL_KEY,
 } from "../../utils/constants";
 import UserContext from "./UserContext";
 import { authService } from "../../services/authService";
@@ -28,10 +30,37 @@ import {
 } from "../../types/user";
 
 const SCIM_IBM_USER_EXT = "urn:ietf:params:scim:schemas:extension:ibm:2.0:User";
-
 type UserProfileApiShape = UserProfile & {
   [SCIM_IBM_USER_EXT]?: UserProfile["details"];
 };
+
+function getRpClientId(searchParams: URLSearchParams): string | undefined {
+  const topLevelClientId =
+    searchParams.get(RP_CLIENT_ID_KEY) ??
+    searchParams.get(CLIENT_ID_KEY) ??
+    undefined;
+
+  if (topLevelClientId) {
+    return topLevelClientId;
+  }
+
+  const target = searchParams.get(IDV_TARGET_URL_KEY);
+  if (!target) {
+    return undefined;
+  }
+
+  try {
+    const targetUrl = new URL(target);
+    return (
+      targetUrl.searchParams.get(RP_CLIENT_ID_KEY) ??
+      targetUrl.searchParams.get(CLIENT_ID_KEY) ??
+      undefined
+    );
+  } catch {
+    // If Target is malformed, continue without RP info.
+    return undefined;
+  }
+}
 
 function normalizeUserProfile(
   profile: UserProfileApiShape | null | undefined,
@@ -370,7 +399,8 @@ export function UserProvider({
 
     const fetchProfileAndRelyingPartyInfo = async () => {
       try {
-        const rp_client_id = searchParams.get(RP_CLIENT_ID_KEY) ?? undefined;
+        const rp_client_id = getRpClientId(searchParams);
+
         const response = await authService.get_my_user_profile(rp_client_id);
         if (response && response.data) {
           const normalizedProfile = normalizeUserProfile(
