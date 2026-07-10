@@ -206,7 +206,9 @@ describe("OnlineVerificationInfo", () => {
     render(<OnlineVerificationInfo />);
 
     expect(screen.getByTestId("continue-button")).toHaveTextContent("Continue");
-    expect(screen.getByTestId("back-button")).toHaveTextContent("Choose a different method");
+    expect(screen.getByTestId("back-button")).toHaveTextContent(
+      "Choose a different method",
+    );
   });
 
   it("calls navigate(-1) when Back button is clicked", () => {
