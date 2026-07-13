@@ -7,7 +7,7 @@ import {
   GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
@@ -27,9 +27,7 @@ export default function InPersonProofingInProgress() {
   const { language, journeyType } = useParams();
   const navigate = useNavigate();
   const { state } = useUser();
-  const [sendEmailDate, setSendEmailDate] = useState(
-    formatDisplayDate(new Date()),
-  );
+  const [sendEmailDate, setSendEmailDate] = useState<string | null>(null);
 
   const rpInfo = state.relyingPartyInfo;
   const localizedDetail = rpInfo?.localized?.[i18n.language];
@@ -42,6 +40,25 @@ export default function InPersonProofingInProgress() {
     language,
     journeyType,
   });
+
+  // Fetch the last email sent date on component mount
+  useEffect(() => {
+    const fetchLastEmailSentDate = async () => {
+      const response =
+        await inPersonIdentityVerificationApi.getLastEmailSentDate();
+
+      if (!response?.success || !response?.lastEmailSent) {
+        return;
+      }
+
+      const parsedDate = new Date(response.lastEmailSent);
+      if (!Number.isNaN(parsedDate.getTime())) {
+        setSendEmailDate(formatDisplayDate(parsedDate));
+      }
+    };
+
+    fetchLastEmailSentDate();
+  }, []);
 
   const handleResetMethod = () => {
     navigate(startIdentityProofingPage);
@@ -60,10 +77,7 @@ export default function InPersonProofingInProgress() {
 
     if (parsedSentAt && !Number.isNaN(parsedSentAt.getTime())) {
       setSendEmailDate(formatDisplayDate(parsedSentAt));
-      return;
     }
-
-    setSendEmailDate(formatDisplayDate(new Date()));
   };
 
   if (!DEV_ONLY_FEATURE) {
@@ -85,9 +99,11 @@ export default function InPersonProofingInProgress() {
           noticeTitle={t("InPersonProofingInProgress.noticeHeading")}
         >
           <GcdsText>
-            {t("InPersonProofingInProgress.noticeText", {
-              date: sendEmailDate,
-            })}
+            {sendEmailDate
+              ? t("InPersonProofingInProgress.noticeText", {
+                  date: sendEmailDate,
+                })
+              : t("InPersonProofingInProgress.noticeTextNoEmail")}
           </GcdsText>
 
           <GcdsText>{t("InPersonProofingInProgress.changedMindText")}</GcdsText>

@@ -37,6 +37,7 @@ IP_RATE_LIMIT_KEY_PREFIX = "idv:in_person:ip"
 USER_COOLDOWN_KEY_PREFIX = "idv:in_person:cooldown"
 USER_DAILY_KEY_PREFIX = "idv:in_person:daily"
 USER_ACTIVE_CODE_KEY_PREFIX = "idv:in_person:active_code"
+USER_EMAIL_SENT_KEY_PREFIX = "idv:in_person:email_sent"
 
 
 def _build_rate_limit_error(reason: str, retry_after_seconds: int) -> HTTPException:
@@ -69,10 +70,13 @@ def _hash_ip(ip_address: str) -> str:
     return hashlib.sha256(ip_address.encode("utf-8")).hexdigest()
 
 
-def _parse_iso_datetime(value: str) -> datetime | None:
+def _parse_iso_datetime(value: str | bytes) -> datetime | None:
     try:
+        # Decode bytes to str if needed (Redis may return bytes)
+        if isinstance(value, bytes):
+            value = value.decode("utf-8")
         parsed = datetime.fromisoformat(value)
-    except ValueError:
+    except (ValueError, TypeError, AttributeError):
         return None
 
     if parsed.tzinfo is None:
@@ -179,14 +183,44 @@ async def _cache_active_code(
     )
 
 
-async def _mark_successful_send(redis_client, user_hash: str) -> None:
+async def _mark_successful_send(
+    redis_client, user_hash: str, sent_at: datetime | None = None
+) -> None:
     cooldown_key = f"{USER_COOLDOWN_KEY_PREFIX}:{user_hash}"
     daily_key = f"{USER_DAILY_KEY_PREFIX}:{user_hash}"
+    email_sent_key = f"{USER_EMAIL_SENT_KEY_PREFIX}:{user_hash}"
 
     await redis_client.setex(cooldown_key, USER_COOLDOWN_SECONDS, "1")
     daily_count = await redis_client.incr(daily_key)
     if daily_count == 1:
         await redis_client.expire(daily_key, USER_DAILY_WINDOW_SECONDS)
+
+    # Store the last email sent timestamp
+    if sent_at is not None:
+        await redis_client.setex(
+            email_sent_key, USER_DAILY_WINDOW_SECONDS, sent_at.isoformat()
+        )
+
+
+async def get_last_email_sent_time(
+    redis_client, user_hash: str
+) -> datetime | None:
+    """Retrieves the timestamp of the last email sent to the user.
+    
+    Args:
+        redis_client: Redis client instance
+        user_hash: Hashed user identifier
+        
+    Returns:
+        datetime of last email sent, or None if no email has been sent yet
+    """
+    email_sent_key = f"{USER_EMAIL_SENT_KEY_PREFIX}:{user_hash}"
+    sent_at_str = await redis_client.get(email_sent_key)
+    
+    if sent_at_str is None:
+        return None
+    
+    return _parse_iso_datetime(sent_at_str)
 
 
 async def send_in_person_verification_code(
@@ -289,7 +323,7 @@ async def send_in_person_verification_code(
     sent_at = datetime.now(UTC)
 
     if redis_client is not None:
-        await _mark_successful_send(redis_client, user_hash)
+        await _mark_successful_send(redis_client, user_hash, sent_at)
 
     logger.info(
         "IDV in-person verification send completed (user_hash=%s, ip_hash=%s)",
