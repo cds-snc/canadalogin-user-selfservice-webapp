@@ -221,6 +221,34 @@ async def get_last_email_sent_time(redis_client, user_hash: str) -> datetime | N
     return _parse_iso_datetime(sent_at_str)
 
 
+async def get_last_email_sent(
+    global_http_client: AsyncClient,
+    user_access_token: str,
+    request: Request,
+) -> ResponseModel:
+    """Returns the timestamp of the last in-person verification email sent to the user."""
+    try:
+        redis_client = get_redis_client(request)
+    except ValueError:
+        return ResponseModel(
+            success=True,
+            message="No email sent yet",
+            data={"last_email_sent": None},
+        )
+
+    profile = await dispatch_get_my_profile_from_ibm(
+        global_http_client, user_access_token
+    )
+    user_hash = _hash_user_identifier(profile.userName)
+    last_sent = await get_last_email_sent_time(redis_client, user_hash)
+
+    return ResponseModel(
+        success=True,
+        message="Last email sent date retrieved",
+        data={"last_email_sent": last_sent.isoformat() if last_sent else None},
+    )
+
+
 async def send_in_person_verification_code(
     global_http_client: AsyncClient,
     user_access_token: str,

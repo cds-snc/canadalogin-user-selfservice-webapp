@@ -3,7 +3,6 @@ import logging
 from fastapi import APIRouter, Depends, Request, status
 from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.schemas import ResponseModel
-from app.utils.redis import get_redis_client
 from app.identity_verification.schemas import StoreTargetUrlRequest
 from app.identity_verification.services.create_identity_verification import (
     idv_mock_success_response,
@@ -11,14 +10,12 @@ from app.identity_verification.services.create_identity_verification import (
 )
 from app.identity_verification.services.send_in_person_verification_code import (
     send_in_person_verification_code,
-    get_last_email_sent_time,
-    _hash_user_identifier,
+    get_last_email_sent,
 )
 from app.identity_verification.services.redirect_target_url import (
     get_identity_verification_redirect_url,
     store_identity_verification_target_url,
 )
-from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -89,26 +86,8 @@ async def get_in_person_last_email_sent(
     request: Request,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    try:
-        redis_client = get_redis_client(request)
-    except ValueError:
-        return ResponseModel(
-            success=True,
-            message="No email sent yet",
-            data={"last_email_sent": None},
-        )
-
-    profile = await dispatch_get_my_profile_from_ibm(
-        request.app.state.request_client, user_access_token
-    )
-    user_hash = _hash_user_identifier(profile.userName)
-
-    last_sent = await get_last_email_sent_time(redis_client, user_hash)
-
-    return ResponseModel(
-        success=True,
-        message="Last email sent date retrieved",
-        data={"last_email_sent": last_sent.isoformat() if last_sent else None},
+    return await get_last_email_sent(
+        request.app.state.request_client, user_access_token, request
     )
 
 

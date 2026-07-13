@@ -619,13 +619,8 @@ class TestGetInPersonLastEmailSentEndpoint:
         redis_client.get = AsyncMock(return_value=last_sent.isoformat())
 
         with (
-            patch(
-                "app.identity_verification.v1_router.get_redis_client",
-                return_value=redis_client,
-            ),
-            patch(
-                "app.identity_verification.v1_router.dispatch_get_my_profile_from_ibm"
-            ) as mock_profile,
+            patch.object(idv_module, "get_redis_client", return_value=redis_client),
+            patch.object(idv_module, "dispatch_get_my_profile_from_ibm") as mock_profile,
         ):
             mock_profile_instance = MagicMock()
             mock_profile_instance.userName = "user@example.com"
@@ -654,13 +649,8 @@ class TestGetInPersonLastEmailSentEndpoint:
         redis_client.get = AsyncMock(return_value=None)
 
         with (
-            patch(
-                "app.identity_verification.v1_router.get_redis_client",
-                return_value=redis_client,
-            ),
-            patch(
-                "app.identity_verification.v1_router.dispatch_get_my_profile_from_ibm"
-            ) as mock_profile,
+            patch.object(idv_module, "get_redis_client", return_value=redis_client),
+            patch.object(idv_module, "dispatch_get_my_profile_from_ibm") as mock_profile,
         ):
             mock_profile_instance = MagicMock()
             mock_profile_instance.userName = "user@example.com"
@@ -684,8 +674,9 @@ class TestGetInPersonLastEmailSentEndpoint:
         mock_request = MagicMock()
         mock_request.app.state.request_client = AsyncMock()
 
-        with patch(
-            "app.identity_verification.v1_router.get_redis_client",
+        with patch.object(
+            idv_module,
+            "get_redis_client",
             side_effect=ValueError("Redis unavailable"),
         ):
             from app.identity_verification.v1_router import (
