@@ -27,7 +27,7 @@ export default function InPersonProofingInProgress() {
   const { language, journeyType } = useParams();
   const navigate = useNavigate();
   const { state } = useUser();
-  const [resendEmailDate, setResendEmailDate] = useState(
+  const [sendEmailDate, setSendEmailDate] = useState(
     formatDisplayDate(new Date()),
   );
 
@@ -59,11 +59,11 @@ export default function InPersonProofingInProgress() {
     const parsedSentAt = sentAt ? new Date(sentAt) : null;
 
     if (parsedSentAt && !Number.isNaN(parsedSentAt.getTime())) {
-      setResendEmailDate(formatDisplayDate(parsedSentAt));
+      setSendEmailDate(formatDisplayDate(parsedSentAt));
       return;
     }
 
-    setResendEmailDate(formatDisplayDate(new Date()));
+    setSendEmailDate(formatDisplayDate(new Date()));
   };
 
   if (!DEV_ONLY_FEATURE) {
@@ -86,7 +86,7 @@ export default function InPersonProofingInProgress() {
         >
           <GcdsText>
             {t("InPersonProofingInProgress.noticeText", {
-              date: resendEmailDate,
+              date: sendEmailDate,
             })}
           </GcdsText>
 
