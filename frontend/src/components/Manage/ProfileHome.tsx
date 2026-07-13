@@ -4,6 +4,7 @@ import {
   GcdsGrid,
   GcdsText,
 } from "@gcds-core/components-react";
+import { useLocation } from "react-router";
 
 import { useTranslation } from "react-i18next";
 import { DEV_ONLY_FEATURE } from "../../utils/constants";
@@ -17,16 +18,18 @@ import ViewEmailInfo from "../../features/ProfileName/components/ViewEmailInfo";
 import CompleteIdentityProofingNotice from "../../features/IDV/components/CompleteIdentityProofingNotice";
 import IdentityInfoSuccessNotice from "../../features/IDV/components/IdentityInfoSuccessNotice";
 
-type ProfileHomeProps = {
+type ProfileHomeLocationState = {
   showIDVSuccessNotice?: boolean;
 };
 
-export default function ProfileHome({
-  showIDVSuccessNotice = false,
-}: ProfileHomeProps) {
+export default function ProfileHome() {
+  const location = useLocation();
   const { t } = useTranslation("profile");
   const { state } = useUser();
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
+  const showIDVSuccessNotice = Boolean(
+    (location.state as ProfileHomeLocationState | null)?.showIDVSuccessNotice,
+  );
 
   return (
     <GcdsContainer role="main">
