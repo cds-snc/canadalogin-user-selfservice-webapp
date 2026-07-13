@@ -620,7 +620,9 @@ class TestGetInPersonLastEmailSentEndpoint:
 
         with (
             patch.object(idv_module, "get_redis_client", return_value=redis_client),
-            patch.object(idv_module, "dispatch_get_my_profile_from_ibm") as mock_profile,
+            patch.object(
+                idv_module, "dispatch_get_my_profile_from_ibm"
+            ) as mock_profile,
         ):
             mock_profile_instance = MagicMock()
             mock_profile_instance.userName = "user@example.com"
@@ -650,7 +652,9 @@ class TestGetInPersonLastEmailSentEndpoint:
 
         with (
             patch.object(idv_module, "get_redis_client", return_value=redis_client),
-            patch.object(idv_module, "dispatch_get_my_profile_from_ibm") as mock_profile,
+            patch.object(
+                idv_module, "dispatch_get_my_profile_from_ibm"
+            ) as mock_profile,
         ):
             mock_profile_instance = MagicMock()
             mock_profile_instance.userName = "user@example.com"
