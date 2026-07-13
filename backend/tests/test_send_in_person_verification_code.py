@@ -553,6 +553,18 @@ class TestGetLastEmailSentTime:
         assert result == sent_at
 
     @pytest.mark.asyncio
+    async def test_returns_datetime_when_timestamp_is_bytes(self):
+        """Should decode and parse byte timestamps returned by Redis."""
+        redis_client = AsyncMock()
+        user_hash = "test-user-hash"
+        sent_at = datetime(2026, 7, 13, 12, 30, 45, tzinfo=UTC)
+        redis_client.get = AsyncMock(return_value=sent_at.isoformat().encode("utf-8"))
+
+        result = await idv_module.get_last_email_sent_time(redis_client, user_hash)
+
+        assert result == sent_at
+
+    @pytest.mark.asyncio
     async def test_timestamp_stored_after_successful_send(
         self,
     ):
