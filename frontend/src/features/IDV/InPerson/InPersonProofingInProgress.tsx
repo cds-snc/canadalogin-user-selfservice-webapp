@@ -57,8 +57,8 @@ export default function InPersonProofingInProgress() {
       }
     };
 
-    fetchLastEmailSentDate();
-  }, []);
+    void fetchLastEmailSentDate();
+  }, [i18n.language]);
 
   const handleResetMethod = () => {
     navigate(startIdentityProofingPage);
