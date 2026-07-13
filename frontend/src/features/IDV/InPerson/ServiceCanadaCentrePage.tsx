@@ -189,7 +189,16 @@ export default function ServiceCanadaCentrePage() {
     }
 
     navigate(serviceCanadaCodePage, {
-      state: { idvCode: response.data.verificationCode },
+      state: {
+        idvCode: response.data.verificationCode,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        dateOfBirth: formData.dateOfBirth,
+        address: formData.address,
+        province: formData.province,
+        idType: formData.idType,
+        idExpiryDate: formData.idExpiryDate,
+      },
     });
   };
 
