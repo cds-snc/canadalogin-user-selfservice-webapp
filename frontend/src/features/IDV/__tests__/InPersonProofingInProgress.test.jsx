@@ -136,7 +136,9 @@ describe("InPersonProofingInProgress", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Look for an email sent by CanadaLogin on/i),
+      screen.getByText(
+        /Look for an email sent by CanadaLogin with instructions to complete proofing your identity at a Canada Post location\./i,
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
