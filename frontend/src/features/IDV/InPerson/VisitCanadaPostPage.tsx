@@ -246,6 +246,7 @@ export default function VisitCanadaPost() {
               <>
                 <GcdsInput
                   required
+                  id="first-name-input"
                   inputId="first-name-input"
                   name="first-name-input"
                   label={t("ServiceCanadaCentre.firstNameLabel")}
@@ -255,6 +256,7 @@ export default function VisitCanadaPost() {
 
                 <GcdsInput
                   required
+                  id="last-name-input"
                   inputId="last-name-input"
                   name="last-name-input"
                   label={t("ServiceCanadaCentre.lastNameLabel")}
@@ -277,6 +279,7 @@ export default function VisitCanadaPost() {
                   <>
                     <GcdsInput
                       required
+                      id="address-input"
                       inputId="address-input"
                       name="address-input"
                       label={t("ServiceCanadaCentre.addressLabel")}
