@@ -4,19 +4,25 @@ export default function useGcdsSelectWidth(
   selectElementIds: readonly string[],
 ): void {
   useEffect(() => {
-    const applySelectShadowWidth = () => {
+    const RETRY_DELAY_MS = 50;
+
+    const applySelectShadowWidth = (): boolean => {
+      let allElementsUpdated = true;
+
       selectElementIds.forEach((elementId) => {
         const element = document.getElementById(
           elementId,
         ) as HTMLElement | null;
 
         if (!element) {
+          allElementsUpdated = false;
           return;
         }
 
         const shadowRoot = element.shadowRoot;
 
         if (!shadowRoot) {
+          allElementsUpdated = false;
           return;
         }
 
@@ -36,10 +42,28 @@ export default function useGcdsSelectWidth(
 
         if (internalSelect) {
           internalSelect.style.width = "100%";
+        } else {
+          allElementsUpdated = false;
         }
       });
+
+      return allElementsUpdated;
     };
 
-    applySelectShadowWidth();
+    const wasUpdatedImmediately = applySelectShadowWidth();
+    let retryTimeoutId: number | undefined;
+
+    if (!wasUpdatedImmediately) {
+      // Back-navigation can restore the page before custom elements fully hydrate.
+      retryTimeoutId = window.setTimeout(() => {
+        applySelectShadowWidth();
+      }, RETRY_DELAY_MS);
+    }
+
+    return () => {
+      if (retryTimeoutId !== undefined) {
+        window.clearTimeout(retryTimeoutId);
+      }
+    };
   }, [selectElementIds]);
 }
