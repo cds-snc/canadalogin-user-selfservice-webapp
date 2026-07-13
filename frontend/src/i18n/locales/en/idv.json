@@ -139,6 +139,7 @@
     "heading": "{{rpName}} needs you to prove your identity",
     "noticeHeading": "You're partway through proofing in person with Canada Post",
     "noticeText": "Look for an email sent by CanadaLogin on {{date}} with instructions to complete proofing your identity at a Canada Post location. You can click resend email to receive another copy.",
+    "noticeTextNoEmail": "Look for an email sent by CanadaLogin with instructions to complete proofing your identity at a Canada Post location. You can click resend email to receive a copy.",
     "changedMindText": "Changed your mind about in-person proofing at Canada Post? You can reset and choose a different method instead.",
     "resetButton": "Reset and choose another method",
     "resendButton": "Resend email",

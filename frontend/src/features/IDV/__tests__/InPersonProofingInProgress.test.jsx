@@ -36,6 +36,7 @@ vi.mock("../../../components/Providers/useUser", () => ({
 vi.mock("../api/inPersonIdentityVerificationApi", () => ({
   inPersonIdentityVerificationApi: {
     sendInPersonVerificationCode: () => mockSendInPersonVerificationCode(),
+    getLastEmailSentDate: () => Promise.resolve({ success: false }),
   },
 }));
 

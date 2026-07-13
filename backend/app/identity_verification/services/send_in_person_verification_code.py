@@ -202,24 +202,22 @@ async def _mark_successful_send(
         )
 
 
-async def get_last_email_sent_time(
-    redis_client, user_hash: str
-) -> datetime | None:
+async def get_last_email_sent_time(redis_client, user_hash: str) -> datetime | None:
     """Retrieves the timestamp of the last email sent to the user.
-    
+
     Args:
         redis_client: Redis client instance
         user_hash: Hashed user identifier
-        
+
     Returns:
         datetime of last email sent, or None if no email has been sent yet
     """
     email_sent_key = f"{USER_EMAIL_SENT_KEY_PREFIX}:{user_hash}"
     sent_at_str = await redis_client.get(email_sent_key)
-    
+
     if sent_at_str is None:
         return None
-    
+
     return _parse_iso_datetime(sent_at_str)
 
 

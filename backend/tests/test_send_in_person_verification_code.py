@@ -572,7 +572,10 @@ class TestGetLastEmailSentTime:
                 break
 
         assert email_sent_call is not None
-        assert email_sent_call[0][0] == f"{idv_module.USER_EMAIL_SENT_KEY_PREFIX}:{user_hash}"
+        assert (
+            email_sent_call[0][0]
+            == f"{idv_module.USER_EMAIL_SENT_KEY_PREFIX}:{user_hash}"
+        )
         assert email_sent_call[0][1] == idv_module.USER_DAILY_WINDOW_SECONDS
         assert email_sent_call[0][2] == sent_at.isoformat()
 
@@ -591,7 +594,6 @@ class TestGetInPersonLastEmailSentEndpoint:
     async def test_returns_last_email_sent_date_from_redis(self):
         """Should return the last email sent timestamp from Redis."""
         from app.identity_verification.v1_router import router
-        from fastapi.testclient import TestClient
         from fastapi import FastAPI
 
         app = FastAPI()
@@ -602,22 +604,25 @@ class TestGetInPersonLastEmailSentEndpoint:
 
         redis_client = AsyncMock()
         last_sent = datetime.now(UTC)
-        redis_client.get = AsyncMock(
-            return_value=last_sent.isoformat()
-        )
+        redis_client.get = AsyncMock(return_value=last_sent.isoformat())
 
-        with patch(
-            "app.identity_verification.v1_router.get_redis_client",
-            return_value=redis_client,
-        ), patch(
-            "app.identity_verification.v1_router.dispatch_get_my_profile_from_ibm"
-        ) as mock_profile:
+        with (
+            patch(
+                "app.identity_verification.v1_router.get_redis_client",
+                return_value=redis_client,
+            ),
+            patch(
+                "app.identity_verification.v1_router.dispatch_get_my_profile_from_ibm"
+            ) as mock_profile,
+        ):
             mock_profile_instance = MagicMock()
             mock_profile_instance.userName = "user@example.com"
             mock_profile.return_value = mock_profile_instance
 
             # Call the endpoint handler directly
-            from app.identity_verification.v1_router import get_in_person_last_email_sent
+            from app.identity_verification.v1_router import (
+                get_in_person_last_email_sent,
+            )
 
             result = await get_in_person_last_email_sent(
                 mock_request,
@@ -636,17 +641,22 @@ class TestGetInPersonLastEmailSentEndpoint:
         redis_client = AsyncMock()
         redis_client.get = AsyncMock(return_value=None)
 
-        with patch(
-            "app.identity_verification.v1_router.get_redis_client",
-            return_value=redis_client,
-        ), patch(
-            "app.identity_verification.v1_router.dispatch_get_my_profile_from_ibm"
-        ) as mock_profile:
+        with (
+            patch(
+                "app.identity_verification.v1_router.get_redis_client",
+                return_value=redis_client,
+            ),
+            patch(
+                "app.identity_verification.v1_router.dispatch_get_my_profile_from_ibm"
+            ) as mock_profile,
+        ):
             mock_profile_instance = MagicMock()
             mock_profile_instance.userName = "user@example.com"
             mock_profile.return_value = mock_profile_instance
 
-            from app.identity_verification.v1_router import get_in_person_last_email_sent
+            from app.identity_verification.v1_router import (
+                get_in_person_last_email_sent,
+            )
 
             result = await get_in_person_last_email_sent(
                 mock_request,
@@ -666,7 +676,9 @@ class TestGetInPersonLastEmailSentEndpoint:
             "app.identity_verification.v1_router.get_redis_client",
             side_effect=ValueError("Redis unavailable"),
         ):
-            from app.identity_verification.v1_router import get_in_person_last_email_sent
+            from app.identity_verification.v1_router import (
+                get_in_person_last_email_sent,
+            )
 
             result = await get_in_person_last_email_sent(
                 mock_request,

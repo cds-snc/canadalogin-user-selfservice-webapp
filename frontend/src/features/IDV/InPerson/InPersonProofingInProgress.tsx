@@ -15,8 +15,8 @@ import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerifica
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
-const formatDisplayDate = (value: Date | string) =>
-  new Intl.DateTimeFormat("en-CA", {
+const formatDisplayDate = (value: Date | string, locale: string = "en-CA") =>
+  new Intl.DateTimeFormat(locale, {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -53,7 +53,7 @@ export default function InPersonProofingInProgress() {
 
       const parsedDate = new Date(response.lastEmailSent);
       if (!Number.isNaN(parsedDate.getTime())) {
-        setSendEmailDate(formatDisplayDate(parsedDate));
+        setSendEmailDate(formatDisplayDate(parsedDate, i18n.language));
       }
     };
 
@@ -76,7 +76,7 @@ export default function InPersonProofingInProgress() {
     const parsedSentAt = sentAt ? new Date(sentAt) : null;
 
     if (parsedSentAt && !Number.isNaN(parsedSentAt.getTime())) {
-      setSendEmailDate(formatDisplayDate(parsedSentAt));
+      setSendEmailDate(formatDisplayDate(parsedSentAt, i18n.language));
     }
   };
 
