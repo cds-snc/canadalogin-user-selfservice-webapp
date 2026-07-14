@@ -22,6 +22,7 @@ export interface ServiceCanadaCentreFormData {
   dateOfBirth: string;
   address: string;
   province: string;
+  postalcode: string;
 }
 
 export interface ServiceCanadaCentreSummaryErrorCodes extends InPersonSharedSummaryErrorCodes {
