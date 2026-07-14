@@ -10,12 +10,12 @@ pydantic==2.13.4
 httpx==0.28.1
 email-validator==2.3.0
 pydantic-extra-types==2.11.1
-phonenumbers==9.0.32
+phonenumbers==9.0.34
 cachetools==5.5.2
 authlib==1.7.2
 itsdangerous==2.2.0
 starsessions==2.2.1
 PyJWT==2.13.0
 redis==6.4.0
-fido2==2.2.0
+fido2==2.2.1
 Secweb==1.30.10
