@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Outlet, useLocation, useMatches } from "react-router";
+import { Outlet, useLocation, useMatches, useNavigationType } from "react-router";
 import { useLanguage } from "../Providers/LanguageProvider";
 import { useRelyingPartyAnalyticsParams } from "../../hooks/useRelyingPartyAnalyticsParams";
 import { useFirstTabPageFocus } from "../../hooks/useFirstTabPageFocus";
@@ -40,6 +40,7 @@ const DisplayReleaseTag = () => {
 
 export default function RootLayout() {
   const { pathname, search, hash } = useLocation();
+  const navigationType = useNavigationType();
   const matches = useMatches();
   const { state: languageState } = useLanguage();
   const { language } = languageState;
@@ -73,7 +74,8 @@ export default function RootLayout() {
     pathname,
     search,
     hash,
-    mainContentId: "main-content",
+    enabled:
+      !hash && (navigationType === "PUSH" || navigationType === "REPLACE"),
   });
 
   return (
