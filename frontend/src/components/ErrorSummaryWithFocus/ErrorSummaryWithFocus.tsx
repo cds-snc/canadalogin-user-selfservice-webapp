@@ -80,7 +80,6 @@ export default function ErrorSummaryWithFocus({
     return null;
   }
 
-  // This could be removed ?
   const defaultErrorLinks = {
     "#error-href-1": errorMessage,
   };

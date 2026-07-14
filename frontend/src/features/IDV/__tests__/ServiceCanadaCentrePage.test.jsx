@@ -336,7 +336,7 @@ describe("ServiceCanadaCentrePage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "There was a problem",
+        name: i18n.getFixedT("en", "common")("Error.genericProblem"),
       }),
     ).toBeInTheDocument();
     expect(
