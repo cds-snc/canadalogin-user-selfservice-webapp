@@ -93,7 +93,7 @@ export const useFirstTabPageFocus = ({
     if (didTargetChange && !hash) {
       shouldHandleFirstTabRef.current = true;
     }
-  }, [hash, mainContentId]);
+  }, [enabled, hash, mainContentId]);
 
   useEffect(() => {
     if (!enabled) {
