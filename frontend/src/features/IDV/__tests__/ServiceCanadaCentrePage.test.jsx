@@ -13,7 +13,6 @@ import {
   getFirstNameRequiredOrInvalidMessage,
   getIdTypeRequiredMessage,
   getSharedDateOfBirthMessages,
-  getValidationSummaryHeading,
 } from "../InPerson/validation/ErrorsDefinition";
 
 // ────────────────────────────────────────────────
@@ -337,7 +336,7 @@ describe("ServiceCanadaCentrePage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: getValidationSummaryHeading(t),
+        name: "There was a problem",
       }),
     ).toBeInTheDocument();
     expect(

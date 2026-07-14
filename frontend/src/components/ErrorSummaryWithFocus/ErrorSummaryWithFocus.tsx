@@ -1,7 +1,33 @@
 import { GcdsErrorSummary } from "@gcds-core/components-react";
-import { useEffect, useRef } from "react";
-import type { ComponentPropsWithoutRef, ComponentRef } from "react";
+import { useEffect } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 import { useTranslation } from "react-i18next";
+
+export const focusErrorSummary = (summaryId: string): void => {
+  const summaryElement = document.getElementById(
+    summaryId,
+  ) as HTMLElement | null;
+
+  if (!summaryElement) {
+    return;
+  }
+
+  const prefersReducedMotion =
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+  summaryElement.scrollIntoView?.({
+    behavior: prefersReducedMotion ? "auto" : "smooth",
+    block: "start",
+  });
+
+  summaryElement.setAttribute("tabindex", "-1");
+  summaryElement.focus();
+
+  summaryElement.addEventListener(
+    "blur",
+    () => summaryElement.removeAttribute("tabindex"),
+    { once: true },
+  );
+};
 
 type GcdsErrorSummaryProps = ComponentPropsWithoutRef<typeof GcdsErrorSummary>;
 
@@ -26,8 +52,6 @@ export default function ErrorSummaryWithFocus({
   autoFocus = true,
   ...otherProps
 }: ErrorSummaryWithFocusProps) {
-  const errorSummaryRef = useRef<ComponentRef<typeof GcdsErrorSummary>>(null);
-
   const { t } = useTranslation("common");
 
   const errorMessage =
@@ -39,16 +63,9 @@ export default function ErrorSummaryWithFocus({
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-    if (errorMessage && errorSummaryRef.current && autoFocus) {
+    if (errorMessage && autoFocus) {
       timeoutId = setTimeout(() => {
-        if (errorSummaryRef.current) {
-          errorSummaryRef.current.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-
-          errorSummaryRef.current.focus();
-        }
+        focusErrorSummary(id);
       }, 100);
     }
 
@@ -57,19 +74,19 @@ export default function ErrorSummaryWithFocus({
         clearTimeout(timeoutId);
       }
     };
-  }, [errorMessage, autoFocus]);
+  }, [errorMessage, autoFocus, id]);
 
   if (!errorMessage) {
     return null;
   }
 
+  // This could be removed ?
   const defaultErrorLinks = {
     "#error-href-1": errorMessage,
   };
 
   return (
     <GcdsErrorSummary
-      ref={errorSummaryRef}
       id={id}
       errorLinks={errorLinks || defaultErrorLinks}
       heading={t("Error.genericProblem")}

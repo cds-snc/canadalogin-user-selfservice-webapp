@@ -2,7 +2,6 @@ import {
   GcdsButton,
   GcdsContainer,
   GcdsDateInput,
-  GcdsErrorSummary,
   GcdsFieldset,
   GcdsGrid,
   GcdsHeading,
@@ -12,9 +11,10 @@ import {
   GcdsSelect,
   GcdsText,
 } from "@gcds-core/components-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
+import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 import {
   AVAILABLE_LANGUAGES,
   CANADIAN_PROVINCES_AND_TERRITORIES,
@@ -39,7 +39,6 @@ import {
   getSharedDateOfBirthMessages,
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
-import { focusErrorSummary } from "../helpers/focusErrorSummary";
 import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
 
 const ERROR_SUMMARY_ID = "visit-canada-post-error-summary";
@@ -69,14 +68,6 @@ export default function VisitCanadaPost() {
 
   const updateField = (field: keyof VisitCanadaPostFormData, value: string) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
-
-  useEffect(() => {
-    if (!showErrorSummary) {
-      return;
-    }
-
-    focusErrorSummary(ERROR_SUMMARY_ID);
-  }, [showErrorSummary, summaryFocusTrigger]);
 
   const createChangeHandler =
     (field: keyof VisitCanadaPostFormData) => (event: CustomEvent) => {
@@ -181,10 +172,12 @@ export default function VisitCanadaPost() {
             <GcdsHeading tag="h1">{t("VisitCanadaPost.heading")}</GcdsHeading>
 
             {showErrorSummary ? (
-              <GcdsErrorSummary
+              <ErrorSummaryWithFocus
+                key={summaryFocusTrigger}
                 id={ERROR_SUMMARY_ID}
-                heading={getValidationSummaryHeading(t)}
+                errorMessage={getValidationSummaryHeading(t)}
                 errorLinks={summaryErrors}
+                language={currentLanguage}
               />
             ) : null}
 
