@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -16,7 +16,11 @@ vi.mock("../Header", () => ({
 }));
 
 vi.mock("../Footer", () => ({
-  default: () => <div data-testid="footer" />,
+  default: () => (
+    <div data-testid="footer">
+      <a href="#footer-link">Footer link</a>
+    </div>
+  ),
 }));
 
 vi.mock("../../Providers/LanguageProvider", () => ({
@@ -101,7 +105,7 @@ function setup(initialEntry = "/step-one") {
   return { router };
 }
 
-describe("RootLayout keyboard-first-tab focus", () => {
+describe("RootLayout keyboard focus behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -116,33 +120,47 @@ describe("RootLayout keyboard-first-tab focus", () => {
     );
   });
 
-  it("moves focus to top heading on first Tab after route change", async () => {
+  it("uses first-tab interception after client-side navigation", async () => {
     const { router } = setup();
 
     await router.navigate("/step-two");
     const heading = await screen.findByRole("heading", { name: "Step Two" });
 
-    fireEvent.keyDown(window, { key: "Tab" });
+    const wasIntercepted = !fireEvent.keyDown(window, { key: "Tab" });
 
-    await waitFor(() => {
-      expect(heading).toHaveFocus();
-    });
+    expect(wasIntercepted).toBe(true);
+    expect(heading).toHaveFocus();
   });
 
-  it("respects explicit page focus target on first Tab", async () => {
+  it("uses first-tab interception after navigation when footer had focus", async () => {
     const { router } = setup();
 
-    await router.navigate("/custom");
-    const target = await screen.findByText("Summary");
+    const footerLink = screen.getByRole("link", { name: "Footer link" });
+    footerLink.focus();
+    expect(footerLink).toHaveFocus();
 
-    fireEvent.keyDown(window, { key: "Tab" });
+    await router.navigate("/step-two");
+    const heading = await screen.findByRole("heading", { name: "Step Two" });
 
-    await waitFor(() => {
-      expect(target).toHaveFocus();
-    });
+    const wasIntercepted = !fireEvent.keyDown(window, { key: "Tab" });
+
+    expect(wasIntercepted).toBe(true);
+    expect(footerLink).not.toHaveFocus();
+    expect(heading).toHaveFocus();
   });
 
-  it("re-arms first-tab focus when the view changes on the same URL", async () => {
+  it("does not intercept first Tab on initial load/refresh", async () => {
+    setup("/step-two");
+
+    const heading = await screen.findByRole("heading", { name: "Step Two" });
+
+    const wasIntercepted = !fireEvent.keyDown(window, { key: "Tab" });
+
+    expect(wasIntercepted).toBe(false);
+    expect(heading).not.toHaveFocus();
+  });
+
+  it("does not force focus to page heading when in-page content changes", async () => {
     setup("/wizard");
 
     const stepOneHeading = await screen.findByRole("heading", {
@@ -150,10 +168,7 @@ describe("RootLayout keyboard-first-tab focus", () => {
     });
 
     fireEvent.keyDown(window, { key: "Tab" });
-
-    await waitFor(() => {
-      expect(stepOneHeading).toHaveFocus();
-    });
+    expect(stepOneHeading).not.toHaveFocus();
 
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
 
@@ -162,9 +177,6 @@ describe("RootLayout keyboard-first-tab focus", () => {
     });
 
     fireEvent.keyDown(window, { key: "Tab" });
-
-    await waitFor(() => {
-      expect(stepTwoHeading).toHaveFocus();
-    });
+    expect(stepTwoHeading).not.toHaveFocus();
   });
 });

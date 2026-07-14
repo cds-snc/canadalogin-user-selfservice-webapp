@@ -20,6 +20,7 @@ interface UseFirstTabPageFocusProps {
   search: string;
   hash: string;
   mainContentId?: string;
+  enabled?: boolean;
 }
 
 // Pick the first matching top-of-page element, otherwise fall back to main content.
@@ -61,15 +62,22 @@ export const useFirstTabPageFocus = ({
   search,
   hash,
   mainContentId = "main-content",
+  enabled = true,
 }: UseFirstTabPageFocusProps) => {
   // One-shot switch: true means intercept the next Tab press.
   const shouldHandleFirstTabRef = useRef(true);
+  // On client-side navigation, force one interception even if stale focus is retained.
+  const forceInterceptNextTabRef = useRef(false);
   // Tracks the current top focus target so we can detect view swaps on the same URL.
   const lastFocusTargetRef = useRef<HTMLElement | null>(null);
 
   // Recompute top target and re-arm first-Tab handling when in-page content changes.
   // This covers wizard-style flows that swap components without changing the route.
   const refreshFocusTarget = useCallback(() => {
+    if (!enabled) {
+      return;
+    }
+
     const mainContent = document.getElementById(mainContentId);
 
     if (!mainContent) {
@@ -85,11 +93,18 @@ export const useFirstTabPageFocus = ({
     if (didTargetChange && !hash) {
       shouldHandleFirstTabRef.current = true;
     }
-  }, [hash, mainContentId]);
+  }, [enabled, hash, mainContentId]);
 
   useEffect(() => {
+    if (!enabled) {
+      shouldHandleFirstTabRef.current = false;
+      forceInterceptNextTabRef.current = false;
+      return;
+    }
+
     // On route/query/hash changes, enable first-Tab behavior unless this is hash navigation.
     shouldHandleFirstTabRef.current = !hash;
+    forceInterceptNextTabRef.current = !hash;
 
     // Wait one frame so the route content has rendered before calculating the top target.
     const frameId = window.requestAnimationFrame(() => {
@@ -99,9 +114,13 @@ export const useFirstTabPageFocus = ({
     return () => {
       window.cancelAnimationFrame(frameId);
     };
-  }, [pathname, search, hash, refreshFocusTarget]);
+  }, [pathname, search, hash, enabled, refreshFocusTarget]);
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     const mainContent = document.getElementById(mainContentId);
 
     if (!mainContent) {
@@ -121,7 +140,7 @@ export const useFirstTabPageFocus = ({
     return () => {
       observer.disconnect();
     };
-  }, [mainContentId, refreshFocusTarget]);
+  }, [enabled, mainContentId, refreshFocusTarget]);
 
   useEffect(() => {
     // Capture Tab key presses before native tabbing so we can redirect only once.
@@ -131,6 +150,7 @@ export const useFirstTabPageFocus = ({
         event.altKey ||
         event.ctrlKey ||
         event.metaKey ||
+        !enabled ||
         !shouldHandleFirstTabRef.current
       ) {
         return;
@@ -142,7 +162,8 @@ export const useFirstTabPageFocus = ({
       if (
         activeElement &&
         activeElement !== document.body &&
-        activeElement !== document.documentElement
+        activeElement !== document.documentElement &&
+        !forceInterceptNextTabRef.current
       ) {
         shouldHandleFirstTabRef.current = false;
         return;
@@ -151,6 +172,7 @@ export const useFirstTabPageFocus = ({
       event.preventDefault();
 
       // After a successful redirect, disable interception until the next view change.
+      forceInterceptNextTabRef.current = false;
       shouldHandleFirstTabRef.current = !focusTopOfMainContent(mainContentId);
     };
 
@@ -159,5 +181,5 @@ export const useFirstTabPageFocus = ({
     return () => {
       window.removeEventListener("keydown", onKeyDown, true);
     };
-  }, [mainContentId]);
+  }, [enabled, mainContentId]);
 };
