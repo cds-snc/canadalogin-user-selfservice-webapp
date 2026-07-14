@@ -117,6 +117,8 @@ class TestSendInPersonVerificationCode:
             mock_generate_code.return_value.expires_at.isoformat()
         )
         assert result.data["verification_validity_days"] == 30
+        assert "sent_at" in result.data
+        assert datetime.fromisoformat(result.data["sent_at"]).tzinfo is not None
 
     @pytest.mark.asyncio
     @patch.object(idv_module, "_gc_notify_config", MOCK_GC_NOTIFY_CONFIG)
@@ -407,6 +409,8 @@ class TestSendInPersonVerificationCode:
 
         assert result.data["verification_code"] == "CACHED12345"
         assert result.data["verification_expires_at"] == future_expiry.isoformat()
+        assert "sent_at" in result.data
+        assert datetime.fromisoformat(result.data["sent_at"]).tzinfo is not None
         mock_generate_code.assert_not_called()
 
         request_payload = mock_http_client.post.call_args.kwargs["json"]
@@ -491,3 +495,202 @@ class TestSendInPersonVerificationCode:
         assert exc_info.value.detail["reason"] == "user_daily_limit"
         assert exc_info.value.detail["retry_after_seconds"] == 3600
         mock_http_client.post.assert_not_called()
+
+
+class TestGetLastEmailSentTime:
+    """Tests for get_last_email_sent_time function."""
+
+    @pytest.mark.asyncio
+    async def test_returns_datetime_when_email_sent_timestamp_exists(self):
+        """Should return a datetime object when email sent timestamp is stored in Redis."""
+        redis_client = AsyncMock()
+        user_hash = "test-user-hash"
+        sent_at = datetime.now(UTC)
+        redis_client.get = AsyncMock(return_value=sent_at.isoformat())
+
+        result = await idv_module.get_last_email_sent_time(redis_client, user_hash)
+
+        assert result is not None
+        assert isinstance(result, datetime)
+        assert result.tzinfo is not None
+        redis_client.get.assert_called_once_with(
+            f"{idv_module.USER_EMAIL_SENT_KEY_PREFIX}:{user_hash}"
+        )
+
+    @pytest.mark.asyncio
+    async def test_returns_none_when_no_email_sent_timestamp_exists(self):
+        """Should return None when no email has been sent yet."""
+        redis_client = AsyncMock()
+        user_hash = "test-user-hash"
+        redis_client.get = AsyncMock(return_value=None)
+
+        result = await idv_module.get_last_email_sent_time(redis_client, user_hash)
+
+        assert result is None
+        redis_client.get.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_returns_none_when_timestamp_is_invalid(self):
+        """Should return None when stored timestamp is invalid."""
+        redis_client = AsyncMock()
+        user_hash = "test-user-hash"
+        redis_client.get = AsyncMock(return_value="invalid-datetime-string")
+
+        result = await idv_module.get_last_email_sent_time(redis_client, user_hash)
+
+        assert result is None
+
+    @pytest.mark.asyncio
+    async def test_returns_correct_timestamp(self):
+        """Should return the exact timestamp that was stored."""
+        redis_client = AsyncMock()
+        user_hash = "test-user-hash"
+        sent_at = datetime(2026, 7, 13, 12, 30, 45, tzinfo=UTC)
+        redis_client.get = AsyncMock(return_value=sent_at.isoformat())
+
+        result = await idv_module.get_last_email_sent_time(redis_client, user_hash)
+
+        assert result == sent_at
+
+    @pytest.mark.asyncio
+    async def test_returns_datetime_when_timestamp_is_bytes(self):
+        """Should decode and parse byte timestamps returned by Redis."""
+        redis_client = AsyncMock()
+        user_hash = "test-user-hash"
+        sent_at = datetime(2026, 7, 13, 12, 30, 45, tzinfo=UTC)
+        redis_client.get = AsyncMock(return_value=sent_at.isoformat().encode("utf-8"))
+
+        result = await idv_module.get_last_email_sent_time(redis_client, user_hash)
+
+        assert result == sent_at
+
+    @pytest.mark.asyncio
+    async def test_timestamp_stored_after_successful_send(
+        self,
+    ):
+        """Should store the email sent timestamp in Redis after successful send."""
+        redis_client = AsyncMock()
+        user_hash = _hash_user_identifier("user@example.com")
+        sent_at = datetime.now(UTC)
+
+        await idv_module._mark_successful_send(redis_client, user_hash, sent_at)
+
+        # Verify setex was called for the email sent key
+        calls = redis_client.setex.call_args_list
+        email_sent_call = None
+        for call in calls:
+            if idv_module.USER_EMAIL_SENT_KEY_PREFIX in call[0][0]:
+                email_sent_call = call
+                break
+
+        assert email_sent_call is not None
+        assert (
+            email_sent_call[0][0]
+            == f"{idv_module.USER_EMAIL_SENT_KEY_PREFIX}:{user_hash}"
+        )
+        assert email_sent_call[0][1] == idv_module.USER_DAILY_WINDOW_SECONDS
+        assert email_sent_call[0][2] == sent_at.isoformat()
+
+
+def _hash_user_identifier(identifier: str) -> str:
+    """Helper function to hash user identifier (email)."""
+    import hashlib
+
+    return hashlib.sha256(identifier.strip().lower().encode("utf-8")).hexdigest()
+
+
+class TestGetInPersonLastEmailSentEndpoint:
+    """Tests for GET /in-person/last-email-sent router endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_returns_last_email_sent_date_from_redis(self):
+        """Should return the last email sent timestamp from Redis."""
+        from app.identity_verification.v1_router import router
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(router, prefix="/v1/identity-verification")
+
+        mock_request = MagicMock()
+        mock_request.app.state.request_client = AsyncMock()
+
+        redis_client = AsyncMock()
+        last_sent = datetime.now(UTC)
+        redis_client.get = AsyncMock(return_value=last_sent.isoformat())
+
+        with (
+            patch.object(idv_module, "get_redis_client", return_value=redis_client),
+            patch.object(
+                idv_module, "dispatch_get_my_profile_from_ibm"
+            ) as mock_profile,
+        ):
+            mock_profile_instance = MagicMock()
+            mock_profile_instance.userName = "user@example.com"
+            mock_profile.return_value = mock_profile_instance
+
+            # Call the endpoint handler directly
+            from app.identity_verification.v1_router import (
+                get_in_person_last_email_sent,
+            )
+
+            result = await get_in_person_last_email_sent(
+                mock_request,
+                "test-token",
+            )
+
+            assert result.success is True
+            assert result.data["last_email_sent"] == last_sent.isoformat()
+
+    @pytest.mark.asyncio
+    async def test_returns_none_when_no_email_sent_yet(self):
+        """Should return None when no email has been sent yet."""
+        mock_request = MagicMock()
+        mock_request.app.state.request_client = AsyncMock()
+
+        redis_client = AsyncMock()
+        redis_client.get = AsyncMock(return_value=None)
+
+        with (
+            patch.object(idv_module, "get_redis_client", return_value=redis_client),
+            patch.object(
+                idv_module, "dispatch_get_my_profile_from_ibm"
+            ) as mock_profile,
+        ):
+            mock_profile_instance = MagicMock()
+            mock_profile_instance.userName = "user@example.com"
+            mock_profile.return_value = mock_profile_instance
+
+            from app.identity_verification.v1_router import (
+                get_in_person_last_email_sent,
+            )
+
+            result = await get_in_person_last_email_sent(
+                mock_request,
+                "test-token",
+            )
+
+            assert result.success is True
+            assert result.data["last_email_sent"] is None
+
+    @pytest.mark.asyncio
+    async def test_returns_none_when_redis_unavailable(self):
+        """Should return None for last_email_sent when Redis is unavailable."""
+        mock_request = MagicMock()
+        mock_request.app.state.request_client = AsyncMock()
+
+        with patch.object(
+            idv_module,
+            "get_redis_client",
+            side_effect=ValueError("Redis unavailable"),
+        ):
+            from app.identity_verification.v1_router import (
+                get_in_person_last_email_sent,
+            )
+
+            result = await get_in_person_last_email_sent(
+                mock_request,
+                "test-token",
+            )
+
+            assert result.success is True
+            assert result.data["last_email_sent"] is None
