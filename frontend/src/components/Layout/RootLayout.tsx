@@ -1,5 +1,10 @@
 import { useEffect } from "react";
-import { Outlet, useLocation, useMatches, useNavigationType } from "react-router";
+import {
+  Outlet,
+  useLocation,
+  useMatches,
+  useNavigationType,
+} from "react-router";
 import { useLanguage } from "../Providers/LanguageProvider";
 import { useRelyingPartyAnalyticsParams } from "../../hooks/useRelyingPartyAnalyticsParams";
 import { useFirstTabPageFocus } from "../../hooks/useFirstTabPageFocus";
