@@ -8,13 +8,13 @@ import {
   GcdsContainer,
   GcdsSelect,
   GcdsDateInput,
-  GcdsErrorSummary,
   GcdsInput,
   GcdsFieldset,
 } from "@gcds-core/components-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
+import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 import {
   AVAILABLE_LANGUAGES,
   CANADIAN_PROVINCES_AND_TERRITORIES,
@@ -37,7 +37,6 @@ import {
   getServiceCanadaCentreValidation,
   type ServiceCanadaCentreFormData,
 } from "./validation/ServiceCanadaCentre.validation";
-import { focusErrorSummary } from "../helpers/focusErrorSummary";
 import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 
 const ERROR_SUMMARY_ID = "service-canada-centre-error-summary";
@@ -86,14 +85,6 @@ export default function ServiceCanadaCentrePage() {
 
       updateField(field, target?.value ?? "");
     };
-
-  useEffect(() => {
-    if (!showErrorSummary) {
-      return;
-    }
-
-    focusErrorSummary(ERROR_SUMMARY_ID);
-  }, [showErrorSummary, summaryFocusTrigger]);
 
   const {
     isFormValid,
@@ -213,10 +204,12 @@ export default function ServiceCanadaCentrePage() {
           <GcdsHeading tag="h1">{t("ServiceCanadaCentre.heading")}</GcdsHeading>
 
           {showErrorSummary ? (
-            <GcdsErrorSummary
+            <ErrorSummaryWithFocus
+              key={summaryFocusTrigger}
               id={ERROR_SUMMARY_ID}
-              heading={getValidationSummaryHeading(t)}
+              errorMessage={getValidationSummaryHeading(t)}
               errorLinks={summaryErrors}
+              language={currentLanguage}
             />
           ) : null}
 
@@ -288,6 +281,7 @@ export default function ServiceCanadaCentrePage() {
               >
                 <GcdsInput
                   required
+                  id="first-name-input"
                   inputId="first-name-input"
                   name="first-name-input"
                   label={t("ServiceCanadaCentre.firstNameLabel")}
@@ -296,6 +290,7 @@ export default function ServiceCanadaCentrePage() {
                 />
                 <GcdsInput
                   required
+                  id="last-name-input"
                   inputId="last-name-input"
                   name="last-name-input"
                   label={t("ServiceCanadaCentre.lastNameLabel")}
@@ -316,6 +311,7 @@ export default function ServiceCanadaCentrePage() {
                   <>
                     <GcdsInput
                       required
+                      id="address-input"
                       inputId="address-input"
                       name="address-input"
                       label={t("ServiceCanadaCentre.addressLabel")}
@@ -325,6 +321,7 @@ export default function ServiceCanadaCentrePage() {
                     />
 
                     <GcdsSelect
+                      id="select-province"
                       name="select-province"
                       selectId="select-province"
                       defaultValue={t(

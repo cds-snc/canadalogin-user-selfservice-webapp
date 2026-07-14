@@ -12,7 +12,6 @@ import {
   getLastNameRequiredOrInvalidMessage,
   getProvinceRequiredMessage,
   getSharedDateOfBirthMessages,
-  getValidationSummaryHeading,
 } from "../InPerson/validation/ErrorsDefinition";
 import i18n from "../../../i18n/test";
 
@@ -424,7 +423,9 @@ describe("VisitCanadaPost", () => {
     fireEvent.click(continueButton);
 
     const summary = screen.getByTestId("errorSummary");
-    expect(summary).toHaveTextContent(getValidationSummaryHeading(t));
+    expect(summary).toHaveTextContent(
+      i18n.getFixedT("en", "common")("Error.genericProblem"),
+    );
     expect(summary).toHaveTextContent(getIdTypeRequiredMessage(t));
 
     expect(
@@ -464,7 +465,9 @@ describe("VisitCanadaPost", () => {
     fireEvent.click(screen.getByTestId("continue-button"));
 
     const summary = screen.getByTestId("errorSummary");
-    expect(summary).toHaveTextContent(getValidationSummaryHeading(t));
+    expect(summary).toHaveTextContent(
+      i18n.getFixedT("en", "common")("Error.genericProblem"),
+    );
     expect(summary).toHaveTextContent(getIdExpiryRequiredMessage(t));
     expect(summary).toHaveTextContent(getFirstNameRequiredOrInvalidMessage(t));
     expect(summary).toHaveTextContent(getLastNameRequiredOrInvalidMessage(t));
