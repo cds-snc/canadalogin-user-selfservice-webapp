@@ -50,4 +50,3 @@ export const SERVICE_CANADA_CENTRE_PRINT_OPTIONS: PrintOptions = {
     },
   ],
 };
-    
