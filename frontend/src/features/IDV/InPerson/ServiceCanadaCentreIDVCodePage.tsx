@@ -13,6 +13,10 @@ import { useUser } from "../../../components/Providers/useUser";
 import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
 import printWithShadowDomStyles from "../helpers/printWithShadowDomStyles";
 import { SERVICE_CANADA_CENTRE_PRINT_OPTIONS } from "./helpers/serviceCanadaCentrePrintConfig";
+import {
+  APPROVED_DOCUMENT_VALUES,
+  type ApprovedDocumentValue,
+} from "../data/approvedDocuments";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import "./css/ServiceCanadaCentreIDVCodePage.print.css";
@@ -24,6 +28,12 @@ type ServiceCanadaCentreIDVCodePageLocationState = {
   dateOfBirth?: string;
   idType?: string;
 };
+
+const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
+
+const isApprovedDocumentValue = (
+  value: string,
+): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
 
 export default function ServiceCanadaCentreIDVCodePage() {
   const { state } = useUser();
@@ -45,7 +55,12 @@ export default function ServiceCanadaCentreIDVCodePage() {
   const firstName = locationState?.firstName?.trim() || "--";
   const lastName = locationState?.lastName?.trim() || "--";
   const dateOfBirth = locationState?.dateOfBirth?.trim() || "--";
-  const idSelected = locationState?.idType?.trim() || "--";
+  const rawIdSelected = locationState?.idType?.trim() || "";
+  const idSelected = rawIdSelected
+    ? isApprovedDocumentValue(rawIdSelected)
+      ? t(`ApprovedDocuments.${rawIdSelected}`)
+      : rawIdSelected
+    : "--";
 
   const handlePrintPage = () => {
     printWithShadowDomStyles(SERVICE_CANADA_CENTRE_PRINT_OPTIONS);

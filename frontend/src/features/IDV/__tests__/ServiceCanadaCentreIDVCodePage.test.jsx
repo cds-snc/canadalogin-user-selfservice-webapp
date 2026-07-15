@@ -1,9 +1,11 @@
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ServiceCanadaCentreIDVCodePage from "../InPerson/ServiceCanadaCentreIDVCodePage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
+import printWithShadowDomStyles from "../helpers/printWithShadowDomStyles";
+import { SERVICE_CANADA_CENTRE_PRINT_OPTIONS } from "../InPerson/helpers/serviceCanadaCentrePrintConfig";
 
 const mockRouteParams = vi.hoisted(() => ({
   language: "en",
@@ -118,6 +120,15 @@ const TestWrapper = ({ children }) => (
     <UserProvider initial={mockUserState}>{children}</UserProvider>
   </BrowserRouter>
 );
+
+const originalDocumentTitle = document.title;
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  document.title = originalDocumentTitle;
+  document.head.innerHTML = "";
+  document.body.innerHTML = "";
+});
 
 describe("ServiceCanadaCentreIDVCodePage", () => {
   beforeEach(() => {
@@ -240,8 +251,23 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("Jane")).toBeInTheDocument();
     expect(screen.getByText("Doe")).toBeInTheDocument();
     expect(screen.getByText("1990-01-01")).toBeInTheDocument();
-    expect(screen.getByText("passport")).toBeInTheDocument();
+    expect(
+      screen.getByText("Canadian and International Passport"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("passport")).not.toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
+  });
+
+  it("falls back to the raw id type when it is not a known approved document key", () => {
+    mockLocationState.idType = "Employee ID";
+
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText("Employee ID")).toBeInTheDocument();
   });
 
   it("navigates back to service canada form when update information is clicked", () => {
@@ -288,5 +314,87 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
 
     // Component should still render without crashing
     expect(screen.getByRole("main")).toBeInTheDocument();
+  });
+});
+
+describe("SERVICE_CANADA_CENTRE_PRINT_OPTIONS", () => {
+  it("uses transform-based typography scaling instead of zoom", () => {
+    const typographyRule =
+      SERVICE_CANADA_CENTRE_PRINT_OPTIONS.shadowStyles.find(({ hosts }) =>
+        hosts.includes("gcds-heading"),
+      );
+
+    expect(typographyRule).toBeDefined();
+    expect(typographyRule.css).toContain("transform: scale(0.75)");
+    expect(typographyRule.css).toContain("transform-origin: top left");
+    expect(typographyRule.css).not.toContain("zoom:");
+  });
+});
+
+describe("printWithShadowDomStyles with Service Canada config", () => {
+  it("applies and removes Service Canada print styles during the print lifecycle", () => {
+    const hiddenHost = document.createElement("gcds-header");
+    hiddenHost.style.display = "block";
+
+    const headingHost = document.createElement("gcds-heading");
+    const headingShadowRoot = headingHost.attachShadow({ mode: "open" });
+
+    const noticeHost = document.createElement("gcds-notice");
+    const noticeShadowRoot = noticeHost.attachShadow({ mode: "open" });
+
+    document.body.append(hiddenHost, headingHost, noticeHost);
+
+    const printSpy = vi
+      .spyOn(window, "print")
+      .mockImplementation(() => undefined);
+
+    printWithShadowDomStyles(SERVICE_CANADA_CENTRE_PRINT_OPTIONS);
+
+    expect(printSpy).toHaveBeenCalledTimes(1);
+    expect(hiddenHost.style.display).toBe("none");
+    expect(document.title).toBe("");
+    expect(headingShadowRoot.querySelector("style")?.textContent).toContain(
+      "transform: scale(0.75)",
+    );
+    expect(noticeShadowRoot.querySelector("style")?.textContent).toContain(
+      "font-size: 0.75em",
+    );
+    expect(document.head.querySelector("style")?.textContent).toContain(
+      "@page",
+    );
+
+    window.dispatchEvent(new Event("afterprint"));
+
+    expect(hiddenHost.style.display).toBe("block");
+    expect(headingShadowRoot.querySelector("style")).toBeNull();
+    expect(noticeShadowRoot.querySelector("style")).toBeNull();
+    expect(document.head.querySelector("style")).toBeNull();
+    expect(document.title).toBe(originalDocumentTitle);
+  });
+
+  it("cleans up immediately when print is unavailable", () => {
+    const hiddenHost = document.createElement("gcds-header");
+    hiddenHost.style.display = "inline";
+    document.body.append(hiddenHost);
+
+    const originalPrint = window.print;
+
+    Object.defineProperty(window, "print", {
+      configurable: true,
+      value: undefined,
+    });
+
+    try {
+      printWithShadowDomStyles(SERVICE_CANADA_CENTRE_PRINT_OPTIONS);
+
+      expect(hiddenHost.style.display).toBe("inline");
+      expect(document.head.querySelector("style")).toBeNull();
+      expect(document.title).toBe(originalDocumentTitle);
+    } finally {
+      Object.defineProperty(window, "print", {
+        configurable: true,
+        value: originalPrint,
+      });
+    }
   });
 });
