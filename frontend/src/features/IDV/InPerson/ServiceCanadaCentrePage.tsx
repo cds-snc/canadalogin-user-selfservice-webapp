@@ -25,12 +25,10 @@ import {
 import { path } from "../../../utils/routeHelpers";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 import {
-  getAddressRequiredMessage,
   getFirstNameRequiredOrInvalidMessage,
   getIdExpiryRequiredMessage,
   getIdTypeRequiredMessage,
   getLastNameRequiredOrInvalidMessage,
-  getProvinceRequiredMessage,
   getSharedDateOfBirthMessages,
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
@@ -125,14 +123,6 @@ export default function ServiceCanadaCentrePage() {
       dateOfBirthMessages[summaryErrorCodes.dateOfBirth].summary;
   }
 
-  if (summaryErrorCodes.address) {
-    summaryErrors["#address-input"] = getAddressRequiredMessage(t);
-  }
-
-  if (summaryErrorCodes.province) {
-    summaryErrors["#select-province"] = getProvinceRequiredMessage(t);
-  }
-
   const idTypeErrorMessage =
     hasSubmitted && summaryErrorCodes.idType ? getIdTypeRequiredMessage(t) : "";
 
@@ -154,16 +144,6 @@ export default function ServiceCanadaCentrePage() {
   const dateOfBirthErrorMessage =
     (isDateOfBirthTouched || hasSubmitted) && dateOfBirthValidationError
       ? dateOfBirthMessages[dateOfBirthValidationError].inline
-      : "";
-
-  const addressErrorMessage =
-    hasSubmitted && summaryErrorCodes.address
-      ? getAddressRequiredMessage(t)
-      : "";
-
-  const provinceErrorMessage =
-    hasSubmitted && summaryErrorCodes.province
-      ? getProvinceRequiredMessage(t)
       : "";
 
   const onContinue = async () => {
@@ -332,7 +312,6 @@ export default function ServiceCanadaCentrePage() {
                       name="address-input"
                       label={t("ServiceCanadaCentre.addressLabel")}
                       hint={t("ServiceCanadaCentre.addressHint")}
-                      errorMessage={addressErrorMessage}
                       onGcdsChange={createChangeHandler("address")}
                     />
 
@@ -345,7 +324,6 @@ export default function ServiceCanadaCentrePage() {
                       )}
                       label={t("ServiceCanadaCentre.provinceLabel")}
                       style={{ maxWidth: "100%" }}
-                      errorMessage={provinceErrorMessage}
                       onGcdsChange={createChangeHandler("province")}
                     >
                       {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
