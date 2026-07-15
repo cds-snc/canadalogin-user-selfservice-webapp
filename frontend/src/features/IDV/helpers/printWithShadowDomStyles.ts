@@ -13,6 +13,10 @@ export type PrintOptions = {
 const PRINT_PREVIOUS_DISPLAY_ATTRIBUTE = "data-print-prev-display";
 
 const hideHosts = (selectors: readonly string[]) => {
+  if (selectors.length === 0) {
+    return () => {};
+  }
+
   const hosts = document.querySelectorAll<HTMLElement>(selectors.join(","));
 
   hosts.forEach((host) => {
@@ -35,7 +39,13 @@ const injectShadowStyles = (rules: readonly ShadowStyleRule[]) => {
   const cleanupCallbacks: Array<() => void> = [];
 
   rules.forEach(({ hosts, css }) => {
-    const matchingHosts = document.querySelectorAll<HTMLElement>(hosts.join(","));
+    if (hosts.length === 0) {
+      return;
+    }
+
+    const matchingHosts = document.querySelectorAll<HTMLElement>(
+      hosts.join(","),
+    );
 
     matchingHosts.forEach((host) => {
       const root = host.shadowRoot;
@@ -86,15 +96,21 @@ const injectPrintCss = (css?: string) => {
   };
 };
 
-export default function printWithShadowDomStyles(
-  options: PrintOptions,
-): void {
+export default function printWithShadowDomStyles(options: PrintOptions): void {
   const restoreHosts = hideHosts(options.hideHosts);
   const restoreShadowStyles = injectShadowStyles(options.shadowStyles);
   const restorePrintTitle = overridePrintTitle(options.printTitle);
   const restorePrintCss = injectPrintCss(options.printCss);
 
+  let didCleanup = false;
+
   const cleanup = () => {
+    if (didCleanup) {
+      return;
+    }
+
+    didCleanup = true;
+    window.removeEventListener("afterprint", cleanup);
     restorePrintCss();
     restorePrintTitle();
     restoreShadowStyles();
@@ -102,5 +118,16 @@ export default function printWithShadowDomStyles(
   };
 
   window.addEventListener("afterprint", cleanup, { once: true });
-  window.print();
+
+  if (typeof window.print !== "function") {
+    cleanup();
+    return;
+  }
+
+  try {
+    window.print();
+  } catch (error) {
+    cleanup();
+    throw error;
+  }
 }

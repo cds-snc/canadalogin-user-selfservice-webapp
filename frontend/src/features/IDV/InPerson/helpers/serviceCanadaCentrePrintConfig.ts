@@ -46,23 +46,22 @@ const GLOBAL_PRINT_STYLE = `
   }
 `;
 
-export const SERVICE_CANADA_CENTRE_PRINT_OPTIONS: PrintOptions =
-  {
-    hideHosts: PRINT_HIDE_HOST_SELECTORS,
-    shadowStyles: [
-      {
-        hosts: PRINT_HIDE_HOST_SELECTORS,
-        css: SHADOW_PRINT_STYLE,
-      },
-      {
-        hosts: ["gcds-heading", "gcds-text"],
-        css: SHADOW_PRINT_TYPOGRAPHY_STYLE,
-      },
-      {
-        hosts: ["gcds-notice"],
-        css: SHADOW_NOTICE_PRINT_STYLE,
-      },
-    ],
-    printTitle: " ",
-    printCss: GLOBAL_PRINT_STYLE,
-  };
+export const SERVICE_CANADA_CENTRE_PRINT_OPTIONS: PrintOptions = {
+  hideHosts: PRINT_HIDE_HOST_SELECTORS,
+  shadowStyles: [
+    {
+      hosts: PRINT_HIDE_HOST_SELECTORS,
+      css: SHADOW_PRINT_STYLE,
+    },
+    {
+      hosts: ["gcds-heading", "gcds-text"],
+      css: SHADOW_PRINT_TYPOGRAPHY_STYLE,
+    },
+    {
+      hosts: ["gcds-notice"],
+      css: SHADOW_NOTICE_PRINT_STYLE,
+    },
+  ],
+  printTitle: "",
+  printCss: GLOBAL_PRINT_STYLE,
+};

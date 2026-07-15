@@ -62,10 +62,10 @@ export default function ServiceCanadaCentreIDVCodePage() {
   return (
     <GcdsContainer role="main" className="service-canada-idv-code-page">
       <GcdsGrid columns="1" gap="450">
-        <div className="service-canada-print-banner" aria-hidden="true">
+        <div className="service-canada-print-banner">
           <img
             src={governmentBannerImage}
-            alt="Government of Canada"
+            alt={t("ServiceCanadaCentreCode.printBannerAlt")}
             className="service-canada-print-banner-image"
           />
         </div>
