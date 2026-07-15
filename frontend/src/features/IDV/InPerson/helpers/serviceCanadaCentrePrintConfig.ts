@@ -21,7 +21,9 @@ const SHADOW_PRINT_STYLE = `
 
 const SHADOW_PRINT_TYPOGRAPHY_STYLE = `
   :host {
-    zoom: 0.75;
+    transform: scale(0.75);
+    transform-origin: top left;
+    display: inline-block;
   }
 `;
 
