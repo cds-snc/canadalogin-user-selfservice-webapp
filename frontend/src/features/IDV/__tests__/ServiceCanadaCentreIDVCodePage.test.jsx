@@ -318,16 +318,14 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
 });
 
 describe("SERVICE_CANADA_CENTRE_PRINT_OPTIONS", () => {
-  it("uses transform-based typography scaling instead of zoom", () => {
+  it("uses zoom-based typography scaling", () => {
     const typographyRule =
       SERVICE_CANADA_CENTRE_PRINT_OPTIONS.shadowStyles.find(({ hosts }) =>
         hosts.includes("gcds-heading"),
       );
 
     expect(typographyRule).toBeDefined();
-    expect(typographyRule.css).toContain("transform: scale(0.75)");
-    expect(typographyRule.css).toContain("transform-origin: top left");
-    expect(typographyRule.css).not.toContain("zoom:");
+    expect(typographyRule.css).toContain("zoom: 0.75");
   });
 });
 
@@ -352,15 +350,11 @@ describe("printWithShadowDomStyles with Service Canada config", () => {
 
     expect(printSpy).toHaveBeenCalledTimes(1);
     expect(hiddenHost.style.display).toBe("none");
-    expect(document.title).toBe("");
     expect(headingShadowRoot.querySelector("style")?.textContent).toContain(
-      "transform: scale(0.75)",
+      "zoom: 0.75",
     );
     expect(noticeShadowRoot.querySelector("style")?.textContent).toContain(
-      "font-size: 0.75em",
-    );
-    expect(document.head.querySelector("style")?.textContent).toContain(
-      "@page",
+      "gcds-heading",
     );
 
     window.dispatchEvent(new Event("afterprint"));
@@ -368,7 +362,6 @@ describe("printWithShadowDomStyles with Service Canada config", () => {
     expect(hiddenHost.style.display).toBe("block");
     expect(headingShadowRoot.querySelector("style")).toBeNull();
     expect(noticeShadowRoot.querySelector("style")).toBeNull();
-    expect(document.head.querySelector("style")).toBeNull();
     expect(document.title).toBe(originalDocumentTitle);
   });
 
@@ -388,7 +381,6 @@ describe("printWithShadowDomStyles with Service Canada config", () => {
       printWithShadowDomStyles(SERVICE_CANADA_CENTRE_PRINT_OPTIONS);
 
       expect(hiddenHost.style.display).toBe("inline");
-      expect(document.head.querySelector("style")).toBeNull();
       expect(document.title).toBe(originalDocumentTitle);
     } finally {
       Object.defineProperty(window, "print", {

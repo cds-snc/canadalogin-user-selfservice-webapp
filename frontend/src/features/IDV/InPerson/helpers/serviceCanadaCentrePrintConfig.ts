@@ -21,30 +21,15 @@ const SHADOW_PRINT_STYLE = `
 
 const SHADOW_PRINT_TYPOGRAPHY_STYLE = `
   :host {
-    transform: scale(0.75);
-    transform-origin: top left;
-    display: inline-block;
+    zoom: 0.75;
   }
 `;
 
-const SHADOW_NOTICE_PRINT_STYLE = `
-  [part="notice-title"],
-  [part="title"],
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-size: 0.75em !important;
-  }
-`;
-
-const GLOBAL_PRINT_STYLE = `
-  @media print {
-    @page {
-      margin: 8mm;
-    }
+const SHADOW_NOTICE_TITLE_PRINT_STYLE = `
+  [part="notice-title"] gcds-heading,
+  [part="title"] gcds-heading,
+  gcds-heading {
+    zoom: 0.75;
   }
 `;
 
@@ -61,9 +46,8 @@ export const SERVICE_CANADA_CENTRE_PRINT_OPTIONS: PrintOptions = {
     },
     {
       hosts: ["gcds-notice"],
-      css: SHADOW_NOTICE_PRINT_STYLE,
+      css: SHADOW_NOTICE_TITLE_PRINT_STYLE,
     },
   ],
-  printTitle: "",
-  printCss: GLOBAL_PRINT_STYLE,
 };
+    
