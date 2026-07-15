@@ -33,7 +33,6 @@ import OnlineVerificationInfo from "./features/IDV/Online/OnlineVerificationInfo
 import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
 import IdentityVerificationSuccess from "./features/IDV/Online/IdentityVerificationSuccess";
-import IdvSuccessRedirect from "./features/IDV/components/IdvSuccessRedirect";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -145,11 +144,6 @@ export const appRoutes: RouteObject[] = [
               },
               ...(DEV_ONLY_FEATURE
                 ? [
-                    {
-                      path: "idv/success",
-                      element: <IdvSuccessRedirect />,
-                      handle: { id: PAGES.idvSuccessPage },
-                    },
                     {
                       path: "identity-verification/:journeyType?",
                       handle: {
