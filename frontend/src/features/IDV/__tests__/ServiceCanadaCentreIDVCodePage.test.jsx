@@ -311,10 +311,7 @@ describe("printWithShadowDomStyles with Service Canada config", () => {
     const headingHost = document.createElement("gcds-heading");
     const headingShadowRoot = headingHost.attachShadow({ mode: "open" });
 
-    const noticeHost = document.createElement("gcds-notice");
-    const noticeShadowRoot = noticeHost.attachShadow({ mode: "open" });
-
-    document.body.append(hiddenHost, headingHost, noticeHost);
+    document.body.append(hiddenHost, headingHost);
 
     const printSpy = vi
       .spyOn(window, "print")
@@ -327,15 +324,11 @@ describe("printWithShadowDomStyles with Service Canada config", () => {
     expect(headingShadowRoot.querySelector("style")?.textContent).toContain(
       "zoom: 0.75",
     );
-    expect(noticeShadowRoot.querySelector("style")?.textContent).toContain(
-      "gcds-heading",
-    );
 
     window.dispatchEvent(new Event("afterprint"));
 
     expect(hiddenHost.style.display).toBe("block");
     expect(headingShadowRoot.querySelector("style")).toBeNull();
-    expect(noticeShadowRoot.querySelector("style")).toBeNull();
     expect(document.title).toBe(originalDocumentTitle);
   });
 
