@@ -1,0 +1,33 @@
+@media print {
+  .service-canada-idv-code-page {
+    max-width: 100%;
+  }
+
+  .service-canada-idv-code-page .service-canada-print-hide {
+    display: none !important;
+  }
+
+  .service-canada-idv-code-page .service-canada-print-banner {
+    border-bottom: 1px solid #d1d3d6;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .service-canada-idv-code-page .service-canada-print-banner-image {
+    display: block;
+    height: 30px;
+    max-width: 100%;
+    width: auto;
+  }
+
+  .service-canada-idv-code-page gcds-notice {
+    display: block;
+    margin-top: 0.5rem;
+  }
+}
+
+@media screen {
+  .service-canada-idv-code-page .service-canada-print-banner {
+    display: none;
+  }
+}

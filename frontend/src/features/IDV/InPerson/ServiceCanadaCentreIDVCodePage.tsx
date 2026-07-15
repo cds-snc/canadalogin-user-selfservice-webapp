@@ -10,8 +10,12 @@ import {
 import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
+import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
+import printWithShadowDomStyles from "../helpers/printWithShadowDomStyles";
+import { SERVICE_CANADA_CENTRE_PRINT_OPTIONS } from "./helpers/serviceCanadaCentrePrintConfig";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+import "./css/ServiceCanadaCentreIDVCodePage.print.css";
 
 type ServiceCanadaCentreIDVCodePageLocationState = {
   idvCode?: string;
@@ -43,7 +47,9 @@ export default function ServiceCanadaCentreIDVCodePage() {
   const dateOfBirth = locationState?.dateOfBirth?.trim() || "--";
   const idSelected = locationState?.idType?.trim() || "--";
 
-  const handlePrintPage = () => {};
+  const handlePrintPage = () => {
+    printWithShadowDomStyles(SERVICE_CANADA_CENTRE_PRINT_OPTIONS);
+  };
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -54,8 +60,16 @@ export default function ServiceCanadaCentreIDVCodePage() {
   }
 
   return (
-    <GcdsContainer role="main">
+    <GcdsContainer role="main" className="service-canada-idv-code-page">
       <GcdsGrid columns="1" gap="450">
+        <div className="service-canada-print-banner" aria-hidden="true">
+          <img
+            src={governmentBannerImage}
+            alt="Government of Canada"
+            className="service-canada-print-banner-image"
+          />
+        </div>
+
         <GcdsHeading tag="h1" marginTop="0">
           {t("ServiceCanadaCentreCode.heading")}
         </GcdsHeading>
@@ -64,7 +78,6 @@ export default function ServiceCanadaCentreIDVCodePage() {
           <strong>{idvCode}</strong>
         </GcdsHeading>
         <GcdsContainer>
-          {" "}
           <GcdsText>
             {t("ServiceCanadaCentreCode.codeValidDays")}{" "}
             <strong>{email}</strong>.
@@ -82,7 +95,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
           <GcdsContainer>
             <GcdsGrid columns="1" gap="150">
               <div>
-                <GcdsText marginTop="300" marginBottom="0">
+                <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.firstName")}</strong>
                 </GcdsText>
                 <GcdsText marginTop="200" marginBottom="0">
@@ -93,7 +106,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
               <div className="separator" style={{ margin: "0" }} />
 
               <div>
-                <GcdsText>
+                <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.lastName")}</strong>
                 </GcdsText>
                 <GcdsText marginTop="200" marginBottom="0">
@@ -125,7 +138,10 @@ export default function ServiceCanadaCentreIDVCodePage() {
 
               <div className="separator" style={{ margin: "0" }} />
 
-              <div style={{ marginTop: "1.5rem" }}>
+              <div
+                className="service-canada-print-hide"
+                style={{ marginTop: "1.5rem" }}
+              >
                 <GcdsGrid
                   columns="1"
                   columnsDesktop="max-content max-content"
@@ -164,7 +180,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
             {
               //TODO: populate with real URL once available
             }
-            <GcdsLink href={"#"} external={true}>
+            <GcdsLink href="#" external>
               {t("ServiceCanadaCentreCode.findNearestLink")}
             </GcdsLink>
             .
