@@ -321,8 +321,6 @@ export default function ServiceCanadaCentrePage() {
                 {showAddressAndProvinceFields && (
                   <>
                     <GcdsInput
-                      required
-                      id="address-input"
                       inputId="address-input"
                       name="address-input"
                       label={`${t("ServiceCanadaCentre.addressLabel")} (optional)`}
