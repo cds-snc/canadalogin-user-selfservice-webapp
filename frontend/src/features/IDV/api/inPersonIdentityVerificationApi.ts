@@ -12,6 +12,15 @@ type InPersonVerificationApiResponse = {
     verification_code?: string;
     verification_expires_at?: string;
     verification_validity_days?: number;
+    sent_at?: string;
+  };
+};
+
+type LastEmailSentResponse = {
+  success: boolean;
+  message: string;
+  data?: {
+    last_email_sent?: string | null;
   };
 };
 
@@ -22,6 +31,7 @@ export type InPersonVerificationCodeResponse = {
     verificationCode?: string;
     verificationExpiresAt?: string;
     verificationValidityDays?: number;
+    sentAt?: string;
   };
 };
 
@@ -44,8 +54,30 @@ export const inPersonIdentityVerificationApi = {
           verificationExpiresAt: responseData.data?.verification_expires_at,
           verificationValidityDays:
             responseData.data?.verification_validity_days,
+          sentAt: responseData.data?.sent_at,
         },
       } as InPersonVerificationCodeResponse;
+    } catch (error) {
+      handleApiError(error as ApiErrorLike);
+    }
+  },
+
+  /**
+   * Fetches the last email sent date for in-person verification.
+   */
+  getLastEmailSentDate: async () => {
+    try {
+      const response = await axios.get(
+        `${config.apiUrl}/v1/identity-verification/in-person/last-email-sent`,
+      );
+
+      const responseData = response.data as LastEmailSentResponse;
+
+      return {
+        success: responseData.success,
+        message: responseData.message,
+        lastEmailSent: responseData.data?.last_email_sent,
+      };
     } catch (error) {
       handleApiError(error as ApiErrorLike);
     }

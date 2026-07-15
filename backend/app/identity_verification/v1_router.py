@@ -10,6 +10,7 @@ from app.identity_verification.services.create_identity_verification import (
 )
 from app.identity_verification.services.send_in_person_verification_code import (
     send_in_person_verification_code,
+    get_last_email_sent,
 )
 from app.identity_verification.services.redirect_target_url import (
     get_identity_verification_redirect_url,
@@ -70,6 +71,23 @@ async def send_in_person_verification(
         request.app.state.request_client,
         user_access_token,
         request=request,
+    )
+
+
+@router.get(
+    "/in-person/last-email-sent",
+    response_model=ResponseModel,
+    status_code=status.HTTP_200_OK,
+    tags=["Identity Verification"],
+    summary="Get the last email sent date for in-person verification",
+    description="Returns the timestamp of the last in-person verification email sent to the user.",
+)
+async def get_in_person_last_email_sent(
+    request: Request,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await get_last_email_sent(
+        request.app.state.request_client, user_access_token, request
     )
 
 
