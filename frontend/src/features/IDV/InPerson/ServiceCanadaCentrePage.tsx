@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
+import { useUser } from "../../../components/Providers/useUser";
 import {
   AVAILABLE_LANGUAGES,
   CANADIAN_PROVINCES_AND_TERRITORIES,
@@ -59,7 +60,11 @@ export default function ServiceCanadaCentrePage() {
     postalcode: "",
   });
 
-  const { t } = useTranslation("idv");
+  const { t, i18n } = useTranslation("idv");
+  const { state } = useUser();
+  const rpInfo = state.relyingPartyInfo;
+  const localizedDetail = rpInfo?.localized?.[i18n.language];
+  const rpName = localizedDetail?.name ?? rpInfo?.linkName;
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,
@@ -238,7 +243,9 @@ export default function ServiceCanadaCentrePage() {
                 </li>
                 <li>
                   <GcdsText marginBottom="0">
-                    {t("ServiceCanadaCentre.step4")}
+                    {t("ServiceCanadaCentre.step4", {
+                      rpName: rpName ?? t("ServiceCanadaCentre.fallbackRpName"),
+                    })}
                   </GcdsText>
                 </li>
               </ol>
@@ -323,7 +330,7 @@ export default function ServiceCanadaCentrePage() {
                     <GcdsInput
                       inputId="address-input"
                       name="address-input"
-                      label={`${t("ServiceCanadaCentre.addressLabel")} (optional)`}
+                      label={t("ServiceCanadaCentre.addressLabel")}
                       hint={t("ServiceCanadaCentre.addressHint")}
                       errorMessage={addressErrorMessage}
                       onGcdsChange={createChangeHandler("address")}
@@ -336,7 +343,7 @@ export default function ServiceCanadaCentrePage() {
                       defaultValue={t(
                         "ServiceCanadaCentre.selectIdDropdownDefaultValue",
                       )}
-                      label={`${t("ServiceCanadaCentre.proviceLabel")} (optional)`}
+                      label={t("ServiceCanadaCentre.provinceLabel")}
                       style={{ maxWidth: "100%" }}
                       errorMessage={provinceErrorMessage}
                       onGcdsChange={createChangeHandler("province")}
@@ -350,7 +357,7 @@ export default function ServiceCanadaCentrePage() {
                     <GcdsInput
                       inputId="postalcode-input"
                       name="postalcode-input"
-                      label={`${t("ServiceCanadaCentre.postalcodeLabel")} (optional)`}
+                      label={t("ServiceCanadaCentre.postalcodeLabel")}
                       hint={t("ServiceCanadaCentre.postalcodeHint")}
                       onGcdsChange={createChangeHandler("postalcode")}
                     />

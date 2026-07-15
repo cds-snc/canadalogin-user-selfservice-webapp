@@ -21,7 +21,8 @@
     "step1": "Select your ID type and enter the details.",
     "step2": "Get a unique code sent to your email, valid for 30 days.",
     "step3": "Bring your code and selected photo ID to any Service Canada Centre.",
-    "step4": "A service agent will verify your identity, once done, sign back in to [RP SERVICE] to continue.",
+    "step4": "A service agent will verify your identity, once done, sign back in to {{rpName}} to continue.",
+    "fallbackRpName": "RP Name",
     "enterDetailsHeading": "Enter your ID details",
     "continueButton": "Continue",
     "chooseDifferentMethodButton": "Choose a different method",
@@ -44,10 +45,10 @@
     "lastNameLabel": "Last Name",
     "lastNameHint": "Must match what is on your official ID",
     "dateOfBirthdayLabel": "Date of birth",
-    "addressLabel": "Address",
+    "addressLabel": "Address (optional)",
     "addressHint": "Enter your street address",
-    "proviceLabel": "Province/ Territory",
-    "postalcodeLabel": "Postal Code",
+    "provinceLabel": "Province/ Territory (optional)",
+    "postalcodeLabel": "Postal Code (optional)",
     "postalcodeHint": "Enter your postal code"
   },
   "ServiceCanadaCentreCode": {
