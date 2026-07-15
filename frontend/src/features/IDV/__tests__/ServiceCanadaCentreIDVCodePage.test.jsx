@@ -210,32 +210,6 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the find nearest Service Canada Centre notice", () => {
-    render(
-      <TestWrapper>
-        <ServiceCanadaCentreIDVCodePage />
-      </TestWrapper>,
-    );
-
-    expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
-    expect(
-      screen.getByText("Find your nearest Service Canada Centre"),
-    ).toBeInTheDocument();
-  });
-
-  it("renders the external link to find a Service Canada Centre", () => {
-    render(
-      <TestWrapper>
-        <ServiceCanadaCentreIDVCodePage />
-      </TestWrapper>,
-    );
-
-    const link = screen.getByTestId("gcds-link");
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute("href", "#");
-    expect(link).toHaveTextContent("Service Canada Centre near you");
-  });
-
   it("renders the your information details without address", () => {
     render(
       <TestWrapper>

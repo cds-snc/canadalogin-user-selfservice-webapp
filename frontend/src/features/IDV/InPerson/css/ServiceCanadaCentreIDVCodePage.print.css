@@ -33,8 +33,7 @@
   }
 
   .service-canada-idv-code-page gcds-notice {
-    display: block;
-    margin-top: 0.5rem;
+    display: none !important;
   }
 }
 

@@ -25,14 +25,6 @@ const SHADOW_PRINT_TYPOGRAPHY_STYLE = `
   }
 `;
 
-const SHADOW_NOTICE_TITLE_PRINT_STYLE = `
-  [part="notice-title"] gcds-heading,
-  [part="title"] gcds-heading,
-  gcds-heading {
-    zoom: 0.75;
-  }
-`;
-
 export const SERVICE_CANADA_CENTRE_PRINT_OPTIONS: PrintOptions = {
   hideHosts: PRINT_HIDE_HOST_SELECTORS,
   shadowStyles: [
@@ -43,10 +35,6 @@ export const SERVICE_CANADA_CENTRE_PRINT_OPTIONS: PrintOptions = {
     {
       hosts: ["gcds-heading", "gcds-text"],
       css: SHADOW_PRINT_TYPOGRAPHY_STYLE,
-    },
-    {
-      hosts: ["gcds-notice"],
-      css: SHADOW_NOTICE_TITLE_PRINT_STYLE,
     },
   ],
 };
