@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
 import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
-import { SERVICE_CANADA_CENTRE_PRINT_OPTIONS } from "./helpers/serviceCanadaCentrePrintConfig";
 import {
   APPROVED_DOCUMENT_VALUES,
   type ApprovedDocumentValue,
