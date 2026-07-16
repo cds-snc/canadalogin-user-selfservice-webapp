@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 import re
 
 from typing import Optional
-from fastapi import Request
+from fastapi import HTTPException, Request
 from fastapi.responses import RedirectResponse
 from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
@@ -54,6 +54,7 @@ async def redirect_user_to_idp_verify(
     request: Request,
     prompt: Optional[str] = None,
     returnToPage: Optional[str] = None,
+    partner: Optional[str] = None,
 ):
     """
     Get the redirect URL for the OAuth login flow.
@@ -66,9 +67,32 @@ async def redirect_user_to_idp_verify(
         request.session[SessionKeys.RETURN_TO_PAGE.value] = returnToPage
         logger.info(f"Return to page set in session from login: {returnToPage}")
 
+    config = get_configuration()
+    provincial_partners_identity_source = (
+        config.ibm_verify_config.IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID
+    )
+
+    partner_to_identity_source = {
+        "bcsc": provincial_partners_identity_source,
+        "ab": provincial_partners_identity_source,
+    }
+
     extra_params = {}
     if prompt:
         extra_params["prompt"] = prompt
+    if partner:
+        if partner not in partner_to_identity_source:
+            raise HTTPException(status_code=400, detail="Invalid provincial partner")
+
+        identity_source_id = partner_to_identity_source.get(partner)
+        if not identity_source_id:
+            raise HTTPException(
+                status_code=503,
+                detail="Provincial partner is not configured",
+            )
+
+        extra_params["identity_source_id"] = identity_source_id
+
     redirect_response = await oauth.verify.authorize_redirect(
         request, callback_redirect_uri, **extra_params
     )

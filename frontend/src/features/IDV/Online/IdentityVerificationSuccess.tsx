@@ -7,13 +7,20 @@ import {
   GcdsHeading,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-// import { useNavigate } from "react-router";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { useNavigate, useParams } from "react-router";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 
 export default function IdentityVerificationSuccess() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
+
+  const detailsConfirmationPage = path(PAGES.idvDetailsConfirmationPage, {
+    language,
+    journeyType,
+  });
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -46,7 +53,7 @@ export default function IdentityVerificationSuccess() {
           <GcdsButton
             type="button"
             onClick={() => {
-              // TODO: navigate to next IDV step
+              navigate(detailsConfirmationPage);
             }}
           >
             {t("IdentityVerificationSuccess.continueButton")}

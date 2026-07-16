@@ -29,6 +29,7 @@ import InPersonProofingInProgress from "./features/IDV/InPerson/InPersonProofing
 import StartIdentityProofingPage from "./features/IDV/StartIdentityProofingPage";
 import ProveIdentityOnlinePage from "./features/IDV/Online/ProveIdentityOnlinePage";
 import ProvincialVerificationPage from "./features/IDV/Online/ProvincialVerificationPage";
+import ProvincialIdentityConnectedPage from "./features/IDV/Online/ProvincialIdentityConnectedPage";
 import OnlineVerificationInfo from "./features/IDV/Online/OnlineVerificationInfo";
 import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
@@ -203,6 +204,11 @@ export const appRoutes: RouteObject[] = [
                           path: "online/provincial",
                           element: <ProvincialVerificationPage />,
                           handle: { id: PAGES.idvProvincialVerificationPage },
+                        },
+                        {
+                          path: "online/provincial/connected",
+                          element: <ProvincialIdentityConnectedPage />,
+                          handle: { id: PAGES.idvProvincialConnectedPage },
                         },
                         {
                           path: "online/bluink/confirmation",
