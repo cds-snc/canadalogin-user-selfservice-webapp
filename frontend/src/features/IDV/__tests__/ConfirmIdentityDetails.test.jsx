@@ -10,7 +10,6 @@ let mockJourneyType;
 let mockUserState = {
   userProfile: {
     userName: "test@example.com",
-    phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
     name: {
       formatted: "Jane Doe",
     },
@@ -55,10 +54,6 @@ vi.mock("../../../utils/constants", () => ({
 
 vi.mock("../../../utils/routeHelpers", () => ({
   path: (pageId, params) => `/${params.language}/${pageId}`,
-}));
-
-vi.mock("../../LanguagePreference/components/ViewLanguagePreference", () => ({
-  default: () => <div>Language preferences</div>,
 }));
 
 vi.mock("../../../components/Badges/VerifiedBadge", () => ({
@@ -115,7 +110,6 @@ describe("ConfirmIdentityDetails", () => {
     mockUserState = {
       userProfile: {
         userName: "test@example.com",
-        phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
         name: {
           formatted: "Jane Doe",
         },
@@ -146,44 +140,26 @@ describe("ConfirmIdentityDetails", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Contact information" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Communication" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("This name is used for display purposes only"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("This email is used for signing in and contacting you:"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "This number is used for 2-step verification and contacting you:",
-      ),
+      screen.getByRole("heading", { name: "Identity proofing details" }),
     ).toBeInTheDocument();
   });
 
-  it("shows verified badges when name, email, and phone exist", () => {
+  it("renders the identity proofing summary card", () => {
     render(<ConfirmIdentityDetails />);
 
-    expect(screen.getAllByTestId("verified-badge")).toHaveLength(2);
-  });
-
-  it("shows verified badge only for existing values", () => {
-    mockUserState = {
-      userProfile: {
-        userName: "",
-        phoneNumbers: [],
-        name: {
-          formatted: "Jane Doe",
-        },
-      },
-    };
-
-    render(<ConfirmIdentityDetails />);
-
-    expect(screen.getAllByTestId("verified-badge")).toHaveLength(1);
+    expect(screen.getByRole("heading", { name: "Name" })).toBeInTheDocument();
+    expect(screen.getByText("Jane Doe")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Date of birth" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: "ID document saved to CanadaLogin",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Update information" }),
+    ).toBeInTheDocument();
   });
 
   it("navigates to start identity proofing when Update information is clicked", () => {
