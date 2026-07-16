@@ -217,9 +217,6 @@
     "idDocumentValue": "Not available",
     "reProofingRequired": "To update this information, you'll need to complete identity proofing again.",
     "updateInformation": "Update information",
-    "contactInfo": "Contact information",
-    "phoneNumber": "Phone number",
-    "communication": "Communication",
     "confirmAndContinue": "Confirm and continue",
     "successNoticeTitle": "Your identity information was successfully verified and proofing is complete.",
     "successNoticeDescription": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access."
