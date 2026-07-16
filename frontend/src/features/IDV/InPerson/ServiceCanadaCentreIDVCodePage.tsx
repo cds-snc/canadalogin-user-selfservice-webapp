@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
 import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
-import printWithShadowDomStyles from "../helpers/printWithShadowDomStyles";
 import { SERVICE_CANADA_CENTRE_PRINT_OPTIONS } from "./helpers/serviceCanadaCentrePrintConfig";
 import {
   APPROVED_DOCUMENT_VALUES,
@@ -63,7 +62,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
     : "--";
 
   const handlePrintPage = () => {
-    printWithShadowDomStyles(SERVICE_CANADA_CENTRE_PRINT_OPTIONS);
+    window.print();
   };
 
   if (!DEV_ONLY_FEATURE) {

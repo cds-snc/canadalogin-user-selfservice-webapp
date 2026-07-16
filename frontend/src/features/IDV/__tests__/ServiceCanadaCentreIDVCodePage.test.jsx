@@ -4,8 +4,6 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ServiceCanadaCentreIDVCodePage from "../InPerson/ServiceCanadaCentreIDVCodePage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
-import printWithShadowDomStyles from "../helpers/printWithShadowDomStyles";
-import { SERVICE_CANADA_CENTRE_PRINT_OPTIONS } from "../InPerson/helpers/serviceCanadaCentrePrintConfig";
 
 const mockRouteParams = vi.hoisted(() => ({
   language: "en",
@@ -258,7 +256,9 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     );
   });
 
-  it("renders print page button and clicking it does not navigate", () => {
+  it("renders print page button, calls window.print, and does not navigate", () => {
+    const printSpy = vi.spyOn(window, "print").mockImplementation(() => {});
+
     render(
       <TestWrapper>
         <ServiceCanadaCentreIDVCodePage />
@@ -269,6 +269,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(printButton).toBeInTheDocument();
 
     fireEvent.click(printButton);
+    expect(printSpy).toHaveBeenCalledTimes(1);
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
@@ -288,72 +289,5 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
 
     // Component should still render without crashing
     expect(screen.getByRole("main")).toBeInTheDocument();
-  });
-});
-
-describe("SERVICE_CANADA_CENTRE_PRINT_OPTIONS", () => {
-  it("uses zoom-based typography scaling", () => {
-    const typographyRule =
-      SERVICE_CANADA_CENTRE_PRINT_OPTIONS.shadowStyles.find(({ hosts }) =>
-        hosts.includes("gcds-heading"),
-      );
-
-    expect(typographyRule).toBeDefined();
-    expect(typographyRule.css).toContain("zoom: 0.75");
-  });
-});
-
-describe("printWithShadowDomStyles with Service Canada config", () => {
-  it("applies and removes Service Canada print styles during the print lifecycle", () => {
-    const hiddenHost = document.createElement("gcds-header");
-    hiddenHost.style.display = "block";
-
-    const headingHost = document.createElement("gcds-heading");
-    const headingShadowRoot = headingHost.attachShadow({ mode: "open" });
-
-    document.body.append(hiddenHost, headingHost);
-
-    const printSpy = vi
-      .spyOn(window, "print")
-      .mockImplementation(() => undefined);
-
-    printWithShadowDomStyles(SERVICE_CANADA_CENTRE_PRINT_OPTIONS);
-
-    expect(printSpy).toHaveBeenCalledTimes(1);
-    expect(hiddenHost.style.display).toBe("none");
-    expect(headingShadowRoot.querySelector("style")?.textContent).toContain(
-      "zoom: 0.75",
-    );
-
-    window.dispatchEvent(new Event("afterprint"));
-
-    expect(hiddenHost.style.display).toBe("block");
-    expect(headingShadowRoot.querySelector("style")).toBeNull();
-    expect(document.title).toBe(originalDocumentTitle);
-  });
-
-  it("cleans up immediately when print is unavailable", () => {
-    const hiddenHost = document.createElement("gcds-header");
-    hiddenHost.style.display = "inline";
-    document.body.append(hiddenHost);
-
-    const originalPrint = window.print;
-
-    Object.defineProperty(window, "print", {
-      configurable: true,
-      value: undefined,
-    });
-
-    try {
-      printWithShadowDomStyles(SERVICE_CANADA_CENTRE_PRINT_OPTIONS);
-
-      expect(hiddenHost.style.display).toBe("inline");
-      expect(document.title).toBe(originalDocumentTitle);
-    } finally {
-      Object.defineProperty(window, "print", {
-        configurable: true,
-        value: originalPrint,
-      });
-    }
   });
 });

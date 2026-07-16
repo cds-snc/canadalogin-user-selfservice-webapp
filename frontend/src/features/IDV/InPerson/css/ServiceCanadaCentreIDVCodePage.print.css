@@ -1,6 +1,24 @@
 @media print {
+  gcds-header,
+  gcds-top-nav,
+  .gcds-top-nav,
+  .gcds-top-nav-container,
+  .gcds-header,
+  gcds-footer,
+  .gcds-footer,
+  nav,
+  [part="top-nav"],
+  [part="menu"] {
+    display: none !important;
+  }
+
   .service-canada-idv-code-page {
     max-width: 100%;
+  }
+
+  .service-canada-idv-code-page gcds-heading,
+  .service-canada-idv-code-page gcds-text {
+    zoom: 0.75;
   }
 
   .service-canada-idv-code-page .separator {
