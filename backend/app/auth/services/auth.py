@@ -14,6 +14,27 @@ from app.auth.services.auth_user_session import update_session_tokens
 logger = logging.getLogger(__name__)
 
 
+def _parse_federated_mapping(map_value: Optional[str]) -> dict[str, str]:
+    """Parse mapping entries like "bc=dev2,ab=alberta" into a dictionary."""
+    if not map_value:
+        return {}
+
+    parsed_map: dict[str, str] = {}
+    entries = [entry.strip() for entry in map_value.split(",") if entry.strip()]
+    for entry in entries:
+        provider, sep, idp = entry.partition("=")
+        if not sep:
+            continue
+
+        normalized_provider = provider.strip().lower()
+        normalized_idp = idp.strip()
+
+        if normalized_provider and normalized_idp:
+            parsed_map[normalized_provider] = normalized_idp
+
+    return parsed_map
+
+
 def is_safe_return_to_page(return_to_page: Optional[str]) -> bool:
     """Allow only internal relative paths to avoid open redirects."""
     if not return_to_page or not isinstance(return_to_page, str):
@@ -54,6 +75,7 @@ async def redirect_user_to_idp_verify(
     request: Request,
     prompt: Optional[str] = None,
     returnToPage: Optional[str] = None,
+    federated_provider: Optional[str] = None,
 ):
     """
     Get the redirect URL for the OAuth login flow.
@@ -67,11 +89,68 @@ async def redirect_user_to_idp_verify(
         logger.info(f"Return to page set in session from login: {returnToPage}")
 
     extra_params = {}
+    config = None
+
+    if federated_provider:
+        config = get_configuration()
+        federated_provider_map = _parse_federated_mapping(
+            config.OIDC_FEDERATED_PROVIDER_MAP
+        )
+        mapped_idp = federated_provider_map.get(federated_provider.lower())
+
+        if mapped_idp:
+            extra_params[config.OIDC_FEDERATED_IDP_PARAM] = mapped_idp
+            # Some IBM Verify flows evaluate identity_source_ids (plural) when
+            # rendering the login experience. Mirror the mapped source as a
+            # single-item list to keep source selection deterministic.
+            if config.OIDC_FEDERATED_IDP_PARAM != "identity_source_ids":
+                extra_params["identity_source_ids"] = mapped_idp
+            logger.info(
+                "Federated provider '%s' mapped to IDP '%s'",
+                federated_provider,
+                mapped_idp,
+            )
+        else:
+            logger.info(
+                "No federated IDP mapping configured for provider '%s'",
+                federated_provider,
+            )
+
     if prompt:
         extra_params["prompt"] = prompt
+
     redirect_response = await oauth.verify.authorize_redirect(
         request, callback_redirect_uri, **extra_params
     )
+
+    if federated_provider and config:
+        federated_auth_path_map = _parse_federated_mapping(
+            config.OIDC_FEDERATED_AUTH_PATH_MAP
+        )
+        mapped_auth_path = federated_auth_path_map.get(federated_provider.lower())
+        authorize_url = redirect_response.headers.get("location")
+
+        if mapped_auth_path and authorize_url:
+            tenant_url = config.ibm_verify_config.IBM_VERIFY_TENANT_URL.rstrip("/")
+            normalized_auth_path = (
+                mapped_auth_path
+                if mapped_auth_path.startswith("/")
+                else f"/{mapped_auth_path}"
+            )
+            simulator_redirect_url = (
+                f"{tenant_url}{normalized_auth_path}?"
+                f"{urlencode({'Target': authorize_url, 'app_login': str(config.OIDC_FEDERATED_APP_LOGIN).lower()})}"
+            )
+            logger.info(
+                "Redirecting federated provider '%s' through auth path '%s'",
+                federated_provider,
+                normalized_auth_path,
+            )
+            return RedirectResponse(
+                url=simulator_redirect_url,
+                status_code=redirect_response.status_code,
+            )
+
     logger.info("User redirected to IBM Verify for authentication")
     return redirect_response
 

@@ -78,3 +78,18 @@ def test_mask_profile_email_addresses_invalid_email():
     profile_data = {"emails": [{"value": "test.com"}]}
     result = mask_profile_email_addresses(profile_data)
     assert result == []
+
+
+@patch(MASK_PHONE_IMPORT)
+def test_mask_profile_details_keeps_non_email_username(mock_masked_phone):
+    """Federated usernames can be non-email identifiers and should be preserved."""
+    profile_data = {
+        "userName": "811000CWGW",
+        "phoneNumbers": [{"value": "+1-613-555-1234", "type": "mobile"}],
+    }
+
+    mock_masked_phone.return_value = [{"value": "+1 (***) ***-1234", "type": "mobile"}]
+
+    result = mask_profile_details(profile_data)
+
+    assert result["userName"] == "811000CWGW"

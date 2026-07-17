@@ -81,6 +81,12 @@ def mask_profile_details(profile_data: dict) -> dict:
     profile_data["phoneNumbers"] = mask_contact_phone_numbers(profile_data)
 
     profile_data["emails"] = mask_profile_email_addresses(profile_data)
-    profile_data["userName"] = mask_email_address(profile_data.get("userName", ""))
+
+    username = profile_data.get("userName", "")
+    try:
+        profile_data["userName"] = mask_email_address(username)
+    except ValueError:
+        # Keep non-email federated usernames as-is.
+        profile_data["userName"] = username
 
     return profile_data

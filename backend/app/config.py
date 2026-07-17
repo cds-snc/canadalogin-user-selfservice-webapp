@@ -115,6 +115,22 @@ class Configuration(BaseSettings):
     PROFILE_MANAGEMENT_DOMAIN: str = (
         "http://localhost:3000"  # Frontend Management App domain to app.gc-signin.cdssandbox.xyz
     )
+    OIDC_FEDERATED_IDP_PARAM: str = Field(
+        default="idp",
+        description="OIDC authorize query parameter name used to select a federated IdP.",
+    )
+    OIDC_FEDERATED_PROVIDER_MAP: str = Field(
+        default="",
+        description="Comma-separated provider mapping, e.g. 'bc=dev2,ab=alberta'.",
+    )
+    OIDC_FEDERATED_AUTH_PATH_MAP: str = Field(
+        default="",
+        description="Comma-separated provider mapping to tenant auth paths, e.g. 'bc=/auth/BC-Simulator'.",
+    )
+    OIDC_FEDERATED_APP_LOGIN: bool = Field(
+        default=False,
+        description="Value passed as app_login when using OIDC_FEDERATED_AUTH_PATH_MAP redirects.",
+    )
 
     CORS_ORIGINS: str = Field(
         default="localhost:3000,localhost:8000",

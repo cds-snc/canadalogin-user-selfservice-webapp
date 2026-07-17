@@ -1,7 +1,7 @@
 # pytest + pytest-asyncio
 from enum import Enum
 from types import SimpleNamespace
-from urllib.parse import quote
+from urllib.parse import parse_qs, quote, urlparse
 from http.cookies import SimpleCookie
 import uuid
 from typing import Dict, Any
@@ -89,6 +89,13 @@ class FakeConfig:
     def __init__(self, env="prod", domain="pm.example.com"):
         self.ENVIRONMENT = env
         self.PROFILE_MANAGEMENT_DOMAIN = domain
+        self.OIDC_FEDERATED_IDP_PARAM = "idp"
+        self.OIDC_FEDERATED_PROVIDER_MAP = "bc=dev2"
+        self.OIDC_FEDERATED_AUTH_PATH_MAP = ""
+        self.OIDC_FEDERATED_APP_LOGIN = False
+        self.ibm_verify_config = SimpleNamespace(
+            IBM_VERIFY_TENANT_URL="https://idp.example"
+        )
 
 
 class FakeSessionHandler:
@@ -228,9 +235,15 @@ def app(monkeypatch, mock_token_transport):
 
     # Login and Reauth entry points
     @base.get("/login")
-    async def login(request: Request, returnToPage: str | None = None):
+    async def login(
+        request: Request,
+        returnToPage: str | None = None,
+        federatedProvider: str | None = None,
+    ):
         return await auth_module.redirect_user_to_idp_verify(
-            request, returnToPage=returnToPage
+            request,
+            returnToPage=returnToPage,
+            federated_provider=federatedProvider,
         )
 
     @base.get("/reauth")
@@ -437,3 +450,58 @@ async def test_reauthenticate_user_with_acr_values_for_stepup(app, client):
         == "loa3_stepup"
     )
     assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("max_age") is None
+
+
+@pytest.mark.asyncio
+async def test_login_forwards_federated_provider_to_authorize_redirect(app, client):
+    resp = await client.get(
+        "/login",
+        params={"federatedProvider": "bc"},
+        follow_redirects=False,
+    )
+    assert resp.status_code in (302, 307)
+    assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("idp") == "dev2"
+
+
+@pytest.mark.asyncio
+async def test_login_ignores_unconfigured_federated_provider(app, client):
+    resp = await client.get(
+        "/login",
+        params={"federatedProvider": "not-configured"},
+        follow_redirects=False,
+    )
+    assert resp.status_code in (302, 307)
+    assert "idp" not in app.state.oauth_verify.last_authorize_redirect_kwargs
+
+
+@pytest.mark.asyncio
+async def test_login_redirects_to_federated_auth_path_when_configured(
+    app, client, monkeypatch
+):
+    bc_config = FakeConfig(env="prod", domain="pm.example.com")
+    bc_config.OIDC_FEDERATED_AUTH_PATH_MAP = "bc=/auth/BC-Simulator"
+
+    monkeypatch.setattr(
+        auth_module,
+        "get_configuration",
+        lambda: bc_config,
+        raising=True,
+    )
+
+    resp = await client.get(
+        "/login",
+        params={"federatedProvider": "bc"},
+        follow_redirects=False,
+    )
+
+    assert resp.status_code in (302, 307)
+
+    parsed_url = urlparse(resp.headers["location"])
+    assert parsed_url.scheme == "https"
+    assert parsed_url.netloc == "idp.example"
+    assert parsed_url.path == "/auth/BC-Simulator"
+
+    query = parse_qs(parsed_url.query)
+    assert query["app_login"] == ["false"]
+    assert "Target" in query
+    assert query["Target"][0].startswith("https://idp.example/authorize?")

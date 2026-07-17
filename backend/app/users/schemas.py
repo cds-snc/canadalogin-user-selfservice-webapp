@@ -189,7 +189,8 @@ class IBMVerifyUserProfileSchema(BaseModel):
     name: Optional[UserProfileName] = None
     active: bool
     id: str
-    userName: EmailStr
+    # Federated identity sources can return non-email usernames (e.g. card IDs).
+    userName: str
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None
     details: Optional[SCIMUserDetails] = Field(
         default=None,
