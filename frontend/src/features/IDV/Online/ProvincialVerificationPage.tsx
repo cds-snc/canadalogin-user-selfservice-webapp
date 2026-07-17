@@ -32,7 +32,12 @@ export default function ProvincialVerificationPage() {
 
   const buildPartnerLoginHref = (partner: "bcsc" | "ab") => {
     const url = new URL(OIDC_REDIRECT.login, window.location.origin);
-    const returnToPage = `${provincialConnectedPage}${location.search}`;
+    const filteredSearchParams = new URLSearchParams(location.search);
+    filteredSearchParams.delete("returnToPage");
+    const filteredSearch = filteredSearchParams.toString();
+    const returnToPage = filteredSearch
+      ? `${provincialConnectedPage}?${filteredSearch}`
+      : provincialConnectedPage;
     url.searchParams.set("returnToPage", returnToPage);
     url.searchParams.set("partner", partner);
 

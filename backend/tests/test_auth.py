@@ -405,10 +405,7 @@ async def test_callback_handler_success_flow_sets_session_and_redirects(app, cli
     resp = await client.get("/auth/callback", follow_redirects=False)
 
     assert resp.status_code in (302, 307)
-    assert (
-        resp.headers["location"]
-        == "https://pm.example.com/dashboard?returnToPage=%2Fdashboard"
-    )
+    assert resp.headers["location"] == "https://pm.example.com/dashboard"
 
     # returnToPage is one-time and should be consumed by callback_handler
     dump = await client.get("/session-dump")

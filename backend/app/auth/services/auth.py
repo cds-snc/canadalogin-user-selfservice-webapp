@@ -1,5 +1,4 @@
 import logging
-from urllib.parse import urlencode
 import re
 
 from typing import Optional
@@ -112,14 +111,7 @@ async def callback_handler(request: Request):
     returnToPageValue = request.session.pop(SessionKeys.RETURN_TO_PAGE.value, None)
 
     if is_safe_return_to_page(returnToPageValue):
-        query_separator = "&" if "?" in returnToPageValue else "?"
-        return_to_page_query = urlencode(
-            {SessionKeys.RETURN_TO_PAGE.value: returnToPageValue}
-        )
-        clientRedirectValue = (
-            f"{returnToPageValue}{query_separator}{return_to_page_query}"
-        )
-        redirectValue += clientRedirectValue
+        redirectValue += returnToPageValue
         logger.info(f"Return to page set in session: {redirectValue}")
 
     logger.info("Verify Access Token Request")
