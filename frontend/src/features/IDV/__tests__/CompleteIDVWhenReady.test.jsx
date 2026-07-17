@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CompleteIdentityProofingPage from "../CompleteIDVWhenReady";
 import { authService } from "../../../services/authService";
@@ -70,15 +70,17 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </a>
   ),
-  GcdsNotice: ({ children, noticeTitle }) => (
-    <div data-testid="gcds-notice">
-      <span>{noticeTitle}</span>
+  GcdsDetails: ({ children, detailsTitle }) => (
+    <details>
+      <summary>{detailsTitle}</summary>
       {children}
-    </div>
+    </details>
   ),
+  GcdsNotice: ({ children }) => <div>{children}</div>,
 }));
 
 import { useUser } from "../../../components/Providers/useUser";
+import OnlineVerificationInfo from "../Online/OnlineVerificationInfo";
 
 const defaultUserState = {
   dispatch: vi.fn(),
@@ -134,7 +136,7 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByRole("heading", {
-          name: "Complete identity proofing when you're ready",
+          name: "Prove your identity when you’re ready",
         }),
       ).toBeInTheDocument();
     });
@@ -146,7 +148,7 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByText(
-          "To access the Localized RP, you need to complete identity proofing first",
+          "You need to complete identity proofing to access Localized RP.",
         ),
       ).toBeInTheDocument();
     });
@@ -164,7 +166,7 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByText(
-          "To access the Fallback Link Name, you need to complete identity proofing first",
+          "You need to complete identity proofing to access Fallback Link Name.",
         ),
       ).toBeInTheDocument();
     });
@@ -177,7 +179,7 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByText(
-          "To access the CanadaLogin, you need to complete identity proofing first",
+          "You need to complete identity proofing to access CanadaLogin.",
         ),
       ).toBeInTheDocument();
     });
@@ -187,25 +189,61 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByText(
-          "When you're ready, sign back in to your CanadaLogin account and you'll be brought back to this step automatically.",
-        ),
-      ).toBeInTheDocument();
-      expect(screen.getAllByTestId("gcds-notice").length).toBeGreaterThan(0);
-      expect(
-        screen.getByText(
-          "Don't have the required documents for identity proofing?",
+          "Whether you need to find your ID or take a break, you can sign out and prove your identity when you sign back in.",
         ),
       ).toBeInTheDocument();
     });
+
+    it("renders the warning notice text with localized RP name", () => {
+      setup();
+
+      const paragraph = screen.getByText(
+        (content, element) =>
+          element?.tagName === "P" &&
+          content.includes(
+            "If you don’t have an acceptable ID, find other ways to access the service by contacting",
+          ),
+      );
+
+      expect(paragraph).toBeInTheDocument();
+      expect(
+        within(paragraph).getByRole("link", { name: "Localized RP" }),
+      ).toBeInTheDocument();
+    });
+
+    it("renders the contact link in the warning notice", () => {
+      setup();
+
+      const contactLink = screen.getByRole("link", {
+        name: "Localized RP",
+      });
+      expect(contactLink).toBeInTheDocument();
+      expect(contactLink).toHaveAttribute("href", "#");
+    });
+
+    it("renders the list of acceptable IDs details element", () => {
+      render(<OnlineVerificationInfo />);
+
+      const matches = screen.getAllByText("List of acceptable IDs");
+      expect(matches.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("renders the list of acceptable IDs as a summary inside a details element", () => {
+      const { container } = render(<OnlineVerificationInfo />);
+
+      const summary = container.querySelector("summary");
+      expect(summary).toBeInTheDocument();
+      expect(summary).toHaveTextContent("List of acceptable IDs");
+    });
   });
 
-  describe("Start Identity button", () => {
+  describe("Start proving identity", () => {
     it("renders the start identity button", () => {
       setup();
 
       expect(screen.getByTestId("start-button")).toBeInTheDocument();
       expect(screen.getByTestId("start-button")).toHaveTextContent(
-        "Start identity proofing now",
+        "Start proving identity",
       );
     });
 
@@ -230,51 +268,6 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(authService.logout).not.toHaveBeenCalled();
       expect(mockSetLoading).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("Warning notice for missing documents", () => {
-    it("renders the warning notice header", () => {
-      setup();
-
-      expect(
-        screen.getByText(
-          "Don't have the required documents for identity proofing?",
-        ),
-      ).toBeInTheDocument();
-    });
-
-    it("renders the warning notice text with localized RP name", () => {
-      setup();
-
-      expect(
-        screen.getByText(
-          "If you do not have the required identity documents, or are unable to complete the proofing process because of some other circumstances, you will need to contact Localized RP directly to ask about alternative ways to verify your identity and access the service.",
-        ),
-      ).toBeInTheDocument();
-    });
-
-    it("renders the contact link in the warning notice", () => {
-      setup();
-
-      const contactLink = screen.getByRole("link", {
-        name: "RP Service Portal contact",
-      });
-      expect(contactLink).toBeInTheDocument();
-      expect(contactLink).toHaveAttribute("href", "#");
-    });
-
-    it("uses fallback app name when RP info is not available", () => {
-      setup({
-        dispatch: vi.fn(),
-        state: { relyingPartyInfo: null },
-      });
-
-      expect(
-        screen.getByText(
-          /will need to contact CanadaLogin directly to ask about alternative ways/,
-        ),
-      ).toBeInTheDocument();
     });
   });
 
