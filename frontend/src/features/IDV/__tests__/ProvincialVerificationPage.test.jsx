@@ -13,16 +13,38 @@ vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
     ...actual,
-    useParams: () => ({ language: "en" }),
+    useParams: () => ({ language: "en", journeyType: "update" }),
     useNavigate: () => mockNavigate,
+    useLocation: () => ({ pathname: "/", search: "" }),
   };
 });
+
+vi.mock("../../../utils/routeHelpers", () => ({
+  path: (page, { language, journeyType } = {}) => {
+    if (page === "IdvProvincialLinkedPage") {
+      return `/${language ?? "en"}/identity-verification/${journeyType ?? "start"}/online/provincial/linked`;
+    }
+
+    if (page === "IdvProveIdentityOnlinePage") {
+      return `/${language ?? "en"}/identity-verification/${journeyType ?? "start"}/online`;
+    }
+
+    return "/";
+  },
+}));
 
 vi.mock("../../../utils/constants", () => ({
   get DEV_ONLY_FEATURE() {
     return mockDevOnlyFeature;
   },
-  PAGES: {},
+  OIDC_REDIRECT: {
+    login: "http://localhost:8000/v1/auth/login",
+    reauth: "http://localhost:8000/v1/auth/reauth",
+  },
+  PAGES: {
+    idvProvincialLinkedPage: "IdvProvincialLinkedPage",
+    idvProveIdentityOnlinePage: "IdvProveIdentityOnlinePage",
+  },
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
 }));
 
@@ -143,6 +165,18 @@ describe("ProvincialVerificationPage", () => {
     expect(cards).toHaveLength(2);
   });
 
+  it("routes BC card to federated OIDC login through backend", () => {
+    render(<ProvincialVerificationPage />);
+
+    const bcCardLink = screen
+      .getByRole("heading", { name: "BC Services Card" })
+      .closest("a");
+    expect(bcCardLink).toHaveAttribute(
+      "href",
+      "http://localhost:8000/v1/auth/login?federatedProvider=bc&returnToPage=%2Fen%2Fidentity-verification%2Fupdate%2Fonline%2Fprovincial%2Flinked",
+    );
+  });
+
   it("renders the BC Services Card image", () => {
     const { container } = render(<ProvincialVerificationPage />);
 
@@ -180,15 +214,17 @@ describe("ProvincialVerificationPage", () => {
     expect(screen.getByTestId("back-button")).toHaveTextContent("Back");
   });
 
-  it("calls navigate(-1) when Back button is clicked", () => {
+  it("navigates to online method selection when Back button is clicked", () => {
     render(<ProvincialVerificationPage />);
 
     fireEvent.click(screen.getByTestId("back-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/update/online",
+    );
   });
 
-  it("calls navigate(-1) only once per back button click", () => {
+  it("calls navigate only once per back button click", () => {
     render(<ProvincialVerificationPage />);
 
     fireEvent.click(screen.getByTestId("back-button"));

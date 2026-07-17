@@ -9,14 +9,32 @@ import {
   GcdsContainer,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { useNavigate, useParams } from "react-router";
+import {
+  DEV_ONLY_FEATURE,
+  OIDC_REDIRECT,
+  PAGES,
+} from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 import imgBcServicesCard from "../../../assets/images/BC_card.png";
 import imgAlbertaAccount from "../../../assets/images/AB_card.png";
 
 export default function ProvincialVerificationPage() {
   const navigate = useNavigate();
+  const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
+  const returnToPage = path(PAGES.idvProvincialLinkedPage, {
+    language,
+    journeyType,
+  });
+  const backToOnlineMethodSelection = path(PAGES.idvProveIdentityOnlinePage, {
+    language,
+    journeyType,
+  });
+
+  const bcLoginUrl = new URL(OIDC_REDIRECT.login, window.location.origin);
+  bcLoginUrl.searchParams.set("federatedProvider", "bc");
+  bcLoginUrl.searchParams.set("returnToPage", returnToPage);
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -61,10 +79,9 @@ export default function ProvincialVerificationPage() {
           <GcdsCard
             cardTitle={t("ProvincialVerification.bcServicesCard")}
             cardTitleTag="h3"
-            href="#"
+            href={bcLoginUrl.toString()}
             imgSrc={imgBcServicesCard}
             imgAlt="British Columbia Logo"
-            // TODO: Replace href with BC Services Card OAuth URL when available
           ></GcdsCard>
           <GcdsCard
             cardTitle={t("ProvincialVerification.albertaAccount")}
@@ -81,7 +98,7 @@ export default function ProvincialVerificationPage() {
             type="button"
             buttonRole="secondary"
             onClick={() => {
-              navigate(-1);
+              navigate(backToOnlineMethodSelection);
             }}
           >
             {t("ProvincialVerification.backButton")}
