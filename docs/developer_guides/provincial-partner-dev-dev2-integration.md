@@ -9,6 +9,12 @@ This document captures the implementation and testing work completed for provinc
 
 It also documents current limitations and next steps.
 
+Latest update (current POC state):
+
+- Reliable DEV2 routing is currently achieved by rewriting login through `/auth/...` before the OIDC authorize target is executed.
+- The implementation now uses one backend config value for provincial routing: `IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID`.
+- `IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_FRIENDLY_NAME` was removed from active code to reduce duplicate configuration.
+
 ## Scope covered in this document
 
 1. DEV2 OIDC application setup.
@@ -61,7 +67,14 @@ Configuration highlights:
 - Type: OIDC enterprise provider.
 - Issuer/well-known/authorize/token/userinfo endpoints point to DEV2 tenant.
 - Provider enabled.
+- Enable identity linking for this identity provider.
+- Set external ID attribute for identity linking to `sub`.
 - Identity provider ID recorded and used by backend as the source hint value.
+
+Important implementation note:
+
+- Custom attribute mappings in the identity provider configuration were removed for this POC.
+- Attribute mappings were not required for successful routing and linking in this tested setup.
 
 ## 3) Linking DEV app to DEV identity provider
 
@@ -102,11 +115,27 @@ Behavior:
 - Validates partner key.
 - Maps partner to configured provincial identity provider ID.
 - Sends `identity_source_id` as extra authorize parameter.
+- Rewrites Verify hosted login URL to `/auth/{identity_source_path_segment}?Target=...&app_login=false` for provincial partner requests, where the path segment currently uses `IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID`.
 - Stores return path in session.
 
 Callback handler:
 
 - Fixed nested redirect issue by redirecting directly to stored `returnToPage` path instead of appending `returnToPage` query to itself.
+
+## 6) Runtime behavior observed by account state
+
+Observed behavior in DEV tenant:
+
+- User with no existing linked identity for this provincial flow:
+  - Provincial click routes to DEV2 authentication as expected.
+- User with existing linked identity:
+  - Without `/auth/...` routing, Verify can route into local broker policy paths (for example `authsvc` with `PolicyId=...macotp`) instead of DEV2.
+  - With `/auth/...` routing enabled in current POC implementation, routing remains on the intended provincial path in testing.
+
+Interpretation:
+
+- `identity_source_id` alone can behave like a hint.
+- Entering through a dedicated `/auth/...` route affects policy selection earlier in the hosted login chain.
 
 ## 5) Testing and validation completed
 
@@ -124,20 +153,14 @@ Automated tests:
 
 ## Current known limitation
 
-Requirement:
-
-- Clicking BCSC/AB card should always route to the corresponding provincial provider flow.
-
-Current reality with main DEV app policy:
-
-- If Cloud Directory is enabled alongside provincial providers, routing can be non-deterministic in hosted login.
-- `identity_source_id` behaves like a hint in this setup, not a strict guarantee.
+- `/auth/...` route behavior is observed and validated in tenant testing, but not explicitly documented as a stable public API contract in Verify Reference docs.
+- Deterministic behavior still depends on tenant policy configuration behind the selected auth route.
 
 ## Why this happens
 
-- Source selection is strongly influenced by DEV OIDC app sign-on policy and hosted login behavior.
+- Source selection is strongly influenced by DEV OIDC app sign-on policy and hosted login policy routing.
 - Redirect URI settings and group membership source settings do not enforce provider choice.
-- App policy isolation is the most deterministic control point.
+- `/auth/...` entry routing changes which hosted-login policy path executes before final authorize processing.
 
 ## Recommended next steps
 
@@ -152,13 +175,14 @@ Option B (strongest deterministic isolation):
 - One OIDC app per provincial provider (for example BC app, AB app).
 - Backend maps partner to corresponding app login flow.
 
-Option C (keep current app and hints):
+Option C (current POC implementation):
 
-- Keep `identity_source_id` hint approach.
-- Accept potential non-deterministic provider selection when multiple providers are enabled.
+- Keep one app and one provincial identity source ID config.
+- Use `/auth/{identity_source_id}` routing plus `Target` for provincial partner clicks.
+- Keep validating behavior in tenant after policy changes.
 
 ## Notes for future contributors
 
-- Treat `identity_source_id` behavior as tenant-observed behavior unless IBM provides explicit precedence documentation for the exact hosted login path.
+- Treat both `identity_source_id` and `/auth/...` routing behavior as tenant-observed behavior unless IBM publishes explicit precedence/contract documentation for the hosted login path used.
 - Always validate with both browser network traces and tenant audit/metrics.
 - Keep return path handling clean to avoid nested `returnToPage` loops.
