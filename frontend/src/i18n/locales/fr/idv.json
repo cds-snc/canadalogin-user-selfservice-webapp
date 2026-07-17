@@ -60,6 +60,7 @@
     "lastName": "Last name",
     "dateOfBirth": "Date of birth",
     "idSelected": "ID selected",
+    "printBannerAlt": "Gouvernement du Canada",
     "printPageButton": "Print page",
     "updateInformationButton": "Update information",
     "findNearestTitle": "Find your nearest Service Canada Centre",
