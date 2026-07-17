@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def _parse_federated_mapping(map_value: Optional[str]) -> dict[str, str]:
-    """Parse mapping entries like "bc=dev2,ab=alberta" into a dictionary."""
+    """Parse mapping entries like "bc=britishcolumbia,ab=alberta" into a dictionary."""
     if not map_value:
         return {}
 
@@ -100,9 +100,7 @@ async def redirect_user_to_idp_verify(
 
         if mapped_idp:
             extra_params[config.OIDC_FEDERATED_IDP_PARAM] = mapped_idp
-            # Some IBM Verify flows evaluate identity_source_ids (plural) when
-            # rendering the login experience. Mirror the mapped source as a
-            # single-item list to keep source selection deterministic.
+
             if config.OIDC_FEDERATED_IDP_PARAM != "identity_source_ids":
                 extra_params["identity_source_ids"] = mapped_idp
             logger.info(
