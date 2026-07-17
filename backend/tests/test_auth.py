@@ -92,7 +92,6 @@ class FakeConfig:
         self.ibm_verify_config = SimpleNamespace(
             IBM_VERIFY_TENANT_URL="https://tenant.example.com",
             IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID="provincial-partners-id",
-            IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_FRIENDLY_NAME="dev2-provincial-partner-poc",
         )
 
 
@@ -367,7 +366,7 @@ async def test_login_passes_identity_source_id_for_bcsc_partner(app, client):
         == "provincial-partners-id"
     )
     assert resp.headers["location"].startswith(
-        "https://tenant.example.com/auth/dev2-provincial-partner-poc?Target="
+        "https://tenant.example.com/auth/provincial-partners-id?Target="
     )
     assert "app_login=false" in resp.headers["location"]
 

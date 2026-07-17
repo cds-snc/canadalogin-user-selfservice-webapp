@@ -14,12 +14,12 @@ from app.auth.services.auth_user_session import update_session_tokens
 logger = logging.getLogger(__name__)
 
 
-def build_identity_source_friendly_redirect_url(
+def build_identity_source_redirect_url(
     tenant_url: str,
-    identity_source_friendly_name: str,
+    identity_source_path_segment: str,
     target_url: str,
 ) -> Optional[str]:
-    if not tenant_url or not identity_source_friendly_name or not target_url:
+    if not tenant_url or not identity_source_path_segment or not target_url:
         return None
 
     parsed_tenant_url = urlparse(tenant_url)
@@ -33,7 +33,7 @@ def build_identity_source_friendly_redirect_url(
     encoded_target_url = quote(target_url, safe="")
 
     return (
-        f"{tenant_base_url}/auth/{identity_source_friendly_name}"
+        f"{tenant_base_url}/auth/{identity_source_path_segment}"
         f"?Target={encoded_target_url}&app_login=false"
     )
 
@@ -95,9 +95,6 @@ async def redirect_user_to_idp_verify(
     provincial_partners_identity_source = (
         config.ibm_verify_config.IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID
     )
-    provincial_partners_identity_source_friendly_name = (
-        config.ibm_verify_config.IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_FRIENDLY_NAME
-    )
 
     partner_to_identity_source = {
         "bcsc": provincial_partners_identity_source,
@@ -124,16 +121,16 @@ async def redirect_user_to_idp_verify(
         request, callback_redirect_uri, **extra_params
     )
 
-    if partner and provincial_partners_identity_source_friendly_name:
+    if partner and provincial_partners_identity_source:
         oauth_authorize_redirect_url = redirect_response.headers.get("location")
         if oauth_authorize_redirect_url:
-            idp_friendly_redirect_url = build_identity_source_friendly_redirect_url(
+            idp_redirect_url = build_identity_source_redirect_url(
                 config.ibm_verify_config.IBM_VERIFY_TENANT_URL,
-                provincial_partners_identity_source_friendly_name,
+                provincial_partners_identity_source,
                 oauth_authorize_redirect_url,
             )
-            if idp_friendly_redirect_url:
-                redirect_response.headers["location"] = idp_friendly_redirect_url
+            if idp_redirect_url:
+                redirect_response.headers["location"] = idp_redirect_url
 
     logger.info("User redirected to IBM Verify for authentication")
     return redirect_response
