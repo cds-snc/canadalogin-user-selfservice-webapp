@@ -90,7 +90,9 @@ class FakeConfig:
         self.ENVIRONMENT = env
         self.PROFILE_MANAGEMENT_DOMAIN = domain
         self.ibm_verify_config = SimpleNamespace(
+            IBM_VERIFY_TENANT_URL="https://tenant.example.com",
             IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID="provincial-partners-id",
+            IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_FRIENDLY_NAME="dev2-provincial-partner-poc",
         )
 
 
@@ -364,6 +366,10 @@ async def test_login_passes_identity_source_id_for_bcsc_partner(app, client):
         app.state.oauth_verify.last_authorize_redirect_kwargs.get("identity_source_id")
         == "provincial-partners-id"
     )
+    assert resp.headers["location"].startswith(
+        "https://tenant.example.com/auth/dev2-provincial-partner-poc?Target="
+    )
+    assert "app_login=false" in resp.headers["location"]
 
 
 @pytest.mark.asyncio
