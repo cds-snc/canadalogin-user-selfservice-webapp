@@ -76,6 +76,7 @@ export const pageIds = [
   "IdvDetailsConfirmationPage",
   "IdvCompleteIdentityProofingPage",
   "IdvIdentityVerificationSuccessPage",
+  "IdvPartnerLinkSuccessPage",
 ] as const;
 
 export type PageId = (typeof pageIds)[number];

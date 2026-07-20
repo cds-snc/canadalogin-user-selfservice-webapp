@@ -178,6 +178,7 @@ export const PAGES = {
   idvInPersonProofingInProgressPage: "IdvInPersonProofingInProgressPage",
   idvDetailsConfirmationPage: "IdvDetailsConfirmationPage",
   idvIdentityVerificationSuccessPage: "IdvIdentityVerificationSuccessPage",
+  idvPartnerLinkSuccessPage: "IdvPartnerLinkSuccessPage",
 } as const;
 
 export const PRIVACY_NOTICE_LINKS = {

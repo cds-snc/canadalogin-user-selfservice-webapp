@@ -123,6 +123,7 @@ export const PAGE_NAMESPACE_MAP: Record<string, I18nNamespace> = {
   IdvProvincialVerificationPage: "idv",
   IdvProvincialConnectedPage: "idv",
   IdvDetailsConfirmationPage: "idv",
+  IdvPartnerLinkSuccessPage: "idv",
 };
 
 i18n.use(initReactI18next).init({
