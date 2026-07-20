@@ -4,6 +4,7 @@ import {
   GcdsGrid,
   GcdsText,
 } from "@gcds-core/components-react";
+import { useLocation } from "react-router";
 
 import { useTranslation } from "react-i18next";
 import { DEV_ONLY_FEATURE } from "../../utils/constants";
@@ -15,11 +16,20 @@ import ViewLanguagePreferences from "../../features/LanguagePreference/component
 import ProvenInformationCard from "../../features/IDV/ProvenInformationCard";
 import ViewEmailInfo from "../../features/ProfileName/components/ViewEmailInfo";
 import CompleteIdentityProofingNotice from "../../features/IDV/components/CompleteIdentityProofingNotice";
+import IdentityInfoSuccessNotice from "../../features/IDV/components/IdentityInfoSuccessNotice";
+
+type ProfileHomeLocationState = {
+  showIDVSuccessNotice?: boolean;
+};
 
 export default function ProfileHome() {
+  const location = useLocation();
   const { t } = useTranslation("profile");
   const { state } = useUser();
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
+  const showIDVSuccessNotice = Boolean(
+    (location.state as ProfileHomeLocationState | null)?.showIDVSuccessNotice,
+  );
 
   return (
     <GcdsContainer role="main">
@@ -28,6 +38,11 @@ export default function ProfileHome() {
           {t("ProfileHome.title")}
         </GcdsHeading>
         {DEV_ONLY_FEATURE && (
+          <IdentityInfoSuccessNotice
+            showIDVSuccessNotice={showIDVSuccessNotice}
+          />
+        )}
+        {DEV_ONLY_FEATURE && !showIDVSuccessNotice && (
           <GcdsContainer className="idvNoticeSpacing">
             <CompleteIdentityProofingNotice />
           </GcdsContainer>
