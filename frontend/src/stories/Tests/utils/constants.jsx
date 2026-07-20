@@ -49,7 +49,7 @@ export const TEST_PROTOTYPES = new Map([
 export const TestDataUserProvider = {
   isLoading: false,
   userData: {
-    service: SERVICES?.[0]?.title ?? "", //to be set later when url referrer is given, also need to refactor other pages to use this value
+    service: SERVICES[0].title, //to be set later when url referrer is given, also need to refactor other pages to use this value
     language: "en", //to be set later when refactoring possibly
     email: null,
     emailLanguage: null,
