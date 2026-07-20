@@ -31,14 +31,9 @@ const PARTNER_DISPLAY_NAMES = {
 } as const;
 
 type PartnerId = keyof typeof PARTNER_DISPLAY_NAMES;
-type SupportedLanguage = keyof typeof AVAILABLE_LANGUAGES;
 
 function isPartnerId(value: string): value is PartnerId {
   return value in PARTNER_DISPLAY_NAMES;
-}
-
-function isSupportedLanguage(value: string): value is SupportedLanguage {
-  return value in AVAILABLE_LANGUAGES;
 }
 
 export default function PartnerLinkSuccessPage() {
@@ -56,12 +51,12 @@ export default function PartnerLinkSuccessPage() {
     return null;
   }
 
-  const normalizedLanguage = (language ?? "").toLowerCase();
-  const displayLanguage = isSupportedLanguage(normalizedLanguage)
-    ? normalizedLanguage
-    : AVAILABLE_LANGUAGES.en;
+  const currentLanguage =
+    language === AVAILABLE_LANGUAGES.fr
+      ? AVAILABLE_LANGUAGES.fr
+      : AVAILABLE_LANGUAGES.en;
   const partnerName =
-    PARTNER_DISPLAY_NAMES[normalizedPartnerId][displayLanguage];
+    PARTNER_DISPLAY_NAMES[normalizedPartnerId][currentLanguage];
   const detailsConfirmationPage = path(PAGES.idvDetailsConfirmationPage, {
     language,
     journeyType,

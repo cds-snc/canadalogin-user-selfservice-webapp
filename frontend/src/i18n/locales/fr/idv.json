@@ -237,10 +237,10 @@
     "moreInfoBody": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access."
   },
   "PartnerLinkSuccess": {
-    "pageTitle": "Prouvez votre identite",
-    "heading": "Votre compte ConnexionCanada est maintenant connecte a votre {{partnerName}}",
-    "noticeTitle": "Vous pouvez aussi utiliser votre {{partnerName}} pour vous connecter",
-    "noticeText": "Nous avons lie vos methodes de connexion de compte afin que vous puissiez maintenant utiliser votre {{partnerName}} pour vous connecter ou recuperer votre compte en plus de la methode de connexion que vous avez selectionnee.",
-    "continueButton": "Continuer"
+    "pageTitle": "Prove your identity",
+    "heading": "Your CanadaLogin account is now connected to your {{partnerName}}",
+    "noticeTitle": "You can also use your {{partnerName}} to sign in",
+    "noticeText": "We've linked your account sign in methods so you can now use your {{partnerName}} to sign in or recover your account in addition to your selected sign in method.",
+    "continueButton": "Continue"
   }
 }
