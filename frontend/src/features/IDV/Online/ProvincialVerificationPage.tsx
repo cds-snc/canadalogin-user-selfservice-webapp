@@ -23,18 +23,19 @@ export default function ProvincialVerificationPage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
-  const returnToPage = path(PAGES.idvProvincialLinkedPage, {
+  const backToOnlineMethodSelection = path(PAGES.idvProveIdentityOnlinePage, {
     language,
     journeyType,
   });
-  const backToOnlineMethodSelection = path(PAGES.idvProveIdentityOnlinePage, {
+
+  const selfPage = path(PAGES.idvProvincialVerificationPage, {
     language,
     journeyType,
   });
 
   const bcLoginUrl = new URL(OIDC_REDIRECT.login, window.location.origin);
   bcLoginUrl.searchParams.set("federatedProvider", "bc");
-  bcLoginUrl.searchParams.set("returnToPage", returnToPage);
+  bcLoginUrl.searchParams.set("returnToPage", selfPage);
 
   if (!DEV_ONLY_FEATURE) {
     return null;

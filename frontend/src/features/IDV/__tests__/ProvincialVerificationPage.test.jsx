@@ -21,8 +21,8 @@ vi.mock("react-router", async () => {
 
 vi.mock("../../../utils/routeHelpers", () => ({
   path: (page, { language, journeyType } = {}) => {
-    if (page === "IdvProvincialLinkedPage") {
-      return `/${language ?? "en"}/identity-verification/${journeyType ?? "start"}/online/provincial/linked`;
+    if (page === "IdvProvincialVerificationPage") {
+      return `/${language ?? "en"}/identity-verification/${journeyType ?? "start"}/online/provincial`;
     }
 
     if (page === "IdvProveIdentityOnlinePage") {
@@ -42,7 +42,7 @@ vi.mock("../../../utils/constants", () => ({
     reauth: "http://localhost:8000/v1/auth/reauth",
   },
   PAGES: {
-    idvProvincialLinkedPage: "IdvProvincialLinkedPage",
+    idvProvincialVerificationPage: "IdvProvincialVerificationPage",
     idvProveIdentityOnlinePage: "IdvProveIdentityOnlinePage",
   },
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
@@ -173,7 +173,7 @@ describe("ProvincialVerificationPage", () => {
       .closest("a");
     expect(bcCardLink).toHaveAttribute(
       "href",
-      "http://localhost:8000/v1/auth/login?federatedProvider=bc&returnToPage=%2Fen%2Fidentity-verification%2Fupdate%2Fonline%2Fprovincial%2Flinked",
+      "http://localhost:8000/v1/auth/login?federatedProvider=bc&returnToPage=%2Fen%2Fidentity-verification%2Fupdate%2Fonline%2Fprovincial",
     );
   });
 

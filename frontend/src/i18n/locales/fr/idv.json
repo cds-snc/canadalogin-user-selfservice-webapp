@@ -150,9 +150,6 @@
   "IdvStartIdentityProofingPage": {
     "pageTitle": "Identity Verification"
   },
-  "IdvProvincialLinkedPage": {
-    "pageTitle": "Prouvez votre identite"
-  },
   "InPersonProofingInProgress": {
     "pageTitle": "Prove your identity",
     "heading": "{{rpName}} needs you to prove your identity",
@@ -238,11 +235,5 @@
     "continueButton": "Continue",
     "moreInfoTitle": "Your identity information was successfully verified, and proofing is now complete.",
     "moreInfoBody": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access."
-  },
-  "ProvincialLinked": {
-    "heading": "Votre compte CanadaLogin est maintenant connecte a votre BC Services Card",
-    "noticeTitle": "Connexion terminee",
-    "noticeBody": "Votre connexion provinciale a reussi. Continuez pour terminer la verification et confirmer vos renseignements.",
-    "continueButton": "Continuer"
   }
 }
