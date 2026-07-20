@@ -28,14 +28,26 @@ export default function ProvincialVerificationPage() {
     journeyType,
   });
 
-  const selfPage = path(PAGES.idvProvincialVerificationPage, {
+  // Create OAuth login URLs for BC and AB with returnToPage pointing to the success page
+  const bcSuccessPath = path(PAGES.idvPartnerLinkSuccessPage, {
     language,
     journeyType,
+    partnerId: "BC",
+  });
+
+  const albertaSuccessPath = path(PAGES.idvPartnerLinkSuccessPage, {
+    language,
+    journeyType,
+    partnerId: "AB",
   });
 
   const bcLoginUrl = new URL(OIDC_REDIRECT.login, window.location.origin);
   bcLoginUrl.searchParams.set("federatedProvider", "bc");
-  bcLoginUrl.searchParams.set("returnToPage", selfPage);
+  bcLoginUrl.searchParams.set("returnToPage", bcSuccessPath);
+
+  const albertaLoginUrl = new URL(OIDC_REDIRECT.login, window.location.origin);
+  albertaLoginUrl.searchParams.set("federatedProvider", "ab");
+  albertaLoginUrl.searchParams.set("returnToPage", albertaSuccessPath);
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -87,10 +99,9 @@ export default function ProvincialVerificationPage() {
           <GcdsCard
             cardTitle={t("ProvincialVerification.albertaAccount")}
             cardTitleTag="h3"
-            href="#"
+            href={albertaLoginUrl.toString()}
             imgSrc={imgAlbertaAccount}
             imgAlt="Alberta Logo"
-            // TODO: Replace href with Alberta.ca Account OAuth URL when available
           ></GcdsCard>
         </GcdsGrid>
 
