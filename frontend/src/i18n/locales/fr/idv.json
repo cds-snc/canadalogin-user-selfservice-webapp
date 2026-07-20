@@ -236,5 +236,12 @@
     "continueButton": "Continue",
     "moreInfoTitle": "Your identity information was successfully verified, and proofing is now complete.",
     "moreInfoBody": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access."
+  },
+  "PartnerLinkSuccess": {
+    "pageTitle": "Prove your identity",
+    "heading": "Your CanadaLogin account is now connected to your {{partnerName}}",
+    "noticeTitle": "You can also use your {{partnerName}} to sign in",
+    "noticeText": "We've linked your account sign in methods so you can now use your {{partnerName}} to sign in or recover your account in addition to your selected sign in method.",
+    "continueButton": "Continue"
   }
 }
