@@ -29,7 +29,11 @@ export default function ConfirmIdentityDetails() {
   const { state } = useUser();
 
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
-  const fallbackRedirectUrl = getRelyingPartyUrl(state.relyingPartyInfo, i18n.language, "/");
+  const fallbackRedirectUrl = getRelyingPartyUrl(
+    state.relyingPartyInfo,
+    i18n.language,
+    "/",
+  );
   const backToProfilePage = path(PAGES.ProfileHome, { language });
 
   const redirectToRelyingParty = async () => {

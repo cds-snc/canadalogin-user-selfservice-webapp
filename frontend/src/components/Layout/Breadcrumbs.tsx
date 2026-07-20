@@ -8,7 +8,10 @@ import type { PageId } from "../../types/utils";
 import { useTranslation } from "react-i18next";
 import { PAGE_NAMESPACE_MAP } from "../../i18n/index";
 import { useUser } from "../Providers/useUser";
-import { getRelyingPartyName, getRelyingPartyUrl } from "../../utils/relyingPartyUtils";
+import {
+  getRelyingPartyName,
+  getRelyingPartyUrl,
+} from "../../utils/relyingPartyUtils";
 
 type BreadcrumbHandle = {
   id: PageId;

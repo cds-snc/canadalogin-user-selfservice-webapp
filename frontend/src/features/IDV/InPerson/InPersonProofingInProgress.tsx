@@ -31,11 +31,7 @@ export default function InPersonProofingInProgress() {
   const [sendEmailDate, setSendEmailDate] = useState<string | null>(null);
 
   const rpInfo = state.relyingPartyInfo;
-  const rpName = getRelyingPartyName(
-    rpInfo,
-    i18n.language,
-    t("RelyingParty.relyingPartyName"),
-  );
+  const rpName = getRelyingPartyName(rpInfo, i18n.language);
 
   const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
     language,

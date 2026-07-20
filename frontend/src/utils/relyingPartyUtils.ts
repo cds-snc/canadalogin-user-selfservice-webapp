@@ -15,7 +15,8 @@ export function getRelyingPartyName(
   fallback?: string,
 ): string {
   const localizedDetail = relyingPartyInfo?.localized?.[language];
-  const rpName = localizedDetail?.name ?? relyingPartyInfo?.linkName ?? fallback ?? "";
+  const rpName =
+    localizedDetail?.name ?? relyingPartyInfo?.linkName ?? fallback ?? "";
   return rpName;
 }
 

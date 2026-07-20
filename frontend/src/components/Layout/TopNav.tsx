@@ -12,7 +12,10 @@ import { useUser } from "../Providers/useUser";
 import { PAGES } from "../../utils/constants";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
-import { getRelyingPartyName, getRelyingPartyUrl } from "../../utils/relyingPartyUtils";
+import {
+  getRelyingPartyName,
+  getRelyingPartyUrl,
+} from "../../utils/relyingPartyUtils";
 
 interface TopNavProps {
   currentLang: string;
