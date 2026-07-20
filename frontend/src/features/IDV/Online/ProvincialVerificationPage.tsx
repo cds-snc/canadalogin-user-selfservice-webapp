@@ -14,6 +14,7 @@ import {
   DEV_ONLY_FEATURE,
   OIDC_REDIRECT,
   PAGES,
+  PROVINCIAL_PARTNERS,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import imgBcServicesCard from "../../../assets/images/BC_card.png";
@@ -25,27 +26,29 @@ export default function ProvincialVerificationPage() {
   const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
 
-  const provincialConnectedPage = path(PAGES.idvProvincialConnectedPage, {
-    language,
-    journeyType,
-  });
-
-  const buildPartnerLoginHref = (partner: "bcsc" | "ab") => {
+  const buildPartnerLoginHref = (
+    partnerId: (typeof PROVINCIAL_PARTNERS)[keyof typeof PROVINCIAL_PARTNERS],
+  ) => {
     const url = new URL(OIDC_REDIRECT.login, window.location.origin);
     const filteredSearchParams = new URLSearchParams(location.search);
     filteredSearchParams.delete("returnToPage");
     const filteredSearch = filteredSearchParams.toString();
+    const partnerSuccessPage = path(PAGES.idvPartnerLinkSuccessPage, {
+      language,
+      journeyType,
+      partnerId,
+    });
     const returnToPage = filteredSearch
-      ? `${provincialConnectedPage}?${filteredSearch}`
-      : provincialConnectedPage;
+      ? `${partnerSuccessPage}?${filteredSearch}`
+      : partnerSuccessPage;
     url.searchParams.set("returnToPage", returnToPage);
-    url.searchParams.set("partner", partner);
+    url.searchParams.set("partner", partnerId.toLowerCase());
 
     return url.toString();
   };
 
-  const bcPartnerLoginHref = buildPartnerLoginHref("bcsc");
-  const abPartnerLoginHref = buildPartnerLoginHref("ab");
+  const bcPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.bc);
+  const abPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.ab);
 
   if (!DEV_ONLY_FEATURE) {
     return null;

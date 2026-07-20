@@ -30,7 +30,8 @@ vi.mock("../../../../config", () => ({
 }));
 
 vi.mock("../../../../utils/routeHelpers", () => ({
-  path: () => "/en/identity-verification/standard/online/provincial/connected",
+  path: (_page: unknown, params?: { partnerId?: string }) =>
+    `/en/identity-verification/standard/online/provincial/link/${params?.partnerId ?? "BC"}/success`,
 }));
 
 vi.mock("@gcds-core/components-react", () => ({
@@ -78,12 +79,12 @@ describe("ProvincialVerificationPage", () => {
 
     expect(bcLink).toHaveAttribute(
       "href",
-      "https://api.example.com/v1/auth/login?returnToPage=%2Fen%2Fidentity-verification%2Fstandard%2Fonline%2Fprovincial%2Fconnected%3FTarget%3D%252Fen%252Fservices&partner=bcsc",
+      "https://api.example.com/v1/auth/login?returnToPage=%2Fen%2Fidentity-verification%2Fstandard%2Fonline%2Fprovincial%2Flink%2FBC%2Fsuccess%3FTarget%3D%252Fen%252Fservices&partner=bc",
     );
 
     expect(abLink).toHaveAttribute(
       "href",
-      "https://api.example.com/v1/auth/login?returnToPage=%2Fen%2Fidentity-verification%2Fstandard%2Fonline%2Fprovincial%2Fconnected%3FTarget%3D%252Fen%252Fservices&partner=ab",
+      "https://api.example.com/v1/auth/login?returnToPage=%2Fen%2Fidentity-verification%2Fstandard%2Fonline%2Fprovincial%2Flink%2FAB%2Fsuccess%3FTarget%3D%252Fen%252Fservices&partner=ab",
     );
   });
 });

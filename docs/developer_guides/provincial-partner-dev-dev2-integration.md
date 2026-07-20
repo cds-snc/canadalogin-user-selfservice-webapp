@@ -28,7 +28,7 @@ Latest update (current POC state):
 ```mermaid
 flowchart LR
     U[User on ProvincialVerificationPage] --> FE[Frontend Provincial Partner Card]
-    FE --> BE[/GET /v1/auth/login?partner=bcsc or ab/]
+  FE --> BE[/GET /v1/auth/login?partner=bc or ab/]
 
     BE --> DEV_AUTH[DEV Verify authorize and hosted login]
     DEV_AUTH -->|identity_source_id hint| DEV_IDP[DEV Identity Provider: Provincial Partner POC DEV2]
@@ -36,7 +36,7 @@ flowchart LR
     DEV_IDP --> DEV2_AUTH[DEV2 OIDC Application Authentication]
     DEV2_AUTH --> DEV_CB[DEV broker callback]
     DEV_CB --> BE_CB[/GET /v1/auth/callback/]
-    BE_CB --> FE_CONNECTED[Frontend /online/provincial/connected]
+    BE_CB --> FE_CONNECTED[Frontend /online/provincial/link/{partnerId}/success]
 
     DEV_AUTH -. if Cloud Directory also enabled and policy precedence wins .-> DEV_CD[DEV Cloud Directory authentication]
 ```
@@ -100,7 +100,7 @@ Provincial partner cards in:
 Behavior:
 
 - BC and AB card clicks call backend login endpoint with partner key.
-- `returnToPage` points to provincial connected page.
+- `returnToPage` points to `online/provincial/link/:partnerId/success`.
 - Nested `returnToPage` propagation bug was fixed by stripping existing `returnToPage` from query params before building the next login URL.
 
 ### Backend
@@ -141,9 +141,9 @@ Interpretation:
 
 End-to-end observations:
 
-- Provincial click correctly calls `/v1/auth/login?...&partner=bcsc`.
+- Provincial click correctly calls `/v1/auth/login?...&partner=bc` (or `partner=ab`).
 - DEV authorize redirect includes source hint and callback params.
-- Callback reaches `/v1/auth/callback` and redirects to frontend connected page.
+- Callback reaches `/v1/auth/callback` and redirects to `online/provincial/link/:partnerId/success`.
 - DEV2 metrics can show authentication events when policy is constrained appropriately.
 
 Automated tests:

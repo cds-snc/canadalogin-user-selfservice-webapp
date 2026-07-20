@@ -173,12 +173,16 @@ export const PAGES = {
   idvProvenInformationCard: "IdvProvenInformationCard",
   idvProveIdentityOnlinePage: "IdvProveIdentityOnlinePage",
   idvProvincialVerificationPage: "IdvProvincialVerificationPage",
-  idvProvincialConnectedPage: "IdvProvincialConnectedPage",
   idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
   idvInPersonProofingInProgressPage: "IdvInPersonProofingInProgressPage",
   idvDetailsConfirmationPage: "IdvDetailsConfirmationPage",
   idvIdentityVerificationSuccessPage: "IdvIdentityVerificationSuccessPage",
   idvPartnerLinkSuccessPage: "IdvPartnerLinkSuccessPage",
+} as const;
+
+export const PROVINCIAL_PARTNERS = {
+  bc: "BC",
+  ab: "AB",
 } as const;
 
 export const PRIVACY_NOTICE_LINKS = {

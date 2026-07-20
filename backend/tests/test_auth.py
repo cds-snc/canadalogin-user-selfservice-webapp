@@ -354,10 +354,10 @@ async def test_login_does_not_set_return_to_page_for_language_root(app, client):
 
 
 @pytest.mark.asyncio
-async def test_login_passes_identity_source_id_for_bcsc_partner(app, client):
+async def test_login_passes_identity_source_id_for_bc_partner(app, client):
     resp = await client.get(
         "/login",
-        params={"partner": "bcsc"},
+        params={"partner": "bc"},
         follow_redirects=False,
     )
     assert resp.status_code in (302, 307)
@@ -396,7 +396,7 @@ async def test_login_rejects_unconfigured_partner(app, client, monkeypatch):
 
     resp = await client.get(
         "/login",
-        params={"partner": "bcsc"},
+        params={"partner": "bc"},
         follow_redirects=False,
     )
 

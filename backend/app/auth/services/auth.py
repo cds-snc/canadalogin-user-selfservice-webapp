@@ -90,6 +90,8 @@ async def redirect_user_to_idp_verify(
     if is_safe_return_to_page(returnToPage):
         request.session[SessionKeys.RETURN_TO_PAGE.value] = returnToPage
         logger.info(f"Return to page set in session from login: {returnToPage}")
+    else:
+        logger.info("Return to page ignored (unsafe or empty): %s", returnToPage)
 
     config = get_configuration()
     provincial_partners_identity_source = (
@@ -97,7 +99,7 @@ async def redirect_user_to_idp_verify(
     )
 
     partner_to_identity_source = {
-        "bcsc": provincial_partners_identity_source,
+        "bc": provincial_partners_identity_source,
         "ab": provincial_partners_identity_source,
     }
 
@@ -105,10 +107,11 @@ async def redirect_user_to_idp_verify(
     if prompt:
         extra_params["prompt"] = prompt
     if partner:
-        if partner not in partner_to_identity_source:
+        normalized_partner = partner.lower()
+        if normalized_partner not in partner_to_identity_source:
             raise HTTPException(status_code=400, detail="Invalid provincial partner")
 
-        identity_source_id = partner_to_identity_source.get(partner)
+        identity_source_id = partner_to_identity_source.get(normalized_partner)
         if not identity_source_id:
             raise HTTPException(
                 status_code=503,
@@ -145,6 +148,10 @@ async def callback_handler(request: Request):
     logger.info("OIDC Callback Handler")
 
     redirectValue = get_base_profile_management_url()
+    logger.info(
+        "Session returnToPage before pop: %s",
+        request.session.get(SessionKeys.RETURN_TO_PAGE.value),
+    )
     returnToPageValue = request.session.pop(SessionKeys.RETURN_TO_PAGE.value, None)
 
     if is_safe_return_to_page(returnToPageValue):

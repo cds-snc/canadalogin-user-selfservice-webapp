@@ -121,7 +121,6 @@ export const PAGE_NAMESPACE_MAP: Record<string, I18nNamespace> = {
   IdvOnlineVerificationInfoPage: "idv",
   IdvInPersonProofingInProgressPage: "idv",
   IdvProvincialVerificationPage: "idv",
-  IdvProvincialConnectedPage: "idv",
   IdvDetailsConfirmationPage: "idv",
   IdvPartnerLinkSuccessPage: "idv",
 };
