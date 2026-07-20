@@ -14,6 +14,7 @@ import { useUser } from "../../../components/Providers/useUser";
 import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+import { getRelyingPartyName } from "../../../utils/relyingPartyUtils";
 
 const formatDisplayDate = (value: Date | string, locale: string = "en-CA") =>
   new Intl.DateTimeFormat(locale, {
@@ -30,11 +31,11 @@ export default function InPersonProofingInProgress() {
   const [sendEmailDate, setSendEmailDate] = useState<string | null>(null);
 
   const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const rpName =
-    localizedDetail?.name ??
-    rpInfo?.linkName ??
-    t("StartIdentityProofing.fallbackRpName");
+  const rpName = getRelyingPartyName(
+    rpInfo,
+    i18n.language,
+    t("RelyingParty.relyingPartyName"),
+  );
 
   const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
     language,

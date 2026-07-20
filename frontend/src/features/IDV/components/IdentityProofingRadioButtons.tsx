@@ -44,7 +44,7 @@ export default function IdentityProofingRadioButtons({
       id: `radio-${START_IDENTITY_OPTION.cantProveNow}`,
       value: START_IDENTITY_OPTION.cantProveNow,
       hint: t("StartIdentityProofing.cantProveNowHint", {
-        rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
+        rpName: rpName ?? t("RelyingParty.relyingPartyName"),
       }),
       checked: selectedOption === START_IDENTITY_OPTION.cantProveNow,
     },

@@ -37,6 +37,7 @@ import {
   type ServiceCanadaCentreFormData,
 } from "./validation/ServiceCanadaCentre.validation";
 import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
+import { getRelyingPartyName } from "../../../utils/relyingPartyUtils";
 
 const ERROR_SUMMARY_ID = "service-canada-centre-error-summary";
 
@@ -61,8 +62,7 @@ export default function ServiceCanadaCentrePage() {
   const { t, i18n } = useTranslation("idv");
   const { state } = useUser();
   const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const rpName = localizedDetail?.name ?? rpInfo?.linkName;
+  const rpName = getRelyingPartyName(rpInfo, i18n.language);
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,
@@ -224,7 +224,7 @@ export default function ServiceCanadaCentrePage() {
                 <li>
                   <GcdsText marginBottom="0">
                     {t("ServiceCanadaCentre.step4", {
-                      rpName: rpName ?? t("ServiceCanadaCentre.fallbackRpName"),
+                      rpName: rpName ?? t("RelyingParty.relyingPartyName"),
                     })}
                   </GcdsText>
                 </li>

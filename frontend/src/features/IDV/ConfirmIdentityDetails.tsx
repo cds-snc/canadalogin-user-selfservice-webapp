@@ -19,6 +19,7 @@ import ViewContactPhoneNumber from "../ContactPhoneNumber/components/ViewContact
 import DisplayEmailInfo from "../ProfileName/components/ViewEmailInfo";
 import { identityVerificationApi } from "./api/identityVerificationApi";
 import { path } from "../../utils/routeHelpers";
+import { getRelyingPartyUrl } from "../../utils/relyingPartyUtils";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
@@ -28,9 +29,7 @@ export default function ConfirmIdentityDetails() {
   const { state } = useUser();
 
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
-  const localizedDetail = state.relyingPartyInfo?.localized?.[i18n.language];
-  const fallbackRedirectUrl =
-    localizedDetail?.url ?? state.relyingPartyInfo?.url ?? "/";
+  const fallbackRedirectUrl = getRelyingPartyUrl(state.relyingPartyInfo, i18n.language, "/");
   const backToProfilePage = path(PAGES.ProfileHome, { language });
 
   const redirectToRelyingParty = async () => {

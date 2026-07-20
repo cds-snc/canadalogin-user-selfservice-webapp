@@ -16,6 +16,7 @@ import {
   IDV_TARGET_URL_KEY,
   PAGES,
 } from "../../utils/constants";
+import { getRelyingPartyName } from "../../utils/relyingPartyUtils";
 import { path } from "../../utils/routeHelpers";
 import IdentityProofingRadioButtons from "./components/IdentityProofingRadioButtons";
 import {
@@ -63,14 +64,13 @@ export default function StartIdentityProofingPage() {
   const { state } = useUser();
 
   const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const rpName = localizedDetail?.name ?? rpInfo?.linkName;
+  const rpName = getRelyingPartyName(rpInfo, i18n.language);
   const titleByJourneyType = {
     [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
-      rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
+      rpName: rpName ?? t("RelyingParty.relyingPartyName"),
     }),
     [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.pageTitle", {
-      rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
+      rpName: rpName ?? t("RelyingParty.relyingPartyName"),
     }),
     [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.proveYourIdentity"),
   } as const;

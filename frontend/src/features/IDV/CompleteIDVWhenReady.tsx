@@ -15,6 +15,7 @@ import { path } from "../../utils/routeHelpers";
 import { useUser } from "../../components/Providers/useUser";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
+import { getRelyingPartyName } from "../../utils/relyingPartyUtils";
 
 export default function CompleteIdentityProofingPage() {
   const navigate = useNavigate();
@@ -33,8 +34,7 @@ export default function CompleteIdentityProofingPage() {
   };
 
   const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
+  const relyingPartyLinkName = getRelyingPartyName(rpInfo, i18n.language);
   const rpServicePortal = relyingPartyLinkName || appName;
 
   const handleSignOut = async (event: Event) => {

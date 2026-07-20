@@ -8,6 +8,7 @@ import type { PageId } from "../../types/utils";
 import { useTranslation } from "react-i18next";
 import { PAGE_NAMESPACE_MAP } from "../../i18n/index";
 import { useUser } from "../Providers/useUser";
+import { getRelyingPartyName, getRelyingPartyUrl } from "../../utils/relyingPartyUtils";
 
 type BreadcrumbHandle = {
   id: PageId;
@@ -25,12 +26,10 @@ export default function Breadcrumbs() {
   const { state } = useUser();
 
   const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-
   const rp: BreadcrumbLink | null = rpInfo
     ? {
-        name: localizedDetail?.name ?? rpInfo.linkName,
-        url: localizedDetail?.url ?? rpInfo.url,
+        name: getRelyingPartyName(rpInfo, i18n.language),
+        url: getRelyingPartyUrl(rpInfo, i18n.language),
       }
     : null;
 

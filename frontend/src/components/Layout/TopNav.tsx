@@ -12,6 +12,7 @@ import { useUser } from "../Providers/useUser";
 import { PAGES } from "../../utils/constants";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
+import { getRelyingPartyName, getRelyingPartyUrl } from "../../utils/relyingPartyUtils";
 
 interface TopNavProps {
   currentLang: string;
@@ -27,9 +28,8 @@ export default function TopNav({ currentLang }: TopNavProps) {
   const { setLoading } = userProfileDispatch(dispatch);
 
   const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
-  const relyingPartyUrl = localizedDetail?.url ?? rpInfo?.url ?? "";
+  const relyingPartyLinkName = getRelyingPartyName(rpInfo, i18n.language);
+  const relyingPartyUrl = getRelyingPartyUrl(rpInfo, i18n.language);
   const shouldRenderRelyingPartyLink = relyingPartyLinkName && relyingPartyUrl;
 
   const { mobile, tablet } = useBreakpoints();
