@@ -15,7 +15,7 @@ import { path } from "../../utils/routeHelpers";
 import { useUser } from "../../components/Providers/useUser";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
-import { APPROVED_DOCUMENT_VALUES } from "./data/approvedDocuments";
+import { APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS } from "./data/approvedDocuments";
 
 export default function CompleteIdentityProofingPage() {
   const navigate = useNavigate();
@@ -96,10 +96,9 @@ export default function CompleteIdentityProofingPage() {
               <ol
                 aria-label={t("CompleteIdentityProofing.listOfAcceptableIds")}
               >
-                {APPROVED_DOCUMENT_VALUES.filter(
-                  (docValue) => docValue !== "noIds",
-                ).map((docValue) => (
-                  <li key={docValue}>{t(`ApprovedDocuments.${docValue}`)}</li>
+                {APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS
+                .map((docValue) => (
+                  <li key={docValue}>{t(`CompleteIdentityProofing.${docValue}`)}</li>
                 ))}
               </ol>
             </GcdsDetails>
