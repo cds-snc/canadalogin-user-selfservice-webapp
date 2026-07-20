@@ -9,9 +9,8 @@ import { path } from "../../../../utils/routeHelpers";
 let mockNavigate = vi.fn();
 
 vi.mock("react-router", async () => {
-  const actual = await vi.importActual<typeof import("react-router")>(
-    "react-router",
-  );
+  const actual =
+    await vi.importActual<typeof import("react-router")>("react-router");
 
   return {
     ...actual,
@@ -37,7 +36,9 @@ vi.mock("../../../../features/IDV/components/InPersonRadioButtons", () => ({
   default: ({
     onMethodChange,
   }: {
-    onMethodChange: (method: "canadaPostLocations" | "serviceCanadaLocations") => void;
+    onMethodChange: (
+      method: "canadaPostLocations" | "serviceCanadaLocations",
+    ) => void;
   }) => (
     <div>
       <button
@@ -57,9 +58,8 @@ vi.mock("../../../../features/IDV/components/InPersonRadioButtons", () => ({
 }));
 
 vi.mock("react-i18next", async () => {
-  const actual = await vi.importActual<typeof import("react-i18next")>(
-    "react-i18next",
-  );
+  const actual =
+    await vi.importActual<typeof import("react-i18next")>("react-i18next");
 
   return {
     ...actual,
@@ -90,7 +90,9 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),
-  GcdsGrid: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  GcdsGrid: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   GcdsHeading: ({
     children,
     tag,
@@ -175,7 +177,9 @@ describe("ProveIdentityInPersonPage", () => {
   it("navigates to Service Canada page when Service Canada option is selected", () => {
     render(<ProveIdentityInPersonPage />);
 
-    fireEvent.click(screen.getByRole("button", { name: "pick service canada" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "pick service canada" }),
+    );
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
 
     expect(mockNavigate).toHaveBeenCalledWith(

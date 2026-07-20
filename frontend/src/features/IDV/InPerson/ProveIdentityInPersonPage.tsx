@@ -77,7 +77,11 @@ export default function ProveIdentityInPersonPage() {
           />
         </GcdsContainer>
 
-        <GcdsGrid columns="1" columnsDesktop="max-content max-content" gap="200">
+        <GcdsGrid
+          columns="1"
+          columnsDesktop="max-content max-content"
+          gap="200"
+        >
           <GcdsButton
             type="button"
             disabled={!selectedMethod}

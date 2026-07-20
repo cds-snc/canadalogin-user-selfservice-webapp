@@ -9,9 +9,8 @@ import { path } from "../../../utils/routeHelpers";
 let mockNavigate = vi.fn();
 
 vi.mock("react-router", async () => {
-  const actual = await vi.importActual<typeof import("react-router")>(
-    "react-router",
-  );
+  const actual =
+    await vi.importActual<typeof import("react-router")>("react-router");
 
   return {
     ...actual,
@@ -33,30 +32,32 @@ vi.mock("../../../components/Providers/useUser", () => ({
   }),
 }));
 
-vi.mock("../../../features/IDV/components/IdentityProofingRadioButtons", () => ({
-  default: ({
-    onOptionChange,
-  }: {
-    onOptionChange: (option: "online" | "inPerson" | "cantProveNow") => void;
-  }) => (
-    <div>
-      <button type="button" onClick={() => onOptionChange("inPerson")}>
-        pick in person
-      </button>
-      <button type="button" onClick={() => onOptionChange("online")}>
-        pick online
-      </button>
-      <button type="button" onClick={() => onOptionChange("cantProveNow")}>
-        pick later
-      </button>
-    </div>
-  ),
-}));
+vi.mock(
+  "../../../features/IDV/components/IdentityProofingRadioButtons",
+  () => ({
+    default: ({
+      onOptionChange,
+    }: {
+      onOptionChange: (option: "online" | "inPerson" | "cantProveNow") => void;
+    }) => (
+      <div>
+        <button type="button" onClick={() => onOptionChange("inPerson")}>
+          pick in person
+        </button>
+        <button type="button" onClick={() => onOptionChange("online")}>
+          pick online
+        </button>
+        <button type="button" onClick={() => onOptionChange("cantProveNow")}>
+          pick later
+        </button>
+      </div>
+    ),
+  }),
+);
 
 vi.mock("react-i18next", async () => {
-  const actual = await vi.importActual<typeof import("react-i18next")>(
-    "react-i18next",
-  );
+  const actual =
+    await vi.importActual<typeof import("react-i18next")>("react-i18next");
 
   return {
     ...actual,
@@ -73,8 +74,7 @@ vi.mock("react-i18next", async () => {
           const translations: Record<string, string> = {
             "StartIdentityProofing.pageTitle":
               "To access RP SERVICE PORTAL, prove your identity first",
-            "StartIdentityProofing.proveYourIdentity":
-              "Prove your identity",
+            "StartIdentityProofing.proveYourIdentity": "Prove your identity",
             "StartIdentityProofing.heading":
               "Use CanadaLogin to prove your identity",
             "StartIdentityProofing.bodyText": "Body text",
@@ -85,8 +85,7 @@ vi.mock("react-i18next", async () => {
             "Button.cancel": "Cancel",
             "StartIdentityProofing.signedInSuccessNotice": "Signed in",
             "StartIdentityProofing.errorNoticeTitle": "Error title",
-            "StartIdentityProofing.errorNoticeDescription":
-              "Error description",
+            "StartIdentityProofing.errorNoticeDescription": "Error description",
             "StartIdentityProofing.fallbackRpName": "RP Name",
           };
 
@@ -101,7 +100,9 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),
-  GcdsGrid: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  GcdsGrid: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   GcdsHeading: ({
     children,
     tag,
