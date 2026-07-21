@@ -13,6 +13,7 @@ Latest update (current POC state):
 
 - Reliable DEV2 routing is currently achieved by rewriting login through `/auth/...` before the OIDC authorize target is executed.
 - The implementation now uses one backend config value for provincial routing: `IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID`.
+- For this POC, `IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID` was set to the Provincial Partner POC DEV2 identity source id.
 - `IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_FRIENDLY_NAME` was removed from active code to reduce duplicate configuration.
 
 ## Scope covered in this document
