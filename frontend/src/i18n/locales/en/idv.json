@@ -45,10 +45,10 @@
     "lastNameLabel": "Last Name",
     "lastNameHint": "Must match what is on your official ID",
     "dateOfBirthdayLabel": "Date of birth",
-    "addressLabel": "Address (optional)",
+    "addressLabel": "Address",
     "addressHint": "Enter your street address",
-    "provinceLabel": "Province/ Territory (optional)",
-    "postalcodeLabel": "Postal Code (optional)",
+    "provinceLabel": "Province/ Territory",
+    "postalcodeLabel": "Postal Code",
     "postalcodeHint": "Enter your postal code"
   },
   "ServiceCanadaCentreCode": {
