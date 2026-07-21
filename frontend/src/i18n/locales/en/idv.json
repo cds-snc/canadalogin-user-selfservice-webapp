@@ -230,7 +230,9 @@
     "communication": "Communication",
     "confirmAndContinue": "Confirm and continue",
     "successNoticeTitle": "Your identity information was successfully verified and proofing is complete.",
-    "successNoticeDescription": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access."
+    "successNoticeDescription": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access.",
+    "successNoticeTitleWithoutRp": "Your CanadaLogin has succesfully saved your changes",
+    "successNoticeDescriptionWithoutRp": "Continue with accessing the service"
   },
   "IdentityVerificationSuccess": {
     "pageTitle": "Prove your identity",
