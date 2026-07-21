@@ -45,9 +45,9 @@
     "proviceLabel": "Province/ State"
   },
   "ServiceCanadaCentreCode": {
-    "heading": "Here is your unique identification code for your identity proofing",
-    "codeValidDays": "This code is valid for 30 days and has been emailed to",
-    "visitInstruction": "Visit a Service Canada Centre with your code and one valid ID document.",
+    "heading": "Your unique code for identity proofing at Service Canada Centre",
+    "codeValidDays": "This code is valid for 30 days (expires June 30, 2027) and has been emailed to",
+    "visitInstruction": "Visit a Service Canada Centre with your code and your {{idSelected}}.",
     "yourInformationHeading": "Your information",
     "firstName": "First name",
     "lastName": "Last name",

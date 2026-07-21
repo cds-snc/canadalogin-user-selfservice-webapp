@@ -141,7 +141,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Here is your unique identification code for your identity proofing",
+        "Your unique code for identity proofing at Service Canada Centre",
       ),
     ).toBeInTheDocument();
   });
@@ -188,13 +188,12 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     );
 
     expect(
-      screen.getByText(
-        /This code is valid for 30 days and has been emailed to/,
-      ),
+      screen.getByText(/This code is valid for 30 days/i),
     ).toBeInTheDocument();
+    expect(screen.getByText(/has been emailed to/i)).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Visit a Service Canada Centre with your code and one valid ID document.",
+        "Visit a Service Canada Centre with your code and your passport.",
       ),
     ).toBeInTheDocument();
   });
@@ -232,6 +231,12 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       </TestWrapper>,
     );
 
+    const expectedDateOfBirth = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(new Date(1990, 0, 1));
+
     expect(screen.getByText("Your information")).toBeInTheDocument();
     expect(screen.getByText("First name")).toBeInTheDocument();
     expect(screen.getByText("Last name")).toBeInTheDocument();
@@ -239,7 +244,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("ID selected")).toBeInTheDocument();
     expect(screen.getByText("Jane")).toBeInTheDocument();
     expect(screen.getByText("Doe")).toBeInTheDocument();
-    expect(screen.getByText("1990-01-01")).toBeInTheDocument();
+    expect(screen.getByText(expectedDateOfBirth)).toBeInTheDocument();
     expect(screen.getByText("passport")).toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });

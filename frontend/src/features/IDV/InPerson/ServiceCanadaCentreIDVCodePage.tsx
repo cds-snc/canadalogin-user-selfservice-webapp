@@ -40,7 +40,38 @@ export default function ServiceCanadaCentreIDVCodePage() {
   const idvCode = locationState?.idvCode ?? null;
   const firstName = locationState?.firstName?.trim() || "--";
   const lastName = locationState?.lastName?.trim() || "--";
-  const dateOfBirth = locationState?.dateOfBirth?.trim() || "--";
+  const dateOfBirth = (() => {
+    const trimmedDate = locationState?.dateOfBirth?.trim();
+
+    if (!trimmedDate) {
+      return "--";
+    }
+
+    const isoDateMatch = trimmedDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+    if (isoDateMatch) {
+      const [, year, month, day] = isoDateMatch;
+      const parsedDate = new Date(Number(year), Number(month) - 1, Number(day));
+
+      return new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }).format(parsedDate);
+    }
+
+    const parsedDate = new Date(trimmedDate);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return trimmedDate;
+    }
+
+    return new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(parsedDate);
+  })();
   const idSelected = locationState?.idType?.trim() || "--";
 
   const handlePrintPage = () => {};
@@ -70,7 +101,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
             <strong>{email}</strong>.
           </GcdsText>
           <GcdsText marginBottom="0">
-            {t("ServiceCanadaCentreCode.visitInstruction")}
+            {t("ServiceCanadaCentreCode.visitInstruction", { idSelected })}
           </GcdsText>
         </GcdsContainer>
 
