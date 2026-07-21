@@ -133,10 +133,10 @@
     "backButton": "Back"
   },
   "ProveIdentityInPerson": {
-    "heading": "Prouvez votre identité en personne",
-    "description": "Vous n'aurez accès à ce {{rpName}} qu'après avoir prouvé votre identité en personne et vous être reconnecté avec votre ConnexionCanada.",
-    "continueButton": "Continuer",
-    "backButton": "Retour"
+    "heading": "Prove your identity in person",
+    "description": "You will only get access to this {{rpName}} after proving your identity in person and signing back in with your CanadaLogin.",
+    "continueButton": "Continue",
+    "backButton": "Back"
   },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",
