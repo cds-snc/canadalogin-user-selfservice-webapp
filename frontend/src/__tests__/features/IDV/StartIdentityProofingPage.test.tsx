@@ -16,6 +16,7 @@ vi.mock("react-router", async () => {
     ...actual,
     useNavigate: () => mockNavigate,
     useParams: () => ({ language: "en", journeyType: "start" }),
+    useSearchParams: () => [new URLSearchParams(), vi.fn()],
   };
 });
 
