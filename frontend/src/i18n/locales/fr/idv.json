@@ -127,6 +127,12 @@
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about provincial identity proofing"
   },
+  "ProvincialVerificationConnected": {
+    "pageTitle": "Prove your identity",
+    "heading": "Your CanadaLogin account is now connected to your BC Service Card",
+    "body": "Continue to confirm your verified identity details.",
+    "continueButton": "Continue"
+  },
   "ProveIdentityOnline": {
     "heading": "Prove your identity online",
     "continueButton": "Continue",
@@ -232,7 +238,7 @@
   },
   "IdentityVerificationSuccess": {
     "pageTitle": "Prove your identity",
-    "heading": "Identity proofing is complete",
+    "heading": "Your identity information was successfully verified and you can use your account to sign in to CanadaLogin.",
     "continueButton": "Continue",
     "moreInfoTitle": "Your identity information was successfully verified, and proofing is now complete.",
     "moreInfoBody": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access."

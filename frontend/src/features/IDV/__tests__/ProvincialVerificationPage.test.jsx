@@ -6,25 +6,30 @@ import ProvincialVerificationPage from "../Online/ProvincialVerificationPage";
 // ────────────────────────────────────────────────
 // Mocks
 // ────────────────────────────────────────────────
-const mockNavigate = vi.fn();
-let mockDevOnlyFeature = true;
+const mockState = vi.hoisted(() => ({
+  mockNavigate: vi.fn(),
+  devOnlyFeature: true,
+}));
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
   return {
     ...actual,
     useParams: () => ({ language: "en" }),
-    useNavigate: () => mockNavigate,
+    useNavigate: () => mockState.mockNavigate,
+    useLocation: () => ({ search: "" }),
   };
 });
 
-vi.mock("../../../utils/constants", () => ({
-  get DEV_ONLY_FEATURE() {
-    return mockDevOnlyFeature;
-  },
-  PAGES: {},
-  VITE_ENVIRONMENTS: { dev: "development", test: "test" },
-}));
+vi.mock("../../../utils/constants", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    get DEV_ONLY_FEATURE() {
+      return mockState.devOnlyFeature;
+    },
+  };
+});
 
 vi.mock("../../../assets/images/BC_card.png", () => ({
   default: "bc-card-stub.png",
@@ -79,8 +84,8 @@ vi.mock("@gcds-core/components-react", () => ({
 // ────────────────────────────────────────────────
 describe("ProvincialVerificationPage", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    mockDevOnlyFeature = true;
+    mockState.mockNavigate.mockClear();
+    mockState.devOnlyFeature = true;
   });
 
   it("renders the page title and main heading", () => {
@@ -185,7 +190,7 @@ describe("ProvincialVerificationPage", () => {
 
     fireEvent.click(screen.getByTestId("back-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    expect(mockState.mockNavigate).toHaveBeenCalledWith(-1);
   });
 
   it("calls navigate(-1) only once per back button click", () => {
@@ -193,7 +198,7 @@ describe("ProvincialVerificationPage", () => {
 
     fireEvent.click(screen.getByTestId("back-button"));
 
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockState.mockNavigate).toHaveBeenCalledTimes(1);
   });
 
   it("renders the more information notice", () => {
@@ -221,7 +226,7 @@ describe("ProvincialVerificationPage", () => {
   });
 
   it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
+    mockState.devOnlyFeature = false;
 
     const { container } = render(<ProvincialVerificationPage />);
 

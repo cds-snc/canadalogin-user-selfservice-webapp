@@ -180,6 +180,11 @@ export const PAGES = {
   idvPartnerLinkSuccessPage: "IdvPartnerLinkSuccessPage",
 } as const;
 
+export const PROVINCIAL_PARTNERS = {
+  bc: "BC",
+  ab: "AB",
+} as const;
+
 export const PRIVACY_NOTICE_LINKS = {
   en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/privacy/`,
   fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/confidentialite/`,
