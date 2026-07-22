@@ -9,14 +9,46 @@ import {
   GcdsContainer,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { useLocation, useNavigate, useParams } from "react-router";
+import {
+  DEV_ONLY_FEATURE,
+  OIDC_REDIRECT,
+  PAGES,
+  PROVINCIAL_PARTNERS,
+} from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 import imgBcServicesCard from "../../../assets/images/BC_card.png";
 import imgAlbertaAccount from "../../../assets/images/AB_card.png";
 
 export default function ProvincialVerificationPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
+
+  const buildPartnerLoginHref = (
+    partnerId: (typeof PROVINCIAL_PARTNERS)[keyof typeof PROVINCIAL_PARTNERS],
+  ) => {
+    const url = new URL(OIDC_REDIRECT.login, window.location.origin);
+    const filteredSearchParams = new URLSearchParams(location.search);
+    filteredSearchParams.delete("returnToPage");
+    const filteredSearch = filteredSearchParams.toString();
+    const partnerSuccessPage = path(PAGES.idvPartnerLinkSuccessPage, {
+      language,
+      journeyType,
+      partnerId,
+    });
+    const returnToPage = filteredSearch
+      ? `${partnerSuccessPage}?${filteredSearch}`
+      : partnerSuccessPage;
+    url.searchParams.set("returnToPage", returnToPage);
+    url.searchParams.set("partner", partnerId.toLowerCase());
+
+    return url.toString();
+  };
+
+  const bcPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.bc);
+  const abPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.ab);
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -61,18 +93,16 @@ export default function ProvincialVerificationPage() {
           <GcdsCard
             cardTitle={t("ProvincialVerification.bcServicesCard")}
             cardTitleTag="h3"
-            href="#"
+            href={bcPartnerLoginHref}
             imgSrc={imgBcServicesCard}
             imgAlt="British Columbia Logo"
-            // TODO: Replace href with BC Services Card OAuth URL when available
           ></GcdsCard>
           <GcdsCard
             cardTitle={t("ProvincialVerification.albertaAccount")}
             cardTitleTag="h3"
-            href="#"
+            href={abPartnerLoginHref}
             imgSrc={imgAlbertaAccount}
             imgAlt="Alberta Logo"
-            // TODO: Replace href with Alberta.ca Account OAuth URL when available
           ></GcdsCard>
         </GcdsGrid>
 

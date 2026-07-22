@@ -90,9 +90,15 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </button>
   ),
-  GcdsNotice: ({ children, type }) => (
-    <div data-testid={`notice-${type}`}>{children}</div>
-  ),
+  GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag }) => {
+    const TitleTag = noticeTitleTag ?? "h2";
+    return (
+      <div data-testid={`notice-${type}`}>
+        {noticeTitle ? <TitleTag>{noticeTitle}</TitleTag> : null}
+        {children}
+      </div>
+    );
+  },
 }));
 
 describe("ConfirmIdentityDetails", () => {
@@ -115,9 +121,10 @@ describe("ConfirmIdentityDetails", () => {
         },
       },
       relyingPartyInfo: {
+        linkName: "CRA",
         url: "https://rp.example.com/service",
         localized: {
-          en: { url: "https://rp.example.com/service" },
+          en: { name: "CRA", url: "https://rp.example.com/service" },
         },
       },
     };
@@ -159,6 +166,42 @@ describe("ConfirmIdentityDetails", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Update information" }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the existing RP success notice when RP details are available", () => {
+    render(<ConfirmIdentityDetails />);
+
+    expect(
+      screen.getByText(
+        "Your identity information was successfully verified and proofing is complete.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with CRA to get access.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the new no-RP success notice when RP details are missing", () => {
+    mockUserState = {
+      ...mockUserState,
+      relyingPartyInfo: {
+        url: "https://rp.example.com/service",
+        localized: {
+          en: { url: "https://rp.example.com/service" },
+        },
+      },
+    };
+
+    render(<ConfirmIdentityDetails />);
+
+    expect(
+      screen.getByText("Your CanadaLogin has succesfully saved your changes"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Continue with accessing the service"),
     ).toBeInTheDocument();
   });
 

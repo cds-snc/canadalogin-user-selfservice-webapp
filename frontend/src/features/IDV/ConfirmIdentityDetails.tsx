@@ -66,7 +66,7 @@ export default function ConfirmIdentityDetails() {
           <GcdsNotice
             noticeRole="success"
             noticeTitleTag="h2"
-            noticeTitle={t("ConfirmIdentityDetails.successNoticeTitle")}
+            noticeTitle={t(successNoticeTitleKey)}
           >
             <GcdsText>
               {t("ConfirmIdentityDetails.successNoticeDescription", {

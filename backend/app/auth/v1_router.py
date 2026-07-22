@@ -40,9 +40,13 @@ async def redirect_url(
         default=None, pattern="^(login|none|consent|select_account)$"
     ),
     returnToPage: Optional[str] = Query(default=None),
+    partner: Optional[str] = Query(default=None),
 ):
     return await redirect_user_to_idp_verify(
-        request, prompt=prompt, returnToPage=returnToPage
+        request,
+        prompt=prompt,
+        returnToPage=returnToPage,
+        partner=partner,
     )
 
 
