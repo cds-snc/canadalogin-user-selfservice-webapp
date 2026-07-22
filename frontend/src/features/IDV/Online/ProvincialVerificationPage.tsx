@@ -19,6 +19,7 @@ import {
 import { path } from "../../../utils/routeHelpers";
 import imgBcServicesCard from "../../../assets/images/BC_card.png";
 import imgAlbertaAccount from "../../../assets/images/AB_card.png";
+import imgQuebecAccount from "../../../assets/images/QC_card.png";
 
 export default function ProvincialVerificationPage() {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ export default function ProvincialVerificationPage() {
 
   const bcPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.bc);
   const abPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.ab);
-
+  const quebecPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.qc);
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
@@ -58,9 +59,6 @@ export default function ProvincialVerificationPage() {
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
         <GcdsContainer>
-          <GcdsText marginBottom="0" size="small">
-            {t("ProvincialVerification.pageTitle")}
-          </GcdsText>
           <GcdsHeading tag="h1">
             {t("ProvincialVerification.heading")}
           </GcdsHeading>
@@ -81,11 +79,6 @@ export default function ProvincialVerificationPage() {
                 {t("ProvincialVerification.step2")}
               </GcdsText>
             </li>
-            <li>
-              <GcdsText marginBottom="0">
-                {t("ProvincialVerification.step3")}
-              </GcdsText>
-            </li>
           </ol>
         </GcdsContainer>
 
@@ -104,6 +97,13 @@ export default function ProvincialVerificationPage() {
             imgSrc={imgAlbertaAccount}
             imgAlt="Alberta Logo"
           ></GcdsCard>
+          <GcdsCard
+            cardTitle={t("ProvincialVerification.quebecAccount")}
+            cardTitleTag="h3"
+            href={quebecPartnerLoginHref}
+            imgSrc={imgQuebecAccount}
+            imgAlt="Québec Logo"
+          ></GcdsCard>
         </GcdsGrid>
 
         <GcdsGrid columns="max-content" gap="200">
@@ -114,7 +114,7 @@ export default function ProvincialVerificationPage() {
               navigate(-1);
             }}
           >
-            {t("ProvincialVerification.backButton")}
+            {t("ProvincialVerification.chooseDifferentMethodButton")}
           </GcdsButton>
         </GcdsGrid>
 
