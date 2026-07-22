@@ -30,6 +30,7 @@ export default function ConfirmIdentityDetails() {
     localizedDetail?.name ??
     rpInfo?.linkName ??
     t("StartIdentityProofing.fallbackRpName");
+  const successNoticeTitleKey = "ConfirmIdentityDetails.successNoticeTitle";
 
   const redirectToRelyingParty = async () => {
     try {
