@@ -198,7 +198,7 @@ describe("ConfirmIdentityDetails", () => {
     render(<ConfirmIdentityDetails />);
 
     expect(
-      screen.getByText("Your CanadaLogin has succesfully saved your changes"),
+      screen.getByText("Your CanadaLogin has successfully saved your changes"),
     ).toBeInTheDocument();
     expect(
       screen.getByText("Continue with accessing the service"),
