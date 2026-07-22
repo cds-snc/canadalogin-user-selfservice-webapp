@@ -32,17 +32,14 @@ export default function ConfirmIdentityDetails() {
   const rpName = localizedDetail?.name ?? rpInfo?.linkName;
   const fallbackRedirectUrl = localizedDetail?.url ?? rpInfo?.url ?? "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
-  const isRequiredJourney = journeyType === IDV_JOURNEY_TYPE.REQUIRED;
   const hasRpService = Boolean(rpName);
 
-  const successNoticeTitleKey =
-    isRequiredJourney && hasRpService
-      ? "ConfirmIdentityDetails.successNoticeTitle"
-      : "ConfirmIdentityDetails.successNoticeTitleWithoutRp";
-  const successNoticeDescriptionKey =
-    isRequiredJourney && hasRpService
-      ? "ConfirmIdentityDetails.successNoticeDescription"
-      : "ConfirmIdentityDetails.successNoticeDescriptionWithoutRp";
+  const successNoticeTitleKey = hasRpService
+    ? "ConfirmIdentityDetails.successNoticeTitle"
+    : "ConfirmIdentityDetails.successNoticeTitleWithoutRp";
+  const successNoticeDescriptionKey = hasRpService
+    ? "ConfirmIdentityDetails.successNoticeDescription"
+    : "ConfirmIdentityDetails.successNoticeDescriptionWithoutRp";
 
   const redirectToRelyingParty = async () => {
     try {

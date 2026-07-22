@@ -194,8 +194,6 @@ describe("ConfirmIdentityDetails", () => {
   });
 
   it("shows the existing RP success notice when RP details are available", () => {
-    mockJourneyType = "required";
-
     render(<ConfirmIdentityDetails />);
 
     expect(
@@ -211,7 +209,6 @@ describe("ConfirmIdentityDetails", () => {
   });
 
   it("shows the new no-RP success notice when RP details are missing", () => {
-    mockJourneyType = "required";
     mockUserState = {
       ...mockUserState,
       relyingPartyInfo: {
