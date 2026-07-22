@@ -16,7 +16,6 @@ import {
   IDV_TARGET_URL_KEY,
   PAGES,
 } from "../../utils/constants";
-import { getRelyingPartyName } from "../../utils/relyingPartyUtils";
 import { path } from "../../utils/routeHelpers";
 import IdentityProofingRadioButtons from "./components/IdentityProofingRadioButtons";
 import {
@@ -26,6 +25,7 @@ import {
 import { useUser } from "../../components/Providers/useUser";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import { identityVerificationApi } from "./api/identityVerificationApi";
+import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 
 function extractTargetUrl(searchParams: URLSearchParams): string | null {
   const structuredTarget = searchParams.get(IDV_TARGET_URL_KEY);
@@ -61,16 +61,19 @@ export default function StartIdentityProofingPage() {
   const [searchParams] = useSearchParams();
 
   const { t, i18n } = useTranslation("idv");
+  const { t: tCommon } = useTranslation("common");
   const { state } = useUser();
-
-  const rpInfo = state.relyingPartyInfo;
-  const rpName = getRelyingPartyName(rpInfo, i18n.language);
+  const { relyingPartyName: rpName } = useRelyingPartyInfo(
+    state,
+    i18n.language,
+    tCommon("RelyingParty.rpName"),
+  );
   const titleByJourneyType = {
     [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
-      rpName: rpName ?? t("RelyingParty.relyingPartyName"),
+      rpName,
     }),
     [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.pageTitle", {
-      rpName: rpName ?? t("RelyingParty.relyingPartyName"),
+      rpName,
     }),
     [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.proveYourIdentity"),
   } as const;

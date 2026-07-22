@@ -51,6 +51,8 @@
     "otp_expired": "Votre code a expiré. Demandez un nouveau code ci-dessous."
   },
   "RelyingParty": {
-    "relyingPartyName": "RP Name"
+    "manageCanadaLogin": "Gérer ConnexionCanada",
+    "rpName": "Nom RP",
+    "relyingPartyName": "Gérer ConnexionCanada"
   }
 }

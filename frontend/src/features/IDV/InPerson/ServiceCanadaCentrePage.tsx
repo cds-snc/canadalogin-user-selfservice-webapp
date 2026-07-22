@@ -23,6 +23,7 @@ import {
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 import {
   getFirstNameRequiredOrInvalidMessage,
@@ -37,7 +38,6 @@ import {
   type ServiceCanadaCentreFormData,
 } from "./validation/ServiceCanadaCentre.validation";
 import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
-import { getRelyingPartyName } from "../../../utils/relyingPartyUtils";
 
 const ERROR_SUMMARY_ID = "service-canada-centre-error-summary";
 
@@ -60,9 +60,13 @@ export default function ServiceCanadaCentrePage() {
   });
 
   const { t, i18n } = useTranslation("idv");
+  const { t: tCommon } = useTranslation("common");
   const { state } = useUser();
-  const rpInfo = state.relyingPartyInfo;
-  const rpName = getRelyingPartyName(rpInfo, i18n.language);
+  const { relyingPartyName: rpName } = useRelyingPartyInfo(
+    state,
+    i18n.language,
+    tCommon("RelyingParty.rpName"),
+  );
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,
@@ -223,9 +227,7 @@ export default function ServiceCanadaCentrePage() {
                 </li>
                 <li>
                   <GcdsText marginBottom="0">
-                    {t("ServiceCanadaCentre.step4", {
-                      rpName: rpName ?? t("RelyingParty.relyingPartyName"),
-                    })}
+                    {t("ServiceCanadaCentre.step4", { rpName })}
                   </GcdsText>
                 </li>
               </ol>

@@ -11,10 +11,10 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
+import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
 import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import { getRelyingPartyName } from "../../../utils/relyingPartyUtils";
 
 const formatDisplayDate = (value: Date | string, locale: string = "en-CA") =>
   new Intl.DateTimeFormat(locale, {
@@ -25,13 +25,17 @@ const formatDisplayDate = (value: Date | string, locale: string = "en-CA") =>
 
 export default function InPersonProofingInProgress() {
   const { t, i18n } = useTranslation("idv");
+  const { t: tCommon } = useTranslation("common");
   const { language, journeyType } = useParams();
   const navigate = useNavigate();
   const { state } = useUser();
   const [sendEmailDate, setSendEmailDate] = useState<string | null>(null);
 
-  const rpInfo = state.relyingPartyInfo;
-  const rpName = getRelyingPartyName(rpInfo, i18n.language);
+  const { relyingPartyName: rpName } = useRelyingPartyInfo(
+    state,
+    i18n.language,
+    tCommon("RelyingParty.rpName"),
+  );
 
   const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
     language,

@@ -12,6 +12,7 @@ import {
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import { useUser } from "../../components/Providers/useUser";
+import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import ProvenInformationCard from "../IDV/ProvenInformationCard";
 import ViewProfileNameCard from "../ProfileName/components/ViewProfileNameCard";
@@ -19,21 +20,22 @@ import ViewContactPhoneNumber from "../ContactPhoneNumber/components/ViewContact
 import DisplayEmailInfo from "../ProfileName/components/ViewEmailInfo";
 import { identityVerificationApi } from "./api/identityVerificationApi";
 import { path } from "../../utils/routeHelpers";
-import { getRelyingPartyUrl } from "../../utils/relyingPartyUtils";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
+  const { t: tCommon } = useTranslation("common");
   const { language, journeyType } = useParams();
   const { state } = useUser();
+  const { relyingPartyUrl } = useRelyingPartyInfo(
+    state,
+    i18n.language,
+    tCommon("RelyingParty.rpName"),
+  );
 
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
-  const fallbackRedirectUrl = getRelyingPartyUrl(
-    state.relyingPartyInfo,
-    i18n.language,
-    "/",
-  );
+  const fallbackRedirectUrl = relyingPartyUrl || "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
 
   const redirectToRelyingParty = async () => {

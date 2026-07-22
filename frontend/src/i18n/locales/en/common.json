@@ -51,6 +51,7 @@
     "otp_expired": "Your code has expired. Request a new code below."
   },
   "RelyingParty": {
-    "relyingPartyName": "RP Name"
+    "manageCanadaLogin": "Manage CanadaLogin",
+    "rpName": "RP Name"
   }
 }

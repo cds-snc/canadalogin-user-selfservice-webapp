@@ -14,7 +14,7 @@ interface RadioOption {
 interface IdentityProofingRadioButtonsProps {
   selectedOption: StartIdentityOption | undefined;
   onOptionChange: (option: StartIdentityOption) => void;
-  rpName?: string;
+  rpName: string;
 }
 
 export default function IdentityProofingRadioButtons({
@@ -44,7 +44,7 @@ export default function IdentityProofingRadioButtons({
       id: `radio-${START_IDENTITY_OPTION.cantProveNow}`,
       value: START_IDENTITY_OPTION.cantProveNow,
       hint: t("StartIdentityProofing.cantProveNowHint", {
-        rpName: rpName ?? t("RelyingParty.relyingPartyName"),
+        rpName,
       }),
       checked: selectedOption === START_IDENTITY_OPTION.cantProveNow,
     },

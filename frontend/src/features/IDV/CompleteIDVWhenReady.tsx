@@ -15,7 +15,7 @@ import { path } from "../../utils/routeHelpers";
 import { useUser } from "../../components/Providers/useUser";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
-import { getRelyingPartyName } from "../../utils/relyingPartyUtils";
+import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 
 export default function CompleteIdentityProofingPage() {
   const navigate = useNavigate();
@@ -25,6 +25,7 @@ export default function CompleteIdentityProofingPage() {
 
   const { t, i18n } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
+  const { t: tCommon } = useTranslation("common");
   const appName = tLayout("TopNavBar.appName");
 
   const handleStartIdentityProofing = () => {
@@ -33,8 +34,11 @@ export default function CompleteIdentityProofingPage() {
     );
   };
 
-  const rpInfo = state.relyingPartyInfo;
-  const relyingPartyLinkName = getRelyingPartyName(rpInfo, i18n.language);
+  const { relyingPartyName: relyingPartyLinkName } = useRelyingPartyInfo(
+    state,
+    i18n.language,
+    tCommon("RelyingParty.rpName"),
+  );
   const rpServicePortal = relyingPartyLinkName || appName;
 
   const handleSignOut = async (event: Event) => {

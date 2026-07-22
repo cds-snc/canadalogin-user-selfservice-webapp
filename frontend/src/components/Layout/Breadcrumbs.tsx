@@ -8,10 +8,7 @@ import type { PageId } from "../../types/utils";
 import { useTranslation } from "react-i18next";
 import { PAGE_NAMESPACE_MAP } from "../../i18n/index";
 import { useUser } from "../Providers/useUser";
-import {
-  getRelyingPartyName,
-  getRelyingPartyUrl,
-} from "../../utils/relyingPartyUtils";
+import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 
 type BreadcrumbHandle = {
   id: PageId;
@@ -26,13 +23,14 @@ type BreadcrumbLink = {
 export default function Breadcrumbs() {
   const matches = useMatches() as Array<UIMatch<unknown, BreadcrumbHandle>>;
   const { t, i18n } = useTranslation();
+  const { t: tCommon } = useTranslation("common");
   const { state } = useUser();
-
-  const rpInfo = state.relyingPartyInfo;
-  const rp: BreadcrumbLink | null = rpInfo
+  const { relyingPartyInfo, relyingPartyName, relyingPartyUrl } =
+    useRelyingPartyInfo(state, i18n.language, tCommon("RelyingParty.rpName"));
+  const rp: BreadcrumbLink | null = relyingPartyInfo
     ? {
-        name: getRelyingPartyName(rpInfo, i18n.language),
-        url: getRelyingPartyUrl(rpInfo, i18n.language),
+        name: relyingPartyName,
+        url: relyingPartyUrl,
       }
     : null;
 
