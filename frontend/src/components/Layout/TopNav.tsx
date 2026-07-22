@@ -30,9 +30,10 @@ export default function TopNav({ currentLang }: TopNavProps) {
   const { relyingPartyName, relyingPartyUrl } = useRelyingPartyInfo(
     state,
     i18n.language,
-    tCommon("RelyingParty.rpName"),
+    tCommon("RelyingParty.canadaLogin"),
   );
-  const shouldRenderRelyingPartyLink = Boolean(relyingPartyUrl);
+  const shouldRenderRelyingPartyLink =
+    Boolean(relyingPartyUrl) && Boolean(relyingPartyName.trim());
 
   const { mobile, tablet } = useBreakpoints();
 

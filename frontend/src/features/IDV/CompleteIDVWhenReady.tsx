@@ -24,9 +24,8 @@ export default function CompleteIdentityProofingPage() {
   const { setLoading } = userProfileDispatch(dispatch);
 
   const { t, i18n } = useTranslation("idv");
-  const { t: tLayout } = useTranslation("layout");
   const { t: tCommon } = useTranslation("common");
-  const appName = tLayout("TopNavBar.appName");
+  const appName = tCommon("RelyingParty.canadaLogin");
 
   const handleStartIdentityProofing = () => {
     navigate(
@@ -37,7 +36,7 @@ export default function CompleteIdentityProofingPage() {
   const { relyingPartyName: relyingPartyLinkName } = useRelyingPartyInfo(
     state,
     i18n.language,
-    tCommon("RelyingParty.rpName"),
+    appName,
   );
   const rpServicePortal = relyingPartyLinkName || appName;
 
