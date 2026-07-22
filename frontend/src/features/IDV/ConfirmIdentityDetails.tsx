@@ -19,14 +19,17 @@ import { path } from "../../utils/routeHelpers";
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation("idv");
-  const { t: tLayout } = useTranslation("layout");
   const { language, journeyType } = useParams();
   const { state } = useUser();
 
-  const localizedDetail = state.relyingPartyInfo?.localized?.[i18n.language];
-  const fallbackRedirectUrl =
-    localizedDetail?.url ?? state.relyingPartyInfo?.url ?? "/";
+  const rpInfo = state?.relyingPartyInfo;
+  const localizedDetail = rpInfo?.localized?.[i18n.language];
+  const fallbackRedirectUrl = localizedDetail?.url ?? rpInfo?.url ?? "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
+  const rpName =
+    localizedDetail?.name ??
+    rpInfo?.linkName ??
+    t("StartIdentityProofing.fallbackRpName");
 
   const redirectToRelyingParty = async () => {
     try {
@@ -67,7 +70,7 @@ export default function ConfirmIdentityDetails() {
           >
             <GcdsText>
               {t("ConfirmIdentityDetails.successNoticeDescription", {
-                appName: tLayout("TopNavBar.appName"),
+                rpName,
               })}
             </GcdsText>
           </GcdsNotice>
