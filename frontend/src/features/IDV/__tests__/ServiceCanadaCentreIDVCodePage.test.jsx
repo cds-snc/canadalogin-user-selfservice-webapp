@@ -155,14 +155,26 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the idvCode from location state", () => {
+  it("renders the idvCode with hyphens every three characters", () => {
     render(
       <TestWrapper>
         <ServiceCanadaCentreIDVCodePage />
       </TestWrapper>,
     );
 
-    expect(screen.getByText("ABC123XYZ")).toBeInTheDocument();
+    expect(screen.getByText("ABC-123-XYZ")).toBeInTheDocument();
+  });
+
+  it("formats codes whose length is not divisible by three", () => {
+    mockLocationState.idvCode = "ABCDE";
+
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText("ABC-DE")).toBeInTheDocument();
   });
 
   it("redirects to the previous step when idvCode is missing", async () => {
