@@ -23,6 +23,8 @@ type ServiceCanadaCentreIDVCodePageLocationState = {
   lastName?: string;
   dateOfBirth?: string;
   idType?: string;
+  verificationExpiresAt?: string;
+  verificationValidityDays?: number;
 };
 
 const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
@@ -48,6 +50,8 @@ export default function ServiceCanadaCentreIDVCodePage() {
     (location.state as ServiceCanadaCentreIDVCodePageLocationState | null) ??
     null;
   const idvCode = locationState?.idvCode ?? null;
+  const verificationExpiresAt = locationState?.verificationExpiresAt;
+  const verificationValidityDays = locationState?.verificationValidityDays;
   const firstName = locationState?.firstName?.trim() || "--";
   const lastName = locationState?.lastName?.trim() || "--";
   const dateOfBirth = (() => {
@@ -89,6 +93,23 @@ export default function ServiceCanadaCentreIDVCodePage() {
       : rawIdSelected
     : "--";
 
+  const formattedExpiryDate = verificationExpiresAt
+    ? new Intl.DateTimeFormat("en-CA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(verificationExpiresAt))
+    : null;
+
+  const codeValidityText = formattedExpiryDate
+    ? t("ServiceCanadaCentreCode.codeValidDaysDynamic", {
+        expiryDate: formattedExpiryDate,
+        validityDays: verificationValidityDays ?? 30,
+      })
+    : t("ServiceCanadaCentreCode.codeValidDays", {
+        validityDays: verificationValidityDays ?? 30,
+      });
+
   const handlePrintPage = () => {};
 
   if (!DEV_ONLY_FEATURE) {
@@ -112,8 +133,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
         <GcdsContainer>
           {" "}
           <GcdsText>
-            {t("ServiceCanadaCentreCode.codeValidDays")}{" "}
-            <strong>{email}</strong>.
+            {codeValidityText} <strong>{email}</strong>.
           </GcdsText>
           <GcdsText marginBottom="0">
             {t("ServiceCanadaCentreCode.visitInstruction", {

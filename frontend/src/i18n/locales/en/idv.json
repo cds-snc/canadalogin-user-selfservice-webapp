@@ -46,7 +46,8 @@
   },
   "ServiceCanadaCentreCode": {
     "heading": "Your unique code for identity proofing at Service Canada Centre",
-    "codeValidDays": "This code is valid for 30 days (expires June 30, 2027) and has been emailed to",
+    "codeValidDays": "This code is valid for {{validityDays}} days and has been emailed to",
+    "codeValidDaysDynamic": "This code is valid for {{validityDays}} days (expires {{expiryDate}}) and has been emailed to",
     "visitInstruction": "Visit a Service Canada Centre with your code and your {{idSelected}}.",
     "yourInformationHeading": "Your information",
     "firstName": "First name",

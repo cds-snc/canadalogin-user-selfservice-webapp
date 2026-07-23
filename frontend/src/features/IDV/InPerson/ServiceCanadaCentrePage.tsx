@@ -189,6 +189,8 @@ export default function ServiceCanadaCentrePage() {
         province: formData.province,
         idType: formData.idType,
         idExpiryDate: formData.idExpiryDate,
+        verificationExpiresAt: response.data.verificationExpiresAt,
+        verificationValidityDays: response.data.verificationValidityDays,
       },
     });
   };
