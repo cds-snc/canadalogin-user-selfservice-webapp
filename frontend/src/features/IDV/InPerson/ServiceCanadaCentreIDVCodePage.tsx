@@ -10,12 +10,18 @@ import {
 import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
+import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
+import {
+  APPROVED_DOCUMENT_VALUES,
+  type ApprovedDocumentValue,
+} from "../data/approvedDocuments";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import {
   APPROVED_DOCUMENT_VALUES,
   type ApprovedDocumentValue,
 } from "../data/approvedDocuments";
+import "./css/ServiceCanadaCentreIDVCodePage.print.css";
 
 type ServiceCanadaCentreIDVCodePageLocationState = {
   idvCode?: string;
@@ -32,6 +38,17 @@ const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
 const isApprovedDocumentValue = (
   value: string,
 ): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
+
+const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
+
+const isApprovedDocumentValue = (
+  value: string,
+): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
+
+const formatCodeWithHyphens = (code: string): string => {
+  const normalizedCode = code.replace(/-/g, "").trim();
+  return normalizedCode.match(/.{1,3}/g)?.join("-") ?? normalizedCode;
+};
 
 export default function ServiceCanadaCentreIDVCodePage() {
   const { state } = useUser();
@@ -50,6 +67,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
     (location.state as ServiceCanadaCentreIDVCodePageLocationState | null) ??
     null;
   const idvCode = locationState?.idvCode ?? null;
+  const formattedIdvCode = idvCode ? formatCodeWithHyphens(idvCode) : null;
   const verificationExpiresAt = locationState?.verificationExpiresAt;
   const verificationValidityDays = locationState?.verificationValidityDays;
   const firstName = locationState?.firstName?.trim() || "--";
@@ -110,7 +128,9 @@ export default function ServiceCanadaCentreIDVCodePage() {
         validityDays: verificationValidityDays ?? 30,
       });
 
-  const handlePrintPage = () => {};
+  const handlePrintPage = () => {
+    window.print();
+  };
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -121,17 +141,24 @@ export default function ServiceCanadaCentreIDVCodePage() {
   }
 
   return (
-    <GcdsContainer role="main">
+    <GcdsContainer role="main" className="service-canada-idv-code-page">
       <GcdsGrid columns="1" gap="450">
+        <div className="service-canada-print-banner">
+          <img
+            src={governmentBannerImage}
+            alt={t("ServiceCanadaCentreCode.printBannerAlt")}
+            className="service-canada-print-banner-image"
+          />
+        </div>
+
         <GcdsHeading tag="h1" marginTop="0">
           {t("ServiceCanadaCentreCode.heading")}
         </GcdsHeading>
 
         <GcdsHeading tag="h2" marginBottom="0" marginTop="0">
-          <strong>{idvCode}</strong>
+          <strong>{formattedIdvCode}</strong>
         </GcdsHeading>
         <GcdsContainer>
-          {" "}
           <GcdsText>
             {codeValidityText} <strong>{email}</strong>.
           </GcdsText>
@@ -150,7 +177,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
           <GcdsContainer>
             <GcdsGrid columns="1" gap="150">
               <div>
-                <GcdsText marginTop="300" marginBottom="0">
+                <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.firstName")}</strong>
                 </GcdsText>
                 <GcdsText marginTop="200" marginBottom="0">
@@ -161,7 +188,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
               <div className="separator" style={{ margin: "0" }} />
 
               <div>
-                <GcdsText>
+                <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.lastName")}</strong>
                 </GcdsText>
                 <GcdsText marginTop="200" marginBottom="0">
@@ -193,7 +220,10 @@ export default function ServiceCanadaCentreIDVCodePage() {
 
               <div className="separator" style={{ margin: "0" }} />
 
-              <div style={{ marginTop: "1.5rem" }}>
+              <div
+                className="service-canada-print-hide"
+                style={{ marginTop: "1.5rem" }}
+              >
                 <GcdsGrid
                   columns="1"
                   columnsDesktop="max-content max-content"
@@ -232,7 +262,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
             {
               //TODO: populate with real URL once available
             }
-            <GcdsLink href={"#"} external={true}>
+            <GcdsLink href="#" external>
               {t("ServiceCanadaCentreCode.findNearestLink")}
             </GcdsLink>
             .

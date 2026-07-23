@@ -21,7 +21,8 @@
     "noPhoneAdded": "Aucun numéro de téléphone de contact n'a été ajouté",
     "addPhoneNumber": "Ajouter un numéro de téléphone",
     "maintenanceTitle": "Maintenance",
-    "maintenanceNoticeBody": "Cette page est en cours de maintenance, la modification de vos renseignements sera à nouveau disponible sous peu."
+    "maintenanceNoticeBody": "Cette page est en cours de maintenance, la modification de vos renseignements sera à nouveau disponible sous peu.",
+    "successNoticeTitle": "Vos renseignements ont été mis à jour avec succès dans ConnexionCanada"
   },
   "ProvenInformationCard": {
     "name": "Nom",

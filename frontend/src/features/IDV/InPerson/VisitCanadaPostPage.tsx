@@ -288,7 +288,7 @@ export default function VisitCanadaPost() {
                       defaultValue={t(
                         "ServiceCanadaCentre.selectIdDropdownDefaultValue",
                       )}
-                      label={t("ServiceCanadaCentre.proviceLabel")}
+                      label={t("ServiceCanadaCentre.provinceLabel")}
                       required
                       errorMessage={provinceErrorMessage}
                       onGcdsChange={createChangeHandler("province")}
