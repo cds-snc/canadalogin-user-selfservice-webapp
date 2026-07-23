@@ -17,10 +17,6 @@ import {
 } from "../data/approvedDocuments";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import {
-  APPROVED_DOCUMENT_VALUES,
-  type ApprovedDocumentValue,
-} from "../data/approvedDocuments";
 
 type ServiceCanadaCentreIDVCodePageLocationState = {
   idvCode?: string;

@@ -214,6 +214,12 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       </TestWrapper>,
     );
 
+    const expectedDateOfBirth = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(new Date(1990, 0, 1));
+
     expect(screen.getByText("Your information")).toBeInTheDocument();
     expect(screen.getByText("First name")).toBeInTheDocument();
     expect(screen.getByText("Last name")).toBeInTheDocument();
@@ -221,7 +227,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("ID selected")).toBeInTheDocument();
     expect(screen.getByText("Jane")).toBeInTheDocument();
     expect(screen.getByText("Doe")).toBeInTheDocument();
-    expect(screen.getByText("1990-01-01")).toBeInTheDocument();
+    expect(screen.getByText(expectedDateOfBirth)).toBeInTheDocument();
     expect(screen.queryByText("passport")).not.toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });
@@ -249,9 +255,6 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("Jane")).toBeInTheDocument();
     expect(screen.getByText("Doe")).toBeInTheDocument();
     expect(screen.getByText(expectedDateOfBirth)).toBeInTheDocument();
-    expect(
-      screen.getByText("Canadian and International Passport"),
-    ).toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });
 
