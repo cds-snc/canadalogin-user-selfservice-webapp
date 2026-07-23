@@ -30,13 +30,6 @@ export default function ConfirmIdentityDetails() {
     localizedDetail?.name ??
     rpInfo?.linkName ??
     t("StartIdentityProofing.fallbackRpName");
-  const hasRpDetails = Boolean(localizedDetail?.name || rpInfo?.linkName);
-  const successNoticeTitle = hasRpDetails
-    ? t("ConfirmIdentityDetails.successNoticeTitle")
-    : t("ConfirmIdentityDetails.noRpSuccessNoticeTitle");
-  const successNoticeDescription = hasRpDetails
-    ? t("ConfirmIdentityDetails.successNoticeDescription", { rpName })
-    : t("ConfirmIdentityDetails.noRpSuccessNoticeDescription");
 
   const redirectToRelyingParty = async () => {
     try {
@@ -73,9 +66,11 @@ export default function ConfirmIdentityDetails() {
           <GcdsNotice
             noticeRole="success"
             noticeTitleTag="h2"
-            noticeTitle={successNoticeTitle}
+            noticeTitle={t("ConfirmIdentityDetails.successNoticeTitle")}
           >
-            <GcdsText>{successNoticeDescription}</GcdsText>
+            <GcdsText>{t("ConfirmIdentityDetails.successNoticeDescription",
+              { rpName })}
+            </GcdsText>
           </GcdsNotice>
         </GcdsContainer>
 
