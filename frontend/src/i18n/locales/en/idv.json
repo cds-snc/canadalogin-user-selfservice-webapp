@@ -18,31 +18,38 @@
   "ServiceCanadaCentre": {
     "heading": "Get ready to visit a Service Canada Centre",
     "followSteps": "Follow the steps to complete the process",
-    "step1": "Select and enter your ID details",
-    "step2": "Get your unique identification code; clicking Continue below will generate your code and send it to your email. It's valid for 30 days.",
-    "step3": "Visit your nearest Service Canada Centre, bring your code and one valid government-issued photo ID.",
+    "step1": "Select your ID type and enter the details.",
+    "step2": "Get a unique code sent to your email, valid for 30 days.",
+    "step3": "Bring your code and selected photo ID to any Service Canada Centre.",
+    "step4": "A service agent will verify your identity, once done, sign back in to {{rpName}} to continue.",
+    "fallbackRpName": "RP Name",
     "enterDetailsHeading": "Enter your ID details",
     "continueButton": "Continue",
-    "backButton": "Back",
+    "chooseDifferentMethodButton": "Choose a different method",
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about Service Canada Centre identity proofing",
     "selectIdLabel": "What ID do you have?",
     "selectIdDropdownDefaultValue": "Select option",
     "driverLicenceOption": "Provincial/Territorial Driver’s Licence",
     "photoIDHealthCardOption": "Provincial/Territorial Photo ID Health Card",
-    "photoIDServiceCardOption": "Provincial/Territorial Photo ID Service Card",
+    "photoIDServiceCardOption": "Provincial/Territorial Photo ID/Service Card",
     "passportOption": "Canadian and International Passport",
-    "canadianPRCardOption": "Canadian PR Card",
+    "canadianPRCardOption": "Canadian PR Cards",
     "indianStatusOption": "Secure Certificate of Indian Status",
     "noIds": "I don’t have any of these IDs",
+    "idHint": "You will need to bring this ID to your in-person visit",
     "idExpirationLabel": "When does it expire?",
     "enterDetailsIdHeading": "Enter your details as shown on the ID",
     "firstNameLabel": "First Name",
+    "firstNameHint": "Must match what is on your official ID",
     "lastNameLabel": "Last Name",
+    "lastNameHint": "Must match what is on your official ID",
     "dateOfBirthdayLabel": "Date of birth",
     "addressLabel": "Address",
     "addressHint": "Enter your street address",
-    "proviceLabel": "Province/ State"
+    "provinceLabel": "Province/ Territory",
+    "postalcodeLabel": "Postal Code",
+    "postalcodeHint": "Enter your postal code"
   },
   "ServiceCanadaCentreCode": {
     "heading": "Your unique code for identity proofing at Service Canada Centre",
@@ -54,6 +61,7 @@
     "lastName": "Last name",
     "dateOfBirth": "Date of birth",
     "idSelected": "ID selected",
+    "printBannerAlt": "Government of Canada",
     "printPageButton": "Print page",
     "updateInformationButton": "Update information",
     "findNearestTitle": "Find your nearest Service Canada Centre",
@@ -119,6 +127,12 @@
     "backButton": "Back",
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about provincial identity proofing"
+  },
+  "ProvincialVerificationConnected": {
+    "pageTitle": "Prove your identity",
+    "heading": "Your CanadaLogin account is now connected to your BC Service Card",
+    "body": "Continue to confirm your verified identity details.",
+    "continueButton": "Continue"
   },
   "ProveIdentityOnline": {
     "heading": "Prove your identity online",
@@ -223,13 +237,22 @@
     "communication": "Communication",
     "confirmAndContinue": "Confirm and continue",
     "successNoticeTitle": "Your identity information was successfully verified and proofing is complete.",
-    "successNoticeDescription": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access."
+    "successNoticeDescription": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access.",
+    "successNoticeTitleWithoutRp": "Your CanadaLogin has succesfully saved your changes",
+    "successNoticeDescriptionWithoutRp": "Continue with accessing the service"
   },
   "IdentityVerificationSuccess": {
     "pageTitle": "Prove your identity",
-    "heading": "Identity proofing is complete",
+    "heading": "Your identity information was successfully verified and you can use your account to sign in to CanadaLogin.",
     "continueButton": "Continue",
     "moreInfoTitle": "Your identity information was successfully verified, and proofing is now complete.",
     "moreInfoBody": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access."
+  },
+  "PartnerLinkSuccess": {
+    "pageTitle": "Prove your identity",
+    "heading": "Your CanadaLogin account is now connected to your {{partnerName}}",
+    "noticeTitle": "You can also use your {{partnerName}} to sign in",
+    "noticeText": "We've linked your account sign in methods so you can now use your {{partnerName}} to sign in or recover your account in addition to your selected sign in method.",
+    "continueButton": "Continue"
   }
 }

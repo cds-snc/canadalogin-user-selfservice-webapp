@@ -23,15 +23,23 @@ import { path } from "../../utils/routeHelpers";
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation("idv");
-  const { t: tLayout } = useTranslation("layout");
   const { language, journeyType } = useParams();
   const { state } = useUser();
 
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
-  const localizedDetail = state.relyingPartyInfo?.localized?.[i18n.language];
-  const fallbackRedirectUrl =
-    localizedDetail?.url ?? state.relyingPartyInfo?.url ?? "/";
+  const rpInfo = state.relyingPartyInfo;
+  const localizedDetail = rpInfo?.localized?.[i18n.language];
+  const rpName = localizedDetail?.name ?? rpInfo?.linkName;
+  const fallbackRedirectUrl = localizedDetail?.url ?? rpInfo?.url ?? "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
+  const hasRpService = Boolean(rpName);
+
+  const successNoticeTitleKey = hasRpService
+    ? "ConfirmIdentityDetails.successNoticeTitle"
+    : "ConfirmIdentityDetails.successNoticeTitleWithoutRp";
+  const successNoticeDescriptionKey = hasRpService
+    ? "ConfirmIdentityDetails.successNoticeDescription"
+    : "ConfirmIdentityDetails.successNoticeDescriptionWithoutRp";
 
   const redirectToRelyingParty = async () => {
     try {
@@ -68,12 +76,10 @@ export default function ConfirmIdentityDetails() {
           <GcdsNotice
             noticeRole="success"
             noticeTitleTag="h2"
-            noticeTitle={t("ConfirmIdentityDetails.successNoticeTitle")}
+            noticeTitle={t(successNoticeTitleKey)}
           >
             <GcdsText>
-              {t("ConfirmIdentityDetails.successNoticeDescription", {
-                appName: tLayout("TopNavBar.appName"),
-              })}
+              {t(successNoticeDescriptionKey, { appName: rpName })}
             </GcdsText>
           </GcdsNotice>
         </GcdsContainer>
