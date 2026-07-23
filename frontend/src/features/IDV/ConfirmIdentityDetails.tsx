@@ -68,8 +68,8 @@ export default function ConfirmIdentityDetails() {
             noticeTitleTag="h2"
             noticeTitle={t("ConfirmIdentityDetails.successNoticeTitle")}
           >
-            <GcdsText>{t("ConfirmIdentityDetails.successNoticeDescription",
-              { rpName })}
+            <GcdsText>
+              {t("ConfirmIdentityDetails.successNoticeDescription", { rpName })}
             </GcdsText>
           </GcdsNotice>
         </GcdsContainer>
