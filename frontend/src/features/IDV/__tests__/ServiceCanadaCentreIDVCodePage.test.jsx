@@ -193,7 +193,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText(/has been emailed to/i)).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Visit a Service Canada Centre with your code and your passport.",
+        /Visit a Service Canada Centre with your code and your .*Passport\./,
       ),
     ).toBeInTheDocument();
   });
@@ -245,7 +245,9 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("Jane")).toBeInTheDocument();
     expect(screen.getByText("Doe")).toBeInTheDocument();
     expect(screen.getByText(expectedDateOfBirth)).toBeInTheDocument();
-    expect(screen.getByText("passport")).toBeInTheDocument();
+    expect(
+      screen.getByText("Canadian and International Passport"),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });
 

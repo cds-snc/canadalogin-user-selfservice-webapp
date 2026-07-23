@@ -12,6 +12,10 @@ import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+import {
+  APPROVED_DOCUMENT_VALUES,
+  type ApprovedDocumentValue,
+} from "../data/approvedDocuments";
 
 type ServiceCanadaCentreIDVCodePageLocationState = {
   idvCode?: string;
@@ -20,6 +24,12 @@ type ServiceCanadaCentreIDVCodePageLocationState = {
   dateOfBirth?: string;
   idType?: string;
 };
+
+const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
+
+const isApprovedDocumentValue = (
+  value: string,
+): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
 
 export default function ServiceCanadaCentreIDVCodePage() {
   const { state } = useUser();
@@ -72,7 +82,12 @@ export default function ServiceCanadaCentreIDVCodePage() {
       year: "numeric",
     }).format(parsedDate);
   })();
-  const idSelected = locationState?.idType?.trim() || "--";
+  const rawIdSelected = locationState?.idType?.trim() || "";
+  const idSelectedText = rawIdSelected
+    ? isApprovedDocumentValue(rawIdSelected)
+      ? t(`ApprovedDocuments.${rawIdSelected}`)
+      : rawIdSelected
+    : "--";
 
   const handlePrintPage = () => {};
 
@@ -101,7 +116,9 @@ export default function ServiceCanadaCentreIDVCodePage() {
             <strong>{email}</strong>.
           </GcdsText>
           <GcdsText marginBottom="0">
-            {t("ServiceCanadaCentreCode.visitInstruction", { idSelected })}
+            {t("ServiceCanadaCentreCode.visitInstruction", {
+              idSelected: idSelectedText,
+            })}
           </GcdsText>
         </GcdsContainer>
 
@@ -149,8 +166,8 @@ export default function ServiceCanadaCentreIDVCodePage() {
                 <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.idSelected")}</strong>
                 </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {idSelected}
+                      <GcdsText marginTop="200" marginBottom="0">
+                  {idSelectedText}
                 </GcdsText>
               </div>
 
