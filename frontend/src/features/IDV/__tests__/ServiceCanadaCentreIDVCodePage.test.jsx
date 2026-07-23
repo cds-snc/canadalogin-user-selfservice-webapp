@@ -226,6 +226,30 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       </TestWrapper>,
     );
 
+    expect(screen.getByText("Your information")).toBeInTheDocument();
+    expect(screen.getByText("First name")).toBeInTheDocument();
+    expect(screen.getByText("Last name")).toBeInTheDocument();
+    expect(screen.getByText("Date of birth")).toBeInTheDocument();
+    expect(screen.getByText("ID selected")).toBeInTheDocument();
+    expect(screen.getByText("Jane")).toBeInTheDocument();
+    expect(screen.getByText("Doe")).toBeInTheDocument();
+    expect(screen.getByText("1990-01-01")).toBeInTheDocument();
+    expect(
+      screen.getByText("Canadian and International Passport"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("passport")).not.toBeInTheDocument();
+    expect(screen.queryByText("Address")).not.toBeInTheDocument();
+  });
+
+  it("falls back to the raw id type when it is not a known approved document key", () => {
+    mockLocationState.idType = "Employee ID";
+
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
     const expectedDateOfBirth = new Intl.DateTimeFormat("en-US", {
       month: "long",
       day: "numeric",
@@ -244,18 +268,6 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       screen.getByText("Canadian and International Passport"),
     ).toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
-  });
-
-  it("falls back to the raw id type when it is not a known approved document key", () => {
-    mockLocationState.idType = "Employee ID";
-
-    render(
-      <TestWrapper>
-        <ServiceCanadaCentreIDVCodePage />
-      </TestWrapper>,
-    );
-
-    expect(screen.getByText("Employee ID")).toBeInTheDocument();
   });
 
   it("navigates back to service canada form when update information is clicked", () => {
