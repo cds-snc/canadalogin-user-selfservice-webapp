@@ -5,6 +5,7 @@ import ProfileHome from "../../../components/Manage/ProfileHome";
 
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
+let mockLocationState = null;
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -12,6 +13,7 @@ vi.mock("react-router", async () => {
     ...actual,
     useParams: () => ({ language: "en" }),
     useNavigate: () => mockNavigate,
+    useLocation: () => ({ state: mockLocationState }),
   };
 });
 
@@ -106,10 +108,16 @@ vi.mock(
   }),
 );
 
+vi.mock("../../../features/IDV/components/IdentityInfoSuccessNotice", () => ({
+  default: ({ showIDVSuccessNotice }) =>
+    showIDVSuccessNotice ? <div data-testid="idv-success-notice" /> : null,
+}));
+
 describe("ProfileHome", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
+    mockLocationState = null;
   });
 
   it("renders the main container with role=main", () => {
@@ -190,5 +198,43 @@ describe("ProfileHome", () => {
     expect(
       badges.some((b) => b.textContent === "Proven January 27, 2026"),
     ).toBe(true);
+  });
+
+  it("renders the IDV success notice when location state enables it and DEV_ONLY_FEATURE is true", () => {
+    mockLocationState = { showIDVSuccessNotice: true };
+    render(<ProfileHome />);
+    expect(screen.getByTestId("idv-success-notice")).toBeInTheDocument();
+  });
+
+  it("hides the complete identity proofing notice when location state enables success notice", () => {
+    mockLocationState = { showIDVSuccessNotice: true };
+    render(<ProfileHome />);
+    expect(screen.queryByTestId("idv-complete-notice")).not.toBeInTheDocument();
+  });
+
+  it("hides the IDV success notice when showIDVSuccessNotice is false", () => {
+    render(<ProfileHome />);
+    expect(screen.queryByTestId("idv-success-notice")).not.toBeInTheDocument();
+  });
+
+  it("shows only IdentityInfoSuccessNotice when location state enables success notice", () => {
+    mockLocationState = { showIDVSuccessNotice: true };
+    render(<ProfileHome />);
+    expect(screen.getByTestId("idv-success-notice")).toBeInTheDocument();
+    expect(screen.queryByTestId("idv-complete-notice")).not.toBeInTheDocument();
+  });
+
+  it("shows only CompleteIdentityProofingNotice when location state does not enable success notice", () => {
+    mockLocationState = { showIDVSuccessNotice: false };
+    render(<ProfileHome />);
+    expect(screen.getByTestId("idv-complete-notice")).toBeInTheDocument();
+    expect(screen.queryByTestId("idv-success-notice")).not.toBeInTheDocument();
+  });
+
+  it("hides the IDV success notice when DEV_ONLY_FEATURE is false", () => {
+    mockDevOnlyFeature = false;
+    mockLocationState = { showIDVSuccessNotice: true };
+    render(<ProfileHome />);
+    expect(screen.queryByTestId("idv-success-notice")).not.toBeInTheDocument();
   });
 });

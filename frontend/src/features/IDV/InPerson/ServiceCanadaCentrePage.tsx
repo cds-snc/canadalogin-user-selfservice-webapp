@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
+import { useUser } from "../../../components/Providers/useUser";
 import {
   AVAILABLE_LANGUAGES,
   CANADIAN_PROVINCES_AND_TERRITORIES,
@@ -24,12 +25,10 @@ import {
 import { path } from "../../../utils/routeHelpers";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 import {
-  getAddressRequiredMessage,
   getFirstNameRequiredOrInvalidMessage,
   getIdExpiryRequiredMessage,
   getIdTypeRequiredMessage,
   getLastNameRequiredOrInvalidMessage,
-  getProvinceRequiredMessage,
   getSharedDateOfBirthMessages,
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
@@ -56,9 +55,14 @@ export default function ServiceCanadaCentrePage() {
     dateOfBirth: "",
     address: "",
     province: "",
+    postalcode: "",
   });
 
-  const { t } = useTranslation("idv");
+  const { t, i18n } = useTranslation("idv");
+  const { state } = useUser();
+  const rpInfo = state.relyingPartyInfo;
+  const localizedDetail = rpInfo?.localized?.[i18n.language];
+  const rpName = localizedDetail?.name ?? rpInfo?.linkName;
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,
@@ -119,14 +123,6 @@ export default function ServiceCanadaCentrePage() {
       dateOfBirthMessages[summaryErrorCodes.dateOfBirth].summary;
   }
 
-  if (summaryErrorCodes.address) {
-    summaryErrors["#address-input"] = getAddressRequiredMessage(t);
-  }
-
-  if (summaryErrorCodes.province) {
-    summaryErrors["#select-province"] = getProvinceRequiredMessage(t);
-  }
-
   const idTypeErrorMessage =
     hasSubmitted && summaryErrorCodes.idType ? getIdTypeRequiredMessage(t) : "";
 
@@ -148,16 +144,6 @@ export default function ServiceCanadaCentrePage() {
   const dateOfBirthErrorMessage =
     (isDateOfBirthTouched || hasSubmitted) && dateOfBirthValidationError
       ? dateOfBirthMessages[dateOfBirthValidationError].inline
-      : "";
-
-  const addressErrorMessage =
-    hasSubmitted && summaryErrorCodes.address
-      ? getAddressRequiredMessage(t)
-      : "";
-
-  const provinceErrorMessage =
-    hasSubmitted && summaryErrorCodes.province
-      ? getProvinceRequiredMessage(t)
       : "";
 
   const onContinue = async () => {
@@ -220,23 +206,32 @@ export default function ServiceCanadaCentrePage() {
             <GcdsText>
               <strong>{t("ServiceCanadaCentre.followSteps")}</strong>
             </GcdsText>
-            <ol>
-              <li>
-                <GcdsText marginBottom="0">
-                  {t("ServiceCanadaCentre.step1")}
-                </GcdsText>
-              </li>
-              <li>
-                <GcdsText marginBottom="0">
-                  {t("ServiceCanadaCentre.step2")}
-                </GcdsText>
-              </li>
-              <li>
-                <GcdsText marginBottom="0">
-                  {t("ServiceCanadaCentre.step3")}
-                </GcdsText>
-              </li>
-            </ol>
+            <GcdsText>
+              <ol>
+                <li>
+                  <GcdsText marginBottom="0">
+                    {t("ServiceCanadaCentre.step1")}
+                  </GcdsText>
+                </li>
+                <li>
+                  <GcdsText marginBottom="0">
+                    {t("ServiceCanadaCentre.step2")}
+                  </GcdsText>
+                </li>
+                <li>
+                  <GcdsText marginBottom="0">
+                    {t("ServiceCanadaCentre.step3")}
+                  </GcdsText>
+                </li>
+                <li>
+                  <GcdsText marginBottom="0">
+                    {t("ServiceCanadaCentre.step4", {
+                      rpName: rpName ?? t("ServiceCanadaCentre.fallbackRpName"),
+                    })}
+                  </GcdsText>
+                </li>
+              </ol>
+            </GcdsText>
           </GcdsContainer>
 
           <GcdsFieldset
@@ -250,6 +245,7 @@ export default function ServiceCanadaCentrePage() {
               selectId="selectId"
               value={formData.idType}
               required
+              hint={t("ServiceCanadaCentre.idHint")}
               errorMessage={idTypeErrorMessage}
               onGcdsChange={createChangeHandler("idType")}
               defaultValue={t(
@@ -287,6 +283,7 @@ export default function ServiceCanadaCentrePage() {
                   inputId="first-name-input"
                   name="first-name-input"
                   label={t("ServiceCanadaCentre.firstNameLabel")}
+                  hint={t("ServiceCanadaCentre.firstNameHint")}
                   errorMessage={firstNameErrorMessage}
                   onGcdsChange={createChangeHandler("firstName")}
                 />
@@ -296,6 +293,7 @@ export default function ServiceCanadaCentrePage() {
                   inputId="last-name-input"
                   name="last-name-input"
                   label={t("ServiceCanadaCentre.lastNameLabel")}
+                  hint={t("ServiceCanadaCentre.lastNameHint")}
                   errorMessage={lastNameErrorMessage}
                   onGcdsChange={createChangeHandler("lastName")}
                 />
@@ -312,13 +310,10 @@ export default function ServiceCanadaCentrePage() {
                 {showAddressAndProvinceFields && (
                   <>
                     <GcdsInput
-                      required
-                      id="address-input"
                       inputId="address-input"
                       name="address-input"
                       label={t("ServiceCanadaCentre.addressLabel")}
                       hint={t("ServiceCanadaCentre.addressHint")}
-                      errorMessage={addressErrorMessage}
                       onGcdsChange={createChangeHandler("address")}
                     />
 
@@ -329,10 +324,8 @@ export default function ServiceCanadaCentrePage() {
                       defaultValue={t(
                         "ServiceCanadaCentre.selectIdDropdownDefaultValue",
                       )}
-                      label={t("ServiceCanadaCentre.proviceLabel")}
-                      required
+                      label={t("ServiceCanadaCentre.provinceLabel")}
                       style={{ maxWidth: "100%" }}
-                      errorMessage={provinceErrorMessage}
                       onGcdsChange={createChangeHandler("province")}
                     >
                       {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
@@ -341,6 +334,13 @@ export default function ServiceCanadaCentrePage() {
                         </option>
                       ))}
                     </GcdsSelect>
+                    <GcdsInput
+                      inputId="postalcode-input"
+                      name="postalcode-input"
+                      label={t("ServiceCanadaCentre.postalcodeLabel")}
+                      hint={t("ServiceCanadaCentre.postalcodeHint")}
+                      onGcdsChange={createChangeHandler("postalcode")}
+                    />
                   </>
                 )}
               </GcdsFieldset>
@@ -362,7 +362,7 @@ export default function ServiceCanadaCentrePage() {
                 navigate(-1);
               }}
             >
-              {t("ServiceCanadaCentre.backButton")}
+              {t("ServiceCanadaCentre.chooseDifferentMethodButton")}
             </GcdsButton>
           </GcdsGrid>
 

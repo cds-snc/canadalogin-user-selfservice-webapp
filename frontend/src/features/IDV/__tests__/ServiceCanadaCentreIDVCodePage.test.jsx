@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ServiceCanadaCentreIDVCodePage from "../InPerson/ServiceCanadaCentreIDVCodePage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 
@@ -119,6 +119,15 @@ const TestWrapper = ({ children }) => (
   </BrowserRouter>
 );
 
+const originalDocumentTitle = document.title;
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  document.title = originalDocumentTitle;
+  document.head.innerHTML = "";
+  document.body.innerHTML = "";
+});
+
 describe("ServiceCanadaCentreIDVCodePage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -146,14 +155,26 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the idvCode from location state", () => {
+  it("renders the idvCode with hyphens every three characters", () => {
     render(
       <TestWrapper>
         <ServiceCanadaCentreIDVCodePage />
       </TestWrapper>,
     );
 
-    expect(screen.getByText("ABC123XYZ")).toBeInTheDocument();
+    expect(screen.getByText("ABC-123-XYZ")).toBeInTheDocument();
+  });
+
+  it("formats codes whose length is not divisible by three", () => {
+    mockLocationState.idvCode = "ABCDE";
+
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText("ABC-DE")).toBeInTheDocument();
   });
 
   it("redirects to the previous step when idvCode is missing", async () => {
@@ -198,33 +219,31 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the find nearest Service Canada Centre notice", () => {
-    render(
-      <TestWrapper>
-        <ServiceCanadaCentreIDVCodePage />
-      </TestWrapper>,
-    );
-
-    expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
-    expect(
-      screen.getByText("Find your nearest Service Canada Centre"),
-    ).toBeInTheDocument();
-  });
-
-  it("renders the external link to find a Service Canada Centre", () => {
-    render(
-      <TestWrapper>
-        <ServiceCanadaCentreIDVCodePage />
-      </TestWrapper>,
-    );
-
-    const link = screen.getByTestId("gcds-link");
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute("href", "#");
-    expect(link).toHaveTextContent("Service Canada Centre near you");
-  });
-
   it("renders the your information details without address", () => {
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText("Your information")).toBeInTheDocument();
+    expect(screen.getByText("First name")).toBeInTheDocument();
+    expect(screen.getByText("Last name")).toBeInTheDocument();
+    expect(screen.getByText("Date of birth")).toBeInTheDocument();
+    expect(screen.getByText("ID selected")).toBeInTheDocument();
+    expect(screen.getByText("Jane")).toBeInTheDocument();
+    expect(screen.getByText("Doe")).toBeInTheDocument();
+    expect(screen.getByText("1990-01-01")).toBeInTheDocument();
+    expect(
+      screen.getByText("Canadian and International Passport"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("passport")).not.toBeInTheDocument();
+    expect(screen.queryByText("Address")).not.toBeInTheDocument();
+  });
+
+  it("falls back to the raw id type when it is not a known approved document key", () => {
+    mockLocationState.idType = "Employee ID";
+
     render(
       <TestWrapper>
         <ServiceCanadaCentreIDVCodePage />
@@ -265,7 +284,9 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     );
   });
 
-  it("renders print page button and clicking it does not navigate", () => {
+  it("renders print page button, calls window.print, and does not navigate", () => {
+    const printSpy = vi.spyOn(window, "print").mockImplementation(() => {});
+
     render(
       <TestWrapper>
         <ServiceCanadaCentreIDVCodePage />
@@ -276,6 +297,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(printButton).toBeInTheDocument();
 
     fireEvent.click(printButton);
+    expect(printSpy).toHaveBeenCalledTimes(1);
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 

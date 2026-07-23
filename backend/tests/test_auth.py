@@ -89,6 +89,10 @@ class FakeConfig:
     def __init__(self, env="prod", domain="pm.example.com"):
         self.ENVIRONMENT = env
         self.PROFILE_MANAGEMENT_DOMAIN = domain
+        self.ibm_verify_config = SimpleNamespace(
+            IBM_VERIFY_TENANT_URL="https://tenant.example.com",
+            IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID="provincial-partners-id",
+        )
 
 
 class FakeSessionHandler:
@@ -228,9 +232,15 @@ def app(monkeypatch, mock_token_transport):
 
     # Login and Reauth entry points
     @base.get("/login")
-    async def login(request: Request, returnToPage: str | None = None):
+    async def login(
+        request: Request,
+        returnToPage: str | None = None,
+        partner: str | None = None,
+    ):
         return await auth_module.redirect_user_to_idp_verify(
-            request, returnToPage=returnToPage
+            request,
+            returnToPage=returnToPage,
+            partner=partner,
         )
 
     @base.get("/reauth")
@@ -344,16 +354,63 @@ async def test_login_does_not_set_return_to_page_for_language_root(app, client):
 
 
 @pytest.mark.asyncio
+async def test_login_passes_identity_source_id_for_bc_partner(app, client):
+    resp = await client.get(
+        "/login",
+        params={"partner": "bc"},
+        follow_redirects=False,
+    )
+    assert resp.status_code in (302, 307)
+    assert (
+        app.state.oauth_verify.last_authorize_redirect_kwargs.get("identity_source_id")
+        == "provincial-partners-id"
+    )
+    assert resp.headers["location"].startswith(
+        "https://tenant.example.com/auth/provincial-partners-id?Target="
+    )
+    assert "app_login=false" in resp.headers["location"]
+
+
+@pytest.mark.asyncio
+async def test_login_rejects_unknown_partner(app, client):
+    resp = await client.get(
+        "/login",
+        params={"partner": "unknown"},
+        follow_redirects=False,
+    )
+
+    assert resp.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_login_rejects_unconfigured_partner(app, client, monkeypatch):
+    cfg = FakeConfig(env="prod", domain="pm.example.com")
+    cfg.ibm_verify_config.IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID = None
+
+    monkeypatch.setattr(
+        auth_module,
+        "get_configuration",
+        lambda: cfg,
+        raising=True,
+    )
+
+    resp = await client.get(
+        "/login",
+        params={"partner": "bc"},
+        follow_redirects=False,
+    )
+
+    assert resp.status_code == 503
+
+
+@pytest.mark.asyncio
 async def test_callback_handler_success_flow_sets_session_and_redirects(app, client):
     # Seed session with RETURN_TO_PAGE so the final redirect includes it
     await client.get("/seed-session", params={"path": "/dashboard"})
     resp = await client.get("/auth/callback", follow_redirects=False)
 
     assert resp.status_code in (302, 307)
-    assert (
-        resp.headers["location"]
-        == "https://pm.example.com/dashboard?returnToPage=%2Fdashboard"
-    )
+    assert resp.headers["location"] == "https://pm.example.com/dashboard"
 
     # returnToPage is one-time and should be consumed by callback_handler
     dump = await client.get("/session-dump")

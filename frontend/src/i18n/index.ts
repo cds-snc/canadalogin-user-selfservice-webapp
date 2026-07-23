@@ -122,6 +122,7 @@ export const PAGE_NAMESPACE_MAP: Record<string, I18nNamespace> = {
   IdvInPersonProofingInProgressPage: "idv",
   IdvProvincialVerificationPage: "idv",
   IdvDetailsConfirmationPage: "idv",
+  IdvPartnerLinkSuccessPage: "idv",
 };
 
 i18n.use(initReactI18next).init({
