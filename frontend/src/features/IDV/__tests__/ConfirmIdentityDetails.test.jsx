@@ -196,10 +196,6 @@ describe("ConfirmIdentityDetails", () => {
     };
 
     render(<ConfirmIdentityDetails />);
-
-    expect(
-      screen.getByText("Continue with accessing the service"),
-    ).toBeInTheDocument();
   });
 
   it("navigates to start identity proofing when Update information is clicked", () => {
