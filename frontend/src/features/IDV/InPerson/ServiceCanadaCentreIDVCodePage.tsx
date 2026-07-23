@@ -17,10 +17,10 @@ import {
 } from "../data/approvedDocuments";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import {
+/* import {
   APPROVED_DOCUMENT_VALUES,
   type ApprovedDocumentValue,
-} from "../data/approvedDocuments";
+} from "../data/approvedDocuments"; */
 import "./css/ServiceCanadaCentreIDVCodePage.print.css";
 
 type ServiceCanadaCentreIDVCodePageLocationState = {
@@ -39,12 +39,12 @@ const isApprovedDocumentValue = (
   value: string,
 ): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
 
-const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
+// const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
 
-const isApprovedDocumentValue = (
+/* const isApprovedDocumentValue = (
   value: string,
 ): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
-
+ */
 const formatCodeWithHyphens = (code: string): string => {
   const normalizedCode = code.replace(/-/g, "").trim();
   return normalizedCode.match(/.{1,3}/g)?.join("-") ?? normalizedCode;
