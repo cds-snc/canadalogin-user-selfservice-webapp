@@ -186,7 +186,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
                 <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ServiceCanadaCentreCode.idSelected")}</strong>
                 </GcdsText>
-                      <GcdsText marginTop="200" marginBottom="0">
+                <GcdsText marginTop="200" marginBottom="0">
                   {idSelectedText}
                 </GcdsText>
               </div>
