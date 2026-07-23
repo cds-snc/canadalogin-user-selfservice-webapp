@@ -34,6 +34,11 @@ const isApprovedDocumentValue = (
   value: string,
 ): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
 
+const formatCodeWithHyphens = (code: string): string => {
+  const normalizedCode = code.replace(/-/g, "").trim();
+  return normalizedCode.match(/.{1,3}/g)?.join("-") ?? normalizedCode;
+};
+
 export default function ServiceCanadaCentreIDVCodePage() {
   const { state } = useUser();
   const { language, journeyType } = useParams();
@@ -139,7 +144,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
         </GcdsHeading>
 
         <GcdsHeading tag="h2" marginBottom="0" marginTop="0">
-          <strong>{idvCode}</strong>
+          <strong>{formattedIdvCode}</strong>
         </GcdsHeading>
         <GcdsContainer>
           <GcdsText>
