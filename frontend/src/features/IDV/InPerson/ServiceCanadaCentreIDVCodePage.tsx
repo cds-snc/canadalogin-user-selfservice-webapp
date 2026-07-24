@@ -39,12 +39,6 @@ const isApprovedDocumentValue = (
   value: string,
 ): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
 
-// const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
-
-/* const isApprovedDocumentValue = (
-  value: string,
-): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
- */
 const formatCodeWithHyphens = (code: string): string => {
   const normalizedCode = code.replace(/-/g, "").trim();
   return normalizedCode.match(/.{1,3}/g)?.join("-") ?? normalizedCode;
