@@ -116,3 +116,4 @@ class OutboundIDVClient:
                 exc,
                 context=f"{PROVIDER_NAME} {context}",
             )
+        raise
