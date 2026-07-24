@@ -1,5 +1,6 @@
 import json
 import importlib
+import sys
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -551,3 +552,16 @@ def test_import_surface_modules_and_exports() -> None:
     assert hasattr(services_module, "IDVDataServiceClient")
     assert hasattr(clients_module, "OutboundIDVClient")
     assert hasattr(services_exports, "IDVDataServiceClient")
+
+
+def test_services_module_reexport_lines_are_executed_for_coverage() -> None:
+    module_name = "app.idv_data_storage_service.services"
+
+    # Force a fresh import so module-level re-export lines execute within test runtime.
+    sys.modules.pop(module_name, None)
+    services_module = importlib.import_module(module_name)
+    services_module = importlib.reload(services_module)
+
+    assert services_module.__all__ == ["IDVDataServiceClient", "OutboundIDVClient"]
+    assert hasattr(services_module, "IDVDataServiceClient")
+    assert hasattr(services_module, "OutboundIDVClient")
