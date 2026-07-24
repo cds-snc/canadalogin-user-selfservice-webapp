@@ -10,6 +10,7 @@ from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.auth.services.auth_user_session import update_session_tokens
+from authlib.integrations.starlette_client import OAuthError
 
 logger = logging.getLogger(__name__)
 
@@ -159,12 +160,26 @@ async def callback_handler(request: Request):
         logger.info(f"Return to page set in session: {redirectValue}")
 
     logger.info("Verify Access Token Request")
-    oidc_response = await oauth.verify.authorize_access_token(request)
+    try:
+        oidc_response = await oauth.verify.authorize_access_token(request)
+    except OAuthError:
+        raise
+    except Exception:
+        logger.exception("Unexpected error during OIDC callback - to authorize_access_token")
+        raise
+    
     logger.info("OIDC Response received from IBM Verify")
+    oidc_userinfo = oidc_response.get("userinfo") or {}
+    oidc_session_id = oidc_userinfo.get("sid")
+    if not oidc_session_id:
+        raise OAuthError(
+            error="invalid_oidc_response",
+            description="Required sid claim is missing",
+        )
 
     # Get the handler and set your sid as session id. sid is uuid passed in id_token
     handler = get_session_handler(request)
-    new_session_id = oidc_response.get("userinfo").get("sid")
+    new_session_id = oidc_session_id
     handler.session_id = new_session_id
 
     update_session_tokens(request, oidc_response)
