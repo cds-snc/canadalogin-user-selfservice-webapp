@@ -233,7 +233,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("ID selected")).toBeInTheDocument();
     expect(screen.getByText("Jane")).toBeInTheDocument();
     expect(screen.getByText("Doe")).toBeInTheDocument();
-    expect(screen.getByText("1990-01-01")).toBeInTheDocument();
+    expect(screen.getByText(expectedDateOfBirth)).toBeInTheDocument();
     expect(screen.queryByText("passport")).not.toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });
