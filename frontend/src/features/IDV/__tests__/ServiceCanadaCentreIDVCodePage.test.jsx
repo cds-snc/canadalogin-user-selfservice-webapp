@@ -140,6 +140,12 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     mockLocationState.idType = "passport";
   });
 
+  const expectedDateOfBirth = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(1990, 0, 1));
+
   it("renders the main heading", () => {
     render(
       <TestWrapper>
@@ -225,12 +231,6 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
         <ServiceCanadaCentreIDVCodePage />
       </TestWrapper>,
     );
-
-    const expectedDateOfBirth = new Intl.DateTimeFormat("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    }).format(new Date(1990, 0, 1));
 
     expect(screen.getByText("Your information")).toBeInTheDocument();
     expect(screen.getByText("First name")).toBeInTheDocument();
