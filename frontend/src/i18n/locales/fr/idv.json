@@ -138,6 +138,12 @@
     "continueButton": "Continue",
     "backButton": "Back"
   },
+  "ProveIdentityInPerson": {
+    "heading": "Prove your identity in person",
+    "description": "You will only get access to this {{rpName}} after proving your identity in person and signing back in with your CanadaLogin.",
+    "continueButton": "Continue",
+    "backButton": "Back"
+  },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",
     "heading": "Get ready for selfie and ID check",

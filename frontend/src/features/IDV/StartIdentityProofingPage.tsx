@@ -86,7 +86,7 @@ export default function StartIdentityProofingPage() {
     language,
     journeyType,
   });
-  const visitCanadaPostPage = path(PAGES.idvVisitCanadaPostPage, {
+  const inPersonPage = path(PAGES.idvProveIdentityInPersonPage, {
     language,
     journeyType,
   });
@@ -118,7 +118,7 @@ export default function StartIdentityProofingPage() {
         navigate(onlineSelectionPage);
         break;
       case START_IDENTITY_OPTION.inPerson:
-        navigate(visitCanadaPostPage);
+        navigate(inPersonPage);
         break;
       case START_IDENTITY_OPTION.cantProveNow:
         navigate(cantProveIdentity);
