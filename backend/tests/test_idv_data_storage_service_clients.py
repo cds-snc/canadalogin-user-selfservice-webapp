@@ -6,11 +6,11 @@ import pytest
 from httpx import AsyncClient, HTTPStatusError, Request, Response
 
 from app.idv_data_storage_service.clients.claims import ClaimsClientMixin
-from app.idv_data_storage_service.clients.client import IDVDataServiceClient
+from app.idv_data_storage_service.client import IDVDataServiceClient
 from app.idv_data_storage_service.clients.metadata import MetadataClientMixin
 from app.idv_data_storage_service.clients.subjects import SubjectsClientMixin
 from app.idv_data_storage_service.clients.validations import ValidationsClientMixin
-from app.idv_data_storage_service.clients.endpoints import IDVDataServiceEndpoints
+from app.idv_data_storage_service.endpoints import IDVDataServiceEndpoints
 from app.idv_data_storage_service.config import IDVDataServiceConfig
 from app.idv_data_storage_service.schemas import (
     CreateValidationRequest,

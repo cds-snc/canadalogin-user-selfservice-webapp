@@ -4,7 +4,7 @@ from typing import Any
 
 from httpx import AsyncClient, HTTPError, Response
 
-from app.idv_data_storage_service.clients.endpoints import IDVDataServiceEndpoints
+from app.idv_data_storage_service.endpoints import IDVDataServiceEndpoints
 from app.idv_data_storage_service.config import IDVDataServiceConfig
 from app.idv_data_storage_service.schemas import RequestContext
 from app.utils.request_error_handler import RequestErrorHandler
