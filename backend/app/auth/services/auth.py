@@ -165,9 +165,11 @@ async def callback_handler(request: Request):
     except OAuthError:
         raise
     except Exception:
-        logger.exception("Unexpected error during OIDC callback - to authorize_access_token")
+        logger.exception(
+            "Unexpected error during OIDC callback - to authorize_access_token"
+        )
         raise
-    
+
     logger.info("OIDC Response received from IBM Verify")
     oidc_userinfo = oidc_response.get("userinfo") or {}
     oidc_session_id = oidc_userinfo.get("sid")
