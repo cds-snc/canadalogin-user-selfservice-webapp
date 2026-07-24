@@ -53,7 +53,10 @@ class OutboundIDVClient:
         content_type: str,
         accept: str | None = None,
     ) -> dict[str, str]:
-        headers: dict[str, str] = {"Content-Type": content_type}
+        headers: dict[str, str] = {
+            "Content-Type": content_type,
+            "Accept": accept or content_type,
+        }
 
         if accept:
             headers["Accept"] = accept
