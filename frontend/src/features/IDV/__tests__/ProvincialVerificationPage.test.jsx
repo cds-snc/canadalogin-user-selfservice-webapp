@@ -39,6 +39,10 @@ vi.mock("../../../assets/images/AB_card.png", () => ({
   default: "ab-card-stub.png",
 }));
 
+vi.mock("../../../assets/images/QC_card.png", () => ({
+  default: "qc-card-stub.png",
+}));
+
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
@@ -88,13 +92,12 @@ describe("ProvincialVerificationPage", () => {
     mockState.devOnlyFeature = true;
   });
 
-  it("renders the page title and main heading", () => {
+  it("renders the main heading", () => {
     render(<ProvincialVerificationPage />);
 
-    expect(screen.getByText("Prove your identity")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
-        name: "Get ready for provincial partner sign in",
+        name: "Get ready for provincial verification",
       }),
     ).toBeInTheDocument();
   });
@@ -107,20 +110,17 @@ describe("ProvincialVerificationPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders all three steps", () => {
+  it("renders both steps", () => {
     render(<ProvincialVerificationPage />);
 
     expect(
-      screen.getByText("Have your provincial partner app ready"),
-    ).toBeInTheDocument();
-    expect(
       screen.getByText(
-        "Select the appropriate option and follow the steps to prove your identity",
+        "Select the appropriate option and follow the steps to sign in and prove your identity",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Once the proofing is complete, you will be automatically redirected",
+        "Once the verification is complete, you will be automatically redirected",
       ),
     ).toBeInTheDocument();
   });
@@ -141,11 +141,21 @@ describe("ProvincialVerificationPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders both provincial partner cards", () => {
+  it("renders the Québec Government Authentication Service card", () => {
+    render(<ProvincialVerificationPage />);
+
+    expect(
+      screen.getByRole("heading", {
+        name: "Québec Government Authentication Service",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders three provincial partner cards", () => {
     render(<ProvincialVerificationPage />);
 
     const cards = screen.getAllByTestId("gcds-card");
-    expect(cards).toHaveLength(2);
+    expect(cards).toHaveLength(3);
   });
 
   it("renders the BC Services Card image", () => {
@@ -168,6 +178,16 @@ describe("ProvincialVerificationPage", () => {
     expect(abImage).toBeInTheDocument();
   });
 
+  it("renders the Quebec card image", () => {
+    const { container } = render(<ProvincialVerificationPage />);
+
+    const images = container.querySelectorAll("img");
+    const qcImage = Array.from(images).find((img) =>
+      img.getAttribute("src")?.includes("qc-card-stub.png"),
+    );
+    expect(qcImage).toBeInTheDocument();
+  });
+
   it("renders card images with descriptive alt text", () => {
     const { container } = render(<ProvincialVerificationPage />);
 
@@ -177,12 +197,15 @@ describe("ProvincialVerificationPage", () => {
     const alts = Array.from(images).map((img) => img.getAttribute("alt"));
     expect(alts).toContain("British Columbia Logo");
     expect(alts).toContain("Alberta Logo");
+    expect(alts).toContain("Québec Logo");
   });
 
   it("renders the Back button", () => {
     render(<ProvincialVerificationPage />);
 
-    expect(screen.getByTestId("back-button")).toHaveTextContent("Back");
+    expect(screen.getByTestId("back-button")).toHaveTextContent(
+      "Choose a different method",
+    );
   });
 
   it("calls navigate(-1) when Back button is clicked", () => {
@@ -212,16 +235,14 @@ describe("ProvincialVerificationPage", () => {
     render(<ProvincialVerificationPage />);
 
     expect(
-      screen.getByText("Learn more about provincial identity proofing"),
+      screen.getByText("Learn more about provincial verfication"),
     ).toBeInTheDocument();
   });
 
   it("renders the learn more link as an external link", () => {
     render(<ProvincialVerificationPage />);
 
-    const link = screen.getByText(
-      "Learn more about provincial identity proofing",
-    );
+    const link = screen.getByText("Learn more about provincial verfication");
     expect(link.closest("a")).toHaveAttribute("target", "_blank");
   });
 
