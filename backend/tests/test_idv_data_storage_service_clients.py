@@ -13,13 +13,15 @@ from app.idv_data_storage_service.clients.validations import ValidationsClientMi
 from app.idv_data_storage_service.endpoints import IDVDataServiceEndpoints
 from app.idv_data_storage_service.config import IDVDataServiceConfig
 from app.idv_data_storage_service.schemas import (
-    CreateValidationRequest,
-    RegisterSubjectRequest,
-    RevokeValidationRequest,
+    ClaimsIn,
+    QueryRequestPayload,
     RequestContext,
-    VerifiedClaimEntry,
-    VerifiedClaimNationality,
-    VerifiedClaimsQueryRequest,
+    RevokeValidationPayload,
+    SubjectData,
+    SubjectRegisterPayload,
+    SubmitValidationPayload,
+    VerificationIn,
+    VerifiedClaimsIn,
 )
 
 
@@ -162,17 +164,16 @@ async def test_get_subject_returns_typed_model(
         "GET",
         "https://idv.example.com/v1/subjects/subject-1",
         payload={
-            "id": "subject-1",
+            "subject_id": "subject-1",
             "external_sub": "user-123",
             "iss": "https://issuer.example.com",
             "created_at": "2026-01-01T00:00:00Z",
-            "updated_at": "2026-01-01T00:00:00Z",
         },
     )
 
     subject = await client.get_subject("subject-1")
 
-    assert subject.id == "subject-1"
+    assert subject.subject_id == "subject-1"
     assert subject.external_sub == "user-123"
 
 
@@ -241,26 +242,30 @@ async def test_register_subject_json_payload_and_response(
         "POST",
         "https://idv.example.com/v1/subjects",
         payload={
-            "id": "subject-2",
+            "subject_id": "subject-2",
             "external_sub": "user-456",
             "iss": "https://issuer.example.com",
             "created_at": "2026-01-01T00:00:00Z",
-            "updated_at": "2026-01-01T00:00:00Z",
         },
     )
 
-    payload = RegisterSubjectRequest(
-        external_sub="user-456",
-        iss="https://issuer.example.com",
+    payload = SubjectRegisterPayload(
+        iss="https://client.example.com",
+        aud="https://idv.example.com",
+        iat=1000000,
+        exp=1003600,
+        jti="jti-register-1",
+        subject=SubjectData(
+            external_sub="user-456",
+            iss="https://issuer.example.com",
+        ),
     )
     result = await client.register_subject_json(payload)
 
     sent_json = mock_http_client.request.call_args.kwargs["json"]
-    assert sent_json == {
-        "external_sub": "user-456",
-        "iss": "https://issuer.example.com",
-    }
-    assert result.id == "subject-2"
+    assert sent_json["subject"]["external_sub"] == "user-456"
+    assert sent_json["subject"]["iss"] == "https://issuer.example.com"
+    assert result.subject_id == "subject-2"
 
 
 @pytest.mark.asyncio
@@ -272,16 +277,15 @@ async def test_subjects_mixin_direct_invocation(
         "GET",
         "https://idv.example.com/v1/subjects/subject-direct",
         payload={
-            "id": "subject-direct",
+            "subject_id": "subject-direct",
             "external_sub": "user-direct",
             "iss": "https://issuer.example.com",
             "created_at": "2026-01-01T00:00:00Z",
-            "updated_at": "2026-01-01T00:00:00Z",
         },
     )
 
     result = await SubjectsClientMixin.get_subject(client, "subject-direct")
-    assert result.id == "subject-direct"
+    assert result.subject_id == "subject-direct"
 
 
 @pytest.mark.asyncio
@@ -356,11 +360,18 @@ async def test_revoke_validation_json_with_payload(
     result = await client.revoke_validation_json(
         "sub-1",
         "val-1",
-        RevokeValidationRequest(reason="subject_request", notes="requested deletion"),
+        RevokeValidationPayload(
+            iss="https://client.example.com",
+            aud="https://idv.example.com",
+            iat=1000000,
+            exp=1003600,
+            jti="jti-revoke-1",
+            revocation={"reason": "subject_request"},
+        ),
     )
 
     sent_json = mock_http_client.request.call_args.kwargs["json"]
-    assert sent_json["reason"] == "subject_request"
+    assert sent_json["revocation"]["reason"] == "subject_request"
     assert result.status == "revoked"
 
 
@@ -411,17 +422,22 @@ async def test_query_verified_claims_json_sends_typed_payload(
         payload={"verified_claims": {"given_name": "Jane"}},
     )
 
-    payload = VerifiedClaimsQueryRequest(
+    payload = QueryRequestPayload(
+        iss="https://client.example.com",
+        aud="https://idv.example.com",
+        iat=1000000,
+        exp=1003600,
+        jti="jti-query-1",
         sub="user-123",
         sub_iss="https://issuer.example.com",
-        requested_claims=VerifiedClaimEntry(given_name="Jane"),
+        verified_claims={"claims": {"given_name": None}},
     )
 
     response = await client.query_verified_claims_json(payload)
 
     sent_json = mock_http_client.request.call_args.kwargs["json"]
     assert sent_json["sub"] == "user-123"
-    assert sent_json["requested_claims"]["given_name"] == "Jane"
+    assert sent_json["sub_iss"] == "https://issuer.example.com"
     assert response.verified_claims is not None
     assert response.verified_claims.given_name == "Jane"
 
@@ -434,29 +450,24 @@ async def test_query_verified_claims_supports_nested_nationalities(
     mock_http_client.request.return_value = _build_httpx_response(
         "POST",
         "https://idv.example.com/v1/claims/query",
-        payload={
-            "verified_claims": {
-                "nationalities": [
-                    {"nationality_code": "CAN", "sort_order": 0},
-                ]
-            }
-        },
+        payload={"verified_claims": {"nationalities": ["CAN"]}},
     )
 
-    payload = VerifiedClaimsQueryRequest(
+    payload = QueryRequestPayload(
+        iss="https://client.example.com",
+        aud="https://idv.example.com",
+        iat=1000000,
+        exp=1003600,
+        jti="jti-query-2",
         sub="user-789",
         sub_iss="https://issuer.example.com",
-        requested_claims=VerifiedClaimEntry(
-            nationalities=[
-                VerifiedClaimNationality(nationality_code="CAN", sort_order=0)
-            ]
-        ),
+        verified_claims={"claims": {"nationalities": None}},
     )
 
     response = await client.query_verified_claims_json(payload)
 
     assert response.verified_claims is not None
-    assert response.verified_claims.nationalities[0].nationality_code == "CAN"
+    assert response.verified_claims.nationalities[0] == "CAN"
 
 
 @pytest.mark.asyncio
@@ -470,10 +481,15 @@ async def test_claims_mixin_direct_invocation(
         payload={"verified_claims": {"given_name": "Direct"}},
     )
 
-    payload = VerifiedClaimsQueryRequest(
+    payload = QueryRequestPayload(
+        iss="https://client.example.com",
+        aud="https://idv.example.com",
+        iat=1000000,
+        exp=1003600,
+        jti="jti-query-direct",
         sub="user-direct",
         sub_iss="https://issuer.example.com",
-        requested_claims=VerifiedClaimEntry(given_name="Direct"),
+        verified_claims={"claims": {"given_name": None}},
     )
     result = await ClaimsClientMixin.query_verified_claims_json(client, payload)
 
@@ -492,20 +508,30 @@ async def test_submit_validation_json_sends_verified_claims_object(
         payload={"validation_id": "val-1", "status": "active"},
     )
 
-    payload = CreateValidationRequest(
-        verified_claims=VerifiedClaimEntry(
-            given_name="Jane",
-            family_name="Doe",
-            birthdate="1990-06-15",
+    payload = SubmitValidationPayload(
+        iss="https://client.example.com",
+        aud="https://idv.example.com",
+        iat=1000000,
+        exp=1003600,
+        jti="jti-submit-1",
+        verified_claims=VerifiedClaimsIn(
+            verification=VerificationIn(trust_framework="nist_800_63A"),
+            claims=ClaimsIn(
+                given_name="Jane",
+                family_name="Doe",
+                birthdate="1990-06-15",
+            ),
         ),
-        verification={"trust_framework": "nist_800_63A"},
     )
 
     result = await client.submit_validation_json("sub-1", payload)
 
     sent_json = mock_http_client.request.call_args.kwargs["json"]
-    assert sent_json["verified_claims"]["given_name"] == "Jane"
-    assert sent_json["verification"]["trust_framework"] == "nist_800_63A"
+    assert (
+        sent_json["verified_claims"]["verification"]["trust_framework"]
+        == "nist_800_63A"
+    )
+    assert sent_json["verified_claims"]["claims"]["given_name"] == "Jane"
     assert result.validation_id == "val-1"
 
 

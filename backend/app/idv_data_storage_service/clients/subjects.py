@@ -1,13 +1,13 @@
 from app.idv_data_storage_service.schemas import (
-    RegisterSubjectRequest,
     SubjectErasureAcceptedResponse,
+    SubjectRegisterPayload,
     SubjectResponse,
 )
 
 
 class SubjectsClientMixin:
     async def register_subject_json(
-        self, payload: RegisterSubjectRequest, request_context=None
+        self, payload: SubjectRegisterPayload, request_context=None
     ) -> SubjectResponse:
         """JSON helper for local/dev flows before JWE/JWS is enforced."""
         context = self._resolve_context(request_context)

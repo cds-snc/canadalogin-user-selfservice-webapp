@@ -1,6 +1,6 @@
 from app.idv_data_storage_service.schemas import (
-    CreateValidationRequest,
-    RevokeValidationRequest,
+    RevokeValidationPayload,
+    SubmitValidationPayload,
     ValidationDetailResponse,
     ValidationListResponse,
 )
@@ -10,7 +10,7 @@ class ValidationsClientMixin:
     async def submit_validation_json(
         self,
         subject_id: str,
-        payload: CreateValidationRequest,
+        payload: SubmitValidationPayload,
         request_context=None,
     ) -> ValidationDetailResponse:
         context = self._resolve_context(request_context)
@@ -79,7 +79,7 @@ class ValidationsClientMixin:
         self,
         subject_id: str,
         validation_id: str,
-        payload: RevokeValidationRequest | None = None,
+        payload: RevokeValidationPayload | None = None,
         request_context=None,
     ) -> ValidationDetailResponse:
         collection_path = self._path(

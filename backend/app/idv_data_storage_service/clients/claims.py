@@ -1,5 +1,5 @@
 from app.idv_data_storage_service.schemas import (
-    VerifiedClaimsQueryRequest,
+    QueryRequestPayload,
     VerifiedClaimsQueryResponse,
 )
 
@@ -7,7 +7,7 @@ from app.idv_data_storage_service.schemas import (
 class ClaimsClientMixin:
     async def query_verified_claims_json(
         self,
-        payload: VerifiedClaimsQueryRequest,
+        payload: QueryRequestPayload,
         request_context=None,
     ) -> VerifiedClaimsQueryResponse:
         context = self._resolve_context(request_context)
