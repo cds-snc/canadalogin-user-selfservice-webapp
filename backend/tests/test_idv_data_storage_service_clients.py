@@ -1,12 +1,10 @@
 import json
 import importlib
-import sys
 from unittest.mock import AsyncMock, patch
 
 import pytest
 from httpx import AsyncClient, HTTPStatusError, Request, Response
 
-from app.idv_data_storage_service import services as services_exports
 from app.idv_data_storage_service.clients.claims import ClaimsClientMixin
 from app.idv_data_storage_service.clients.client import IDVDataServiceClient
 from app.idv_data_storage_service.clients.metadata import MetadataClientMixin
@@ -544,24 +542,8 @@ async def test_request_routes_http_errors_through_request_error_handler(
 
 def test_import_surface_modules_and_exports() -> None:
     package_module = importlib.import_module("app.idv_data_storage_service")
-    services_module = importlib.import_module("app.idv_data_storage_service.services")
     clients_module = importlib.import_module("app.idv_data_storage_service.clients")
 
     assert hasattr(package_module, "IDVDataServiceClient")
     assert hasattr(package_module, "IDVDataServiceConfig")
-    assert hasattr(services_module, "IDVDataServiceClient")
     assert hasattr(clients_module, "OutboundIDVClient")
-    assert hasattr(services_exports, "IDVDataServiceClient")
-
-
-def test_services_module_reexport_lines_are_executed_for_coverage() -> None:
-    module_name = "app.idv_data_storage_service.services"
-
-    # Force a fresh import so module-level re-export lines execute within test runtime.
-    sys.modules.pop(module_name, None)
-    services_module = importlib.import_module(module_name)
-    services_module = importlib.reload(services_module)
-
-    assert services_module.__all__ == ["IDVDataServiceClient", "OutboundIDVClient"]
-    assert hasattr(services_module, "IDVDataServiceClient")
-    assert hasattr(services_module, "OutboundIDVClient")
