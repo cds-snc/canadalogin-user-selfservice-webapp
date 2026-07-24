@@ -53,8 +53,8 @@
   },
   "ServiceCanadaCentreCode": {
     "heading": "Here is your unique identification code for your identity proofing",
-    "codeValidDays": "Ce code est valide pendant {{validityDays}} jours et a été envoyé par courriel à",
-    "codeValidDaysDynamic": "Ce code est valide pendant {{validityDays}} jours (expire le {{expiryDate}}) et a été envoyé par courriel à",
+    "codeValidDays": "This code is valid for {{validityDays}} days and has been emailed to",
+    "codeValidDaysDynamic": "This code is valid for {{validityDays}} days (expires {{expiryDate}}) and has been emailed to",
     "visitInstruction": "Visit a Service Canada Centre with your code and one valid ID document.",
     "yourInformationHeading": "Your information",
     "firstName": "First name",
