@@ -1,8 +1,13 @@
-from app.idv_data_storage_service.schemas import JwksResponse, OpenIDConfigurationResponse
+from app.idv_data_storage_service.schemas import (
+    JwksResponse,
+    OpenIDConfigurationResponse,
+)
 
 
 class MetadataClientMixin:
-    async def get_openid_configuration(self, request_context=None) -> OpenIDConfigurationResponse:
+    async def get_openid_configuration(
+        self, request_context=None
+    ) -> OpenIDConfigurationResponse:
         context = self._resolve_context(request_context)
         response = await self._request(
             method="GET",

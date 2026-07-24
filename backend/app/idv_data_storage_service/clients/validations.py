@@ -16,7 +16,9 @@ class ValidationsClientMixin:
         context = self._resolve_context(request_context)
         response = await self._request(
             method="POST",
-            path=self._path(self.endpoints.validations_by_subject, subject_id=subject_id),
+            path=self._path(
+                self.endpoints.validations_by_subject, subject_id=subject_id
+            ),
             request_context=context,
             context="submit validation (json)",
             json_payload=payload.model_dump(exclude_none=True),
@@ -39,11 +41,15 @@ class ValidationsClientMixin:
             "cursor": cursor,
             "limit": limit,
         }
-        query_params = {key: value for key, value in params.items() if value is not None}
+        query_params = {
+            key: value for key, value in params.items() if value is not None
+        }
         context = self._resolve_context(request_context)
         response = await self._request(
             method="GET",
-            path=self._path(self.endpoints.validations_by_subject, subject_id=subject_id),
+            path=self._path(
+                self.endpoints.validations_by_subject, subject_id=subject_id
+            ),
             request_context=context,
             context="list validations",
             query_params=query_params,
@@ -88,5 +94,5 @@ class ValidationsClientMixin:
             context="revoke validation (json)",
             json_payload=payload.model_dump(exclude_none=True) if payload else None,
         )
-        raw_payload = response.json() if response.content else {}
-        return ValidationDetailResponse.model_validate(raw_payload)
+        response_payload = response.json() if response.content else {}
+        return ValidationDetailResponse.model_validate(response_payload)

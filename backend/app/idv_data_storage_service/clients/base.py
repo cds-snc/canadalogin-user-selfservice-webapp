@@ -6,11 +6,11 @@ from httpx import AsyncClient, HTTPError, Response
 
 from app.idv_data_storage_service.clients.endpoints import IDVDataServiceEndpoints
 from app.idv_data_storage_service.config import IDVDataServiceConfig
-from app.idv_data_storage_service.schemas import ExternalProvider, RequestContext
+from app.idv_data_storage_service.schemas import RequestContext
 from app.utils.request_error_handler import RequestErrorHandler
 
-
 APPLICATION_JSON = "application/json"
+PROVIDER_NAME = "idv_data_service"
 
 
 class OutboundIDVClient:
@@ -28,9 +28,7 @@ class OutboundIDVClient:
         self.endpoints = IDVDataServiceEndpoints.from_config(config)
 
     def _default_context(self) -> RequestContext:
-        return self._request_context or RequestContext(
-            provider=ExternalProvider.IDV_DATA_SERVICE
-        )
+        return self._request_context or RequestContext()
 
     def with_context(self, request_context: RequestContext) -> "OutboundIDVClient":
         """Return a client instance bound to a request context.
@@ -91,10 +89,8 @@ class OutboundIDVClient:
         path: str,
         request_context: RequestContext,
         context: str,
-        content_type: str = APPLICATION_JSON,
         accept: str | None = None,
         json_payload: dict[str, Any] | None = None,
-        raw_payload: str | None = None,
         query_params: dict[str, Any] | None = None,
     ) -> Response:
         try:
@@ -103,18 +99,17 @@ class OutboundIDVClient:
                 url=self._build_absolute_url(path),
                 headers=self._build_headers(
                     request_context,
-                    content_type=content_type,
+                    content_type=APPLICATION_JSON,
                     accept=accept,
                 ),
                 params=query_params,
                 json=json_payload,
-                content=raw_payload,
                 timeout=self._config.IDV_DATA_SERVICE_TIMEOUT_SECONDS,
             )
             response.raise_for_status()
             return response
-        except HTTPError as exc:  # pragma: no cover - covered by shared handler tests
+        except HTTPError as exc:
             RequestErrorHandler.handle(
                 exc,
-                context=f"{request_context.provider.value} {context}",
+                context=f"{PROVIDER_NAME} {context}",
             )

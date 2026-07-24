@@ -6,7 +6,9 @@ from app.idv_data_storage_service.schemas import (
 
 
 class SubjectsClientMixin:
-    async def register_subject_json(self, payload: RegisterSubjectRequest, request_context=None) -> SubjectResponse:
+    async def register_subject_json(
+        self, payload: RegisterSubjectRequest, request_context=None
+    ) -> SubjectResponse:
         """JSON helper for local/dev flows before JWE/JWS is enforced."""
         context = self._resolve_context(request_context)
         response = await self._request(
@@ -18,7 +20,9 @@ class SubjectsClientMixin:
         )
         return SubjectResponse.model_validate(response.json())
 
-    async def get_subject(self, subject_id: str, request_context=None) -> SubjectResponse:
+    async def get_subject(
+        self, subject_id: str, request_context=None
+    ) -> SubjectResponse:
         context = self._resolve_context(request_context)
         response = await self._request(
             method="GET",
@@ -28,7 +32,9 @@ class SubjectsClientMixin:
         )
         return SubjectResponse.model_validate(response.json())
 
-    async def erase_subject_json(self, subject_id: str, request_context=None) -> SubjectErasureAcceptedResponse:
+    async def erase_subject_json(
+        self, subject_id: str, request_context=None
+    ) -> SubjectErasureAcceptedResponse:
         """Starts asynchronous subject erasure workflow and returns job metadata."""
         context = self._resolve_context(request_context)
         response = await self._request(
