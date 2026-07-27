@@ -97,9 +97,7 @@ export default function CompleteIdentityProofingPage() {
                 aria-label={t("CompleteIdentityProofing.listOfAcceptableIds")}
               >
                 {APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS.map((docValue) => (
-                  <li key={docValue}>
-                    {t(`ApprovedDocuments.${docValue}`)}
-                  </li>
+                  <li key={docValue}>{t(`ApprovedDocuments.${docValue}`)}</li>
                 ))}
               </ol>
             </GcdsDetails>
