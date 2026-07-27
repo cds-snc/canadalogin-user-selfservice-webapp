@@ -208,5 +208,5 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
     acr_value = "loa3_stepup"
     # Use acr_values for step-up authentication to require LOA3 level
     return await oauth.verify.authorize_redirect(
-            request, callback_redirect_uri, acr_values=acr_value
+        request, callback_redirect_uri, acr_values=acr_value
         )
