@@ -520,7 +520,7 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "    const body = pm.response.json();",
-                  "    const results = body.Resources || body.resources || [];",
+                  "    const results = body.Resources || body.password || [];",
                   "    if (results.length > 0 && results[0].id) {",
                   "        pm.environment.set(\"CLOUD_DIRECTORY_ID\", results[0].id);",
                   "        console.log(\"Saved CLOUD_DIRECTORY_ID to environment\");",
