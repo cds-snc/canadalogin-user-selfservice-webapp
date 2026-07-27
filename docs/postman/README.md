@@ -1,21 +1,94 @@
 ### Getting started with POSTMAN
+
 Download and Install Postman (https://www.postman.com/downloads)
 
-### Import the POSTMAN collection
-In the top left corner there is an import button. 
-Either drag the [docs/postman/GC_Sign_In_DEV.postman_collection.json](GC_Sign_In_DEV.postman_collection.json) file into the window or click choose files and select it.
+### Import the POSTMAN collection and environment
+
+In the top left corner there is an import button. Drag both of the
+following files into the window (or click choose files and select them):
+
+- [GC_Sign_In_DEV.postman_collection.json](GC_Sign_In_DEV.postman_collection.json)
+- [GC_Sign_In_DEV.postman_environment.json](GC_Sign_In_DEV.postman_environment.json)
+
+Select the "GC_Sign_In_DEV" environment in the top-right environment dropdown.
 
 ### POSTMAN Environment Variables
-To get started, set the required environment values. 
-On the left hand side, click on environments and set the following secrets
 
-1. Set the tenant `IBM_VERIFY_CLIENT_SECRET` and `IBM_VERIFY_API_CLIENT_SECRET`
-2. In Postman Collections, run the `Get a Admin Oauth Token` request
-3. From the response, copy the `access_token` value
-4. On the left hand side, navigate to environments and set `ADMIN_ACCESS_TOKEN`to the value of `access_token`
-5. In Postman Collections, you can now authenticate a user - `SignIn With Password - Return JWT`
-6. After you have authenticated a user, you can exchange the returned `assertion` value for a User Access Token
-7. In the folder `User Access Token Requests`, run the `Get User Access Token` request. Make sure to update the `assertion` field
-8. From the response, copy the `access_token` returned from `Get User Access Token`
-9. On the left hand side navigate to environments and set the `User Access Token` variable to the value returned from `access_token`
+All variables used by this collection follow a consistent `UPPER_SNAKE_CASE`
+naming convention and live in the `GC_Sign_In_DEV` environment. Most token
+variables are auto-populated by test scripts on the relevant requests, so you
+only need to set a handful of secrets/config values up front:
 
+1. Set `IBM_VERIFY_TENANT_URL`, `IBM_VERIFY_CLIENT_ID`, `IBM_VERIFY_CLIENT_SECRET`,
+   `IBM_VERIFY_API_CLIENT_ID` and `IBM_VERIFY_API_CLIENT_SECRET`.
+2. Run `Get a Admin Oauth Token`. Its test script automatically saves the
+   response's `access_token` to `ADMIN_ACCESS_TOKEN`.
+3. Run `SignIn With Password - Return JWT`. Its test script automatically
+   saves the returned JWT/assertion to `ASSERTION_JWT`.
+4. In the folder `User Access Token Requests`, run `Get User Access Token`.
+   Its test script automatically saves `access_token`/`refresh_token` to
+   `USER_ACCESS_TOKEN`/`REFRESH_TOKEN`.
+5. (Optional) Run `Get Cloud Directory ID` and `Authenticated User Profile` —
+   their test scripts automatically save `CLOUD_DIRECTORY_ID` and `USER_ID`
+   respectively, used by a few of the other requests in this collection.
+
+### IDV Data Store - Token Exchange Flow
+
+This folder mirrors the exact request logic the backend performs in
+`backend/app/idv_data_store/services/verified_claims.py` when a user requests
+their verified identity claims (`GET /verified-claims`). It talks to two
+separate systems: IBM Verify (for the RFC 8693 token exchange) and
+idv-data-store itself (for client bootstrap + the verified-claims call).
+
+**Additional environment variables required:**
+
+| Variable                           | Description                                                                                                                                     |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `IDV_DATA_STORE_BASE_URL`          | Base URL of the idv-data-store instance you're testing against (e.g. `http://localhost:8100`).                                                  |
+| `IDV_DATA_STORE_CLIENT_ID`         | This app's client id in idv-data-store's own internal client-bootstrap system (any string you choose, e.g. `local-dev-client`).                 |
+| `IDV_DATA_STORE_SCOPES`            | Space-separated scopes to request, e.g. `idv:auth:verified-claims`. See `documentation/SCOPES.md` in the idv-data-store repo for the full list. |
+| `IDV_DATA_STORE_STS_CLIENT_ID`     | Client ID of the dedicated IBM Verify STS client used to perform the token exchange.                                                            |
+| `IDV_DATA_STORE_STS_CLIENT_SECRET` | Client secret for the STS client above.                                                                                                         |
+
+These map 1:1 to the backend's own `.env` settings of the same name (see
+`backend/.env.example`).
+
+**Steps (run in order, after completing steps 1-4 above so `USER_ACCESS_TOKEN` is set):**
+
+1. Run `0. Register IDV Data Store Client (one-time bootstrap)`. This only
+   needs to be run once per `IDV_DATA_STORE_CLIENT_ID`/environment — a `409`
+   response means it's already registered, which is safe to ignore.
+2. Run `1. Exchange User Token for IDV Data Store (STS)`. Its test script
+   automatically saves the response's `access_token` to the
+   `IDV_EXCHANGED_ACCESS_TOKEN` environment variable.
+3. Run `2. Get IDV Data Store Client Token`. Its test script automatically
+   saves the response's `access_token` to the `IDV_DATA_STORE_CLIENT_TOKEN`
+   environment variable.
+4. Run `3. Get Verified Claims`. This uses `IDV_DATA_STORE_CLIENT_TOKEN` as
+   its Bearer auth and `IDV_EXCHANGED_ACCESS_TOKEN` in the request body, and
+   returns the user's verified identity claims from idv-data-store.
+
+### IDV Data Store - Token Exchange Flow (standalone collection)
+
+The four requests above also exist as their own, independently importable
+collection — useful if you only want to test/share the idv-data-store token
+exchange flow without importing the full `GC_Sign_In_DEV` collection:
+
+- Collection: [IDV_Data_Store_Token_Exchange.postman_collection.json](IDV_Data_Store_Token_Exchange.postman_collection.json)
+- Environment template: [IDV_Data_Store_Token_Exchange.postman_environment.json](IDV_Data_Store_Token_Exchange.postman_environment.json)
+
+To use it:
+
+1. Import both files into Postman (Import button → drag both files in, or
+   select them via the file picker).
+2. Select the "IDV Data Store - Token Exchange (template)" environment in
+   the top-right environment dropdown.
+3. Fill in `IBM_VERIFY_TENANT_URL`, `IDV_DATA_STORE_STS_CLIENT_ID`,
+   `IDV_DATA_STORE_STS_CLIENT_SECRET`, and `USER_ACCESS_TOKEN` (obtained the
+   same way as step 4 above, e.g. from the `GC_Sign_In_DEV` collection's
+   `Get User Access Token` request). `IDV_DATA_STORE_BASE_URL`,
+   `IDV_DATA_STORE_CLIENT_ID`, and `IDV_DATA_STORE_SCOPES` already have
+   sensible local-dev defaults.
+4. Run requests `0` through `3` in order, same as above —
+   `IDV_EXCHANGED_ACCESS_TOKEN` and `IDV_DATA_STORE_CLIENT_TOKEN` are
+   auto-populated by each request's test script.
