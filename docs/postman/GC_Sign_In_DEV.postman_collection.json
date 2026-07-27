@@ -258,7 +258,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "{{USER_ACCESS_TOKEN}}",
+                      "value": "{{ADMIN_ACCESS_TOKEN}}",
                       "type": "string"
                     }
                   ]
