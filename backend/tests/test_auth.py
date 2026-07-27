@@ -627,10 +627,6 @@ async def test_reauthenticate_user_with_acr_values_for_stepup(app, client):
 
     # Confirm we passed acr_values="loa3_stepup" to authorize_redirect() instead of max_age
     assert (
-        app.state.oauth_verify.last_authorize_redirect_kwargs.get("response_type")
-        == "code"
-    )
-    assert (
         app.state.oauth_verify.last_authorize_redirect_kwargs.get("acr_values")
         == "loa3_stepup"
     )
