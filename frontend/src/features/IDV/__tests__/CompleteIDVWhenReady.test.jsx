@@ -80,7 +80,6 @@ vi.mock("@gcds-core/components-react", () => ({
 }));
 
 import { useUser } from "../../../components/Providers/useUser";
-import OnlineVerificationInfo from "../Online/OnlineVerificationInfo";
 
 const defaultUserState = {
   dispatch: vi.fn(),
@@ -222,18 +221,32 @@ describe("CompleteIdentityProofingPage", () => {
     });
 
     it("renders the list of acceptable IDs details element", () => {
-      render(<OnlineVerificationInfo />);
+      setup();
 
-      const matches = screen.getAllByText("List of acceptable IDs");
-      expect(matches.length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText("List of acceptable IDs")).toBeInTheDocument();
     });
 
     it("renders the list of acceptable IDs as a summary inside a details element", () => {
-      const { container } = render(<OnlineVerificationInfo />);
+      const { container } = setup();
 
       const summary = container.querySelector("summary");
       expect(summary).toBeInTheDocument();
       expect(summary).toHaveTextContent("List of acceptable IDs");
+    });
+
+    it("renders all acceptable ID document types in the list", () => {
+      setup();
+
+      expect(
+        screen.getByText("Provincial/Territorial Driver's Licence"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Canadian and International Passport"),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Canadian PR Card")).toBeInTheDocument();
+      expect(
+        screen.getByText("Secure Certificate of Indian Status"),
+      ).toBeInTheDocument();
     });
   });
 
