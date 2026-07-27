@@ -324,6 +324,10 @@ async def test_redirect_user_to_idp_verify_redirects(app, client):
     resp = await client.get("/login", follow_redirects=False)
     assert resp.status_code in (302, 307)
     assert resp.headers["location"].startswith("https://idp.example/authorize?")
+    assert (
+        app.state.oauth_verify.last_authorize_redirect_kwargs.get("response_type")
+        == "code"
+    )
 
 
 @pytest.mark.asyncio
@@ -367,6 +371,10 @@ async def test_login_passes_identity_source_id_for_bc_partner(app, client):
     assert (
         app.state.oauth_verify.last_authorize_redirect_kwargs.get("identity_source_id")
         == "provincial-partners-id"
+    )
+    assert (
+        app.state.oauth_verify.last_authorize_redirect_kwargs.get("response_type")
+        == "code"
     )
     assert resp.headers["location"].startswith(
         "https://tenant.example.com/auth/provincial-partners-id?Target="

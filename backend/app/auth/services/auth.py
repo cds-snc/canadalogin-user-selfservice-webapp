@@ -105,6 +105,7 @@ async def redirect_user_to_idp_verify(
     }
 
     extra_params = {}
+    extra_params["response_type"] = "code"
     if prompt:
         extra_params["prompt"] = prompt
     if partner:
