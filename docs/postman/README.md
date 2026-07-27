@@ -23,14 +23,18 @@ only need to set a handful of secrets/config values up front:
    `IBM_VERIFY_API_CLIENT_ID` and `IBM_VERIFY_API_CLIENT_SECRET`.
 2. Run `Get a Admin Oauth Token`. Its test script automatically saves the
    response's `access_token` to `ADMIN_ACCESS_TOKEN`.
-3. Run `SignIn With Password - Return JWT`. Its test script automatically
+3. Run `Get Cloud Directory ID` (uses `ADMIN_ACCESS_TOKEN` as its Bearer
+   auth). Its test script automatically saves the resulting id to
+   `CLOUD_DIRECTORY_ID`, which `SignIn With Password - Return JWT` needs in
+   its URL — this must run before step 4.
+4. Run `SignIn With Password - Return JWT`. Its test script automatically
    saves the returned JWT/assertion to `ASSERTION_JWT`.
-4. In the folder `User Access Token Requests`, run `Get User Access Token`.
+5. In the folder `User Access Token Requests`, run `Get User Access Token`.
    Its test script automatically saves `access_token`/`refresh_token` to
    `USER_ACCESS_TOKEN`/`REFRESH_TOKEN`.
-5. (Optional) Run `Get Cloud Directory ID` and `Authenticated User Profile` —
-   their test scripts automatically save `CLOUD_DIRECTORY_ID` and `USER_ID`
-   respectively, used by a few of the other requests in this collection.
+6. (Optional) Run `Authenticated User Profile` — its test script
+   automatically saves `USER_ID`, used by a few of the other requests in
+   this collection.
 
 ### IDV Data Store - Token Exchange Flow
 
@@ -53,7 +57,7 @@ idv-data-store itself (for client bootstrap + the verified-claims call).
 These map 1:1 to the backend's own `.env` settings of the same name (see
 `backend/.env.example`).
 
-**Steps (run in order, after completing steps 1-4 above so `USER_ACCESS_TOKEN` is set):**
+**Steps (run in order, after completing steps 1-5 above so `USER_ACCESS_TOKEN` is set):**
 
 1. Run `0. Register IDV Data Store Client (one-time bootstrap)`. This only
    needs to be run once per `IDV_DATA_STORE_CLIENT_ID`/environment — a `409`
@@ -85,7 +89,7 @@ To use it:
    the top-right environment dropdown.
 3. Fill in `IBM_VERIFY_TENANT_URL`, `IDV_DATA_STORE_STS_CLIENT_ID`,
    `IDV_DATA_STORE_STS_CLIENT_SECRET`, and `USER_ACCESS_TOKEN` (obtained the
-   same way as step 4 above, e.g. from the `GC_Sign_In_DEV` collection's
+   same way as step 5 above, e.g. from the `GC_Sign_In_DEV` collection's
    `Get User Access Token` request). `IDV_DATA_STORE_BASE_URL`,
    `IDV_DATA_STORE_CLIENT_ID`, and `IDV_DATA_STORE_SCOPES` already have
    sensible local-dev defaults.
