@@ -3405,7 +3405,9 @@ class TestErrorHandlingAuth:
     @pytest.mark.asyncio
     @patch.object(global_error_handlers_module, "logger")
     @patch.object(global_error_handlers_module, "standard_logger")
-    @patch.object(global_error_handlers_module.uuid, "uuid4", return_value="test-correlation-id")
+    @patch.object(
+        global_error_handlers_module.uuid, "uuid4", return_value="test-correlation-id"
+    )
     async def test_oauth_error_handler_logs_warning_without_traceback(
         self,
         mock_uuid4,
