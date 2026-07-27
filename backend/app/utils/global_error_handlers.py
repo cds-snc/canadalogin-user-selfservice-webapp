@@ -55,9 +55,14 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 async def oauth_error_handler(request: Request, exc: OAuthError):
     correlation_id = str(uuid.uuid4())
     status_code = getattr(exc, "status_code", status.HTTP_401_UNAUTHORIZED)
+    oauth_error = getattr(exc, "error", None) or str(exc)
+    oauth_description = getattr(exc, "description", None)
 
-    logger.exception(
-        f"Correlation ID: {correlation_id} - Authentication failed. Please try again."
+    logger.warning(
+        "Correlation ID: %s - Authentication failed. Please try again. error=%s description=%s",
+        correlation_id,
+        oauth_error,
+        oauth_description,
     )
 
     if "text/html" in request.headers.get("accept", ""):

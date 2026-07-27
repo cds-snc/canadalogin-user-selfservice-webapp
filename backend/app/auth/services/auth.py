@@ -105,6 +105,7 @@ async def redirect_user_to_idp_verify(
     }
 
     extra_params = {}
+    extra_params["response_type"] = "code"
     if prompt:
         extra_params["prompt"] = prompt
     if partner:
@@ -207,5 +208,8 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
     acr_value = "loa3_stepup"
     # Use acr_values for step-up authentication to require LOA3 level
     return await oauth.verify.authorize_redirect(
-        request, callback_redirect_uri, acr_values=acr_value
+        request,
+        callback_redirect_uri,
+        acr_values=acr_value,
+        response_type="code",
     )

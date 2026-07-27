@@ -78,6 +78,9 @@ auth_user_session_module = importlib.import_module(
 )
 auth_logout_module = importlib.import_module("app.auth.services.auth_logout")
 auth_module = importlib.import_module("app.auth.services.auth")
+global_error_handlers_module = importlib.import_module(
+    "app.utils.global_error_handlers"
+)
 
 
 # region Mocks (Middleware/Fixtures)
@@ -3398,6 +3401,46 @@ class TestErrorHandlingRpInfo:
 
 
 class TestErrorHandlingAuth:
+
+    @pytest.mark.asyncio
+    @patch.object(global_error_handlers_module, "logger")
+    @patch.object(global_error_handlers_module, "standard_logger")
+    @patch.object(global_error_handlers_module.uuid, "uuid4", return_value="test-correlation-id")
+    async def test_oauth_error_handler_logs_warning_without_traceback(
+        self,
+        mock_uuid4,
+        mock_standard_logger,
+        mock_logger,
+    ):
+        request = MagicMock()
+        request.headers = {"accept": "application/json"}
+
+        async def passthrough_log(_request, response):
+            return response
+
+        mock_standard_logger.log = AsyncMock(side_effect=passthrough_log)
+
+        response = await global_error_handlers_module.oauth_error_handler(
+            request,
+            OAuthError(
+                error="unsupported_response_type",
+                description="Missing response_type",
+            ),
+        )
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert json.loads(response.body) == {
+            "correlation_id": "test-correlation-id",
+            "success": False,
+            "message": "Authentication failed. Please try again.",
+        }
+        mock_logger.warning.assert_called_once_with(
+            "Correlation ID: %s - Authentication failed. Please try again. error=%s description=%s",
+            "test-correlation-id",
+            "unsupported_response_type",
+            "Missing response_type",
+        )
+        mock_logger.exception.assert_not_called()
 
     @pytest.mark.asyncio
     @patch.object(auth_module, "get_base_profile_management_url")
