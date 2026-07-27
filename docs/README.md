@@ -28,3 +28,8 @@ The diagrams can be viewed directly in GitHub by creating a markdown file and us
 ## Diagram Updates
 
 When making changes to the authentication flows, please update the corresponding diagram files to maintain accurate documentation.
+
+## Implementation Notes
+
+- Provincial partner DEV/DEV2 identity linking implementation and findings:
+  [developer_guides/provincial-partner-dev-dev2-integration.md](developer_guides/provincial-partner-dev-dev2-integration.md)

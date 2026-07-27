@@ -27,9 +27,11 @@ import VisitCanadaPost from "./features/IDV/InPerson/VisitCanadaPostPage";
 import ProofingBarcodeCanadaPostPage from "./features/IDV/InPerson/ProofingBarcodeCanadaPostPage";
 import InPersonProofingInProgress from "./features/IDV/InPerson/InPersonProofingInProgress";
 import StartIdentityProofingPage from "./features/IDV/StartIdentityProofingPage";
+import ProveIdentityInPersonPage from "./features/IDV/InPerson/ProveIdentityInPersonPage";
 import ProveIdentityOnlinePage from "./features/IDV/Online/ProveIdentityOnlinePage";
 import ProvincialVerificationPage from "./features/IDV/Online/ProvincialVerificationPage";
 import OnlineVerificationInfo from "./features/IDV/Online/OnlineVerificationInfo";
+import PartnerLinkSuccessPage from "./features/IDV/Online/PartnerLinkSuccessPage";
 import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
 import IdentityVerificationSuccess from "./features/IDV/Online/IdentityVerificationSuccess";
@@ -161,6 +163,11 @@ export const appRoutes: RouteObject[] = [
                           handle: { id: PAGES.idvCompleteIdentityProofingPage },
                         },
                         {
+                          path: "in-person",
+                          element: <ProveIdentityInPersonPage />,
+                          handle: { id: PAGES.idvProveIdentityInPersonPage },
+                        },
+                        {
                           path: "in-person/canada-post",
                           element: <VisitCanadaPost />,
                           handle: { id: PAGES.idvVisitCanadaPostPage },
@@ -203,6 +210,11 @@ export const appRoutes: RouteObject[] = [
                           path: "online/provincial",
                           element: <ProvincialVerificationPage />,
                           handle: { id: PAGES.idvProvincialVerificationPage },
+                        },
+                        {
+                          path: "online/provincial/link/:partnerId/success",
+                          element: <PartnerLinkSuccessPage />,
+                          handle: { id: PAGES.idvPartnerLinkSuccessPage },
                         },
                         {
                           path: "online/bluink/confirmation",

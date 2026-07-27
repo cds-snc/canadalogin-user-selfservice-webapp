@@ -45,10 +45,10 @@
     "lastNameLabel": "Last Name",
     "lastNameHint": "Must match what is on your official ID",
     "dateOfBirthdayLabel": "Date of birth",
-    "addressLabel": "Address (optional)",
+    "addressLabel": "Address",
     "addressHint": "Enter your street address",
-    "provinceLabel": "Province/ Territory (optional)",
-    "postalcodeLabel": "Postal Code (optional)",
+    "provinceLabel": "Province/ Territory",
+    "postalcodeLabel": "Postal Code",
     "postalcodeHint": "Enter your postal code"
   },
   "ServiceCanadaCentreCode": {
@@ -116,19 +116,31 @@
   },
   "ProvincialVerification": {
     "pageTitle": "Prove your identity",
-    "heading": "Get ready for provincial partner sign in",
+    "heading": "Get ready for provincial verification",
     "followSteps": "Follow the steps to complete the process",
-    "step1": "Have your provincial partner app ready",
-    "step2": "Select the appropriate option and follow the steps to prove your identity",
-    "step3": "Once the proofing is complete, you will be automatically redirected",
+    "step1": "Select the appropriate option and follow the steps to sign in and prove your identity",
+    "step2": "Once the verification is complete, you will be automatically redirected",
     "bcServicesCard": "BC Services Card",
     "albertaAccount": "Alberta.ca Account",
-    "backButton": "Back",
+    "quebecAccount": "Québec Government Authentication Service",
+    "chooseDifferentMethodButton": "Choose a different method",
     "moreInfoTitle": "For more information",
-    "learnMoreLink": "Learn more about provincial identity proofing"
+    "learnMoreLink": "Learn more about provincial verfication"
+  },
+  "ProvincialVerificationConnected": {
+    "pageTitle": "Prove your identity",
+    "heading": "Your CanadaLogin account is now connected to your BC Service Card",
+    "body": "Continue to confirm your verified identity details.",
+    "continueButton": "Continue"
   },
   "ProveIdentityOnline": {
     "heading": "Prove your identity online",
+    "continueButton": "Continue",
+    "backButton": "Back"
+  },
+  "ProveIdentityInPerson": {
+    "heading": "Prove your identity in person",
+    "description": "You will only get access to this {{rpName}} after proving your identity in person and signing back in with your CanadaLogin.",
     "continueButton": "Continue",
     "backButton": "Back"
   },
@@ -216,7 +228,7 @@
   },
   "ConfirmIdentityDetails": {
     "pageTitle": "Confirm what will be saved to your CanadaLogin",
-    "description": "Review the details that will be saved to your CanadaLogin. You can edit most information here, or update it later in your CanadaLogin account.",
+    "description": "Review the details that will be saved to your CanadaLogin. You can edit most information here, or update it later.",
     "identityProofingDetails": "Identity proofing details",
     "name": "Name",
     "dateOfBirth": "Date of birth",
@@ -225,16 +237,27 @@
     "idDocumentValue": "Not available",
     "reProofingRequired": "To update this information, you'll need to complete identity proofing again.",
     "updateInformation": "Update information",
-    "contactInfo": "Contact info",
+    "contactInfo": "Contact information",
     "phoneNumber": "Phone number",
     "communication": "Communication",
-    "confirmAndContinue": "Confirm and continue"
+    "confirmAndContinue": "Confirm and continue",
+    "successNoticeTitle": "Your identity information was successfully verified and proofing is complete.",
+    "successNoticeDescription": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access.",
+    "successNoticeTitleWithoutRp": "Your CanadaLogin has succesfully saved your changes",
+    "successNoticeDescriptionWithoutRp": "Continue with accessing the service"
   },
   "IdentityVerificationSuccess": {
     "pageTitle": "Prove your identity",
-    "heading": "Identity proofing is complete",
+    "heading": "Your identity information was successfully verified and you can use your account to sign in to CanadaLogin.",
     "continueButton": "Continue",
     "moreInfoTitle": "Your identity information was successfully verified, and proofing is now complete.",
     "moreInfoBody": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access."
+  },
+  "PartnerLinkSuccess": {
+    "pageTitle": "Prove your identity",
+    "heading": "Your CanadaLogin account is now connected to your {{partnerName}}",
+    "noticeTitle": "You can also use your {{partnerName}} to sign in",
+    "noticeText": "We've linked your account sign in methods so you can now use your {{partnerName}} to sign in or recover your account in addition to your selected sign in method.",
+    "continueButton": "Continue"
   }
 }

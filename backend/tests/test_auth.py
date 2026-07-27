@@ -5,6 +5,8 @@ from urllib.parse import quote
 from http.cookies import SimpleCookie
 import uuid
 from typing import Dict, Any
+from unittest.mock import AsyncMock
+from unittest.mock import Mock
 
 import pytest
 import pytest_asyncio
@@ -13,6 +15,7 @@ from fastapi.responses import JSONResponse
 
 import httpx
 from httpx import AsyncClient, MockTransport, Response, ASGITransport
+from authlib.integrations.starlette_client import OAuthError
 
 # Import your module under test directly from your app package
 import app.auth.services.auth as auth_module
@@ -89,6 +92,10 @@ class FakeConfig:
     def __init__(self, env="prod", domain="pm.example.com"):
         self.ENVIRONMENT = env
         self.PROFILE_MANAGEMENT_DOMAIN = domain
+        self.ibm_verify_config = SimpleNamespace(
+            IBM_VERIFY_TENANT_URL="https://tenant.example.com",
+            IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID="provincial-partners-id",
+        )
 
 
 class FakeSessionHandler:
@@ -228,9 +235,15 @@ def app(monkeypatch, mock_token_transport):
 
     # Login and Reauth entry points
     @base.get("/login")
-    async def login(request: Request, returnToPage: str | None = None):
+    async def login(
+        request: Request,
+        returnToPage: str | None = None,
+        partner: str | None = None,
+    ):
         return await auth_module.redirect_user_to_idp_verify(
-            request, returnToPage=returnToPage
+            request,
+            returnToPage=returnToPage,
+            partner=partner,
         )
 
     @base.get("/reauth")
@@ -344,16 +357,63 @@ async def test_login_does_not_set_return_to_page_for_language_root(app, client):
 
 
 @pytest.mark.asyncio
+async def test_login_passes_identity_source_id_for_bc_partner(app, client):
+    resp = await client.get(
+        "/login",
+        params={"partner": "bc"},
+        follow_redirects=False,
+    )
+    assert resp.status_code in (302, 307)
+    assert (
+        app.state.oauth_verify.last_authorize_redirect_kwargs.get("identity_source_id")
+        == "provincial-partners-id"
+    )
+    assert resp.headers["location"].startswith(
+        "https://tenant.example.com/auth/provincial-partners-id?Target="
+    )
+    assert "app_login=false" in resp.headers["location"]
+
+
+@pytest.mark.asyncio
+async def test_login_rejects_unknown_partner(app, client):
+    resp = await client.get(
+        "/login",
+        params={"partner": "unknown"},
+        follow_redirects=False,
+    )
+
+    assert resp.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_login_rejects_unconfigured_partner(app, client, monkeypatch):
+    cfg = FakeConfig(env="prod", domain="pm.example.com")
+    cfg.ibm_verify_config.IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID = None
+
+    monkeypatch.setattr(
+        auth_module,
+        "get_configuration",
+        lambda: cfg,
+        raising=True,
+    )
+
+    resp = await client.get(
+        "/login",
+        params={"partner": "bc"},
+        follow_redirects=False,
+    )
+
+    assert resp.status_code == 503
+
+
+@pytest.mark.asyncio
 async def test_callback_handler_success_flow_sets_session_and_redirects(app, client):
     # Seed session with RETURN_TO_PAGE so the final redirect includes it
     await client.get("/seed-session", params={"path": "/dashboard"})
     resp = await client.get("/auth/callback", follow_redirects=False)
 
     assert resp.status_code in (302, 307)
-    assert (
-        resp.headers["location"]
-        == "https://pm.example.com/dashboard?returnToPage=%2Fdashboard"
-    )
+    assert resp.headers["location"] == "https://pm.example.com/dashboard"
 
     # returnToPage is one-time and should be consumed by callback_handler
     dump = await client.get("/session-dump")
@@ -396,6 +456,132 @@ async def test_callback_handler_sets_new_session_id_and_updates_tokens(
     dump = await client.get("/session-dump")
     assert dump.status_code == 200
     assert dump.json().get("access_token") == "token-xyz"
+
+
+@pytest.mark.asyncio
+async def test_callback_handler_raises_oauth_error_when_sid_missing(monkeypatch):
+    request = SimpleNamespace(session={FakeSessionKeys.RETURN_TO_PAGE.value: "/home"})
+
+    monkeypatch.setattr(auth_module, "SessionKeys", FakeSessionKeys, raising=True)
+    monkeypatch.setattr(
+        auth_module,
+        "get_base_profile_management_url",
+        lambda: "https://pm.example.com",
+        raising=True,
+    )
+    monkeypatch.setattr(
+        auth_module,
+        "oauth",
+        SimpleNamespace(
+            verify=SimpleNamespace(
+                authorize_access_token=AsyncMock(
+                    return_value={"access_token": "token-xyz", "userinfo": {}}
+                )
+            )
+        ),
+        raising=True,
+    )
+    monkeypatch.setattr(
+        auth_module,
+        "get_session_handler",
+        lambda _request: FakeSessionHandler(),
+        raising=True,
+    )
+    monkeypatch.setattr(
+        auth_module,
+        "update_session_tokens",
+        lambda _request, _oidc_response: None,
+        raising=True,
+    )
+
+    with pytest.raises(OAuthError) as exc_info:
+        await auth_module.callback_handler(request)
+
+    assert exc_info.value.error == "invalid_oidc_response"
+    assert exc_info.value.description == "Required sid claim is missing"
+
+
+@pytest.mark.asyncio
+async def test_callback_handler_reraises_unexpected_oauth_token_exception(monkeypatch):
+    request = SimpleNamespace(session={FakeSessionKeys.RETURN_TO_PAGE.value: "/home"})
+
+    monkeypatch.setattr(auth_module, "SessionKeys", FakeSessionKeys, raising=True)
+    monkeypatch.setattr(
+        auth_module,
+        "get_base_profile_management_url",
+        lambda: "https://pm.example.com",
+        raising=True,
+    )
+    monkeypatch.setattr(
+        auth_module,
+        "oauth",
+        SimpleNamespace(
+            verify=SimpleNamespace(
+                authorize_access_token=AsyncMock(side_effect=RuntimeError("boom"))
+            )
+        ),
+        raising=True,
+    )
+    monkeypatch.setattr(
+        auth_module,
+        "get_session_handler",
+        lambda _request: FakeSessionHandler(),
+        raising=True,
+    )
+    monkeypatch.setattr(
+        auth_module,
+        "update_session_tokens",
+        lambda _request, _oidc_response: None,
+        raising=True,
+    )
+
+    with pytest.raises(RuntimeError, match="boom"):
+        await auth_module.callback_handler(request)
+
+
+@pytest.mark.asyncio
+async def test_callback_handler_logs_exception_for_unexpected_token_error(monkeypatch):
+    request = SimpleNamespace(session={FakeSessionKeys.RETURN_TO_PAGE.value: "/home"})
+
+    monkeypatch.setattr(auth_module, "SessionKeys", FakeSessionKeys, raising=True)
+    monkeypatch.setattr(
+        auth_module,
+        "get_base_profile_management_url",
+        lambda: "https://pm.example.com",
+        raising=True,
+    )
+    monkeypatch.setattr(
+        auth_module,
+        "oauth",
+        SimpleNamespace(
+            verify=SimpleNamespace(
+                authorize_access_token=AsyncMock(side_effect=RuntimeError("boom"))
+            )
+        ),
+        raising=True,
+    )
+    monkeypatch.setattr(
+        auth_module,
+        "get_session_handler",
+        lambda _request: FakeSessionHandler(),
+        raising=True,
+    )
+    monkeypatch.setattr(
+        auth_module,
+        "update_session_tokens",
+        lambda _request, _oidc_response: None,
+        raising=True,
+    )
+
+    mock_logger = Mock()
+    monkeypatch.setattr(auth_module, "logger", mock_logger, raising=True)
+
+    with pytest.raises(RuntimeError, match="boom"):
+        await auth_module.callback_handler(request)
+
+    mock_logger.exception.assert_called_once_with(
+        "Unexpected error during OIDC callback - to authorize_access_token"
+    )
 
 
 @pytest.mark.asyncio

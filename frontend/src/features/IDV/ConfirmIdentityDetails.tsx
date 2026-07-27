@@ -37,6 +37,14 @@ export default function ConfirmIdentityDetails() {
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
   const fallbackRedirectUrl = relyingPartyUrl || "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
+  const hasRpService = Boolean(rpName);
+
+  const successNoticeTitleKey = hasRpService
+    ? "ConfirmIdentityDetails.successNoticeTitle"
+    : "ConfirmIdentityDetails.successNoticeTitleWithoutRp";
+  const successNoticeDescriptionKey = hasRpService
+    ? "ConfirmIdentityDetails.successNoticeDescription"
+    : "ConfirmIdentityDetails.successNoticeDescriptionWithoutRp";
 
   const redirectToRelyingParty = async () => {
     try {
@@ -73,12 +81,10 @@ export default function ConfirmIdentityDetails() {
           <GcdsNotice
             noticeRole="success"
             noticeTitleTag="h2"
-            noticeTitle={t("ConfirmIdentityDetails.successNoticeTitle")}
+            noticeTitle={t(successNoticeTitleKey)}
           >
             <GcdsText>
-              {t("ConfirmIdentityDetails.successNoticeDescription", {
-                appName: tLayout("TopNavBar.appName"),
-              })}
+              {t(successNoticeDescriptionKey, { appName: rpName })}
             </GcdsText>
           </GcdsNotice>
         </GcdsContainer>
