@@ -98,7 +98,7 @@ export default function CompleteIdentityProofingPage() {
               >
                 {APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS.map((docValue) => (
                   <li key={docValue}>
-                    {t(`CompleteIdentityProofing.${docValue}`)}
+                    {t(`ApprovedDocuments.${docValue}`)}
                   </li>
                 ))}
               </ol>
