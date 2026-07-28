@@ -22,7 +22,6 @@ import {
   START_IDENTITY_OPTION,
   type StartIdentityOption,
 } from "./components/methods";
-import { useUser } from "../../components/Providers/useUser";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import { identityVerificationApi } from "./api/identityVerificationApi";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
@@ -61,11 +60,7 @@ export default function StartIdentityProofingPage() {
   const [searchParams] = useSearchParams();
 
   const { t, i18n } = useTranslation("idv");
-  const { state } = useUser();
-  const { relyingPartyName: rpName } = useRelyingPartyInfo(
-    state,
-    i18n.language,
-  );
+  const { relyingPartyName: rpName } = useRelyingPartyInfo(i18n.language);
   const titleByJourneyType = {
     [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
       rpName,

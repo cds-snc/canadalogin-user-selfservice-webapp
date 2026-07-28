@@ -27,7 +27,7 @@ export default function ConfirmIdentityDetails() {
   const { language, journeyType } = useParams();
   const { state } = useUser();
   const { relyingPartyUrl, relyingPartyName, hasRelyingParty } =
-    useRelyingPartyInfo(state, i18n.language);
+    useRelyingPartyInfo(i18n.language);
 
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
   const fallbackRedirectUrl = relyingPartyUrl || "/";

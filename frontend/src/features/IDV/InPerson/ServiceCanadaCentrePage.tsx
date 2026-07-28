@@ -15,7 +15,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
-import { useUser } from "../../../components/Providers/useUser";
 import {
   AVAILABLE_LANGUAGES,
   CANADIAN_PROVINCES_AND_TERRITORIES,
@@ -60,11 +59,7 @@ export default function ServiceCanadaCentrePage() {
   });
 
   const { t, i18n } = useTranslation("idv");
-  const { state } = useUser();
-  const { relyingPartyName: rpName } = useRelyingPartyInfo(
-    state,
-    i18n.language,
-  );
+  const { relyingPartyName: rpName } = useRelyingPartyInfo(i18n.language);
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,

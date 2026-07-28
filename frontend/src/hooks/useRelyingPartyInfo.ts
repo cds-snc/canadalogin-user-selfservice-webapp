@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
-import type { RelyingPartyInfo, UserState } from "../types/user";
+import { useUser } from "../components/Providers/useUser";
+import type { RelyingPartyInfo } from "../types/user";
 
 export type RelyingPartyDetails = {
   relyingPartyInfo: RelyingPartyInfo | null;
@@ -20,16 +21,15 @@ function getRelyingPartyDetails(
     relyingPartyInfo: relyingParty,
     hasRelyingParty: Boolean(relyingParty),
     relyingPartyName: localizedDetail?.name ?? relyingPartyInfo?.linkName ?? "",
-    relyingPartyUrl: localizedDetail?.url ?? relyingPartyInfo?.url ?? "",
+    relyingPartyUrl: localizedDetail?.url ?? relyingPartyInfo?.url ?? "/",
   };
 }
 
-export function useRelyingPartyInfo(
-  userState: UserState | null | undefined,
-  language: string,
-): RelyingPartyDetails {
+export function useRelyingPartyInfo(language: string): RelyingPartyDetails {
+  const { state } = useUser();
+
   return useMemo(
-    () => getRelyingPartyDetails(userState?.relyingPartyInfo, language),
-    [userState?.relyingPartyInfo, language],
+    () => getRelyingPartyDetails(state?.relyingPartyInfo, language),
+    [state?.relyingPartyInfo, language],
   );
 }

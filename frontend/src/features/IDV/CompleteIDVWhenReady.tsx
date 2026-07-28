@@ -21,7 +21,7 @@ import { APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS } from "./data/approvedDocument
 export default function CompleteIdentityProofingPage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
-  const { state, dispatch } = useUser();
+  const { dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
 
   const { t, i18n } = useTranslation("idv");
@@ -35,7 +35,6 @@ export default function CompleteIdentityProofingPage() {
   };
 
   const { relyingPartyName: relyingPartyLinkName } = useRelyingPartyInfo(
-    state,
     i18n.language,
   );
 
