@@ -75,7 +75,7 @@ export default function CompleteIdentityProofingPage() {
           <GcdsText>
             <strong>
               {t("CompleteIdentityProofing.accessRPServicePortalTitle", {
-                relyingPartyLinkName,
+                rpServicePortal: relyingPartyLinkName,
               })}
             </strong>
           </GcdsText>
@@ -87,7 +87,9 @@ export default function CompleteIdentityProofingPage() {
           <GcdsText>
             {t("CompleteIdentityProofing.noDocumentsNoticeText")}
             <GcdsLink href="#" external size="regular">
-              {t("CompleteIdentityProofing.contactLink", { relyingPartyLinkName })}
+              {t("CompleteIdentityProofing.contactLink", {
+                rpServicePortal: relyingPartyLinkName,
+              })}
             </GcdsLink>
           </GcdsText>
           <GcdsText>
