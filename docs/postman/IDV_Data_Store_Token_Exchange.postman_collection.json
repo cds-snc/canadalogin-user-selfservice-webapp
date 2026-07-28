@@ -1,0 +1,235 @@
+{
+  "info": {
+    "_postman_id": "b3f6e6f0-1c2a-4e3a-9d3b-idv-data-store-exchange",
+    "name": "IDV Data Store - Token Exchange Flow",
+    "description": "Standalone collection mirroring the RFC 8693 OAuth 2.0 Token Exchange logic in backend/app/idv_data_store/services/verified_claims.py. Requires a USER_ACCESS_TOKEN obtained separately (e.g. from the GC_Sign_In_DEV collection's 'Get User Access Token' request). See README.md in this folder for setup steps and environment variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Register IDV Data Store Client (one-time bootstrap)",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"client_id\": \"{{IDV_DATA_STORE_CLIENT_ID}}\",\n  \"client_name\": \"gc-signin-selfservice-webapp\",\n  \"allowed_scopes\": \"{{IDV_DATA_STORE_SCOPES}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/admin/clients",
+          "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
+          "path": ["v1", "admin", "clients"]
+        },
+        "description": "Bootstraps this app's RegisteredClient row in idv-data-store. No auth required (bootstrap-only). Only needs to be run once per environment/client_id — returns 409 if the client_id is already registered, which is safe to ignore."
+      },
+      "response": []
+    },
+    {
+      "name": "1. Exchange User Token for IDV Data Store (STS)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const body = pm.response.json();",
+              "    if (body.access_token) {",
+              "        pm.environment.set(\"IDV_EXCHANGED_ACCESS_TOKEN\", body.access_token);",
+              "        console.log(\"Saved IDV_EXCHANGED_ACCESS_TOKEN to environment\");",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "urn:ietf:params:oauth:grant-type:token-exchange",
+              "type": "text"
+            },
+            {
+              "key": "client_id",
+              "value": "{{IDV_DATA_STORE_STS_CLIENT_ID}}",
+              "type": "text"
+            },
+            {
+              "key": "client_secret",
+              "value": "{{IDV_DATA_STORE_STS_CLIENT_SECRET}}",
+              "type": "text"
+            },
+            {
+              "key": "subject_token",
+              "value": "{{USER_ACCESS_TOKEN}}",
+              "type": "text"
+            },
+            {
+              "key": "subject_token_type",
+              "value": "urn:ietf:params:oauth:token-type:access_token",
+              "type": "text"
+            },
+            {
+              "key": "requested_token_type",
+              "value": "urn:ietf:params:oauth:token-type:access_token",
+              "type": "text"
+            },
+            {
+              "key": "scope",
+              "value": "{{IDV_DATA_STORE_SCOPES}}",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
+          "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+          "path": ["oauth2", "token"]
+        },
+        "description": "RFC 8693 OAuth 2.0 Token Exchange, mirrors app.idv_data_store.services.verified_claims.exchange_token_for_idv_data_store(). Uses this app's dedicated IBM Verify STS client credentials to exchange the user's own USER_ACCESS_TOKEN for a new access_token scoped only to idv-data-store. Saves the result to IDV_EXCHANGED_ACCESS_TOKEN."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Get IDV Data Store Client Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const body = pm.response.json();",
+              "    if (body.access_token) {",
+              "        pm.environment.set(\"IDV_DATA_STORE_CLIENT_TOKEN\", body.access_token);",
+              "        console.log(\"Saved IDV_DATA_STORE_CLIENT_TOKEN to environment\");",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/admin/token?client_id={{IDV_DATA_STORE_CLIENT_ID}}&scopes={{IDV_DATA_STORE_SCOPES}}",
+          "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
+          "path": ["v1", "admin", "token"],
+          "query": [
+            {
+              "key": "client_id",
+              "value": "{{IDV_DATA_STORE_CLIENT_ID}}"
+            },
+            {
+              "key": "scopes",
+              "value": "{{IDV_DATA_STORE_SCOPES}}"
+            }
+          ]
+        },
+        "description": "idv-data-store's own client-bootstrap token endpoint, mirrors app.idv_data_store.services.verified_claims.get_idv_data_store_client_token(). Only ever grants the intersection of the requested scopes and the client's allowed_scopes (see idv-data-store's admin/router.py). Saves the result to IDV_DATA_STORE_CLIENT_TOKEN."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Get Verified Claims",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{IDV_DATA_STORE_CLIENT_TOKEN}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"access_token\": \"{{IDV_EXCHANGED_ACCESS_TOKEN}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/auth/verified-claims",
+          "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
+          "path": ["v1", "auth", "verified-claims"]
+        },
+        "description": "Mirrors app.idv_data_store.services.verified_claims.dispatch_get_verified_claims_from_idv_data_store(). Presents idv-data-store's own client-bootstrap Bearer token (IDV_DATA_STORE_CLIENT_TOKEN) plus the already-exchanged, idv-data-store-scoped access_token (IDV_EXCHANGED_ACCESS_TOKEN) in the body. Returns the user's verified identity claims."
+      },
+      "response": []
+    }
+  ]
+}

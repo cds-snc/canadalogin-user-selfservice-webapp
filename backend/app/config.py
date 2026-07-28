@@ -104,10 +104,47 @@ class GCNotifyConfig(BaseSettings):
     )
 
 
+class IdvDataStoreConfig(BaseSettings):
+    """Configuration for exchanging tokens with, and calling, idv-data-store.
+
+    Two independent credential systems are involved:
+      - IDV_DATA_STORE_STS_CLIENT_ID/SECRET: this app's dedicated IBM Verify
+        STS client, used to perform the RFC 8693 OAuth 2.0 Token Exchange
+        directly against IBM Verify (grant_type=token-exchange), turning the
+        user's own access_token into a new access_token scoped only to
+        idv-data-store (custom scope IDV_DATA_STORE_SCOPES). The
+        user's original access_token is never shared with idv-data-store.
+      - IDV_DATA_STORE_CLIENT_ID: this app's own registered client id in
+        idv-data-store's separate, internal client-bootstrap system, used to
+        obtain an idv-data-store-issued Bearer token (via idv-data-store's
+        POST /v1/admin/token) to authenticate calls to idv-data-store itself.
+    """
+
+    IDV_DATA_STORE_BASE_URL: str = "http://localhost:8100"
+    IDV_DATA_STORE_CLIENT_ID: str = ""
+    IDV_DATA_STORE_STS_CLIENT_ID: str = ""
+    IDV_DATA_STORE_STS_CLIENT_SECRET: str = ""
+    IDV_DATA_STORE_SCOPES: str = Field(
+        default="idv:auth:verified-claims",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from both "
+            "the IBM Verify STS client (token exchange) and idv-data-store's "
+            "own client-bootstrap token endpoint. Currently only "
+            "'idv:auth:verified-claims' is needed, but this can be extended "
+            "with additional space-separated scopes as this app calls more "
+            "idv-data-store endpoints."
+        ),
+    )
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
+    )
+
+
 class Configuration(BaseSettings):
     app_info: AppInfo = AppInfo()
     ibm_verify_config: IBMVerifyConfig = IBMVerifyConfig()
     session_config: SessionConfig = SessionConfig()
+    idv_data_store_config: IdvDataStoreConfig = IdvDataStoreConfig()
     ENVIRONMENT: str = Field(default="local")
     V1_API_VERSION: str = "/v1"
     ROOT_DOMAIN: Optional[str] = (
@@ -175,6 +212,23 @@ class Configuration(BaseSettings):
     @property
     def verify_password_api_endpoint(self) -> str:
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.VERIFY_PASSWORD.value}"
+
+    @property
+    def token_api_endpoint(self) -> str:
+        """IBM Verify's OAuth2 token endpoint, used for the RFC 8693 Token
+        Exchange performed against idv-data-store's dedicated STS client."""
+        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
+
+    @property
+    def idv_data_store_token_endpoint(self) -> str:
+        """idv-data-store's own client-bootstrap token endpoint."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/admin/token"
+
+    @property
+    def idv_data_store_exchange_endpoint(self) -> str:
+        """idv-data-store's endpoint for fetching verified identity claims for
+        an already-exchanged access_token."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/auth/verified-claims"
 
 
 @lru_cache
