@@ -26,12 +26,10 @@ export default function TopNav({ currentLang }: TopNavProps) {
   const { t, i18n } = useTranslation("layout");
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
-  const { relyingPartyName, relyingPartyUrl } = useRelyingPartyInfo(
+  const { relyingPartyName, relyingPartyUrl, hasRelyingParty } = useRelyingPartyInfo(
     state,
     i18n.language,
   );
-  const shouldRenderRelyingPartyLink =
-    Boolean(relyingPartyUrl) && Boolean(relyingPartyName.trim());
 
   const { mobile, tablet } = useBreakpoints();
 
@@ -76,7 +74,7 @@ export default function TopNav({ currentLang }: TopNavProps) {
       <GcdsNavLink href={securitySettingsLink}>
         {t("TopNavBar.securitySettings")}
       </GcdsNavLink>
-      {shouldRenderRelyingPartyLink && (
+      {hasRelyingParty && (
         <GcdsNavLink href={relyingPartyUrl}>
           {t("TopNavBar.returnTo") + relyingPartyName}
         </GcdsNavLink>
