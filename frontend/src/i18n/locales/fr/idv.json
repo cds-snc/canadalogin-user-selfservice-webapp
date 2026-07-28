@@ -203,19 +203,20 @@
   },
   "CompleteIdentityProofing": {
     "pageTitle": "Complete identity proofing",
-    "heading": "Complete identity proofing when you're ready",
+    "heading": "Prove your identity when you’re ready",
     "noticeTitle": "Get access to more services",
     "noticeDescription": "Complete identity proofing to secure your CanadaLogin, make recovery easier, and access more Government of Canada services.",
     "noticeCta": "Complete identity proofing",
-    "accessRPServicePortalTitle": "To access the {{rpServicePortal}}, you need to complete identity proofing first",
-    "accessRPServicePortalText": "When you're ready, sign back in to your {{appName}} account and you'll be brought back to this step automatically.",
-    "buttonStartIdentity": "Start identity proofing now",
+    "accessRPServicePortalTitle": "You need to complete identity proofing to access {{rpServicePortal}}.",
+    "accessRPServicePortalText": "Whether you need to find your ID or take a break, you can sign out and prove your identity when you sign back in.",
+    "listOfAcceptableIds": "List of acceptable IDs",
+    "buttonStartIdentity": "Start proving identity",
     "signOut": "Sign out",
     "signingOut": "Signing you out...",
     "signOutFailed": "Failed to sign you out. Redirecting...",
     "noDocumentsNoticeHeader": "Don't have the required documents for identity proofing?",
-    "noDocumentsNoticeText": "If you do not have the required identity documents, or are unable to complete the proofing process because of some other circumstances, you will need to contact {{rpServicePortal}} directly to ask about alternative ways to verify your identity and access the service.",
-    "contactLink": "RP Service Portal contact"
+    "noDocumentsNoticeText": "If you don’t have an acceptable ID, find other ways to access the service by contacting ",
+    "contactLink": "{{rpServicePortal}}"
   },
   "ApprovedDocuments": {
     "driverLicence": "Permis de conduire provincial/territorial",

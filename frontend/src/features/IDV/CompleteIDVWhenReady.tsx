@@ -7,7 +7,7 @@ import {
   GcdsLink,
   GcdsText,
   GcdsContainer,
-  GcdsNotice,
+  GcdsDetails,
 } from "@gcds-core/components-react";
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
@@ -16,6 +16,7 @@ import { useUser } from "../../components/Providers/useUser";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
+import { APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS } from "./data/approvedDocuments";
 
 export default function CompleteIdentityProofingPage() {
   const navigate = useNavigate();
@@ -84,6 +85,25 @@ export default function CompleteIdentityProofingPage() {
               appName,
             })}
           </GcdsText>
+          <GcdsText>
+            {t("CompleteIdentityProofing.noDocumentsNoticeText")}
+            <GcdsLink href="#" external size="regular">
+              {t("CompleteIdentityProofing.contactLink", { rpServicePortal })}
+            </GcdsLink>
+          </GcdsText>
+          <GcdsText>
+            <GcdsDetails
+              detailsTitle={t("CompleteIdentityProofing.listOfAcceptableIds")}
+            >
+              <ol
+                aria-label={t("CompleteIdentityProofing.listOfAcceptableIds")}
+              >
+                {APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS.map((docValue) => (
+                  <li key={docValue}>{t(`ApprovedDocuments.${docValue}`)}</li>
+                ))}
+              </ol>
+            </GcdsDetails>
+          </GcdsText>
           <GcdsGrid columns="max-content max-content" gap="200">
             <GcdsButton
               type="button"
@@ -104,21 +124,6 @@ export default function CompleteIdentityProofingPage() {
               {t("CompleteIdentityProofing.signOut")}
             </GcdsButton>
           </GcdsGrid>
-          <GcdsNotice
-            noticeRole="warning"
-            noticeTitleTag="h2"
-            style={{ marginTop: "2rem" }}
-            noticeTitle={t("CompleteIdentityProofing.noDocumentsNoticeHeader")}
-          >
-            <GcdsText>
-              {t("CompleteIdentityProofing.noDocumentsNoticeText", {
-                rpServicePortal,
-              })}
-            </GcdsText>
-            <GcdsLink href="#" external size="regular">
-              {t("CompleteIdentityProofing.contactLink")}
-            </GcdsLink>
-          </GcdsNotice>
         </GcdsContainer>
       </GcdsGrid>
     </GcdsContainer>
