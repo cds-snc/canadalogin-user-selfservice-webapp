@@ -26,16 +26,13 @@ import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 import {
   getVisitCanadaPostValidation,
-  requiresAddressAndProvince,
   type VisitCanadaPostFormData,
 } from "./validation/VisitCanadaPost.validation";
 import {
-  getAddressRequiredMessage,
   getFirstNameRequiredOrInvalidMessage,
   getIdExpiryRequiredMessage,
   getIdTypeRequiredMessage,
   getLastNameRequiredOrInvalidMessage,
-  getProvinceRequiredMessage,
   getSharedDateOfBirthMessages,
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
@@ -60,6 +57,7 @@ export default function VisitCanadaPost() {
     dateOfBirth: "",
     address: "",
     province: "",
+    postalcode: "",
   });
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isDateOfBirthTouched, setIsDateOfBirthTouched] = useState(false);
@@ -95,11 +93,6 @@ export default function VisitCanadaPost() {
 
   const dobMessages = getSharedDateOfBirthMessages(t);
 
-  const dateOfBirthErrorMessage =
-    (isDateOfBirthTouched || hasSubmitted) && dateOfBirthValidationError
-      ? dobMessages[dateOfBirthValidationError].inline
-      : "";
-
   const summaryErrors: Record<string, string> = {};
 
   if (summaryErrorCodes.idType) {
@@ -124,14 +117,6 @@ export default function VisitCanadaPost() {
       dobMessages[summaryErrorCodes.dateOfBirth].summary;
   }
 
-  if (summaryErrorCodes.address) {
-    summaryErrors["#address-input"] = getAddressRequiredMessage(t);
-  }
-
-  if (summaryErrorCodes.province) {
-    summaryErrors["#select-province"] = getProvinceRequiredMessage(t);
-  }
-
   const idTypeErrorMessage =
     hasSubmitted && summaryErrorCodes.idType ? getIdTypeRequiredMessage(t) : "";
 
@@ -150,14 +135,9 @@ export default function VisitCanadaPost() {
       ? getLastNameRequiredOrInvalidMessage(t)
       : "";
 
-  const addressErrorMessage =
-    hasSubmitted && summaryErrorCodes.address
-      ? getAddressRequiredMessage(t)
-      : "";
-
-  const provinceErrorMessage =
-    hasSubmitted && summaryErrorCodes.province
-      ? getProvinceRequiredMessage(t)
+  const dateOfBirthErrorMessage =
+    (isDateOfBirthTouched || hasSubmitted) && dateOfBirthValidationError
+      ? dobMessages[dateOfBirthValidationError].inline
       : "";
 
   if (!DEV_ONLY_FEATURE) {
@@ -271,13 +251,11 @@ export default function VisitCanadaPost() {
                 {showAddressAndProvinceFields && (
                   <>
                     <GcdsInput
-                      required
                       id="address-input"
                       inputId="address-input"
                       name="address-input"
                       label={t("ServiceCanadaCentre.addressLabel")}
                       hint={t("ServiceCanadaCentre.addressHint")}
-                      errorMessage={addressErrorMessage}
                       onGcdsChange={createChangeHandler("address")}
                     />
 
@@ -289,8 +267,6 @@ export default function VisitCanadaPost() {
                         "ServiceCanadaCentre.selectIdDropdownDefaultValue",
                       )}
                       label={t("ServiceCanadaCentre.provinceLabel")}
-                      required
-                      errorMessage={provinceErrorMessage}
                       onGcdsChange={createChangeHandler("province")}
                     >
                       {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
@@ -299,6 +275,13 @@ export default function VisitCanadaPost() {
                         </option>
                       ))}
                     </GcdsSelect>
+                    <GcdsInput
+                      inputId="postalcode-input"
+                      name="postalcode-input"
+                      label={t("ServiceCanadaCentre.postalcodeLabel")}
+                      hint={t("ServiceCanadaCentre.postalcodeHint")}
+                      onGcdsChange={createChangeHandler("postalcode")}
+                    />
                   </>
                 )}
               </>
@@ -331,9 +314,8 @@ export default function VisitCanadaPost() {
                   lastName: formData.lastName,
                   dateOfBirth: formData.dateOfBirth,
                   idSelected: formData.idType,
-                  ...(requiresAddressAndProvince(formData.idType)
-                    ? { address: formData.address }
-                    : {}),
+                  address: formData.address,
+                  province: formData.province,
                 };
 
                 navigate(
