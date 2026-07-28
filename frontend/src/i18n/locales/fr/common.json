@@ -49,5 +49,8 @@
     "password_invalid_attempts_other": "Mot de passe incorrect. Il vous reste {{count}} tentatives.",
     "password_max_attempts": "Vous avez atteint la limite de tentatives de vérification. Attendez 15 minutes et réessayez.",
     "otp_expired": "Votre code a expiré. Demandez un nouveau code ci-dessous."
-  }
+  },
+  "RelyingParty": {
+    "canadaLogin": "CanadaLogin"
+    }
 }

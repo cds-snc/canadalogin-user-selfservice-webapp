@@ -38,7 +38,6 @@ export default function CompleteIdentityProofingPage() {
     state,
     i18n.language,
   );
-  const rpServicePortal = relyingPartyLinkName || appName;
 
   const handleSignOut = async (event: Event) => {
     event.preventDefault();
@@ -76,7 +75,7 @@ export default function CompleteIdentityProofingPage() {
           <GcdsText>
             <strong>
               {t("CompleteIdentityProofing.accessRPServicePortalTitle", {
-                rpServicePortal,
+                relyingPartyLinkName,
               })}
             </strong>
           </GcdsText>
@@ -88,7 +87,7 @@ export default function CompleteIdentityProofingPage() {
           <GcdsText>
             {t("CompleteIdentityProofing.noDocumentsNoticeText")}
             <GcdsLink href="#" external size="regular">
-              {t("CompleteIdentityProofing.contactLink", { rpServicePortal })}
+              {t("CompleteIdentityProofing.contactLink", { relyingPartyLinkName })}
             </GcdsLink>
           </GcdsText>
           <GcdsText>
