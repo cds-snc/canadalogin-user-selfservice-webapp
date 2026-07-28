@@ -267,7 +267,6 @@ export default function VisitCanadaPost() {
                         "ServiceCanadaCentre.selectIdDropdownDefaultValue",
                       )}
                       label={t("ServiceCanadaCentre.provinceLabel")}
-
                       onGcdsChange={createChangeHandler("province")}
                     >
                       {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (

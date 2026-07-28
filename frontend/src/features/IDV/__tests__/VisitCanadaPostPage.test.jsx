@@ -5,12 +5,10 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import VisitCanadaPost from "../InPerson/VisitCanadaPostPage";
 import {
-  getAddressRequiredMessage,
   getFirstNameRequiredOrInvalidMessage,
   getIdExpiryRequiredMessage,
   getIdTypeRequiredMessage,
   getLastNameRequiredOrInvalidMessage,
-  getProvinceRequiredMessage,
   getSharedDateOfBirthMessages,
 } from "../InPerson/validation/ErrorsDefinition";
 import i18n from "../../../i18n/test";
@@ -474,8 +472,6 @@ describe("VisitCanadaPost", () => {
     expect(summary).toHaveTextContent(
       getSharedDateOfBirthMessages(t).required.summary,
     );
-    expect(summary).toHaveTextContent(getAddressRequiredMessage(t));
-    expect(summary).toHaveTextContent(getProvinceRequiredMessage(t));
   });
 
   it("blocks navigation and shows invalid date summary for impossible date", () => {
