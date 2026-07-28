@@ -23,7 +23,13 @@ class IDVDataServiceConfig(BaseSettings):
     )
     IDV_DATA_SERVICE_CLAIMS_QUERY_PATH: str = Field(default="/v1/claims/query")
 
-    # Transport/auth defaults.
+    # OAuth2 authentication settings (instead of API key).
+    IDV_DATA_SERVICE_CLIENT_ID: str | None = Field(default=None)
+    IDV_DATA_SERVICE_OAUTH_SCOPES: str = Field(
+        default="idv:validations:write idv:validations:read idv:validations:update idv:validations:delete idv:claims:query"
+    )
+
+    # Legacy API key (deprecated if using OAuth).
     IDV_DATA_SERVICE_API_KEY: str | None = Field(default=None)
     IDV_DATA_SERVICE_TIMEOUT_SECONDS: int = Field(default=30, ge=1)
 

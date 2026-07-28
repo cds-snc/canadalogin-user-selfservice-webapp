@@ -1,6 +1,6 @@
 import logging
 from fastapi import HTTPException, status
-from httpx import HTTPStatusError, TimeoutException
+from httpx import ConnectError, HTTPStatusError, TimeoutException
 from authlib.integrations.starlette_client import OAuthError
 from pydantic import ValidationError
 
@@ -61,6 +61,13 @@ class RequestErrorHandler:
                 raise OAuthError("Invalid or expired token")
             raise HTTPException(
                 status_code=response_status_code, detail=f"{context} failed"
+            ) from exc
+
+        elif isinstance(exc, ConnectError):
+            logger.error("%s connection failed: %s", context, exc)
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"{context} upstream service unavailable",
             ) from exc
 
         elif isinstance(exc, TimeoutException):

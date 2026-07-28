@@ -23,6 +23,7 @@ from app.password import v1_router as v1_password_router
 from app.otp import v1_router as v1_otp_router
 from app.fido2 import v1_router as v1_fido2_router
 from app.identity_verification import v1_router as v1_identity_verification_router
+from app.idv_data_storage import v1_router as v1_idv_data_storage_router
 from app.fido2.services.mds_service import mds_service
 from app.auth.services import oidc_config
 from app.utils.global_error_handlers import (
@@ -54,6 +55,9 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+# Debug logging for IDV data service client
+logging.getLogger("app.idv_data_storage_service.clients.base").setLevel(logging.DEBUG)
 
 # Add filter to suppress healthcheck logs from Uvicorn access logs
 logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
@@ -221,6 +225,11 @@ def create_app():
             v1_identity_verification_router.router,
             prefix=f"{configuration.V1_API_VERSION}/identity-verification",
             tags=["Identity Verification"],
+        )
+        app.include_router(
+            v1_idv_data_storage_router.router,
+            prefix=f"{configuration.V1_API_VERSION}/idv-data-storage",
+            tags=["IDV Data Storage"],
         )
 
     app.add_exception_handler(HTTPException, http_exception_handler)
