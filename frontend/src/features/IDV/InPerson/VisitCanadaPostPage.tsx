@@ -30,12 +30,10 @@ import {
   type VisitCanadaPostFormData,
 } from "./validation/VisitCanadaPost.validation";
 import {
-  getAddressRequiredMessage,
   getFirstNameRequiredOrInvalidMessage,
   getIdExpiryRequiredMessage,
   getIdTypeRequiredMessage,
   getLastNameRequiredOrInvalidMessage,
-  getProvinceRequiredMessage,
   getSharedDateOfBirthMessages,
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
@@ -124,14 +122,6 @@ export default function VisitCanadaPost() {
       dobMessages[summaryErrorCodes.dateOfBirth].summary;
   }
 
-  if (summaryErrorCodes.address) {
-    summaryErrors["#address-input"] = getAddressRequiredMessage(t);
-  }
-
-  if (summaryErrorCodes.province) {
-    summaryErrors["#select-province"] = getProvinceRequiredMessage(t);
-  }
-
   const idTypeErrorMessage =
     hasSubmitted && summaryErrorCodes.idType ? getIdTypeRequiredMessage(t) : "";
 
@@ -148,16 +138,6 @@ export default function VisitCanadaPost() {
   const lastNameErrorMessage =
     hasSubmitted && summaryErrorCodes.lastName
       ? getLastNameRequiredOrInvalidMessage(t)
-      : "";
-
-  const addressErrorMessage =
-    hasSubmitted && summaryErrorCodes.address
-      ? getAddressRequiredMessage(t)
-      : "";
-
-  const provinceErrorMessage =
-    hasSubmitted && summaryErrorCodes.province
-      ? getProvinceRequiredMessage(t)
       : "";
 
   if (!DEV_ONLY_FEATURE) {
@@ -271,13 +251,11 @@ export default function VisitCanadaPost() {
                 {showAddressAndProvinceFields && (
                   <>
                     <GcdsInput
-                      required
                       id="address-input"
                       inputId="address-input"
                       name="address-input"
                       label={t("ServiceCanadaCentre.addressLabel")}
                       hint={t("ServiceCanadaCentre.addressHint")}
-                      errorMessage={addressErrorMessage}
                       onGcdsChange={createChangeHandler("address")}
                     />
 
@@ -289,8 +267,7 @@ export default function VisitCanadaPost() {
                         "ServiceCanadaCentre.selectIdDropdownDefaultValue",
                       )}
                       label={t("ServiceCanadaCentre.provinceLabel")}
-                      required
-                      errorMessage={provinceErrorMessage}
+
                       onGcdsChange={createChangeHandler("province")}
                     >
                       {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
