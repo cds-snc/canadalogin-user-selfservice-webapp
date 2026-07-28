@@ -23,11 +23,10 @@ type BreadcrumbLink = {
 export default function Breadcrumbs() {
   const matches = useMatches() as Array<UIMatch<unknown, BreadcrumbHandle>>;
   const { t, i18n } = useTranslation();
-  const { t: tCommon } = useTranslation("common");
   const { state } = useUser();
-  const { relyingPartyInfo, relyingPartyName, relyingPartyUrl } =
-    useRelyingPartyInfo(state, i18n.language, tCommon("RelyingParty.rpName"));
-  const rp: BreadcrumbLink | null = relyingPartyInfo
+  const { hasRelyingParty, relyingPartyName, relyingPartyUrl } =
+    useRelyingPartyInfo(state, i18n.language);
+  const rp: BreadcrumbLink | null = hasRelyingParty
     ? {
         name: relyingPartyName,
         url: relyingPartyUrl,

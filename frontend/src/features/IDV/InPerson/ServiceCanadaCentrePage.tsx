@@ -60,12 +60,10 @@ export default function ServiceCanadaCentrePage() {
   });
 
   const { t, i18n } = useTranslation("idv");
-  const { t: tCommon } = useTranslation("common");
   const { state } = useUser();
   const { relyingPartyName: rpName } = useRelyingPartyInfo(
     state,
     i18n.language,
-    tCommon("RelyingParty.rpName"),
   );
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {

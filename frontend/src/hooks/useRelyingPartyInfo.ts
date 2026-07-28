@@ -4,6 +4,7 @@ import type { RelyingPartyInfo, UserState } from "../types/user";
 
 export type RelyingPartyDetails = {
   relyingPartyInfo: RelyingPartyInfo | null;
+  hasRelyingParty: boolean;
   relyingPartyName: string;
   relyingPartyUrl: string;
 };
@@ -11,14 +12,14 @@ export type RelyingPartyDetails = {
 function getRelyingPartyDetails(
   relyingPartyInfo: RelyingPartyInfo | null | undefined,
   language: string,
-  fallbackName: string,
 ): RelyingPartyDetails {
   const localizedDetail = relyingPartyInfo?.localized?.[language];
+  const relyingParty = relyingPartyInfo ?? null;
 
   return {
-    relyingPartyInfo: relyingPartyInfo ?? null,
-    relyingPartyName:
-      localizedDetail?.name ?? relyingPartyInfo?.linkName ?? fallbackName,
+    relyingPartyInfo: relyingParty,
+    hasRelyingParty: Boolean(relyingParty),
+    relyingPartyName: localizedDetail?.name ?? relyingPartyInfo?.linkName ?? "",
     relyingPartyUrl: localizedDetail?.url ?? relyingPartyInfo?.url ?? "",
   };
 }
@@ -26,15 +27,9 @@ function getRelyingPartyDetails(
 export function useRelyingPartyInfo(
   userState: UserState | null | undefined,
   language: string,
-  fallbackName: string,
 ): RelyingPartyDetails {
   return useMemo(
-    () =>
-      getRelyingPartyDetails(
-        userState?.relyingPartyInfo,
-        language,
-        fallbackName,
-      ),
-    [userState?.relyingPartyInfo, language, fallbackName],
+    () => getRelyingPartyDetails(userState?.relyingPartyInfo, language),
+    [userState?.relyingPartyInfo, language],
   );
 }

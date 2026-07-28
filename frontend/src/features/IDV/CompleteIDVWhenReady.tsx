@@ -36,7 +36,6 @@ export default function CompleteIdentityProofingPage() {
   const { relyingPartyName: relyingPartyLinkName } = useRelyingPartyInfo(
     state,
     i18n.language,
-    appName,
   );
   const rpServicePortal = relyingPartyLinkName || appName;
 

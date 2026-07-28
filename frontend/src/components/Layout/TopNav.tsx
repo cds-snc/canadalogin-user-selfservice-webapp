@@ -24,13 +24,11 @@ type NavigationEvent = {
 
 export default function TopNav({ currentLang }: TopNavProps) {
   const { t, i18n } = useTranslation("layout");
-  const { t: tCommon } = useTranslation("common");
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
   const { relyingPartyName, relyingPartyUrl } = useRelyingPartyInfo(
     state,
     i18n.language,
-    tCommon("RelyingParty.canadaLogin"),
   );
   const shouldRenderRelyingPartyLink =
     Boolean(relyingPartyUrl) && Boolean(relyingPartyName.trim());

@@ -25,7 +25,6 @@ const formatDisplayDate = (value: Date | string, locale: string = "en-CA") =>
 
 export default function InPersonProofingInProgress() {
   const { t, i18n } = useTranslation("idv");
-  const { t: tCommon } = useTranslation("common");
   const { language, journeyType } = useParams();
   const navigate = useNavigate();
   const { state } = useUser();
@@ -34,7 +33,6 @@ export default function InPersonProofingInProgress() {
   const { relyingPartyName: rpName } = useRelyingPartyInfo(
     state,
     i18n.language,
-    tCommon("RelyingParty.rpName"),
   );
 
   const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
