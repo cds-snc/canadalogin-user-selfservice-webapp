@@ -26,10 +26,8 @@ export default function TopNav({ currentLang }: TopNavProps) {
   const { t, i18n } = useTranslation("layout");
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
-  const { relyingPartyName, relyingPartyUrl, hasRelyingParty } = useRelyingPartyInfo(
-    state,
-    i18n.language,
-  );
+  const { relyingPartyName, relyingPartyUrl, hasRelyingParty } =
+    useRelyingPartyInfo(state, i18n.language);
 
   const { mobile, tablet } = useBreakpoints();
 
