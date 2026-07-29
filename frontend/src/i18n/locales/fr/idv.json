@@ -55,7 +55,7 @@
     "heading": "Your unique code for identity proofing at Service Canada Centre",
     "codeValidDays": "This code is valid for {{validityDays}} days and has been emailed to",
     "codeValidDaysDynamic": "This code is valid for {{validityDays}} days (expires {{expiryDate}}) and has been emailed to",
-    "visitInstruction": "Visit a Service Canada Centre with your code and one valid ID document.",
+      "visitInstruction": "Visit a Service Canada Centre with your code and your {{idSelected}}.",
     "yourInformationHeading": "Your information",
     "firstName": "First name",
     "lastName": "Last name",
