@@ -175,6 +175,7 @@ export const PAGES = {
   idvProvincialVerificationPage: "IdvProvincialVerificationPage",
   idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
   idvInPersonProofingInProgressPage: "IdvInPersonProofingInProgressPage",
+  idvProveIdentityInPersonPage: "IdvProveIdentityInPersonPage",
   idvDetailsConfirmationPage: "IdvDetailsConfirmationPage",
   idvIdentityVerificationSuccessPage: "IdvIdentityVerificationSuccessPage",
   idvPartnerLinkSuccessPage: "IdvPartnerLinkSuccessPage",
@@ -183,6 +184,7 @@ export const PAGES = {
 export const PROVINCIAL_PARTNERS = {
   bc: "BC",
   ab: "AB",
+  qc: "QC",
 } as const;
 
 export const PRIVACY_NOTICE_LINKS = {
