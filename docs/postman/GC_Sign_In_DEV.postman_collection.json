@@ -14,6 +14,27 @@
           "item": [
             {
               "name": "Get User Access Token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const body = pm.response.json();",
+                      "    if (body.access_token) {",
+                      "        pm.environment.set(\"USER_ACCESS_TOKEN\", body.access_token);",
+                      "        console.log(\"Saved USER_ACCESS_TOKEN to environment\");",
+                      "    }",
+                      "    if (body.refresh_token) {",
+                      "        pm.environment.set(\"REFRESH_TOKEN\", body.refresh_token);",
+                      "        console.log(\"Saved REFRESH_TOKEN to environment\");",
+                      "    }",
+                      "}"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "auth": {
                   "type": "bearer",
@@ -63,7 +84,7 @@
                     },
                     {
                       "key": "assertion",
-                      "value": "eyJhbGciOiJSUzI1NiIsImtpZCI6InNlcnZlciJ9.eyJzdWIiOiI3NzEwMDFGT0RGIiwianRpIjoiNjk4OGJiZTMtNjY2Ny00ZjgxLThlMzYtMzY1NDNhYjEyZDcyIiwiaWF0IjoxNzQ4Mjc2NDE1LCJleHAiOjE3NDgyNzY3MTUsInRlbmFudElkIjoiY2RzLWdjc2lnbmluLWRldi52ZXJpZnkuaWJtLmNvbSIsImlzcyI6Imh0dHBzOi8vY2RzLWdjc2lnbmluLWRldi52ZXJpZnkuaWJtLmNvbS92Mi4wL2ZhY3RvcnMiLCJhdWQiOlsiYzYyN2QwOGItYmI2Mi00MTlkLWJkOTQtYjJhMTc2MDE2MDdlIiwiaHR0cHM6Ly9jZHMtZ2NzaWduaW4tZGV2LnZlcmlmeS5pYm0uY29tL3YxLjAvZW5kcG9pbnQvZGVmYXVsdC90b2tlbiJdLCJmYWN0b3IiOiJwYXNzd29yZCIsImFtciI6WyJwYXNzd29yZCJdLCJncmFudF9pZCI6ImVkYzc5YzQ2LWExYmEtNGIxYi05MGQwLTRhYTE4MDY2MjFlMCIsInN1Yl90eXBlIjoidWlkIn0.kJevdaDcPb8RcDrXlPQij9pX5PMIXcjKjdeLPxXq4FRjdERTaVI1kDQNDYszGqsq8yz4sLgCPIeJVsGBc-cdL7FvTET1PwFDXNf9jPB_-iVw5kzWryuGz19A4STCmU1z8nMBpzmZSGWd_WdfbDBFV1utTRjWGNO0MVfhmDdXQZJXya2zmMdbl5LQoR0L1PQSCi3YliAHztQFmbSMNKBRFHr8z74XiSvwlxCFdLxn1mA7VvPNqiIj2TTUHog7u44MEF_Nv7wmtCW1t3xUUBZ81Jo6RsFNYmFEbq8kbzSegGDHqS1kn50EtxdWzXCNubij8IGjQoykEO0NohYrMaGiYw",
+                      "value": "{{ASSERTION_JWT}}",
                       "type": "text"
                     }
                   ]
@@ -78,13 +99,34 @@
             },
             {
               "name": "Refresh Token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const body = pm.response.json();",
+                      "    if (body.access_token) {",
+                      "        pm.environment.set(\"USER_ACCESS_TOKEN\", body.access_token);",
+                      "        console.log(\"Saved USER_ACCESS_TOKEN to environment\");",
+                      "    }",
+                      "    if (body.refresh_token) {",
+                      "        pm.environment.set(\"REFRESH_TOKEN\", body.refresh_token);",
+                      "        console.log(\"Saved REFRESH_TOKEN to environment\");",
+                      "    }",
+                      "}"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "auth": {
                   "type": "bearer",
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "{{ACCESS_TOKEN}}",
+                      "value": "{{USER_ACCESS_TOKEN}}",
                       "type": "string"
                     }
                   ]
@@ -127,7 +169,7 @@
                     },
                     {
                       "key": "refresh_token",
-                      "value": "<token-redacted>",
+                      "value": "{{REFRESH_TOKEN}}",
                       "type": "text"
                     }
                   ]
@@ -137,14 +179,6 @@
                   "host": ["{{IBM_VERIFY_TENANT_URL}}"],
                   "path": ["oauth2", "token"]
                 }
-              },
-              "response": []
-            },
-            {
-              "name": "New Request",
-              "request": {
-                "method": "GET",
-                "header": []
               },
               "response": []
             }
@@ -161,7 +195,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "{{ACCESS_TOKEN}}",
+                      "value": "{{USER_ACCESS_TOKEN}}",
                       "type": "string"
                     }
                   ]
@@ -170,12 +204,12 @@
                 "header": [
                   {
                     "key": "Content-Type",
-                    "value": "{{SCIMJSON CONTENT HEADER}}",
+                    "value": "{{SCIM_CONTENT_TYPE}}",
                     "type": "text"
                   },
                   {
                     "key": "Accept",
-                    "value": "{{SCIMJSON CONTENT HEADER}}",
+                    "value": "{{SCIM_CONTENT_TYPE}}",
                     "type": "text"
                   }
                 ],
@@ -198,13 +232,33 @@
             },
             {
               "name": "SignIn With Password - Return JWT",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const body = pm.response.json();",
+                      "    const jwt = body.jwt || body.token || body.assertion;",
+                      "    if (jwt) {",
+                      "        pm.environment.set(\"ASSERTION_JWT\", jwt);",
+                      "        console.log(\"Saved ASSERTION_JWT to environment\");",
+                      "    } else {",
+                      "        console.warn(\"Could not find a JWT/assertion field in the response - inspect the response body and set ASSERTION_JWT manually\");",
+                      "    }",
+                      "}"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "auth": {
                   "type": "bearer",
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "{{ACCESS_TOKEN}}",
+                      "value": "{{ADMIN_ACCESS_TOKEN}}",
                       "type": "string"
                     }
                   ]
@@ -232,9 +286,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/authnmethods/password/{{Cloud Directory ID}}?returnJwt=true",
+                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/authnmethods/password/{{CLOUD_DIRECTORY_ID}}?returnJwt=true",
                   "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-                  "path": ["v1.0", "authnmethods", "password", "{{Cloud Directory ID}}"],
+                  "path": ["v1.0", "authnmethods", "password", "{{CLOUD_DIRECTORY_ID}}"],
                   "query": [
                     {
                       "key": "returnJwt",
@@ -261,7 +315,7 @@
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "{{ACCESS_TOKEN}}",
+                      "value": "{{USER_ACCESS_TOKEN}}",
                       "type": "string"
                     }
                   ]
@@ -270,12 +324,12 @@
                 "header": [
                   {
                     "key": "Accept",
-                    "value": "{{SCIMJSON CONTENT HEADER}}",
+                    "value": "{{SCIM_CONTENT_TYPE}}",
                     "type": "text"
                   },
                   {
                     "key": "Content-Type",
-                    "value": "{{SCIMJSON CONTENT HEADER}}",
+                    "value": "{{SCIM_CONTENT_TYPE}}",
                     "type": "text"
                   }
                 ],
@@ -309,9 +363,9 @@
                   ]
                 },
                 "url": {
-                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Users/{{User ID}}",
+                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Users/{{USER_ID}}",
                   "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-                  "path": ["v2.0", "Users", "{{User ID}}"]
+                  "path": ["v2.0", "Users", "{{USER_ID}}"]
                 }
               },
               "response": []
@@ -332,22 +386,39 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/auth/sessions/{{User ID}}",
+                  "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/auth/sessions/{{USER_ID}}",
                   "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-                  "path": ["v1.0", "auth", "sessions", "{{User ID}}"]
+                  "path": ["v1.0", "auth", "sessions", "{{USER_ID}}"]
                 }
               },
               "response": []
             },
             {
               "name": "Authenticated User Profile",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const body = pm.response.json();",
+                      "    if (body.id) {",
+                      "        pm.environment.set(\"USER_ID\", body.id);",
+                      "        console.log(\"Saved USER_ID to environment\");",
+                      "    }",
+                      "}"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "auth": {
                   "type": "bearer",
                   "bearer": [
                     {
                       "key": "token",
-                      "value": "{{User Access Token}}",
+                      "value": "{{USER_ACCESS_TOKEN}}",
                       "type": "string"
                     }
                   ]
@@ -356,7 +427,7 @@
                 "header": [
                   {
                     "key": "Accept",
-                    "value": "{{SCIMJSON CONTENT HEADER}}",
+                    "value": "{{SCIM_CONTENT_TYPE}}",
                     "type": "text"
                   }
                 ],
@@ -372,6 +443,23 @@
         },
         {
           "name": "Get a Admin Oauth Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    if (body.access_token) {",
+                  "        pm.environment.set(\"ADMIN_ACCESS_TOKEN\", body.access_token);",
+                  "        console.log(\"Saved ADMIN_ACCESS_TOKEN to environment\");",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -424,13 +512,33 @@
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    const results = body.Resources || body.password || [];",
+                  "    if (results.length > 0 && results[0].id) {",
+                  "        pm.environment.set(\"CLOUD_DIRECTORY_ID\", results[0].id);",
+                  "        console.log(\"Saved CLOUD_DIRECTORY_ID to environment\");",
+                  "    } else {",
+                  "        console.warn(\"Could not find Cloud Directory id in response - inspect the response body and set CLOUD_DIRECTORY_ID manually\");",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{ACCESS_TOKEN}}",
+                  "value": "{{ADMIN_ACCESS_TOKEN}}",
                   "type": "string"
                 }
               ]
@@ -500,7 +608,7 @@
                 },
                 {
                   "key": "access_token",
-                  "value": "{{User Access Token}}",
+                  "value": "{{USER_ACCESS_TOKEN}}",
                   "type": "text"
                 }
               ]
@@ -537,7 +645,7 @@
               "formdata": [
                 {
                   "key": "access_token",
-                  "value": "<token-redacted>",
+                  "value": "{{USER_ACCESS_TOKEN}}",
                   "type": "text"
                 }
               ]
@@ -547,6 +655,236 @@
               "host": ["{{IBM_VERIFY_TENANT_URL}}"],
               "path": ["oauth2", "userinfo"]
             }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "IDV Data Store - Token Exchange Flow",
+      "item": [
+        {
+          "name": "0. Register IDV Data Store Client (one-time bootstrap)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"{{IDV_DATA_STORE_CLIENT_ID}}\",\n  \"client_name\": \"gc-signin-selfservice-webapp\",\n  \"allowed_scopes\": \"{{IDV_DATA_STORE_SCOPES}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/admin/clients",
+              "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
+              "path": ["v1", "admin", "clients"]
+            },
+            "description": "Bootstraps this app's RegisteredClient row in idv-data-store. No auth required (bootstrap-only). Only needs to be run once per environment/client_id — returns 409 if the client_id is already registered, which is safe to ignore."
+          },
+          "response": []
+        },
+        {
+          "name": "1. Exchange User Token for IDV Data Store (STS)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    if (body.access_token) {",
+                  "        pm.environment.set(\"IDV_EXCHANGED_ACCESS_TOKEN\", body.access_token);",
+                  "        console.log(\"Saved IDV_EXCHANGED_ACCESS_TOKEN to environment\");",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "urn:ietf:params:oauth:grant-type:token-exchange",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{IDV_DATA_STORE_STS_CLIENT_ID}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{IDV_DATA_STORE_STS_CLIENT_SECRET}}",
+                  "type": "text"
+                },
+                {
+                  "key": "subject_token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "text"
+                },
+                {
+                  "key": "subject_token_type",
+                  "value": "urn:ietf:params:oauth:token-type:access_token",
+                  "type": "text"
+                },
+                {
+                  "key": "requested_token_type",
+                  "value": "urn:ietf:params:oauth:token-type:access_token",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "{{IDV_DATA_STORE_SCOPES}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
+              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+              "path": ["oauth2", "token"]
+            },
+            "description": "RFC 8693 OAuth 2.0 Token Exchange, mirrors app.idv_data_store.services.verified_claims.exchange_token_for_idv_data_store(). Uses this app's dedicated IBM Verify STS client credentials to exchange the user's own USER_ACCESS_TOKEN (obtained from the 'Get User Access Token' request under IBM Verify API) for a new access_token scoped only to idv-data-store. Saves the result to IDV_EXCHANGED_ACCESS_TOKEN."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get IDV Data Store Client Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    if (body.access_token) {",
+                  "        pm.environment.set(\"IDV_DATA_STORE_CLIENT_TOKEN\", body.access_token);",
+                  "        console.log(\"Saved IDV_DATA_STORE_CLIENT_TOKEN to environment\");",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/admin/token?client_id={{IDV_DATA_STORE_CLIENT_ID}}&scopes={{IDV_DATA_STORE_SCOPES}}",
+              "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
+              "path": ["v1", "admin", "token"],
+              "query": [
+                {
+                  "key": "client_id",
+                  "value": "{{IDV_DATA_STORE_CLIENT_ID}}"
+                },
+                {
+                  "key": "scopes",
+                  "value": "{{IDV_DATA_STORE_SCOPES}}"
+                }
+              ]
+            },
+            "description": "idv-data-store's own client-bootstrap token endpoint, mirrors app.idv_data_store.services.verified_claims.get_idv_data_store_client_token(). Only ever grants the intersection of the requested scopes and the client's allowed_scopes (see idv-data-store's admin/router.py). Saves the result to IDV_DATA_STORE_CLIENT_TOKEN."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get Verified Claims",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{IDV_DATA_STORE_CLIENT_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"access_token\": \"{{IDV_EXCHANGED_ACCESS_TOKEN}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/auth/verified-claims",
+              "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
+              "path": ["v1", "auth", "verified-claims"]
+            },
+            "description": "Mirrors app.idv_data_store.services.verified_claims.dispatch_get_verified_claims_from_idv_data_store(). Presents idv-data-store's own client-bootstrap Bearer token (IDV_DATA_STORE_CLIENT_TOKEN) plus the already-exchanged, idv-data-store-scoped access_token (IDV_EXCHANGED_ACCESS_TOKEN) in the body. Returns the user's verified identity claims."
           },
           "response": []
         }

@@ -35,13 +35,19 @@ class SubjectsClientMixin:
     async def erase_subject_json(
         self, subject_id: str, request_context=None
     ) -> SubjectErasureAcceptedResponse:
-        """Starts asynchronous subject erasure workflow and returns job metadata."""
+        """Backward-compatible alias for user erasure by subject-style identifier."""
+        return await self.erase_user_json(subject_id, request_context)
+
+    async def erase_user_json(
+        self, user_id: str, request_context=None
+    ) -> SubjectErasureAcceptedResponse:
+        """Starts asynchronous user erasure workflow and returns job metadata."""
         context = self._resolve_context(request_context)
         response = await self._request(
             method="DELETE",
-            path=self._path(self.endpoints.subject_by_id, subject_id=subject_id),
+            path=self._path(self.endpoints.user_by_id, user_id=user_id),
             request_context=context,
-            context="erase subject (json)",
+            context="erase user (json)",
         )
         payload = response.json() if response.content else {}
         return SubjectErasureAcceptedResponse.model_validate(payload)

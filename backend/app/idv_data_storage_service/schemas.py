@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -399,5 +399,30 @@ class ValidationDetailResponse(BaseModel):
 
 class VerifiedClaimsQueryResponse(BaseModel):
     verified_claims: Optional[ClaimsIn] = None
+
+    model_config = ConfigDict(extra="allow")
+
+
+class EnrichmentVerification(BaseModel):
+    trust_framework: Optional[str] = None
+    assurance_level: Optional[str] = None
+    time: Optional[str] = None
+
+    model_config = ConfigDict(extra="allow")
+
+
+class EnrichmentVerifiedClaims(BaseModel):
+    verification: Optional[EnrichmentVerification] = None
+    claims: Optional[ClaimsIn] = None
+
+    model_config = ConfigDict(extra="allow")
+
+
+class VerificationStatusForEnrichmentResponse(BaseModel):
+    subject: str
+    status: Literal["found", "not_found"]
+    verified_claims: EnrichmentVerifiedClaims = Field(
+        default_factory=EnrichmentVerifiedClaims
+    )
 
     model_config = ConfigDict(extra="allow")

@@ -96,3 +96,23 @@ class ValidationsClientMixin:
         )
         response_payload = response.json() if response.content else {}
         return ValidationDetailResponse.model_validate(response_payload)
+
+    async def revoke_validation_by_id_json(
+        self,
+        validation_id: str,
+        payload: RevokeValidationPayload | None = None,
+        request_context=None,
+    ) -> ValidationDetailResponse:
+        context = self._resolve_context(request_context)
+        response = await self._request(
+            method="DELETE",
+            path=self._path(
+                self.endpoints.validation_by_id,
+                validation_id=validation_id,
+            ),
+            request_context=context,
+            context="revoke validation by id (json)",
+            json_payload=payload.model_dump(exclude_none=True) if payload else None,
+        )
+        response_payload = response.json() if response.content else {}
+        return ValidationDetailResponse.model_validate(response_payload)

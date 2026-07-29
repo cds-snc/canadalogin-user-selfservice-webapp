@@ -8,7 +8,6 @@ from app.idv_data_storage_service import (
     IDVDataServiceConfig,
     JwksResponse,
     OpenIDConfigurationResponse,
-    QueryRequestPayload,
     RevokeValidationPayload,
     SubjectErasureAcceptedResponse,
     SubjectRegisterPayload,
@@ -16,7 +15,7 @@ from app.idv_data_storage_service import (
     SubmitValidationPayload,
     ValidationDetailResponse,
     ValidationListResponse,
-    VerifiedClaimsQueryResponse,
+    VerificationStatusForEnrichmentResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -95,16 +94,16 @@ async def get_subject(request: Request, subject_id: str):
 
 
 @router.delete(
-    "/subjects/{subject_id}",
+    "/users/{user_id}",
     response_model=SubjectErasureAcceptedResponse,
     status_code=status.HTTP_200_OK,
     tags=["IDV Data Storage"],
-    summary="Erase a subject",
-    description="Initiates an asynchronous erasure workflow for the given subject.",
+    summary="Erase a user",
+    description="Initiates an asynchronous erasure workflow for the given user.",
 )
-async def erase_subject(request: Request, subject_id: str):
+async def erase_user(request: Request, user_id: str):
     client = _get_client(request)
-    return await client.erase_subject_json(subject_id)
+    return await client.erase_user_json(user_id)
 
 
 # ---------------------------------------------------------------------------
@@ -167,21 +166,20 @@ async def get_validation(request: Request, subject_id: str, validation_id: str):
 
 
 @router.delete(
-    "/subjects/{subject_id}/validations/{validation_id}",
+    "/validations/{validation_id}",
     response_model=ValidationDetailResponse,
     status_code=status.HTTP_200_OK,
     tags=["IDV Data Storage"],
     summary="Revoke a validation",
-    description="Revokes a specific validation for a given subject.",
+    description="Revokes a specific validation by validation ID.",
 )
 async def revoke_validation(
     request: Request,
-    subject_id: str,
     validation_id: str,
     payload: Optional[RevokeValidationPayload] = None,
 ):
     client = _get_client(request)
-    return await client.revoke_validation_json(subject_id, validation_id, payload)
+    return await client.revoke_validation_by_id_json(validation_id, payload)
 
 
 # ---------------------------------------------------------------------------
@@ -189,14 +187,14 @@ async def revoke_validation(
 # ---------------------------------------------------------------------------
 
 
-@router.post(
-    "/claims/query",
-    response_model=VerifiedClaimsQueryResponse,
+@router.get(
+    "/users/{user_id}/verification-status",
+    response_model=VerificationStatusForEnrichmentResponse,
     status_code=status.HTTP_200_OK,
     tags=["IDV Data Storage"],
-    summary="Query verified claims",
-    description="Queries verified claims for a subject from the IDV data storage service.",
+    summary="Get user verification status for claims enrichment",
+    description="Retrieves OIDC4IDA-style verified claims for IBM Verify token enrichment.",
 )
-async def query_verified_claims(request: Request, payload: QueryRequestPayload):
+async def get_user_verification_status(request: Request, user_id: str):
     client = _get_client(request)
-    return await client.query_verified_claims_json(payload)
+    return await client.get_user_verification_status_json(user_id)

@@ -18,10 +18,19 @@ class IDVDataServiceConfig(BaseSettings):
     IDV_DATA_SERVICE_SUBJECT_PATH_TEMPLATE: str = Field(
         default="/v1/subjects/{subject_id}"
     )
+    IDV_DATA_SERVICE_USER_PATH_TEMPLATE: str = Field(
+        default="/v1/users/{user_id}"
+    )
     IDV_DATA_SERVICE_VALIDATIONS_PATH_TEMPLATE: str = Field(
         default="/v1/subjects/{subject_id}/validations"
     )
+    IDV_DATA_SERVICE_VALIDATION_PATH_TEMPLATE: str = Field(
+        default="/v1/validations/{validation_id}"
+    )
     IDV_DATA_SERVICE_CLAIMS_QUERY_PATH: str = Field(default="/v1/claims/query")
+    IDV_DATA_SERVICE_USER_VERIFICATION_STATUS_PATH_TEMPLATE: str = Field(
+        default="/v1/users/{user_id}/verification-status"
+    )
 
     # OAuth2 authentication settings (instead of API key).
     IDV_DATA_SERVICE_CLIENT_ID: str | None = Field(default=None)
