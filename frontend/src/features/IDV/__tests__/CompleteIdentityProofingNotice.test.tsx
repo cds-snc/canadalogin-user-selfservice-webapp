@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import CompleteIdentityProofingNotice from "../../../../features/IDV/components/CompleteIdentityProofingNotice";
+import CompleteIdentityProofingNotice from "../../../components/CompleteIdentityProofingNotice";
 
 let mockNavigate = vi.fn();
 

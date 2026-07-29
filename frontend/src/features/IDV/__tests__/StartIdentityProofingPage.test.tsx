@@ -2,9 +2,9 @@ import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import StartIdentityProofingPage from "../../../features/IDV/StartIdentityProofingPage";
-import { PAGES } from "../../../utils/constants";
-import { path } from "../../../utils/routeHelpers";
+import StartIdentityProofingPage from "../../StartIdentityProofingPage";
+import { PAGES } from "../../../../utils/constants";
+import { path } from "../../../../utils/routeHelpers";
 
 let mockNavigate = vi.fn();
 
