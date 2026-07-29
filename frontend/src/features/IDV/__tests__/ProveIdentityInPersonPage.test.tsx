@@ -2,9 +2,9 @@ import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import ProveIdentityInPersonPage from "../../../../features/IDV/InPerson/ProveIdentityInPersonPage";
-import { PAGES } from "../../../../utils/constants";
-import { path } from "../../../../utils/routeHelpers";
+import ProveIdentityInPersonPage from "../InPerson/ProveIdentityInPersonPage";
+import { PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
 
 let mockNavigate = vi.fn();
 
@@ -19,7 +19,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../../components/Providers/useUser", () => ({
+vi.mock("../../../components/Providers/useUser", () => ({
   useUser: () => ({
     state: {
       relyingPartyInfo: {
@@ -32,7 +32,7 @@ vi.mock("../../../../components/Providers/useUser", () => ({
   }),
 }));
 
-vi.mock("../../../../features/IDV/components/InPersonRadioButtons", () => ({
+vi.mock("../components/InPersonRadioButtons", () => ({
   default: ({
     onMethodChange,
   }: {
