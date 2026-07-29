@@ -76,14 +76,6 @@ export const getVisitCanadaPostValidation = (
     summaryErrorCodes.dateOfBirth = dateOfBirthValidationError;
   }
 
-  if (showAddressAndProvinceFields && !isNonEmptyTrimmed(formData.address)) {
-    summaryErrorCodes.address = "required";
-  }
-
-  if (showAddressAndProvinceFields && !isNonEmptyTrimmed(formData.province)) {
-    summaryErrorCodes.province = "required";
-  }
-
   return {
     isFormValid: Object.keys(summaryErrorCodes).length === 0,
     hasSelectedIdType,
