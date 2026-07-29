@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import StartIdentityProofingPage from "../../../features/IDV/StartIdentityProofingPage";
+import StartIdentityProofingPage from "../StartIdentityProofingPage";
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
@@ -33,28 +33,25 @@ vi.mock("../../../components/Providers/useUser", () => ({
   }),
 }));
 
-vi.mock(
-  "../../../features/IDV/components/IdentityProofingRadioButtons",
-  () => ({
-    default: ({
-      onOptionChange,
-    }: {
-      onOptionChange: (option: "online" | "inPerson" | "cantProveNow") => void;
-    }) => (
-      <div>
-        <button type="button" onClick={() => onOptionChange("inPerson")}>
-          pick in person
-        </button>
-        <button type="button" onClick={() => onOptionChange("online")}>
-          pick online
-        </button>
-        <button type="button" onClick={() => onOptionChange("cantProveNow")}>
-          pick later
-        </button>
-      </div>
-    ),
-  }),
-);
+vi.mock("../components/IdentityProofingRadioButtons", () => ({
+  default: ({
+    onOptionChange,
+  }: {
+    onOptionChange: (option: "online" | "inPerson" | "cantProveNow") => void;
+  }) => (
+    <div>
+      <button type="button" onClick={() => onOptionChange("inPerson")}>
+        pick in person
+      </button>
+      <button type="button" onClick={() => onOptionChange("online")}>
+        pick online
+      </button>
+      <button type="button" onClick={() => onOptionChange("cantProveNow")}>
+        pick later
+      </button>
+    </div>
+  ),
+}));
 
 vi.mock("react-i18next", async () => {
   const actual =

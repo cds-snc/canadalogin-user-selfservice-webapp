@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import CompleteIdentityProofingNotice from "../../../../features/IDV/components/CompleteIdentityProofingNotice";
+import CompleteIdentityProofingNotice from "../components/CompleteIdentityProofingNotice";
 
 let mockNavigate = vi.fn();
 
@@ -32,7 +32,7 @@ vi.mock("react-i18next", async () => {
   };
 });
 
-vi.mock("../../../../utils/routeHelpers", () => ({
+vi.mock("../../../utils/routeHelpers", () => ({
   path: (_id: string, params: { language?: string }) =>
     `/${params.language ?? "en"}/idv`,
 }));

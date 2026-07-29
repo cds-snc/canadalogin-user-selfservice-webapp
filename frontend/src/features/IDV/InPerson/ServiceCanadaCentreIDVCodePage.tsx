@@ -25,6 +25,8 @@ type ServiceCanadaCentreIDVCodePageLocationState = {
   lastName?: string;
   dateOfBirth?: string;
   idType?: string;
+  verificationExpiresAt?: string;
+  verificationValidityDays?: number;
 };
 
 const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
@@ -56,15 +58,65 @@ export default function ServiceCanadaCentreIDVCodePage() {
     null;
   const idvCode = locationState?.idvCode ?? null;
   const formattedIdvCode = idvCode ? formatCodeWithHyphens(idvCode) : null;
+  const verificationExpiresAt = locationState?.verificationExpiresAt;
+  const verificationValidityDays = locationState?.verificationValidityDays;
   const firstName = locationState?.firstName?.trim() || "--";
   const lastName = locationState?.lastName?.trim() || "--";
-  const dateOfBirth = locationState?.dateOfBirth?.trim() || "--";
+  const dateOfBirth = (() => {
+    const trimmedDate = locationState?.dateOfBirth?.trim();
+
+    if (!trimmedDate) {
+      return "--";
+    }
+
+    const isoDateMatch = trimmedDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+    if (isoDateMatch) {
+      const [, year, month, day] = isoDateMatch;
+      const parsedDate = new Date(Number(year), Number(month) - 1, Number(day));
+
+      return new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }).format(parsedDate);
+    }
+
+    const parsedDate = new Date(trimmedDate);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return trimmedDate;
+    }
+
+    return new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(parsedDate);
+  })();
   const rawIdSelected = locationState?.idType?.trim() || "";
-  const idSelected = rawIdSelected
+  const idSelectedText = rawIdSelected
     ? isApprovedDocumentValue(rawIdSelected)
       ? t(`ApprovedDocuments.${rawIdSelected}`)
       : rawIdSelected
     : "--";
+
+  const formattedExpiryDate = verificationExpiresAt
+    ? new Intl.DateTimeFormat("en-CA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(verificationExpiresAt))
+    : null;
+
+  const codeValidityText = formattedExpiryDate
+    ? t("ServiceCanadaCentreCode.codeValidDaysDynamic", {
+        expiryDate: formattedExpiryDate,
+        validityDays: verificationValidityDays ?? 30,
+      })
+    : t("ServiceCanadaCentreCode.codeValidDays", {
+        validityDays: verificationValidityDays ?? 30,
+      });
 
   const handlePrintPage = () => {
     window.print();
@@ -98,11 +150,12 @@ export default function ServiceCanadaCentreIDVCodePage() {
         </GcdsHeading>
         <GcdsContainer>
           <GcdsText>
-            {t("ServiceCanadaCentreCode.codeValidDays")}{" "}
-            <strong>{email}</strong>.
+            {codeValidityText} <strong>{email}</strong>.
           </GcdsText>
           <GcdsText marginBottom="0">
-            {t("ServiceCanadaCentreCode.visitInstruction")}
+            {t("ServiceCanadaCentreCode.visitInstruction", {
+              idSelected: idSelectedText,
+            })}
           </GcdsText>
         </GcdsContainer>
 
@@ -151,7 +204,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
                   <strong>{t("ServiceCanadaCentreCode.idSelected")}</strong>
                 </GcdsText>
                 <GcdsText marginTop="200" marginBottom="0">
-                  {idSelected}
+                  {idSelectedText}
                 </GcdsText>
               </div>
 
