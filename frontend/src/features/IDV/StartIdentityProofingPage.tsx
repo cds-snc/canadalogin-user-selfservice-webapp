@@ -59,8 +59,8 @@ export default function StartIdentityProofingPage() {
   const { language, journeyType } = useParams();
   const [searchParams] = useSearchParams();
 
-  const { t, i18n } = useTranslation("idv");
-  const { relyingPartyName: rpName } = useRelyingPartyInfo(i18n.language);
+  const { t } = useTranslation("idv");
+  const { relyingPartyName: rpName } = useRelyingPartyInfo();
   const titleByJourneyType = {
     [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
       rpName,

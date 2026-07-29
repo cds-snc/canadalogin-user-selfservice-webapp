@@ -24,7 +24,7 @@ export default function CompleteIdentityProofingPage() {
   const { dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
 
-  const { t, i18n } = useTranslation("idv");
+  const { t } = useTranslation("idv");
   const { t: tCommon } = useTranslation("common");
   const appName = tCommon("RelyingParty.canadaLogin");
 
@@ -34,9 +34,7 @@ export default function CompleteIdentityProofingPage() {
     );
   };
 
-  const { relyingPartyName: relyingPartyLinkName } = useRelyingPartyInfo(
-    i18n.language,
-  );
+  const { relyingPartyName: relyingPartyLinkName } = useRelyingPartyInfo();
 
   const handleSignOut = async (event: Event) => {
     event.preventDefault();

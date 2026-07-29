@@ -23,11 +23,11 @@ type NavigationEvent = {
 };
 
 export default function TopNav({ currentLang }: TopNavProps) {
-  const { t, i18n } = useTranslation("layout");
+  const { t } = useTranslation("layout");
   const { dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
   const { relyingPartyName, relyingPartyUrl, hasRelyingParty } =
-    useRelyingPartyInfo(i18n.language);
+    useRelyingPartyInfo();
 
   const { mobile, tablet } = useBreakpoints();
 

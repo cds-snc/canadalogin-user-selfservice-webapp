@@ -28,7 +28,7 @@ export default function InPersonProofingInProgress() {
   const navigate = useNavigate();
   const [sendEmailDate, setSendEmailDate] = useState<string | null>(null);
 
-  const { relyingPartyName: rpName } = useRelyingPartyInfo(i18n.language);
+  const { relyingPartyName: rpName } = useRelyingPartyInfo();
 
   const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
     language,

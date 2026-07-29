@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useUser } from "../components/Providers/useUser";
 import type { RelyingPartyInfo } from "../types/user";
@@ -25,11 +26,12 @@ function getRelyingPartyDetails(
   };
 }
 
-export function useRelyingPartyInfo(language: string): RelyingPartyDetails {
+export function useRelyingPartyInfo(): RelyingPartyDetails {
   const { state } = useUser();
+  const { i18n } = useTranslation();
 
   return useMemo(
-    () => getRelyingPartyDetails(state?.relyingPartyInfo, language),
-    [state?.relyingPartyInfo, language],
+    () => getRelyingPartyDetails(state?.relyingPartyInfo, i18n.language),
+    [state?.relyingPartyInfo, i18n.language],
   );
 }

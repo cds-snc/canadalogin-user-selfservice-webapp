@@ -58,8 +58,8 @@ export default function ServiceCanadaCentrePage() {
     postalcode: "",
   });
 
-  const { t, i18n } = useTranslation("idv");
-  const { relyingPartyName: rpName } = useRelyingPartyInfo(i18n.language);
+  const { t } = useTranslation("idv");
+  const { relyingPartyName: rpName } = useRelyingPartyInfo();
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,

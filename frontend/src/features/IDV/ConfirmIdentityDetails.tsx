@@ -23,11 +23,11 @@ import { path } from "../../utils/routeHelpers";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation("idv");
+  const { t } = useTranslation("idv");
   const { language, journeyType } = useParams();
   const { state } = useUser();
   const { relyingPartyUrl, relyingPartyName, hasRelyingParty } =
-    useRelyingPartyInfo(i18n.language);
+    useRelyingPartyInfo();
 
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
   const fallbackRedirectUrl = relyingPartyUrl || "/";
