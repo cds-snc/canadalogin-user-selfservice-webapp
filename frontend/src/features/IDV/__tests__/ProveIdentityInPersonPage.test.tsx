@@ -19,7 +19,7 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../../components/Providers/useUser", () => ({
+vi.mock("../../../components/Providers/useUser", () => ({
   useUser: () => ({
     state: {
       relyingPartyInfo: {
@@ -32,7 +32,7 @@ vi.mock("../../../../components/Providers/useUser", () => ({
   }),
 }));
 
-vi.mock("../../../../features/IDV/components/InPersonRadioButtons", () => ({
+vi.mock("../components/InPersonRadioButtons", () => ({
   default: ({
     onMethodChange,
   }: {
