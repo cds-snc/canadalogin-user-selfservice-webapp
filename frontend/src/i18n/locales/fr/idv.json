@@ -52,9 +52,10 @@
     "postalcodeHint": "Enter your postal code"
   },
   "ServiceCanadaCentreCode": {
-    "heading": "Here is your unique identification code for your identity proofing",
-    "codeValidDays": "This code is valid for 30 days and has been emailed to",
-    "visitInstruction": "Visit a Service Canada Centre with your code and one valid ID document.",
+    "heading": "Your unique code for identity proofing at Service Canada Centre",
+    "codeValidDays": "This code is valid for {{validityDays}} days and has been emailed to",
+    "codeValidDaysDynamic": "This code is valid for {{validityDays}} days (expires {{expiryDate}}) and has been emailed to",
+    "visitInstruction": "Visit a Service Canada Centre with your code and your {{idSelected}}.",
     "yourInformationHeading": "Your information",
     "firstName": "First name",
     "lastName": "Last name",

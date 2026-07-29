@@ -140,6 +140,12 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     mockLocationState.idType = "passport";
   });
 
+  const expectedDateOfBirth = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(1990, 0, 1));
+
   it("renders the main heading", () => {
     render(
       <TestWrapper>
@@ -150,7 +156,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Here is your unique identification code for your identity proofing",
+        "Your unique code for identity proofing at Service Canada Centre",
       ),
     ).toBeInTheDocument();
   });
@@ -209,13 +215,12 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     );
 
     expect(
-      screen.getByText(
-        /This code is valid for 30 days and has been emailed to/,
-      ),
+      screen.getByText(/This code is valid for 30 days/i),
     ).toBeInTheDocument();
+    expect(screen.getByText(/has been emailed to/i)).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Visit a Service Canada Centre with your code and one valid ID document.",
+        /Visit a Service Canada Centre with your code and your .*Passport\./,
       ),
     ).toBeInTheDocument();
   });
@@ -234,10 +239,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("ID selected")).toBeInTheDocument();
     expect(screen.getByText("Jane")).toBeInTheDocument();
     expect(screen.getByText("Doe")).toBeInTheDocument();
-    expect(screen.getByText("1990-01-01")).toBeInTheDocument();
-    expect(
-      screen.getByText("Canadian and International Passport"),
-    ).toBeInTheDocument();
+    expect(screen.getByText(expectedDateOfBirth)).toBeInTheDocument();
     expect(screen.queryByText("passport")).not.toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });
@@ -251,7 +253,15 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText("Employee ID")).toBeInTheDocument();
+    expect(screen.getByText("Your information")).toBeInTheDocument();
+    expect(screen.getByText("First name")).toBeInTheDocument();
+    expect(screen.getByText("Last name")).toBeInTheDocument();
+    expect(screen.getByText("Date of birth")).toBeInTheDocument();
+    expect(screen.getByText("ID selected")).toBeInTheDocument();
+    expect(screen.getByText("Jane")).toBeInTheDocument();
+    expect(screen.getByText("Doe")).toBeInTheDocument();
+    expect(screen.getByText(expectedDateOfBirth)).toBeInTheDocument();
+    expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });
 
   it("navigates back to service canada form when update information is clicked", () => {
