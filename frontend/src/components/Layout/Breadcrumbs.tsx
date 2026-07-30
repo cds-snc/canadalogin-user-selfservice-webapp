@@ -7,7 +7,7 @@ import type { UIMatch } from "react-router";
 import type { PageId } from "../../types/utils";
 import { useTranslation } from "react-i18next";
 import { PAGE_NAMESPACE_MAP } from "../../i18n/index";
-import { useUser } from "../Providers/useUser";
+import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 
 type BreadcrumbHandle = {
   id: PageId;
@@ -21,16 +21,13 @@ type BreadcrumbLink = {
 
 export default function Breadcrumbs() {
   const matches = useMatches() as Array<UIMatch<unknown, BreadcrumbHandle>>;
-  const { t, i18n } = useTranslation();
-  const { state } = useUser();
-
-  const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-
-  const rp: BreadcrumbLink | null = rpInfo
+  const { t } = useTranslation();
+  const { hasRelyingParty, relyingPartyName, relyingPartyUrl } =
+    useRelyingPartyInfo();
+  const rp: BreadcrumbLink | null = hasRelyingParty
     ? {
-        name: localizedDetail?.name ?? rpInfo.linkName,
-        url: localizedDetail?.url ?? rpInfo.url,
+        name: relyingPartyName,
+        url: relyingPartyUrl,
       }
     : null;
 

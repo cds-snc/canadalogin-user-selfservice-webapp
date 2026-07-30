@@ -223,7 +223,7 @@ describe("TopNav", () => {
       expect(screen.getByText("Return to My Service")).toBeInTheDocument();
     });
 
-    it("does not render the Return to link when linkName is empty", () => {
+    it("renders the Return to link when linkName is empty but relyingPartyInfo exists", () => {
       useUser.mockReturnValue({
         state: {
           relyingPartyInfo: {
@@ -240,10 +240,15 @@ describe("TopNav", () => {
         </TestWrapper>,
       );
 
-      expect(screen.queryByText(/Return to/)).not.toBeInTheDocument();
+      const returnLink = screen.getByRole("link", { name: /^Return to$/ });
+      expect(returnLink).toBeInTheDocument();
+      expect(returnLink).toHaveAttribute(
+        "href",
+        "https://my-service.example.com",
+      );
     });
 
-    it("does not render the Return to link when url is empty", () => {
+    it("renders the Return to link when url is empty but relyingPartyInfo exists", () => {
       useUser.mockReturnValue({
         state: {
           relyingPartyInfo: {
@@ -260,7 +265,11 @@ describe("TopNav", () => {
         </TestWrapper>,
       );
 
-      expect(screen.queryByText(/Return to/)).not.toBeInTheDocument();
+      expect(screen.getByText("Return to My Service")).toBeInTheDocument();
+      expect(screen.getByText("Return to My Service")).toHaveAttribute(
+        "href",
+        "",
+      );
     });
   });
 

@@ -12,6 +12,7 @@ import {
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import { useUser } from "../../components/Providers/useUser";
+import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import ProvenInformationCard from "../IDV/ProvenInformationCard";
 import ViewProfileNameCard from "../ProfileName/components/ViewProfileNameCard";
@@ -22,22 +23,20 @@ import { path } from "../../utils/routeHelpers";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation("idv");
+  const { t } = useTranslation("idv");
   const { language, journeyType } = useParams();
   const { state } = useUser();
+  const { relyingPartyUrl, relyingPartyName, hasRelyingParty } =
+    useRelyingPartyInfo();
 
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
-  const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const rpName = localizedDetail?.name ?? rpInfo?.linkName;
-  const fallbackRedirectUrl = localizedDetail?.url ?? rpInfo?.url ?? "/";
+  const fallbackRedirectUrl = relyingPartyUrl || "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
-  const hasRpService = Boolean(rpName);
 
-  const successNoticeTitleKey = hasRpService
+  const successNoticeTitleKey = hasRelyingParty
     ? "ConfirmIdentityDetails.successNoticeTitle"
     : "ConfirmIdentityDetails.successNoticeTitleWithoutRp";
-  const successNoticeDescriptionKey = hasRpService
+  const successNoticeDescriptionKey = hasRelyingParty
     ? "ConfirmIdentityDetails.successNoticeDescription"
     : "ConfirmIdentityDetails.successNoticeDescriptionWithoutRp";
 
@@ -79,7 +78,7 @@ export default function ConfirmIdentityDetails() {
             noticeTitle={t(successNoticeTitleKey)}
           >
             <GcdsText>
-              {t(successNoticeDescriptionKey, { appName: rpName })}
+              {t(successNoticeDescriptionKey, { appName: relyingPartyName })}
             </GcdsText>
           </GcdsNotice>
         </GcdsContainer>

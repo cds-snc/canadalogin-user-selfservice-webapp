@@ -15,7 +15,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
-import { useUser } from "../../../components/Providers/useUser";
 import {
   AVAILABLE_LANGUAGES,
   CANADIAN_PROVINCES_AND_TERRITORIES,
@@ -23,6 +22,7 @@ import {
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 import {
   getFirstNameRequiredOrInvalidMessage,
@@ -59,11 +59,8 @@ export default function ServiceCanadaCentrePage() {
     postalcode: "",
   });
 
-  const { t, i18n } = useTranslation("idv");
-  const { state } = useUser();
-  const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const rpName = localizedDetail?.name ?? rpInfo?.linkName;
+  const { t } = useTranslation("idv");
+  const { relyingPartyName: rpName } = useRelyingPartyInfo();
 
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,
@@ -230,9 +227,7 @@ export default function ServiceCanadaCentrePage() {
                 </li>
                 <li>
                   <GcdsText marginBottom="0">
-                    {t("ServiceCanadaCentre.step4", {
-                      rpName: rpName ?? t("ServiceCanadaCentre.fallbackRpName"),
-                    })}
+                    {t("ServiceCanadaCentre.step4", { rpName })}
                   </GcdsText>
                 </li>
               </ol>

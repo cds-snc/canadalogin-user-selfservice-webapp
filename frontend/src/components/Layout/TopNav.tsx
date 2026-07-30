@@ -12,6 +12,7 @@ import { useUser } from "../Providers/useUser";
 import { PAGES } from "../../utils/constants";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
+import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 
 interface TopNavProps {
   currentLang: string;
@@ -22,15 +23,11 @@ type NavigationEvent = {
 };
 
 export default function TopNav({ currentLang }: TopNavProps) {
-  const { t, i18n } = useTranslation("layout");
-  const { state, dispatch } = useUser();
+  const { t } = useTranslation("layout");
+  const { dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
-
-  const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
-  const relyingPartyUrl = localizedDetail?.url ?? rpInfo?.url ?? "";
-  const shouldRenderRelyingPartyLink = relyingPartyLinkName && relyingPartyUrl;
+  const { relyingPartyName, relyingPartyUrl, hasRelyingParty } =
+    useRelyingPartyInfo();
 
   const { mobile, tablet } = useBreakpoints();
 
@@ -75,9 +72,9 @@ export default function TopNav({ currentLang }: TopNavProps) {
       <GcdsNavLink href={securitySettingsLink}>
         {t("TopNavBar.securitySettings")}
       </GcdsNavLink>
-      {shouldRenderRelyingPartyLink && (
+      {hasRelyingParty && (
         <GcdsNavLink href={relyingPartyUrl}>
-          {t("TopNavBar.returnTo") + relyingPartyLinkName}
+          {t("TopNavBar.returnTo") + relyingPartyName}
         </GcdsNavLink>
       )}
       <GcdsNavLink href="#" onClick={handleLogout}>

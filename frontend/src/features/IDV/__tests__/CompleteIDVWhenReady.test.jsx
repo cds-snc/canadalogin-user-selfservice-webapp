@@ -170,16 +170,19 @@ describe("CompleteIdentityProofingPage", () => {
       ).toBeInTheDocument();
     });
 
-    it("falls back to app name when both localized name and linkName are unavailable", () => {
+    it("does not fall back to app name when both localized name and linkName are unavailable", () => {
       setup({
         dispatch: vi.fn(),
         state: { relyingPartyInfo: { localized: {} } },
       });
 
       expect(
-        screen.getByText(
+        screen.queryByText(
           "You need to complete identity proofing to access CanadaLogin.",
         ),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText("You need to complete identity proofing to access ."),
       ).toBeInTheDocument();
     });
 

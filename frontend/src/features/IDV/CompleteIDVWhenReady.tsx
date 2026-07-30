@@ -15,17 +15,18 @@ import { path } from "../../utils/routeHelpers";
 import { useUser } from "../../components/Providers/useUser";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
+import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 import { APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS } from "./data/approvedDocuments";
 
 export default function CompleteIdentityProofingPage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
-  const { state, dispatch } = useUser();
+  const { dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
 
-  const { t, i18n } = useTranslation("idv");
-  const { t: tLayout } = useTranslation("layout");
-  const appName = tLayout("TopNavBar.appName");
+  const { t } = useTranslation("idv");
+  const { t: tCommon } = useTranslation("common");
+  const appName = tCommon("RelyingParty.canadaLogin");
 
   const handleStartIdentityProofing = () => {
     navigate(
@@ -33,10 +34,7 @@ export default function CompleteIdentityProofingPage() {
     );
   };
 
-  const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const relyingPartyLinkName = localizedDetail?.name ?? rpInfo?.linkName ?? "";
-  const rpServicePortal = relyingPartyLinkName || appName;
+  const { relyingPartyName: relyingPartyLinkName } = useRelyingPartyInfo();
 
   const handleSignOut = async (event: Event) => {
     event.preventDefault();
@@ -74,7 +72,7 @@ export default function CompleteIdentityProofingPage() {
           <GcdsText>
             <strong>
               {t("CompleteIdentityProofing.accessRPServicePortalTitle", {
-                rpServicePortal,
+                rpServicePortal: relyingPartyLinkName,
               })}
             </strong>
           </GcdsText>
@@ -86,7 +84,9 @@ export default function CompleteIdentityProofingPage() {
           <GcdsText>
             {t("CompleteIdentityProofing.noDocumentsNoticeText")}
             <GcdsLink href="#" external size="regular">
-              {t("CompleteIdentityProofing.contactLink", { rpServicePortal })}
+              {t("CompleteIdentityProofing.contactLink", {
+                rpServicePortal: relyingPartyLinkName,
+              })}
             </GcdsLink>
           </GcdsText>
           <GcdsText>
