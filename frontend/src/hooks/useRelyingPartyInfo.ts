@@ -17,7 +17,8 @@ function getRelyingPartyDetails(
 ): RelyingPartyDetails {
   const localizedDetail = relyingPartyInfo?.localized?.[language];
   const relyingParty = relyingPartyInfo ?? null;
-  const relyingPartyName = localizedDetail?.name ?? relyingPartyInfo?.linkName ?? "";
+  const relyingPartyName =
+    localizedDetail?.name ?? relyingPartyInfo?.linkName ?? "";
 
   return {
     relyingPartyInfo: relyingParty,
