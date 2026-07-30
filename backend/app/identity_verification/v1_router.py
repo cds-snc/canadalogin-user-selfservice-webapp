@@ -8,7 +8,7 @@ from app.identity_verification.services.create_identity_verification import (
     idv_mock_success_response,
     create_identity_verification,
 )
-from app.identity_verification.services.send_in_person_verification_code import (
+from app.idv_data_store.services.in_person_verification import (
     send_in_person_verification_code,
     get_last_email_sent,
 )
@@ -70,7 +70,6 @@ async def send_in_person_verification(
     return await send_in_person_verification_code(
         request.app.state.request_client,
         user_access_token,
-        request=request,
     )
 
 
@@ -87,7 +86,7 @@ async def get_in_person_last_email_sent(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await get_last_email_sent(
-        request.app.state.request_client, user_access_token, request
+        request.app.state.request_client, user_access_token
     )
 
 

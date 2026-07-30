@@ -10,7 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 async def exchange_token_for_idv_data_store(
-    global_http_client: AsyncClient, user_access_token: str
+    global_http_client: AsyncClient,
+    user_access_token: str,
+    scope: str | None = None,
 ) -> str:
     """RFC 8693 OAuth 2.0 Token Exchange against IBM Verify.
 
@@ -24,6 +26,10 @@ async def exchange_token_for_idv_data_store(
 
     The user's original, broadly-scoped access_token is never shared with
     idv-data-store — only this narrowly-scoped, exchanged access_token is.
+
+    `scope` defaults to IDV_DATA_STORE_SCOPES, but can be overridden by
+    callers that need a different idv-data-store scope (e.g. the in-person
+    verification flow uses IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES).
     """
     settings = get_configuration()
     idv_settings = settings.idv_data_store_config
@@ -35,7 +41,7 @@ async def exchange_token_for_idv_data_store(
         "subject_token": user_access_token,
         "subject_token_type": "urn:ietf:params:oauth:token-type:access_token",
         "requested_token_type": "urn:ietf:params:oauth:token-type:access_token",
-        "scope": idv_settings.IDV_DATA_STORE_SCOPES,
+        "scope": scope or idv_settings.IDV_DATA_STORE_SCOPES,
     }
 
     logger.info("Exchanging user access_token for an idv-data-store-scoped token")
@@ -60,7 +66,9 @@ async def exchange_token_for_idv_data_store(
     return exchanged_access_token
 
 
-async def get_idv_data_store_client_token(global_http_client: AsyncClient) -> str:
+async def get_idv_data_store_client_token(
+    global_http_client: AsyncClient, scope: str | None = None
+) -> str:
     """Obtain idv-data-store's own bootstrap-issued Bearer token.
 
     idv-data-store's protected endpoints (including POST /v1/auth/verified-claims)
@@ -68,6 +76,9 @@ async def get_idv_data_store_client_token(global_http_client: AsyncClient) -> st
     idv:auth:verified-claims, identifying this app as a trusted registered client
     (see idv-data-store's POST /v1/admin/token). This is a separate
     credential system from the IBM Verify STS client used above.
+
+    `scope` defaults to IDV_DATA_STORE_SCOPES, but can be overridden by
+    callers that need a different idv-data-store scope.
     """
     settings = get_configuration()
     idv_settings = settings.idv_data_store_config
@@ -78,7 +89,7 @@ async def get_idv_data_store_client_token(global_http_client: AsyncClient) -> st
             settings.idv_data_store_token_endpoint,
             params={
                 "client_id": idv_settings.IDV_DATA_STORE_CLIENT_ID,
-                "scopes": idv_settings.IDV_DATA_STORE_SCOPES,
+                "scopes": scope or idv_settings.IDV_DATA_STORE_SCOPES,
             },
         )
         response.raise_for_status()

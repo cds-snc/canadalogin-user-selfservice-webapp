@@ -97,13 +97,6 @@ class BluinkConfig(BaseSettings):
     )
 
 
-class GCNotifyConfig(BaseSettings):
-    GC_NOTIFY_API_KEY: Optional[str] = None
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
-    )
-
-
 class IdvDataStoreConfig(BaseSettings):
     """Configuration for exchanging tokens with, and calling, idv-data-store.
 
@@ -133,6 +126,15 @@ class IdvDataStoreConfig(BaseSettings):
             "'idv:auth:verified-claims' is needed, but this can be extended "
             "with additional space-separated scopes as this app calls more "
             "idv-data-store endpoints."
+        ),
+    )
+    IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES: str = Field(
+        default="idv:in-person-verification:send",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from both "
+            "the IBM Verify STS client (token exchange) and idv-data-store's "
+            "own client-bootstrap token endpoint when calling the in-person "
+            "verification endpoints."
         ),
     )
     model_config = SettingsConfigDict(
@@ -229,6 +231,18 @@ class Configuration(BaseSettings):
         """idv-data-store's endpoint for fetching verified identity claims for
         an already-exchanged access_token."""
         return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/auth/verified-claims"
+
+    @property
+    def idv_data_store_in_person_verification_send_endpoint(self) -> str:
+        """idv-data-store's endpoint for generating and sending an in-person
+        verification code email for an already-exchanged access_token."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/in-person-verification/send"
+
+    @property
+    def idv_data_store_in_person_verification_last_email_endpoint(self) -> str:
+        """idv-data-store's endpoint for retrieving the last in-person
+        verification email sent timestamp for an already-exchanged access_token."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/in-person-verification/last-email-sent"
 
 
 @lru_cache
