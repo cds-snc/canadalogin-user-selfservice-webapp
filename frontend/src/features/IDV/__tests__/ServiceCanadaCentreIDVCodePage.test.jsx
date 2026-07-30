@@ -13,7 +13,7 @@ const mockLocationState = vi.hoisted(() => ({
   idvCode: "ABC123XYZ",
   firstName: "Jane",
   lastName: "Doe",
-  dateOfBirth: "1990-01-01",
+  dateOfBirth: "January 1, 1990",
   idType: "passport",
 }));
 
@@ -136,15 +136,9 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     mockLocationState.idvCode = "ABC123XYZ";
     mockLocationState.firstName = "Jane";
     mockLocationState.lastName = "Doe";
-    mockLocationState.dateOfBirth = "1990-01-01";
+    mockLocationState.dateOfBirth = "January 1, 1990";
     mockLocationState.idType = "passport";
   });
-
-  const expectedDateOfBirth = new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(1990, 0, 1));
 
   it("renders the main heading", () => {
     render(
@@ -239,7 +233,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("ID selected")).toBeInTheDocument();
     expect(screen.getByText("Jane")).toBeInTheDocument();
     expect(screen.getByText("Doe")).toBeInTheDocument();
-    expect(screen.getByText(expectedDateOfBirth)).toBeInTheDocument();
+    expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
     expect(screen.queryByText("passport")).not.toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });
@@ -260,7 +254,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("ID selected")).toBeInTheDocument();
     expect(screen.getByText("Jane")).toBeInTheDocument();
     expect(screen.getByText("Doe")).toBeInTheDocument();
-    expect(screen.getByText(expectedDateOfBirth)).toBeInTheDocument();
+    expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });
 
