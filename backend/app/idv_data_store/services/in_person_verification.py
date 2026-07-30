@@ -5,7 +5,6 @@ from httpx import AsyncClient
 from app.config import get_configuration
 from app.idv_data_store.services.verified_claims import (
     exchange_token_for_idv_data_store,
-    get_idv_data_store_client_token,
 )
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
@@ -21,8 +20,8 @@ async def _dispatch_in_person_verification_request(
 ) -> ResponseModel:
     """Shared plumbing for the in-person-verification endpoints: exchange the
     user's access_token for one scoped to idv-data-store's in-person
-    verification scope, obtain idv-data-store's own client token, then call
-    the given idv-data-store endpoint with the exchanged access_token.
+    verification scope, then call the given idv-data-store endpoint using the
+    exchanged token directly as Authorization Bearer.
 
     idv-data-store's in-person-verification endpoints already respond with
     a body matching this app's ResponseModel shape (success/message/data),
@@ -35,17 +34,13 @@ async def _dispatch_in_person_verification_request(
     idv_scoped_access_token = await exchange_token_for_idv_data_store(
         global_http_client, user_access_token, scope=scope
     )
-    idv_data_store_client_token = await get_idv_data_store_client_token(
-        global_http_client, scope=scope
-    )
 
     try:
         response = await global_http_client.post(
             endpoint,
-            json={"access_token": idv_scoped_access_token},
             headers={
-                "Authorization": f"Bearer {idv_data_store_client_token}",
-                "Content-Type": "application/json",
+                "Authorization": f"Bearer {idv_scoped_access_token}",
+                "Accept": "application/json",
             },
         )
         response.raise_for_status()

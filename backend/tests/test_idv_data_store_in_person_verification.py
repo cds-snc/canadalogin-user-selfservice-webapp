@@ -53,17 +53,14 @@ class TestSendInPersonVerificationCode:
         "get_configuration",
         return_value=MOCK_CONFIGURATION,
     )
-    @patch.object(in_person_verification_module, "get_idv_data_store_client_token")
     @patch.object(in_person_verification_module, "exchange_token_for_idv_data_store")
     async def test_success_sends_code_and_returns_response(
         self,
         mock_exchange,
-        mock_get_client_token,
         mock_get_configuration,
         mock_http_client,
     ):
         mock_exchange.return_value = "idv-scoped-access-token"
-        mock_get_client_token.return_value = "idv-data-store-jwt"
         mock_http_client.post = AsyncMock(
             return_value=_mock_response(
                 {
@@ -87,9 +84,6 @@ class TestSendInPersonVerificationCode:
             "user-access-token",
             scope="idv:in-person-verification:send",
         )
-        mock_get_client_token.assert_awaited_once_with(
-            mock_http_client, scope="idv:in-person-verification:send"
-        )
 
         call_args = mock_http_client.post.call_args
         url = call_args[0][0] if call_args[0] else call_args.kwargs.get("url")
@@ -97,22 +91,16 @@ class TestSendInPersonVerificationCode:
             url == "https://idv-data-store.example.com/v1/in-person-verification/send"
         )
 
-        payload = call_args.kwargs.get("json")
-        assert payload == {"access_token": "idv-scoped-access-token"}
+        assert "json" not in call_args.kwargs
 
         headers = call_args.kwargs.get("headers")
-        assert headers["Authorization"] == "Bearer idv-data-store-jwt"
+        assert headers["Authorization"] == "Bearer idv-scoped-access-token"
 
     @pytest.mark.asyncio
     @patch.object(
         in_person_verification_module,
         "get_configuration",
         return_value=MOCK_CONFIGURATION,
-    )
-    @patch.object(
-        in_person_verification_module,
-        "get_idv_data_store_client_token",
-        AsyncMock(return_value="idv-data-store-jwt"),
     )
     @patch.object(
         in_person_verification_module,
@@ -157,17 +145,14 @@ class TestGetLastEmailSent:
         "get_configuration",
         return_value=MOCK_CONFIGURATION,
     )
-    @patch.object(in_person_verification_module, "get_idv_data_store_client_token")
     @patch.object(in_person_verification_module, "exchange_token_for_idv_data_store")
     async def test_success_returns_last_email_sent(
         self,
         mock_exchange,
-        mock_get_client_token,
         mock_get_configuration,
         mock_http_client,
     ):
         mock_exchange.return_value = "idv-scoped-access-token"
-        mock_get_client_token.return_value = "idv-data-store-jwt"
         mock_http_client.post = AsyncMock(
             return_value=_mock_response(
                 {

@@ -91,8 +91,13 @@
                 },
                 "url": {
                   "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
-                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-                  "path": ["oauth2", "token"]
+                  "host": [
+                    "{{IBM_VERIFY_TENANT_URL}}"
+                  ],
+                  "path": [
+                    "oauth2",
+                    "token"
+                  ]
                 }
               },
               "response": []
@@ -176,8 +181,13 @@
                 },
                 "url": {
                   "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
-                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-                  "path": ["oauth2", "token"]
+                  "host": [
+                    "{{IBM_VERIFY_TENANT_URL}}"
+                  ],
+                  "path": [
+                    "oauth2",
+                    "token"
+                  ]
                 }
               },
               "response": []
@@ -224,8 +234,14 @@
                 },
                 "url": {
                   "raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Users/authentication",
-                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-                  "path": ["v2.0", "Users", "authentication"]
+                  "host": [
+                    "{{IBM_VERIFY_TENANT_URL}}"
+                  ],
+                  "path": [
+                    "v2.0",
+                    "Users",
+                    "authentication"
+                  ]
                 }
               },
               "response": []
@@ -287,8 +303,15 @@
                 },
                 "url": {
                   "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/authnmethods/password/{{CLOUD_DIRECTORY_ID}}?returnJwt=true",
-                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-                  "path": ["v1.0", "authnmethods", "password", "{{CLOUD_DIRECTORY_ID}}"],
+                  "host": [
+                    "{{IBM_VERIFY_TENANT_URL}}"
+                  ],
+                  "path": [
+                    "v1.0",
+                    "authnmethods",
+                    "password",
+                    "{{CLOUD_DIRECTORY_ID}}"
+                  ],
                   "query": [
                     {
                       "key": "returnJwt",
@@ -364,8 +387,14 @@
                 },
                 "url": {
                   "raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Users/{{USER_ID}}",
-                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-                  "path": ["v2.0", "Users", "{{USER_ID}}"]
+                  "host": [
+                    "{{IBM_VERIFY_TENANT_URL}}"
+                  ],
+                  "path": [
+                    "v2.0",
+                    "Users",
+                    "{{USER_ID}}"
+                  ]
                 }
               },
               "response": []
@@ -387,8 +416,15 @@
                 "header": [],
                 "url": {
                   "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/auth/sessions/{{USER_ID}}",
-                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-                  "path": ["v1.0", "auth", "sessions", "{{USER_ID}}"]
+                  "host": [
+                    "{{IBM_VERIFY_TENANT_URL}}"
+                  ],
+                  "path": [
+                    "v1.0",
+                    "auth",
+                    "sessions",
+                    "{{USER_ID}}"
+                  ]
                 }
               },
               "response": []
@@ -433,8 +469,13 @@
                 ],
                 "url": {
                   "raw": "{{IBM_VERIFY_TENANT_URL}}/v2.0/Me",
-                  "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-                  "path": ["v2.0", "Me"]
+                  "host": [
+                    "{{IBM_VERIFY_TENANT_URL}}"
+                  ],
+                  "path": [
+                    "v2.0",
+                    "Me"
+                  ]
                 }
               },
               "response": []
@@ -501,8 +542,13 @@
             },
             "url": {
               "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
-              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-              "path": ["oauth2", "token"]
+              "host": [
+                "{{IBM_VERIFY_TENANT_URL}}"
+              ],
+              "path": [
+                "oauth2",
+                "token"
+              ]
             }
           },
           "response": []
@@ -567,8 +613,14 @@
             },
             "url": {
               "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/authnmethods/password?search=name%20%3D%20%22Cloud%20Directory%22",
-              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-              "path": ["v1.0", "authnmethods", "password"],
+              "host": [
+                "{{IBM_VERIFY_TENANT_URL}}"
+              ],
+              "path": [
+                "v1.0",
+                "authnmethods",
+                "password"
+              ],
               "query": [
                 {
                   "key": "search",
@@ -615,8 +667,14 @@
             },
             "url": {
               "raw": "{{IBM_VERIFY_TENANT_URL}}/v1.0/auth/session",
-              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-              "path": ["v1.0", "auth", "session"]
+              "host": [
+                "{{IBM_VERIFY_TENANT_URL}}"
+              ],
+              "path": [
+                "v1.0",
+                "auth",
+                "session"
+              ]
             }
           },
           "response": []
@@ -652,8 +710,13 @@
             },
             "url": {
               "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/userinfo",
-              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-              "path": ["oauth2", "userinfo"]
+              "host": [
+                "{{IBM_VERIFY_TENANT_URL}}"
+              ],
+              "path": [
+                "oauth2",
+                "userinfo"
+              ]
             }
           },
           "response": []
@@ -684,7 +747,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"client_id\": \"{{IDV_DATA_STORE_CLIENT_ID}}\",\n  \"client_name\": \"gc-signin-selfservice-webapp\",\n  \"allowed_scopes\": \"idv:auth:userinfo\"\n}",
+              "raw": "{\n  \"client_id\": \"{{IDV_DATA_STORE_CLIENT_ID}}\",\n  \"client_name\": \"gc-signin-selfservice-webapp\",\n  \"allowed_scopes\": \"{{IDV_DATA_STORE_SCOPES}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -693,8 +756,14 @@
             },
             "url": {
               "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/admin/clients",
-              "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
-              "path": ["v1", "admin", "clients"]
+              "host": [
+                "{{IDV_DATA_STORE_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "clients"
+              ]
             },
             "description": "Bootstraps this app's RegisteredClient row in idv-data-store. No auth required (bootstrap-only). Only needs to be run once per environment/client_id — returns 409 if the client_id is already registered, which is safe to ignore."
           },
@@ -771,42 +840,37 @@
                 },
                 {
                   "key": "scope",
-                  "value": "idv:auth:userinfo",
+                  "value": "{{IDV_DATA_STORE_SCOPES}}",
                   "type": "text"
                 }
               ]
             },
             "url": {
               "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
-              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
-              "path": ["oauth2", "token"]
+              "host": [
+                "{{IBM_VERIFY_TENANT_URL}}"
+              ],
+              "path": [
+                "oauth2",
+                "token"
+              ]
             },
-            "description": "RFC 8693 OAuth 2.0 Token Exchange, mirrors app.idv_data_store.services.verified_claims.exchange_token_for_idv_data_store(). Uses this app's dedicated IBM Verify STS client credentials to exchange the user's own USER_ACCESS_TOKEN (obtained from the 'Get User Access Token' request under IBM Verify API) for a new access_token scoped only to idv-data-store. Saves the result to IDV_EXCHANGED_ACCESS_TOKEN."
+            "description": "RFC 8693 OAuth 2.0 Token Exchange reference flow for idv-data-store /v1/auth/userinfo. Uses the dedicated IBM Verify STS client credentials to exchange USER_ACCESS_TOKEN for a delegated token scoped to idv-data-store userinfo access. Saves access_token to IDV_EXCHANGED_ACCESS_TOKEN."
           },
           "response": []
         },
         {
-          "name": "2. Get IDV Data Store Client Token",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    const body = pm.response.json();",
-                  "    if (body.access_token) {",
-                  "        pm.environment.set(\"IDV_DATA_STORE_CLIENT_TOKEN\", body.access_token);",
-                  "        console.log(\"Saved IDV_DATA_STORE_CLIENT_TOKEN to environment\");",
-                  "    }",
-                  "}"
-                ]
-              }
-            }
-          ],
+          "name": "2. Get Userinfo Claims",
           "request": {
             "auth": {
-              "type": "noauth"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{IDV_EXCHANGED_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [
@@ -826,65 +890,17 @@
               }
             },
             "url": {
-              "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/admin/token?client_id={{IDV_DATA_STORE_CLIENT_ID}}&scopes=idv:auth:userinfo",
-              "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
-              "path": ["v1", "admin", "token"],
-              "query": [
-                {
-                  "key": "client_id",
-                  "value": "{{IDV_DATA_STORE_CLIENT_ID}}"
-                },
-                {
-                  "key": "scopes",
-                  "value": "idv:auth:userinfo"
-                }
-              ]
-            },
-            "description": "idv-data-store's own client-bootstrap token endpoint, mirrors app.idv_data_store.services.verified_claims.get_idv_data_store_client_token(). Only ever grants the intersection of the requested scopes and the client's allowed_scopes (see idv-data-store's admin/router.py). Saves the result to IDV_DATA_STORE_CLIENT_TOKEN."
-          },
-          "response": []
-        },
-        {
-          "name": "3. Get Userinfo Claims",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{IDV_DATA_STORE_CLIENT_TOKEN}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"access_token\": \"{{IDV_EXCHANGED_ACCESS_TOKEN}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
               "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/auth/userinfo",
-              "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
-              "path": ["v1", "auth", "userinfo"]
+              "host": [
+                "{{IDV_DATA_STORE_BASE_URL}}"
+              ],
+              "path": [
+                "v1",
+                "auth",
+                "userinfo"
+              ]
             },
-            "description": "Calls idv-data-store's POST /v1/auth/userinfo endpoint. Presents idv-data-store's own client-bootstrap Bearer token (IDV_DATA_STORE_CLIENT_TOKEN) plus the already-exchanged, idv-data-store-scoped access_token (IDV_EXCHANGED_ACCESS_TOKEN) in the body. This endpoint requires the idv:auth:userinfo scope and returns userinfo claims for the exchanged token."
+            "description": "Calls idv-data-store POST /v1/auth/userinfo as the reference delegated-token flow. Uses IDV_EXCHANGED_ACCESS_TOKEN directly as Bearer auth; no request-body access_token and no idv-data-store bootstrap token are required."
           },
           "response": []
         }
