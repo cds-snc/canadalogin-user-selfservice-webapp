@@ -1,5 +1,60 @@
 # Changelog
 
+## [1.29.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.28.0...v1.29.0) (2026-07-29)
+
+
+### Features
+
+* **identity-verifcation:** [FE] Prove your identity in person ID 6.0 ([#1871](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1871)) ([aff35bf](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/aff35bfd139774d38fb36848093d0e8a22b3d6d6))
+* **identity-verificaiton:** Update IDV Code - Service Canada Center ([#1803](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1803)) ([e7e8fd0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e7e8fd0c47c93ad24dc4bf0a49e1724a3c735436))
+* **identity-verification:** [FE] Dynamic Expiry date for IDV Code and Figma updates ([#1893](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1893)) ([6fc6fa0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6fc6fa00b649fe403c7cedb898f4aae486147a31))
+* **identity-verification:** Add a resend email button ([#1832](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1832)) ([268bd23](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/268bd23a0ca58bf2f8bb06abe2b2c63381fa8896))
+* **identity-verification:** Added fix to re-render the useGcdsSelect… ([#1837](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1837)) ([f687ea5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f687ea5ecfea98548470c97b35d8855364a16614))
+* **identity-verification:** Added fix to re-render the useGcdsSelectWidth ([f687ea5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f687ea5ecfea98548470c97b35d8855364a16614))
+* **identity-verification:** Added notice to ProfileHome "Your information was successfully updated in CanadaLogin" ([#1794](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1794)) ([b798906](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b79890622911b76052cff1711565541566b73773))
+* **identity-verification:** App Name should be relying party name ([#1877](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1877)) ([6fae5bf](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6fae5bfc38e158955257f5a2fa36990939b7397b))
+* **identity-verification:** Format Verification Code ([#1880](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1880)) ([b0c74e8](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b0c74e89bbc668d7a145928e7c888e2447c559c0))
+* **identity-verification:** Get ready for selfie and ID check [FE -Content Update] ([#1807](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1807)) ([24e83a5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/24e83a57e82dd049977659a972d7a0cc20a3c0aa))
+* **identity-verification:** implement token exchange to be used for idv data store  ([#1922](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1922)) ([5cb5a2d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5cb5a2d4ae40b0f340edb0940c3f3d863b6de7ec))
+* **identity-verification:** Print Page Funtionctionality ([#1859](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1859)) ([1e27d9b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1e27d9b8de3e3411fd8ab5c3dc98ea947aba8e97))
+* **identity-verification:** Store Relying Party Info in State ([#1829](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1829)) ([da9de9c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/da9de9c615eb438e9addef461e2ee98617c6e7e1))
+* **identity-verification:** your canadalogin account is connected to bc service card ([#1869](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1869)) ([eb34f73](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/eb34f73b20e51579a20b8ac0d79260d91c674428))
+* POC identity linking using two ibm verify tenants ([#1873](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1873)) ([31ab637](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/31ab637be663179939d4b068f9f43014107ad9af))
+
+
+### Bug Fixes
+
+* **accessibility:** Skip to main content link not being the first tab… ([#1845](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1845)) ([55b4c31](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/55b4c31d2f428a73aaf353b2c0eedf67c497a4a3))
+* **Auth:** resolve unhandled authentication error ([#1903](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1903)) ([cfe3a88](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/cfe3a88de374df2eeba95186ea9d181aaabc76c8))
+* **auth:** unsupported response type CSIAQ0147E the required parameter response type is missing in the request ([#1908](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1908)) ([758ae18](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/758ae18cd73576dafac77993da0460c793c60b9f))
+* **identity-verification:** Added the Id param to GcdsInput Fields ([#1836](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1836)) ([6db0f81](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6db0f816a91fbc97686121874efbb8b03bf96712))
+* Replace the GA ID with the non prod ID ([210e333](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/210e3333411eaa976bddedd8bf0a228502cfc697))
+* Swapped GA ID o use non-dev google analytics ID ([#1858](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1858)) ([210e333](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/210e3333411eaa976bddedd8bf0a228502cfc697))
+
+
+### Code Refactoring
+
+* **identity-verification:** [FE - Content Update] Add QC title to Prove your identity online ([#1828](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1828)) ([5fad9c0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5fad9c0d0a0153c9b57cfc466e0b8e5a53657cf8))
+* **identity-verification:** [FE - Content Update] Add QC to Get ready for provincial verification ([#1886](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1886)) ([1f42d5d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1f42d5d700927621b3ac1ec3b9a9b9ed672b05c7))
+* **identity-verification:** [FE Content Update] Get ready to visit a Canada Post location - Remove "optional" ([#1924](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1924)) ([9eed7ea](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9eed7eafbbaeec2124c3cf662f4f3431a4f7d7ab))
+* **identity-verification:** [FE Content Update] Removed '(optional)' text from Service Canada Centre page form ([#1878](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1878)) ([0571ec8](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0571ec82670a9f66fb3b1be20a8e580ece4cf504))
+* **identity-verification:** [FE Content] Complete identity proofing when you're ready ([#1866](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1866)) ([2c7b8b9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2c7b8b99a1c7f196d5fc98466e4f3a1f232b5cd3))
+* **Identity-verification:** Get ready to visit a Service Canada Centre [FE-Content Update] ([#1857](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1857)) ([fcb93f0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fcb93f09ec53bf060fb70b5350fc30d04a0fb0f7))
+* **identity-verification:** refactor test files in idv ([#1925](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1925)) ([2bfcb65](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2bfcb65e81908a76047f067e9eea787c99b6481a))
+
+
+### Miscellaneous Chores
+
+* bump prod version to 1.28.0 ([#1843](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1843)) ([dce58e9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/dce58e927478adadfee8672e7b17cc0a6bc3424c))
+* **deps:** lock file maintenance ([#1728](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1728)) ([901091c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/901091cddc1bc848433a13f610ac663fb75b85b2))
+* **deps:** update all minor dependencies ([#1727](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1727)) ([f2b385d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f2b385dd8a6063e29dbfb21d59492914b19e8b26))
+* **deps:** update all minor dependencies ([#1868](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1868)) ([9dd7f3d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9dd7f3d55f5e1664cd2cc8e20b8adfdb5bd242ad))
+* **deps:** update all non-major github action dependencies ([#1725](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1725)) ([2898f48](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2898f48495356d0b9433592c2fe0fdb9d42ee36f))
+* **deps:** update all patch dependencies ([#1726](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1726)) ([050f320](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/050f3208e22999fb77880c7fb19d38300cd7f1b6))
+* **deps:** update all patch dependencies ([#1867](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1867)) ([8f040eb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/8f040eb491764bc6c8be97960dbb68e6022edeb8))
+* **deps:** update mcr.microsoft.com/devcontainers/python:3.14-bookworm docker digest to 0fdcf95 ([#1833](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1833)) ([d1a9c5b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d1a9c5b0a55ea82b06b1d69821f57035fe7b4701))
+* **staging:** bump version to 1.28.0 ([#1842](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1842)) ([e56d75f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e56d75f8d1714f4dad2d4ce20cb2634c5cb325a8))
+
 ## [1.28.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.27.0...v1.28.0) (2026-07-09)
 
 
