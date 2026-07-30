@@ -22,9 +22,9 @@ import {
   START_IDENTITY_OPTION,
   type StartIdentityOption,
 } from "./components/methods";
-import { useUser } from "../../components/Providers/useUser";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import { identityVerificationApi } from "./api/identityVerificationApi";
+import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 
 function extractTargetUrl(searchParams: URLSearchParams): string | null {
   const structuredTarget = searchParams.get(IDV_TARGET_URL_KEY);
@@ -59,18 +59,14 @@ export default function StartIdentityProofingPage() {
   const { language, journeyType } = useParams();
   const [searchParams] = useSearchParams();
 
-  const { t, i18n } = useTranslation("idv");
-  const { state } = useUser();
-
-  const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const rpName = localizedDetail?.name ?? rpInfo?.linkName;
+  const { t } = useTranslation("idv");
+  const { relyingPartyName: rpName } = useRelyingPartyInfo();
   const titleByJourneyType = {
     [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
-      rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
+      rpName,
     }),
     [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.pageTitle", {
-      rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
+      rpName,
     }),
     [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.proveYourIdentity"),
   } as const;

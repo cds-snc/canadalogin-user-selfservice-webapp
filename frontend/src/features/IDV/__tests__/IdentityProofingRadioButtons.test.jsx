@@ -68,7 +68,7 @@ describe("IdentityProofingRadioButtons", () => {
   });
 
   it("renders hint text for all options", () => {
-    render(<IdentityProofingRadioButtons {...defaultProps} />);
+    render(<IdentityProofingRadioButtons {...defaultProps} rpName="RP Name" />);
 
     expect(
       screen.getByText(

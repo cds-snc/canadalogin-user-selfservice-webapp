@@ -51,6 +51,42 @@ const parseIsoDate = (
   return { year, month, day };
 };
 
+export const formatDateOfBirthForDisplay = (
+  value: string,
+  locale = "en-US",
+): string => {
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return "";
+  }
+
+  const parsed = parseIsoDate(trimmedValue);
+
+  if (parsed) {
+    const { year, month, day } = parsed;
+    const parsedDate = new Date(year, month - 1, day);
+
+    return new Intl.DateTimeFormat(locale, {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(parsedDate);
+  }
+
+  const parsedDate = new Date(trimmedValue);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return trimmedValue;
+  }
+
+  return new Intl.DateTimeFormat(locale, {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(parsedDate);
+};
+
 export type DateOfBirthValidationError =
   | "required"
   | "invalid"

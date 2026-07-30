@@ -187,12 +187,7 @@ describe("ConfirmIdentityDetails", () => {
   it("shows the new no-RP success notice when RP details are missing", () => {
     mockUserState = {
       ...mockUserState,
-      relyingPartyInfo: {
-        url: "https://rp.example.com/service",
-        localized: {
-          en: { url: "https://rp.example.com/service" },
-        },
-      },
+      relyingPartyInfo: null,
     };
 
     render(<ConfirmIdentityDetails />);

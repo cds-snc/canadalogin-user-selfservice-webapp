@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { useUser } from "../../../components/Providers/useUser";
+import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
 import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
@@ -26,15 +26,9 @@ export default function InPersonProofingInProgress() {
   const { t, i18n } = useTranslation("idv");
   const { language, journeyType } = useParams();
   const navigate = useNavigate();
-  const { state } = useUser();
   const [sendEmailDate, setSendEmailDate] = useState<string | null>(null);
 
-  const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const rpName =
-    localizedDetail?.name ??
-    rpInfo?.linkName ??
-    t("StartIdentityProofing.fallbackRpName");
+  const { relyingPartyName: rpName } = useRelyingPartyInfo();
 
   const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
     language,

@@ -18,9 +18,11 @@ import { path } from "../../utils/routeHelpers";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation("idv");
+  const { t } = useTranslation("idv");
   const { language, journeyType } = useParams();
   const { state } = useUser();
+  const { relyingPartyUrl, relyingPartyName, hasRelyingParty } =
+    useRelyingPartyInfo();
 
   const rpInfo = state?.relyingPartyInfo;
   const localizedDetail = rpInfo?.localized?.[i18n.language];
