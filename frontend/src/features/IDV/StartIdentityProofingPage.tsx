@@ -60,14 +60,14 @@ export default function StartIdentityProofingPage() {
   const [searchParams] = useSearchParams();
 
   const { t } = useTranslation("idv");
-  const { relyingPartyName: rpName } = useRelyingPartyInfo();
+  const { relyingPartyName: rpName, hasRelyingParty } = useRelyingPartyInfo();
+
+  const startIdentityTitle = hasRelyingParty
+    ? t("StartIdentityProofing.pageTitle", { rpName })
+    : t("StartIdentityProofing.proveYourIdentity");
   const titleByJourneyType = {
-    [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
-      rpName,
-    }),
-    [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.pageTitle", {
-      rpName,
-    }),
+    [IDV_JOURNEY_TYPE.REQUIRED]: startIdentityTitle,
+    [IDV_JOURNEY_TYPE.START]: startIdentityTitle,
     [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.proveYourIdentity"),
   } as const;
   const requestedJourneyType = journeyType ?? IDV_JOURNEY_TYPE.START;
