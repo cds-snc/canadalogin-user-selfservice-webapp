@@ -17,11 +17,12 @@ function getRelyingPartyDetails(
 ): RelyingPartyDetails {
   const localizedDetail = relyingPartyInfo?.localized?.[language];
   const relyingParty = relyingPartyInfo ?? null;
+  const relyingPartyName = localizedDetail?.name ?? relyingPartyInfo?.linkName ?? "";
 
   return {
     relyingPartyInfo: relyingParty,
-    hasRelyingParty: Boolean(relyingParty),
-    relyingPartyName: localizedDetail?.name ?? relyingPartyInfo?.linkName ?? "",
+    hasRelyingParty: Boolean(relyingPartyName.trim()),
+    relyingPartyName,
     relyingPartyUrl: localizedDetail?.url ?? relyingPartyInfo?.url ?? "/",
   };
 }
