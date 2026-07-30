@@ -684,7 +684,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"client_id\": \"{{IDV_DATA_STORE_CLIENT_ID}}\",\n  \"client_name\": \"gc-signin-selfservice-webapp\",\n  \"allowed_scopes\": \"{{IDV_DATA_STORE_SCOPES}}\"\n}",
+              "raw": "{\n  \"client_id\": \"{{IDV_DATA_STORE_CLIENT_ID}}\",\n  \"client_name\": \"gc-signin-selfservice-webapp\",\n  \"allowed_scopes\": \"idv:auth:userinfo\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -771,7 +771,7 @@
                 },
                 {
                   "key": "scope",
-                  "value": "{{IDV_DATA_STORE_SCOPES}}",
+                  "value": "idv:auth:userinfo",
                   "type": "text"
                 }
               ]
@@ -826,7 +826,7 @@
               }
             },
             "url": {
-              "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/admin/token?client_id={{IDV_DATA_STORE_CLIENT_ID}}&scopes={{IDV_DATA_STORE_SCOPES}}",
+              "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/admin/token?client_id={{IDV_DATA_STORE_CLIENT_ID}}&scopes=idv:auth:userinfo",
               "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
               "path": ["v1", "admin", "token"],
               "query": [
@@ -836,7 +836,7 @@
                 },
                 {
                   "key": "scopes",
-                  "value": "{{IDV_DATA_STORE_SCOPES}}"
+                  "value": "idv:auth:userinfo"
                 }
               ]
             },
@@ -845,7 +845,7 @@
           "response": []
         },
         {
-          "name": "3. Get Verified Claims",
+          "name": "3. Get Userinfo Claims",
           "request": {
             "auth": {
               "type": "bearer",
@@ -880,11 +880,11 @@
               }
             },
             "url": {
-              "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/auth/verified-claims",
+              "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/auth/userinfo",
               "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
-              "path": ["v1", "auth", "verified-claims"]
+              "path": ["v1", "auth", "userinfo"]
             },
-            "description": "Mirrors app.idv_data_store.services.verified_claims.dispatch_get_verified_claims_from_idv_data_store(). Presents idv-data-store's own client-bootstrap Bearer token (IDV_DATA_STORE_CLIENT_TOKEN) plus the already-exchanged, idv-data-store-scoped access_token (IDV_EXCHANGED_ACCESS_TOKEN) in the body. Returns the user's verified identity claims."
+            "description": "Calls idv-data-store's POST /v1/auth/userinfo endpoint. Presents idv-data-store's own client-bootstrap Bearer token (IDV_DATA_STORE_CLIENT_TOKEN) plus the already-exchanged, idv-data-store-scoped access_token (IDV_EXCHANGED_ACCESS_TOKEN) in the body. This endpoint requires the idv:auth:userinfo scope and returns userinfo claims for the exchanged token."
           },
           "response": []
         }
