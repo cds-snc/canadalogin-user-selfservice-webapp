@@ -27,8 +27,8 @@ export default function CompleteIdentityProofingPage() {
   const { t } = useTranslation("idv");
   const { t: tCommon } = useTranslation("common");
   const appName = tCommon("RelyingParty.canadaLogin");
-  const { relyingPartyName: relyingPartyLinkName } = useRelyingPartyInfo();
-  const heading = relyingPartyLinkName
+  const { relyingPartyName: relyingPartyLinkName, hasRelyingParty } = useRelyingPartyInfo();
+  const heading = hasRelyingParty
     ? t("CompleteIdentityProofing.headingWithRpName", {
         rpName: relyingPartyLinkName,
       })
