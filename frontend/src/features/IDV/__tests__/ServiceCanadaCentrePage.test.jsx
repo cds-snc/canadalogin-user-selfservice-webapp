@@ -319,7 +319,7 @@ describe("ServiceCanadaCentrePage", () => {
             idvCode: MOCK_GENERATED_VERIFICATION_CODE,
             firstName: "Jane",
             lastName: "Doe",
-            dateOfBirth: "1990-01-01",
+            dateOfBirth: "January 1, 1990",
             idType: "passport",
             idExpiryDate: "2026-12-31",
           }),

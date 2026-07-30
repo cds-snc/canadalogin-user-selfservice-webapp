@@ -36,6 +36,7 @@ import {
   getServiceCanadaCentreValidation,
   type ServiceCanadaCentreFormData,
 } from "./validation/ServiceCanadaCentre.validation";
+import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.validation";
 import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 
 const ERROR_SUMMARY_ID = "service-canada-centre-error-summary";
@@ -165,12 +166,16 @@ export default function ServiceCanadaCentrePage() {
       return;
     }
 
+    const formattedDateOfBirth = formatDateOfBirthForDisplay(
+      formData.dateOfBirth,
+    );
+
     navigate(serviceCanadaCodePage, {
       state: {
         idvCode: response.data.verificationCode,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        dateOfBirth: formData.dateOfBirth,
+        dateOfBirth: formattedDateOfBirth,
         address: formData.address,
         province: formData.province,
         idType: formData.idType,
