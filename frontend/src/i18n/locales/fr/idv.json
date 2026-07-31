@@ -183,7 +183,7 @@
     "howToProveHeading": "Comment souhaitez-vous prouver votre identité?",
     "onlineInstantOption": "Confirmation d’identité en ligne et accès immédiat",
     "onlineInstantHint": "Prenez un égoportrait et une photo de votre document d’identité avec votre téléphone ou connectez-vous avec votre compte provincial (C.-B., AB, QC).",
-    "inPersonSignBackInOption": "Confirmation d’identité en ligne suivie d’une reconnexion",
+    "inPersonSignBackInOption": "Confirmation d’identité en personne suivie d’une reconnexion",
     "inPersonSignBackInHint": "Prévoyez une visite dans un bureau Postes Canada ou dans un centre Service Canada et munissez-vous d’un document d’identité gouvernemental valide.",
     "cantProveNowOption": "Confirmation d’identité plus tard ou d’une manière différente",
     "cantProveNowHint": "Déconnectez-vous et connectez-vous à nouveau lorsque vous serez prêt ou prête, ou découvrez les autres manières d’accéder à {{rpName}}.",
