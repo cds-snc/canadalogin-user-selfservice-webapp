@@ -13,19 +13,16 @@ import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import InPersonRadioButtons from "../components/InPersonRadioButtons";
 import { IN_PERSON_METHOD, type InPersonMethod } from "../components/methods";
-import { useUser } from "../../../components/Providers/useUser";
+import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
 
 export default function ProveIdentityInPersonPage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
-  const { t, i18n } = useTranslation("idv");
-  const { state } = useUser();
+  const { t } = useTranslation("idv");
 
   const [selectedMethod, setSelectedMethod] = useState<InPersonMethod>();
 
-  const rpInfo = state.relyingPartyInfo;
-  const localizedDetail = rpInfo?.localized?.[i18n.language];
-  const rpName = localizedDetail?.name ?? rpInfo?.linkName;
+  const { relyingPartyName: rpName } = useRelyingPartyInfo();
 
   const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
     language,
