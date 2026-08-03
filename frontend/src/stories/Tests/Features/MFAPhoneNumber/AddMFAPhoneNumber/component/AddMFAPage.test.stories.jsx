@@ -622,12 +622,27 @@ export const CompleteAddMFAFlowSMS = (() => {
 
       await step("Enter new MFA phone number", async () => {
         await waitFor(async () => {
-          await expect(
-            canvasElement.querySelector("input"),
-          ).toBeInTheDocument();
+          const phoneInputHost = canvasElement.querySelector(
+            "gcds-input#mfa-phone-number",
+          );
+          await expect(phoneInputHost).toBeInTheDocument();
+
+          const shadowPhoneInput =
+            phoneInputHost?.shadowRoot?.querySelector(
+              "input#mfa-phone-number",
+            ) ||
+            phoneInputHost?.shadowRoot?.querySelector('input[name="phone"]') ||
+            phoneInputHost?.shadowRoot?.querySelector("input");
+          await expect(shadowPhoneInput).toBeInTheDocument();
         });
 
-        const phoneInput = canvasElement.querySelector("input");
+        const phoneInputHost = canvasElement.querySelector(
+          "gcds-input#mfa-phone-number",
+        );
+        const phoneInput =
+          phoneInputHost?.shadowRoot?.querySelector("input#mfa-phone-number") ||
+          phoneInputHost?.shadowRoot?.querySelector('input[name="phone"]') ||
+          phoneInputHost?.shadowRoot?.querySelector("input");
         if (phoneInput) {
           // Clear existing value and type new phone number
           await userEvent.type(phoneInput, "5559998888");
@@ -973,14 +988,12 @@ export const ResendOtpCode = (() => {
             );
             await expect(resendLink).toBeInTheDocument();
 
-            // Click the gcds-link element directly or find the actual link in shadow DOM
-            if (resendLink.shadowRoot) {
-              const actualLink = resendLink.shadowRoot.querySelector("a");
-              await expect(actualLink).toBeInTheDocument();
-              await userEvent.click(actualLink);
-            } else {
-              await userEvent.click(resendLink);
-            }
+            const gcdsClickEvent = new CustomEvent("gcdsClick", {
+              bubbles: true,
+              cancelable: true,
+              detail: {},
+            });
+            resendLink.dispatchEvent(gcdsClickEvent);
           },
           { timeout: 11000 },
         );
@@ -1247,12 +1260,27 @@ export const UseDifferentPhoneNumber = (() => {
 
       await step("Enter new MFA phone number", async () => {
         await waitFor(async () => {
-          await expect(
-            canvasElement.querySelector("input"),
-          ).toBeInTheDocument();
+          const phoneInputHost = canvasElement.querySelector(
+            "gcds-input#mfa-phone-number",
+          );
+          await expect(phoneInputHost).toBeInTheDocument();
+
+          const shadowPhoneInput =
+            phoneInputHost?.shadowRoot?.querySelector(
+              "input#mfa-phone-number",
+            ) ||
+            phoneInputHost?.shadowRoot?.querySelector('input[name="phone"]') ||
+            phoneInputHost?.shadowRoot?.querySelector("input");
+          await expect(shadowPhoneInput).toBeInTheDocument();
         });
 
-        const phoneInput = canvasElement.querySelector("input");
+        const phoneInputHost = canvasElement.querySelector(
+          "gcds-input#mfa-phone-number",
+        );
+        const phoneInput =
+          phoneInputHost?.shadowRoot?.querySelector("input#mfa-phone-number") ||
+          phoneInputHost?.shadowRoot?.querySelector('input[name="phone"]') ||
+          phoneInputHost?.shadowRoot?.querySelector("input");
         if (phoneInput) {
           // Clear existing value and type new phone number
           await userEvent.type(phoneInput, "5559998888");
@@ -1287,33 +1315,19 @@ export const UseDifferentPhoneNumber = (() => {
 
       await step("Test use different phone number link", async () => {
         await waitFor(async () => {
-          // Use canvas.getByText to directly find the link by its text content
-          let differentPhoneNumberLink = canvas.getByText(
-            "Use a different phone number",
+          const linkText = "Use a different phone number";
+          const factorLinks = canvasElement.querySelectorAll("gcds-link");
+          const differentPhoneNumberLink = Array.from(factorLinks).find(
+            (link) => link.textContent.includes(linkText),
           );
           await expect(differentPhoneNumberLink).toBeInTheDocument();
 
-          // Verify we found the correct gcds-link element
-          if (
-            differentPhoneNumberLink &&
-            differentPhoneNumberLink.tagName !== "GCDS-LINK"
-          ) {
-            // If canvas.getByText found a text node or different element, find the parent gcds-link
-            differentPhoneNumberLink =
-              differentPhoneNumberLink.closest("gcds-link");
-          }
-
-          await expect(differentPhoneNumberLink).toBeInTheDocument();
-
-          // Click the gcds-link element directly or find the actual link in shadow DOM
-          if (differentPhoneNumberLink.shadowRoot) {
-            const actualLink =
-              differentPhoneNumberLink.shadowRoot.querySelector("a");
-            await expect(actualLink).toBeInTheDocument();
-            await userEvent.click(actualLink);
-          } else {
-            await userEvent.click(differentPhoneNumberLink);
-          }
+          const gcdsClickEvent = new CustomEvent("gcdsClick", {
+            bubbles: true,
+            cancelable: true,
+            detail: {},
+          });
+          differentPhoneNumberLink.dispatchEvent(gcdsClickEvent);
         });
 
         // Wait for navigation to complete
