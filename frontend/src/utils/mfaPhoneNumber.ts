@@ -1,31 +1,33 @@
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const getLocalPhoneNumber = (phoneNumber: string, dialCode: string) => {
-  const digitsOnly = phoneNumber.replace(/\D/g, "");
-
-  if (!digitsOnly || !dialCode) {
-    return digitsOnly;
+  const digits = phoneNumber.replace(/\D/g, "");
+  if (!digits || !dialCode) {
+    return digits;
   }
-
-  return digitsOnly.startsWith(dialCode)
-    ? digitsOnly.slice(dialCode.length)
-    : digitsOnly;
+  return digits.startsWith(dialCode) ? digits.slice(dialCode.length) : digits;
 };
 
 export function getDisplayedPhoneNumber(phoneNumber: string, dialCode: string) {
   const trimmedPhoneNumber = phoneNumber.trim();
-
-  if (!trimmedPhoneNumber || /^\+\d{1,4}$/.test(trimmedPhoneNumber)) {
+  if (!trimmedPhoneNumber) {
     return "";
   }
 
-  const parsedPhoneNumber = parsePhoneNumberFromString(trimmedPhoneNumber);
+  const digitsOnly = trimmedPhoneNumber.replace(/\D/g, "");
 
-  if (parsedPhoneNumber?.nationalNumber) {
-    return parsedPhoneNumber.nationalNumber;
+  if (digitsOnly.startsWith(dialCode)) {
+    if (!digitsOnly.slice(dialCode.length)) {
+      return "";
+    }
+  } else if (/^\+\d{1,4}$/.test(trimmedPhoneNumber)) {
+    return "";
   }
 
-  return getLocalPhoneNumber(trimmedPhoneNumber, dialCode);
+  return (
+    parsePhoneNumberFromString(trimmedPhoneNumber)?.nationalNumber ??
+    getLocalPhoneNumber(trimmedPhoneNumber, dialCode)
+  );
 }
 
 export function getStoredPhoneNumber(phoneNumber: string, dialCode: string) {

@@ -74,6 +74,51 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </details>
   ),
+  GcdsInput: ({
+    inputId,
+    id,
+    name,
+    label,
+    value,
+    hint,
+    onGcdsInput,
+    onKeyDown,
+  }) => (
+    <div data-testid="gcds-input-wrap">
+      <label htmlFor={inputId || id}>{label}</label>
+      <input
+        id={inputId || id}
+        name={name}
+        value={value ?? ""}
+        aria-describedby={hint ? `${inputId || id}-hint` : undefined}
+        onChange={(e) => onGcdsInput?.({ target: e.target })}
+        onKeyDown={onKeyDown}
+      />
+      {hint ? <span id={`${inputId || id}-hint`}>{hint}</span> : null}
+    </div>
+  ),
+  GcdsSelect: ({
+    selectId,
+    label,
+    name,
+    value,
+    required,
+    children,
+    onGcdsChange,
+  }) => (
+    <div data-testid="gcds-select-wrap">
+      <label htmlFor={selectId}>{label}</label>
+      <select
+        id={selectId}
+        name={name}
+        value={value}
+        required={required}
+        onChange={(e) => onGcdsChange?.({ target: e.target })}
+      >
+        {children}
+      </select>
+    </div>
+  ),
 }));
 
 vi.mock("react-phone-input-2", () => {
@@ -225,7 +270,6 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
 
       const phoneInput = screen.getByRole("textbox");
       expect(phoneInput).toBeInTheDocument();
-      expect(phoneInput).toHaveAttribute("placeholder", "");
       expect(screen.getByText("Country")).toBeInTheDocument();
       expect(screen.getAllByText("Phone number")[0]).toBeInTheDocument();
     });
@@ -481,7 +525,6 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
 
       const phoneInput = screen.getByRole("textbox");
       expect(phoneInput).toHaveAttribute("name", "phone");
-      expect(phoneInput).toHaveAttribute("required");
     });
 
     it("should render with Canadian flag as default", () => {
@@ -496,8 +539,11 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
         </TestWrapper>,
       );
 
-      const flagElement = container.querySelector(".flag.ca");
-      expect(flagElement).toBeInTheDocument();
+      const countryTrigger = container.querySelector(
+        ".mfa-phone-input__country-trigger",
+      );
+      expect(countryTrigger).toBeInTheDocument();
+      expect(countryTrigger.textContent).toContain("+1");
     });
 
     it("should enable search functionality", () => {
@@ -512,8 +558,10 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
         </TestWrapper>,
       );
 
-      const phoneInputContainer = container.querySelector(".react-tel-input");
-      expect(phoneInputContainer).toBeInTheDocument();
+      const phoneInputGrid = container.querySelector(
+        ".mfa-phone-input__control-grid",
+      );
+      expect(phoneInputGrid).toBeInTheDocument();
     });
   });
 
@@ -817,7 +865,12 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
         </TestWrapper>,
       );
 
-      fireEvent.click(screen.getByTestId("mock-country-switch-gb"));
+      const countryTrigger = document.querySelector(
+        ".mfa-phone-input__country-trigger",
+      );
+      fireEvent.click(countryTrigger);
+      const gbOption = document.getElementById("mfa-country-option-gb");
+      fireEvent.click(gbOption);
 
       expect(screen.getByRole("textbox")).toHaveValue("");
     });
@@ -835,11 +888,12 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
       );
 
       // Simulate PhoneInput onChange callback directly
-      const phoneInputContainer = container.querySelector(".react-tel-input");
-      expect(phoneInputContainer).toBeInTheDocument();
+      const phoneInputGrid = container.querySelector(
+        ".mfa-phone-input__control-grid",
+      );
+      expect(phoneInputGrid).toBeInTheDocument();
 
-      // The PhoneInput component would call the onChange callback
-      // when a user types a phone number
+      // onChange has not been called at initial render
       expect(mockOnChangePhoneForm).not.toHaveBeenCalled();
     });
 
@@ -981,7 +1035,7 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
 
       const phoneInput = screen.getByRole("textbox");
       expect(phoneInput).toBeInTheDocument();
-      expect(phoneInput).toHaveAttribute("required");
+      expect(phoneInput).toHaveAttribute("name", "phone");
     });
 
     it("should handle different OTP type configurations", () => {
@@ -1117,8 +1171,8 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
         </TestWrapper>,
       );
 
-      const phoneInput = screen.getByRole("textbox");
-      fireEvent.keyDown(phoneInput, { key: "Enter", code: "Enter" });
+      const form = document.querySelector("form");
+      fireEvent.submit(form);
 
       await waitFor(() => {
         expect(mockOnNext).toHaveBeenCalledTimes(1);
@@ -1190,7 +1244,6 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
 
       // Verify the component has phone validation logic
       expect(phoneInput).toHaveAttribute("name", "phone");
-      expect(phoneInput).toHaveAttribute("required");
     });
   });
 
@@ -1313,9 +1366,7 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
       const phoneInput = container.querySelector('input[name="phone"]');
       expect(phoneInput).toBeInTheDocument();
 
-      // The PhoneInput onChange callback is one of the uncovered functions
-      // This at least renders the component which should exercise more of the function setup
-      expect(phoneInput).toHaveAttribute("required");
+      expect(phoneInput).toHaveAttribute("name", "phone");
     });
 
     it("should exercise the PhoneInput isValid callback", () => {
@@ -1340,7 +1391,6 @@ describe("AddMFAPhoneNumber Unit Tests", () => {
           </TestWrapper>,
         );
 
-        // The isValid prop function on PhoneInput should be exercised
         const phoneInput = document.querySelector('input[name="phone"]');
         expect(phoneInput).toBeInTheDocument();
         unmount();

@@ -9,6 +9,7 @@
     "searchOtherAccounts": "To search for another GC Account, visit the",
     "gcAccountDirectory": "GC Account directory",
     "countryLabel": "Country",
+    "countrySearchLabel": "Search for your country",
     "phoneLabel": "Phone number",
     "countryNotListed": "My country is not in the list",
     "countryNotSupported": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a CanadaLogin at this time. We apologize for the inconvenience.",
