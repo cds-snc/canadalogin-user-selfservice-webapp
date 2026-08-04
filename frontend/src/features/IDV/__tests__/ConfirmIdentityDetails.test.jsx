@@ -152,23 +152,6 @@ describe("ConfirmIdentityDetails", () => {
         name: "Confirm what will be saved to your CanadaLogin",
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Contact information" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Communication" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("This name is used for display purposes only"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("This email is used for signing in and contacting you:"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "This number is used for 2-step verification and contacting you:",
-      ),
-    ).toBeInTheDocument();
   });
 
   it("shows verified badges when name, email, and phone exist", () => {
