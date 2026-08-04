@@ -87,17 +87,17 @@ export default function ConfirmIdentityDetails() {
             {t("ConfirmIdentityDetails.identityProofingDetails")}
           </GcdsHeading>
 
-        <ProvenInformationCard />
+          <ProvenInformationCard />
 
-        <GcdsButton
-          type="button"
-          onGcdsClick={(event) => {
-            event.preventDefault();
-            void handleContinue();
-          }}
-        >
-          {t("ConfirmIdentityDetails.confirmAndContinue")}
-        </GcdsButton>
+          <GcdsButton
+            type="button"
+            onGcdsClick={(event) => {
+              event.preventDefault();
+              void handleContinue();
+            }}
+          >
+            {t("ConfirmIdentityDetails.confirmAndContinue")}
+          </GcdsButton>
         </GcdsContainer>
       </GcdsGrid>
     </GcdsContainer>
