@@ -48,8 +48,7 @@ two systems: IBM Verify (for the RFC 8693 token exchange) and idv-data-store
 | Variable                           | Description                                                                                    |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `IDV_DATA_STORE_BASE_URL`          | Base URL of the idv-data-store instance you're testing against (e.g. `http://localhost:8100`). |
-| `IDV_DATA_STORE_CLIENT_ID`         | (Optional) Legacy bootstrap client id for local `/v1/admin/clients` registration tests.        |
-| `IDV_DATA_STORE_SCOPES`            | Scope requested during token exchange. For this flow use `idv:auth:userinfo`.                  |
+| `IDV_DATA_STORE_USERINFO_SCOPE`    | Scope requested during token exchange. For this flow use `idv:auth:userinfo`.                  |
 | `IDV_DATA_STORE_STS_CLIENT_ID`     | Client ID of the dedicated IBM Verify STS client used to perform the token exchange.           |
 | `IDV_DATA_STORE_STS_CLIENT_SECRET` | Client secret for the STS client above.                                                        |
 
@@ -58,14 +57,10 @@ These map 1:1 to the backend's own `.env` settings of the same name (see
 
 **Steps (run in order, after completing steps 1-5 above so `USER_ACCESS_TOKEN` is set):**
 
-1. Run `0. Register IDV Data Store Client (one-time bootstrap)`. This only
-   needs to be run once per `IDV_DATA_STORE_CLIENT_ID`/environment **if** you
-   also test local bootstrap registration. A `409` response means it's already
-   registered, which is safe to ignore.
-2. Run `1. Exchange User Token for IDV Data Store (STS)`. Its test script
+1. Run `0. Exchange User Token for IDV Data Store (STS)`. Its test script
    automatically saves the response's `access_token` to the
    `IDV_EXCHANGED_ACCESS_TOKEN` environment variable.
-3. Run `2. Get Userinfo Claims`. This uses
+2. Run `1. Get Userinfo Claims`. This uses
    `IDV_EXCHANGED_ACCESS_TOKEN` directly as Bearer auth to call
    `/v1/auth/userinfo`.
 
@@ -87,9 +82,9 @@ To use it:
 3. Fill in `IBM_VERIFY_TENANT_URL`, `IDV_DATA_STORE_STS_CLIENT_ID`,
    `IDV_DATA_STORE_STS_CLIENT_SECRET`, and `USER_ACCESS_TOKEN` (obtained the
    same way as step 5 above, e.g. from the `GC_Sign_In_DEV` collection's
-   `Get User Access Token` request). `IDV_DATA_STORE_BASE_URL`,
-   `IDV_DATA_STORE_CLIENT_ID`, and `IDV_DATA_STORE_SCOPES` already have
+   `Get User Access Token` request). `IDV_DATA_STORE_BASE_URL` and
+   `IDV_DATA_STORE_USERINFO_SCOPE` already have
    sensible local-dev defaults.
-4. Run requests `0` through `2` in order, same as above —
-   `IDV_EXCHANGED_ACCESS_TOKEN` is auto-populated by request `1` and then
-   reused as Bearer for request `2`.
+4. Run requests `0` through `1` in order, same as above —
+   `IDV_EXCHANGED_ACCESS_TOKEN` is auto-populated by request `0` and then
+   reused as Bearer for request `1`.

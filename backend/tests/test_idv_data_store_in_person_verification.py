@@ -1,9 +1,6 @@
 """
 Unit tests for the idv-data-store in-person-verification glue service
 (app.idv_data_store.services.in_person_verification).
-
-Mirrors the pattern used in tests/test_idv_data_store_verified_claims.py:
-MagicMock-based Configuration, pytest.mark.asyncio, AsyncMock(spec=AsyncClient).
 """
 
 import importlib
