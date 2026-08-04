@@ -20,9 +20,11 @@
       "envFile": "${workspaceFolder}/backend/tests/.env"
     },
     {
-      "name": "Python Debugger: FastAPI",
+      "name": "Python Debugger: FastAPI (HTTPS)",
       "type": "debugpy",
       "request": "launch",
+      "preLaunchTask": "redis: start (selfservice)",
+      "postDebugTask": "redis: stop (selfservice)",
       "python": "${workspaceFolder}/.venv/bin/python",
       "module": "uvicorn",
       "args": [
@@ -53,6 +55,8 @@
       "name": "Python Debugger: FastAPI (HTTP)",
       "type": "debugpy",
       "request": "launch",
+      "preLaunchTask": "redis: start (selfservice)",
+      "postDebugTask": "redis: stop (selfservice)",
       "python": "${workspaceFolder}/.venv/bin/python",
       "module": "uvicorn",
       "args": [
