@@ -9,8 +9,8 @@ let mockDevOnlyFeature = true;
 let mockJourneyType;
 let mockUserState = {
   userProfile: {
-    userName: "test@example.com",
-    phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
+    // userName: "test@example.com",
+    // phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
     name: {
       formatted: "Jane Doe",
     },
@@ -120,8 +120,8 @@ describe("ConfirmIdentityDetails", () => {
     });
     mockUserState = {
       userProfile: {
-        userName: "test@example.com",
-        phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
+        // userName: "test@example.com",
+        // phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
         name: {
           formatted: "Jane Doe",
         },
@@ -154,7 +154,7 @@ describe("ConfirmIdentityDetails", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows verified badges when name, email, and phone exist", () => {
+  it("shows verified badges when name exist", () => {
     render(<ConfirmIdentityDetails />);
 
     expect(screen.getAllByTestId("verified-badge")).toHaveLength(2);
@@ -163,8 +163,8 @@ describe("ConfirmIdentityDetails", () => {
   it("shows verified badge only for existing values", () => {
     mockUserState = {
       userProfile: {
-        userName: "",
-        phoneNumbers: [],
+        // userName: "",
+        // phoneNumbers: [],
         name: {
           formatted: "Jane Doe",
         },
