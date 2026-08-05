@@ -10,6 +10,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 verified_claims_module = importlib.import_module(
     "app.idv_data_store.services.verified_claims"
 )
+token_exchange_module = importlib.import_module(
+    "app.idv_data_store.services.token_exchange"
+)
 exchange_token_for_idv_data_store = (
     verified_claims_module.exchange_token_for_idv_data_store
 )
@@ -47,7 +50,7 @@ class TestExchangeTokenForIdvDataStore:
 
     @pytest.mark.asyncio
     @patch.object(
-        verified_claims_module, "get_configuration", return_value=MOCK_CONFIGURATION
+        token_exchange_module, "get_configuration", return_value=MOCK_CONFIGURATION
     )
     async def test_success_returns_exchanged_access_token(
         self, mock_get_configuration, mock_http_client
@@ -79,7 +82,7 @@ class TestExchangeTokenForIdvDataStore:
 
     @pytest.mark.asyncio
     @patch.object(
-        verified_claims_module, "get_configuration", return_value=MOCK_CONFIGURATION
+        token_exchange_module, "get_configuration", return_value=MOCK_CONFIGURATION
     )
     async def test_missing_access_token_raises(
         self, mock_get_configuration, mock_http_client
@@ -97,9 +100,9 @@ class TestExchangeTokenForIdvDataStore:
 
     @pytest.mark.asyncio
     @patch.object(
-        verified_claims_module, "get_configuration", return_value=MOCK_CONFIGURATION
+        token_exchange_module, "get_configuration", return_value=MOCK_CONFIGURATION
     )
-    @patch.object(verified_claims_module, "RequestErrorHandler")
+    @patch.object(token_exchange_module, "RequestErrorHandler")
     async def test_upstream_error_handled(
         self, mock_error_handler, mock_get_configuration, mock_http_client
     ):
@@ -125,7 +128,7 @@ class TestGetIdvDataStoreClientToken:
 
     @pytest.mark.asyncio
     @patch.object(
-        verified_claims_module, "get_configuration", return_value=MOCK_CONFIGURATION
+        token_exchange_module, "get_configuration", return_value=MOCK_CONFIGURATION
     )
     async def test_success_returns_client_token(
         self, mock_get_configuration, mock_http_client
@@ -150,7 +153,7 @@ class TestGetIdvDataStoreClientToken:
 
     @pytest.mark.asyncio
     @patch.object(
-        verified_claims_module, "get_configuration", return_value=MOCK_CONFIGURATION
+        token_exchange_module, "get_configuration", return_value=MOCK_CONFIGURATION
     )
     async def test_missing_access_token_raises(
         self, mock_get_configuration, mock_http_client
