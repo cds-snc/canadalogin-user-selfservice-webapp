@@ -117,16 +117,16 @@
   },
   "ProvincialVerification": {
     "pageTitle": "Prove your identity",
-    "heading": "Get ready for provincial verification",
-    "followSteps": "Follow the steps to complete the process",
-    "step1": "Select the appropriate option and follow the steps to sign in and prove your identity",
-    "step2": "Once the verification is complete, you will be automatically redirected",
+    "heading": "Préparez-vous à la vérification provinciale",
+    "followSteps": "Suivez les différentes étapes pour terminer le processus",
+    "step1": "Sélectionnez l’option appropriée et suivez les étapes pour vous connecter et prouver votre identité.",
+    "step2": "Une fois la vérification effectuée, la redirection se fera automatiquement.",
     "bcServicesCard": "BC Services Card",
     "albertaAccount": "Alberta.ca Account",
-    "quebecAccount": "Québec Government Authentication Service",
-    "chooseDifferentMethodButton": "Choose a different method",
-    "moreInfoTitle": "For more information",
-    "learnMoreLink": "Learn more about provincial verfication"
+    "quebecAccount": "Québec Service d’authentification gouvernementale",
+    "chooseDifferentMethodButton": "Choisir une autre méthode",
+    "moreInfoTitle": "Renseignements supplémentaires",
+    "learnMoreLink": "Apprenez-en davantage sur la vérification provinciale"
   },
   "ProvincialVerificationConnected": {
     "pageTitle": "Prove your identity",
