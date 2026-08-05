@@ -118,13 +118,6 @@ class IdvDataStoreConfig(BaseSettings):
             "verification endpoints."
         ),
     )
-    IDV_DATA_STORE_VERIFIED_CLAIMS_SCOPES: str = Field(
-        default="idv:auth:verified-claims",
-        description=(
-            "Scope requested from the IBM Verify STS client (token exchange) "
-            "when calling the idv-data-store verified-claims endpoint."
-        ),
-    )
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )
@@ -208,12 +201,6 @@ class Configuration(BaseSettings):
         """IBM Verify's OAuth2 token endpoint, used for the RFC 8693 Token
         Exchange performed against idv-data-store's dedicated STS client."""
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
-
-    @property
-    def idv_data_store_exchange_endpoint(self) -> str:
-        """idv-data-store's endpoint for retrieving verified identity claims
-        for an already-exchanged access_token."""
-        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/auth/verified-claims"
 
     @property
     def idv_data_store_in_person_verification_send_endpoint(self) -> str:

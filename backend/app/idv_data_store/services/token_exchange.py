@@ -61,38 +61,3 @@ async def exchange_token_for_idv_data_store(
         )
     logger.info("Token exchange for idv-data-store succeeded")
     return exchanged_access_token
-
-
-async def get_idv_data_store_client_token(global_http_client: AsyncClient) -> str:
-    """Obtain idv-data-store's own bootstrap-issued Bearer token.
-
-    idv-data-store's protected endpoints (including POST /v1/auth/verified-claims)
-    require a Bearer token issued by idv-data-store itself, scoped to
-    idv:auth:verified-claims, identifying this app as a trusted registered client
-    (see idv-data-store's POST /v1/admin/token). This is a separate
-    credential system from the IBM Verify STS client used above.
-    """
-    settings = get_configuration()
-    idv_settings = settings.idv_data_store_config
-
-    logger.info("Requesting idv-data-store client token")
-    try:
-        response = await global_http_client.post(
-            settings.idv_data_store_token_endpoint,
-            params={
-                "client_id": idv_settings.IDV_DATA_STORE_CLIENT_ID,
-                "scopes": idv_settings.IDV_DATA_STORE_SCOPES,
-            },
-        )
-        response.raise_for_status()
-    except Exception as exc:
-        RequestErrorHandler.handle(exc, context="idv-data-store client token request")
-
-    client_token = response.json().get("access_token")
-    if not client_token:
-        logger.error("idv-data-store token response did not contain an access_token")
-        raise RequestErrorHandler.handle(
-            ValueError("Missing access_token in idv-data-store token response"),
-            context="idv-data-store client token response",
-        )
-    return client_token
