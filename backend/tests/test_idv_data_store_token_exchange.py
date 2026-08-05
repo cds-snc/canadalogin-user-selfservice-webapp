@@ -58,7 +58,9 @@ class TestExchangeTokenForIdvDataStore:
 
     @pytest.mark.asyncio
     @patch.object(module, "get_configuration", return_value=MOCK_CONFIGURATION)
-    async def test_missing_access_token_raises(self, mock_get_configuration, mock_http_client):
+    async def test_missing_access_token_raises(
+        self, mock_get_configuration, mock_http_client
+    ):
         mock_response = MagicMock()
         mock_response.raise_for_status = MagicMock()
         mock_response.json.return_value = {}
@@ -85,7 +87,9 @@ class TestExchangeTokenForIdvDataStore:
 
         mock_response = MagicMock()
         mock_response.raise_for_status = MagicMock(
-            side_effect=HTTPStatusError("error", request=request, response=error_response)
+            side_effect=HTTPStatusError(
+                "error", request=request, response=error_response
+            )
         )
         mock_http_client.post = AsyncMock(return_value=mock_response)
 
