@@ -97,42 +97,32 @@ class BluinkConfig(BaseSettings):
     )
 
 
-class GCNotifyConfig(BaseSettings):
-    GC_NOTIFY_API_KEY: Optional[str] = None
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
-    )
-
-
 class IdvDataStoreConfig(BaseSettings):
     """Configuration for exchanging tokens with, and calling, idv-data-store.
 
-    Two independent credential systems are involved:
-      - IDV_DATA_STORE_STS_CLIENT_ID/SECRET: this app's dedicated IBM Verify
-        STS client, used to perform the RFC 8693 OAuth 2.0 Token Exchange
-        directly against IBM Verify (grant_type=token-exchange), turning the
-        user's own access_token into a new access_token scoped only to
-        idv-data-store (custom scope IDV_DATA_STORE_SCOPES). The
-        user's original access_token is never shared with idv-data-store.
-      - IDV_DATA_STORE_CLIENT_ID: this app's own registered client id in
-        idv-data-store's separate, internal client-bootstrap system, used to
-        obtain an idv-data-store-issued Bearer token (via idv-data-store's
-        POST /v1/admin/token) to authenticate calls to idv-data-store itself.
+    The credential system used is this app's dedicated IBM Verify STS
+    client (IDV_DATA_STORE_STS_CLIENT_ID/SECRET), which performs RFC 8693
+    OAuth 2.0 Token Exchange directly against IBM Verify. The exchanged,
+    narrowly-scoped token is then used directly as Bearer for idv-data-store
+    delegated-user endpoints.
     """
 
     IDV_DATA_STORE_BASE_URL: str = "http://localhost:8100"
-    IDV_DATA_STORE_CLIENT_ID: str = ""
     IDV_DATA_STORE_STS_CLIENT_ID: str = ""
     IDV_DATA_STORE_STS_CLIENT_SECRET: str = ""
-    IDV_DATA_STORE_SCOPES: str = Field(
+    IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES: str = Field(
+        default="idv:in-person-verification:send",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from the "
+            "IBM Verify STS client (token exchange) when calling in-person "
+            "verification endpoints."
+        ),
+    )
+    IDV_DATA_STORE_VERIFIED_CLAIMS_SCOPES: str = Field(
         default="idv:auth:verified-claims",
         description=(
-            "Space-separated list of idv-data-store scopes requested from both "
-            "the IBM Verify STS client (token exchange) and idv-data-store's "
-            "own client-bootstrap token endpoint. Currently only "
-            "'idv:auth:verified-claims' is needed, but this can be extended "
-            "with additional space-separated scopes as this app calls more "
-            "idv-data-store endpoints."
+            "Scope requested from the IBM Verify STS client (token exchange) "
+            "when calling the idv-data-store verified-claims endpoint."
         ),
     )
     model_config = SettingsConfigDict(
@@ -220,15 +210,22 @@ class Configuration(BaseSettings):
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
 
     @property
-    def idv_data_store_token_endpoint(self) -> str:
-        """idv-data-store's own client-bootstrap token endpoint."""
-        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/admin/token"
+    def idv_data_store_exchange_endpoint(self) -> str:
+        """idv-data-store's endpoint for retrieving verified identity claims
+        for an already-exchanged access_token."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/auth/verified-claims"
 
     @property
-    def idv_data_store_exchange_endpoint(self) -> str:
-        """idv-data-store's endpoint for fetching verified identity claims for
-        an already-exchanged access_token."""
-        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/auth/verified-claims"
+    def idv_data_store_in_person_verification_send_endpoint(self) -> str:
+        """idv-data-store's endpoint for generating and sending an in-person
+        verification code email for an already-exchanged access_token."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/in-person-verification/send"
+
+    @property
+    def idv_data_store_in_person_verification_last_email_endpoint(self) -> str:
+        """idv-data-store's endpoint for retrieving the last in-person
+        verification email sent timestamp for an already-exchanged access_token."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/in-person-verification/last-email-sent"
 
 
 @lru_cache

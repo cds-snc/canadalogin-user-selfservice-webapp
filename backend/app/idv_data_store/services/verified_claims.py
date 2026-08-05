@@ -3,10 +3,7 @@ import logging
 from httpx import AsyncClient
 
 from app.config import get_configuration
-from app.idv_data_store.services.token_exchange import (
-    exchange_token_for_idv_data_store,
-    get_idv_data_store_client_token,
-)
+from app.idv_data_store.services.token_exchange import exchange_token_for_idv_data_store
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
 
@@ -22,18 +19,13 @@ async def dispatch_get_verified_claims_from_idv_data_store(
     """
     settings = get_configuration()
 
-    idv_data_store_client_token = await get_idv_data_store_client_token(
-        global_http_client
-    )
-
     logger.info("Requesting verified identity claims from idv-data-store")
     try:
         response = await global_http_client.post(
             settings.idv_data_store_exchange_endpoint,
-            json={"access_token": idv_scoped_access_token},
             headers={
-                "Authorization": f"Bearer {idv_data_store_client_token}",
-                "Content-Type": "application/json",
+                "Authorization": f"Bearer {idv_scoped_access_token}",
+                "Accept": "application/json",
             },
         )
         response.raise_for_status()
@@ -52,8 +44,11 @@ async def get_verified_identity_claims(
     """End-to-end: exchange the user's access_token for one scoped to
     idv-data-store, then fetch and return their verified identity claims.
     """
+    settings = get_configuration()
+    scope = settings.idv_data_store_config.IDV_DATA_STORE_VERIFIED_CLAIMS_SCOPES
+
     idv_scoped_access_token = await exchange_token_for_idv_data_store(
-        global_http_client, user_access_token
+        global_http_client, user_access_token, scope=scope
     )
     claims = await dispatch_get_verified_claims_from_idv_data_store(
         global_http_client, idv_scoped_access_token
