@@ -33,3 +33,5 @@ When making changes to the authentication flows, please update the corresponding
 
 - Provincial partner DEV/DEV2 identity linking implementation and findings:
   [developer_guides/provincial-partner-dev-dev2-integration.md](developer_guides/provincial-partner-dev-dev2-integration.md)
+- In-person identity verification code generation sequence (frontend -> backend -> idv-data-store):
+  [developer_guides/idv_in_person_verification_flow.md](developer_guides/idv_in_person_verification_flow.md)
