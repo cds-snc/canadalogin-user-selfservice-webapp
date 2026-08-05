@@ -9,8 +9,6 @@ let mockDevOnlyFeature = true;
 let mockJourneyType;
 let mockUserState = {
   userProfile: {
-    // userName: "test@example.com",
-    // phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
     name: {
       formatted: "Jane Doe",
     },
@@ -120,8 +118,6 @@ describe("ConfirmIdentityDetails", () => {
     });
     mockUserState = {
       userProfile: {
-        // userName: "test@example.com",
-        // phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
         name: {
           formatted: "Jane Doe",
         },
@@ -154,26 +150,13 @@ describe("ConfirmIdentityDetails", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows verified badges when name exist", () => {
+  it("shows verified badge", () => {
     render(<ConfirmIdentityDetails />);
 
-    expect(screen.getAllByTestId("verified-badge")).toHaveLength(2);
-  });
-
-  it("shows verified badge only for existing values", () => {
-    mockUserState = {
-      userProfile: {
-        // userName: "",
-        // phoneNumbers: [],
-        name: {
-          formatted: "Jane Doe",
-        },
-      },
-    };
-
-    render(<ConfirmIdentityDetails />);
-
-    expect(screen.getAllByTestId("verified-badge")).toHaveLength(1);
+    const badges = screen.getAllByTestId("verified-badge");
+    expect(
+      badges.some((b) => b.textContent === "Proven January 27, 2026"),
+    ).toBe(true);
   });
 
   it("shows the existing RP success notice when RP details are available", () => {

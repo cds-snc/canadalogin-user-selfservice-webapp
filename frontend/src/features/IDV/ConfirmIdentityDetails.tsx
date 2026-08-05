@@ -14,6 +14,7 @@ import { IDV_JOURNEY_TYPE } from "./constants";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 import ProvenInformationCard from "../IDV/ProvenInformationCard";
 import { identityVerificationApi } from "./api/identityVerificationApi";
+import VerifiedBadge from "../../components/Badges/VerifiedBadge";
 import { path } from "../../utils/routeHelpers";
 
 export default function ConfirmIdentityDetails() {
@@ -83,9 +84,13 @@ export default function ConfirmIdentityDetails() {
 
           <GcdsText>{t("ConfirmIdentityDetails.description")}</GcdsText>
 
-          <GcdsHeading tag="h2" marginTop="0">
+          <GcdsHeading tag="h2" marginTop="0" marginBottom="0">
             {t("ConfirmIdentityDetails.identityProofingDetails")}
           </GcdsHeading>
+
+          <GcdsText marginBottom="300">
+            <VerifiedBadge text={"Proven January 27, 2026"} />
+          </GcdsText>
 
           <ProvenInformationCard />
 
