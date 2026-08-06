@@ -8,15 +8,13 @@ import {
   createCountryOptions,
   getCountryFlagEmoji,
   getDialCodeForCountry,
+  getDisplayedPhoneNumber,
   getFormattedLocalPhoneNumber,
   getFormattedPhoneNumber,
   getInitialCountry,
+  getStoredPhoneNumber,
   isPhoneNumberValidForCountry,
 } from "./utils";
-import {
-  getDisplayedPhoneNumber,
-  getStoredPhoneNumber,
-} from "../../utils/mfaPhoneNumber";
 
 function CountryPhoneInput({
   language,

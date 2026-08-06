@@ -111,6 +111,49 @@ export const getFormattedLocalPhoneNumber = (
   }
 };
 
+const getLocalPhoneNumber = (phoneNumber: string, dialCode: string): string => {
+  const digits = phoneNumber.replace(/\D/g, "");
+  if (!digits || !dialCode) {
+    return digits;
+  }
+
+  return digits.startsWith(dialCode) ? digits.slice(dialCode.length) : digits;
+};
+
+export const getDisplayedPhoneNumber = (
+  phoneNumber: string,
+  dialCode: string,
+): string => {
+  const trimmedPhoneNumber = phoneNumber.trim();
+  if (!trimmedPhoneNumber) {
+    return "";
+  }
+
+  const digitsOnly = trimmedPhoneNumber.replace(/\D/g, "");
+
+  if (digitsOnly.startsWith(dialCode)) {
+    if (!digitsOnly.slice(dialCode.length)) {
+      return "";
+    }
+  } else if (/^\+\d{1,4}$/.test(trimmedPhoneNumber)) {
+    return "";
+  }
+
+  return (
+    parsePhoneNumberFromString(trimmedPhoneNumber)?.nationalNumber ??
+    getLocalPhoneNumber(trimmedPhoneNumber, dialCode)
+  );
+};
+
+export const getStoredPhoneNumber = (
+  phoneNumber: string,
+  dialCode: string,
+): string => {
+  const localPhoneNumber = getLocalPhoneNumber(phoneNumber, dialCode);
+
+  return localPhoneNumber ? `+${dialCode}${localPhoneNumber}` : "";
+};
+
 export const isPhoneNumberValidForCountry = (
   localPhoneNumber: string,
   countryIso2: string,
