@@ -1,5 +1,5 @@
 import { GcdsInput } from "@gcds-core/components-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import "./CountryPhoneInput.css";
 import { ALLOWED_PHONE_KEYS, MAX_PHONE_DIGITS } from "./constants";
@@ -18,7 +18,7 @@ import {
   getStoredPhoneNumber,
 } from "../../utils/mfaPhoneNumber";
 
-export default function CountryPhoneInput({
+function CountryPhoneInput({
   language,
   storedPhoneNumber,
   variant,
@@ -32,11 +32,13 @@ export default function CountryPhoneInput({
     () => createCountryOptions(language),
     [language],
   );
-  const initialCountryIso2 = getInitialCountry(storedPhoneNumber);
-  const initialDialCode = getDialCodeForCountry(initialCountryIso2);
-  const [selectedCountryIso2, setSelectedCountryIso2] =
-    useState(initialCountryIso2);
-  const selectedDialCode = getDialCodeForCountry(selectedCountryIso2);
+  const [selectedCountryIso2, setSelectedCountryIso2] = useState(() =>
+    getInitialCountry(storedPhoneNumber),
+  );
+  const selectedDialCode = useMemo(
+    () => getDialCodeForCountry(selectedCountryIso2),
+    [selectedCountryIso2],
+  );
   const [isCountryMenuOpen, setIsCountryMenuOpen] = useState(false);
   const [countrySearchQuery, setCountrySearchQuery] = useState("");
   const countryDropdownRef = useRef<HTMLDivElement | null>(null);
@@ -44,7 +46,10 @@ export default function CountryPhoneInput({
   const countrySearchInputRef = useRef<HTMLInputElement | null>(null);
   const [activeCountryOptionIndex, setActiveCountryOptionIndex] = useState(-1);
   const [displayedPhoneNumber, setDisplayedPhoneNumber] = useState(() =>
-    getDisplayedPhoneNumber(storedPhoneNumber, initialDialCode),
+    getDisplayedPhoneNumber(
+      storedPhoneNumber,
+      getDialCodeForCountry(getInitialCountry(storedPhoneNumber)),
+    ),
   );
   const selectedCountryOption = useMemo(
     () =>
@@ -70,269 +75,319 @@ export default function CountryPhoneInput({
   const searchId = `${optionIdPrefix}-country-search`;
   const optionsId = `${optionIdPrefix}-country-options`;
 
-  const emitChange = (
-    nextLocalPhoneNumber: string,
-    nextCountryIso2: string,
-    nextDialCode: string,
-  ) => {
-    const nextStoredPhoneNumber = getStoredPhoneNumber(
-      nextLocalPhoneNumber,
-      nextDialCode,
-    );
-    const nextFormattedPhoneNumber = nextStoredPhoneNumber
-      ? getFormattedPhoneNumber(nextLocalPhoneNumber, nextDialCode)
-      : "";
-
-    onChange({
-      storedPhoneNumber: nextStoredPhoneNumber,
-      formattedPhoneNumber: nextFormattedPhoneNumber,
-      isValid: isPhoneNumberValidForCountry(
+  const emitChange = useCallback(
+    (
+      nextLocalPhoneNumber: string,
+      nextCountryIso2: string,
+      nextDialCode: string,
+    ) => {
+      const nextStoredPhoneNumber = getStoredPhoneNumber(
         nextLocalPhoneNumber,
-        nextCountryIso2,
         nextDialCode,
-      ),
-    });
-  };
+      );
+      const nextFormattedPhoneNumber = nextStoredPhoneNumber
+        ? getFormattedPhoneNumber(nextLocalPhoneNumber, nextDialCode)
+        : "";
 
-  const updatePhoneFields = (
-    nextLocalPhoneNumber: string,
-    nextCountryIso2: string,
-    nextDialCode: string,
-  ) => {
-    setDisplayedPhoneNumber(
-      getFormattedLocalPhoneNumber(nextLocalPhoneNumber, nextCountryIso2),
-    );
-    emitChange(nextLocalPhoneNumber, nextCountryIso2, nextDialCode);
-  };
+      onChange({
+        storedPhoneNumber: nextStoredPhoneNumber,
+        formattedPhoneNumber: nextFormattedPhoneNumber,
+        isValid: isPhoneNumberValidForCountry(
+          nextLocalPhoneNumber,
+          nextCountryIso2,
+          nextDialCode,
+        ),
+      });
+    },
+    [onChange],
+  );
 
-  const onCountryOptionSelect = (nextCountryIso2: string) => {
-    const nextDialCode = getDialCodeForCountry(nextCountryIso2);
-    setSelectedCountryIso2(nextCountryIso2);
-    updatePhoneFields(displayedPhoneNumber, nextCountryIso2, nextDialCode);
-    setCountrySearchQuery("");
-    setActiveCountryOptionIndex(-1);
-    setIsCountryMenuOpen(false);
-  };
+  const updatePhoneFields = useCallback(
+    (
+      nextLocalPhoneNumber: string,
+      nextCountryIso2: string,
+      nextDialCode: string,
+    ) => {
+      setDisplayedPhoneNumber(
+        getFormattedLocalPhoneNumber(nextLocalPhoneNumber, nextCountryIso2),
+      );
+      emitChange(nextLocalPhoneNumber, nextCountryIso2, nextDialCode);
+    },
+    [emitChange],
+  );
 
-  const focusActiveCountryOption = (nextIndex: number) => {
-    const option = filteredCountryOptions[nextIndex];
-    if (!option) {
-      return;
-    }
+  const onCountryOptionSelect = useCallback(
+    (nextCountryIso2: string) => {
+      const nextDialCode = getDialCodeForCountry(nextCountryIso2);
+      setSelectedCountryIso2(nextCountryIso2);
+      updatePhoneFields(displayedPhoneNumber, nextCountryIso2, nextDialCode);
+      setCountrySearchQuery("");
+      setActiveCountryOptionIndex(-1);
+      setIsCountryMenuOpen(false);
+    },
+    [displayedPhoneNumber, updatePhoneFields],
+  );
 
-    const optionEl = document.getElementById(
-      `${optionIdPrefix}-country-option-${option.iso2}`,
-    ) as HTMLElement | null;
-    optionEl?.focus();
-  };
-
-  const openCountryMenu = (initialIndex = -1) => {
-    setIsCountryMenuOpen(true);
-    const selectedIndex = filteredCountryOptions.findIndex(
-      (option) => option.iso2 === selectedCountryIso2,
-    );
-    setActiveCountryOptionIndex(
-      initialIndex >= 0
-        ? initialIndex
-        : selectedIndex >= 0
-          ? selectedIndex
-          : filteredCountryOptions.length > 0
-            ? 0
-            : -1,
-    );
-  };
-
-  const closeCountryMenu = () => {
-    setIsCountryMenuOpen(false);
-    setActiveCountryOptionIndex(-1);
-  };
-
-  const onCountryTriggerKeyDown: React.KeyboardEventHandler<
-    HTMLButtonElement
-  > = (event) => {
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      openCountryMenu(0);
-    } else if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      isCountryMenuOpen ? closeCountryMenu() : openCountryMenu();
-    }
-  };
-
-  const moveActiveCountryOption = (direction: "next" | "previous") => {
-    const n = filteredCountryOptions.length;
-    if (n === 0) {
-      return;
-    }
-    const nextIndex =
-      direction === "next"
-        ? (activeCountryOptionIndex + 1) % n
-        : (activeCountryOptionIndex - 1 + n) % n;
-    setActiveCountryOptionIndex(nextIndex);
-    focusActiveCountryOption(nextIndex);
-  };
-
-  const onCountrySearchKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (
-    event,
-  ) => {
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      moveActiveCountryOption(event.key === "ArrowDown" ? "next" : "previous");
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      closeCountryMenu();
-      countryTriggerRef.current?.focus();
-    }
-  };
-
-  const onCountryOptionKeyDown = (
-    event: React.KeyboardEvent<HTMLLIElement>,
-    countryIso2: string,
-  ) => {
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
-      moveActiveCountryOption(event.key === "ArrowDown" ? "next" : "previous");
-    } else if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onCountryOptionSelect(countryIso2);
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      closeCountryMenu();
-      countryTriggerRef.current?.focus();
-    } else if (event.key === "Tab") {
-      closeCountryMenu();
-    }
-  };
-
-  const onPhoneInputChange = (event: CustomEvent<string>) => {
-    const nextLocalPhoneNumber = (
-      (event.target as HTMLInputElement).value ?? ""
-    )
-      .replace(/\D/g, "")
-      .slice(0, MAX_PHONE_DIGITS);
-    updatePhoneFields(
-      nextLocalPhoneNumber,
-      selectedCountryIso2,
-      selectedDialCode,
-    );
-  };
-
-  const restorePhoneCursor = (
-    shadowInput: HTMLInputElement,
-    digitsBeforeCursor: number,
-  ) => {
-    requestAnimationFrame(() => {
-      const newValue = shadowInput.value;
-      if (digitsBeforeCursor <= 0) {
-        shadowInput.setSelectionRange(0, 0);
+  const focusActiveCountryOption = useCallback(
+    (nextIndex: number) => {
+      const option = filteredCountryOptions[nextIndex];
+      if (!option) {
         return;
       }
-      let digitCount = 0;
-      let newCursorPos = newValue.length;
-      for (let i = 0; i < newValue.length; i++) {
-        if (/\d/.test(newValue[i])) {
-          digitCount++;
-          if (digitCount === digitsBeforeCursor) {
-            newCursorPos = i + 1;
-            break;
+
+      const optionEl = document.getElementById(
+        `${optionIdPrefix}-country-option-${option.iso2}`,
+      ) as HTMLElement | null;
+      optionEl?.focus();
+    },
+    [filteredCountryOptions, optionIdPrefix],
+  );
+
+  const openCountryMenu = useCallback(
+    (initialIndex = -1) => {
+      setIsCountryMenuOpen(true);
+      const selectedIndex = filteredCountryOptions.findIndex(
+        (option) => option.iso2 === selectedCountryIso2,
+      );
+      setActiveCountryOptionIndex(
+        initialIndex >= 0
+          ? initialIndex
+          : selectedIndex >= 0
+            ? selectedIndex
+            : filteredCountryOptions.length > 0
+              ? 0
+              : -1,
+      );
+    },
+    [filteredCountryOptions, selectedCountryIso2],
+  );
+
+  const closeCountryMenu = useCallback(() => {
+    setIsCountryMenuOpen(false);
+    setActiveCountryOptionIndex(-1);
+  }, []);
+
+  const onCountryTriggerKeyDown: React.KeyboardEventHandler<HTMLButtonElement> =
+    useCallback(
+      (event) => {
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          openCountryMenu(0);
+        } else if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          isCountryMenuOpen ? closeCountryMenu() : openCountryMenu();
+        }
+      },
+      [closeCountryMenu, isCountryMenuOpen, openCountryMenu],
+    );
+
+  const moveActiveCountryOption = useCallback(
+    (direction: "next" | "previous") => {
+      const n = filteredCountryOptions.length;
+      if (n === 0) {
+        return;
+      }
+      const nextIndex =
+        direction === "next"
+          ? (activeCountryOptionIndex + 1) % n
+          : (activeCountryOptionIndex - 1 + n) % n;
+      setActiveCountryOptionIndex(nextIndex);
+      focusActiveCountryOption(nextIndex);
+    },
+    [
+      activeCountryOptionIndex,
+      filteredCountryOptions.length,
+      focusActiveCountryOption,
+    ],
+  );
+
+  const onCountrySearchKeyDown: React.KeyboardEventHandler<HTMLInputElement> =
+    useCallback(
+      (event) => {
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          moveActiveCountryOption(
+            event.key === "ArrowDown" ? "next" : "previous",
+          );
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          closeCountryMenu();
+          countryTriggerRef.current?.focus();
+        }
+      },
+      [closeCountryMenu, moveActiveCountryOption],
+    );
+
+  const onCountryOptionKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLLIElement>, countryIso2: string) => {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        moveActiveCountryOption(
+          event.key === "ArrowDown" ? "next" : "previous",
+        );
+      } else if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        onCountryOptionSelect(countryIso2);
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        closeCountryMenu();
+        countryTriggerRef.current?.focus();
+      } else if (event.key === "Tab") {
+        closeCountryMenu();
+      }
+    },
+    [closeCountryMenu, moveActiveCountryOption, onCountryOptionSelect],
+  );
+
+  const onPhoneInputChange = useCallback(
+    (event: CustomEvent<string>) => {
+      const nextLocalPhoneNumber = (
+        (event.target as HTMLInputElement).value ?? ""
+      )
+        .replace(/\D/g, "")
+        .slice(0, MAX_PHONE_DIGITS);
+      updatePhoneFields(
+        nextLocalPhoneNumber,
+        selectedCountryIso2,
+        selectedDialCode,
+      );
+    },
+    [selectedCountryIso2, selectedDialCode, updatePhoneFields],
+  );
+
+  const restorePhoneCursor = useCallback(
+    (shadowInput: HTMLInputElement, digitsBeforeCursor: number) => {
+      requestAnimationFrame(() => {
+        const newValue = shadowInput.value;
+        if (digitsBeforeCursor <= 0) {
+          shadowInput.setSelectionRange(0, 0);
+          return;
+        }
+        let digitCount = 0;
+        let newCursorPos = newValue.length;
+        for (let i = 0; i < newValue.length; i++) {
+          if (/\d/.test(newValue[i])) {
+            digitCount++;
+            if (digitCount === digitsBeforeCursor) {
+              newCursorPos = i + 1;
+              break;
+            }
           }
         }
+        shadowInput.setSelectionRange(newCursorPos, newCursorPos);
+      });
+    },
+    [],
+  );
+
+  const applyPhoneEdit = useCallback(
+    (
+      shadowInput: HTMLInputElement,
+      newDigits: string,
+      digitsBeforeCursor: number,
+    ) => {
+      flushSync(() => {
+        updatePhoneFields(newDigits, selectedCountryIso2, selectedDialCode);
+      });
+      restorePhoneCursor(shadowInput, digitsBeforeCursor);
+    },
+    [
+      restorePhoneCursor,
+      selectedCountryIso2,
+      selectedDialCode,
+      updatePhoneFields,
+    ],
+  );
+
+  const onPhoneInputKeyDown: React.KeyboardEventHandler<any> = useCallback(
+    (event) => {
+      if (event.ctrlKey || event.metaKey) {
+        return;
       }
-      shadowInput.setSelectionRange(newCursorPos, newCursorPos);
-    });
-  };
 
-  const applyPhoneEdit = (
-    shadowInput: HTMLInputElement,
-    newDigits: string,
-    digitsBeforeCursor: number,
-  ) => {
-    flushSync(() => {
-      updatePhoneFields(newDigits, selectedCountryIso2, selectedDialCode);
-    });
-    restorePhoneCursor(shadowInput, digitsBeforeCursor);
-  };
+      const nativeEvent = event.nativeEvent as KeyboardEvent;
+      const shadowInput = (nativeEvent.composedPath?.()[0] ??
+        event.target) as HTMLInputElement;
+      const value = shadowInput.value ?? "";
+      const start = shadowInput.selectionStart ?? value.length;
+      const end = shadowInput.selectionEnd ?? value.length;
 
-  const onPhoneInputKeyDown: React.KeyboardEventHandler<any> = (event) => {
-    if (event.ctrlKey || event.metaKey) {
-      return;
-    }
+      if (event.key === "Backspace" || event.key === "Delete") {
+        event.preventDefault();
 
-    const nativeEvent = event.nativeEvent as KeyboardEvent;
-    const shadowInput = (nativeEvent.composedPath?.()[0] ??
-      event.target) as HTMLInputElement;
-    const value = shadowInput.value ?? "";
-    const start = shadowInput.selectionStart ?? value.length;
-    const end = shadowInput.selectionEnd ?? value.length;
+        if (start !== end) {
+          applyPhoneEdit(
+            shadowInput,
+            (value.slice(0, start) + value.slice(end)).replace(/\D/g, ""),
+            value.slice(0, start).replace(/\D/g, "").length,
+          );
+        } else if (event.key === "Backspace") {
+          let pos = start - 1;
+          while (pos >= 0 && !/\d/.test(value[pos])) {
+            pos--;
+          }
+          if (pos >= 0) {
+            applyPhoneEdit(
+              shadowInput,
+              (value.slice(0, pos) + value.slice(pos + 1)).replace(/\D/g, ""),
+              value.slice(0, pos).replace(/\D/g, "").length,
+            );
+          }
+        } else {
+          let pos = start;
+          while (pos < value.length && !/\d/.test(value[pos])) {
+            pos++;
+          }
+          if (pos < value.length) {
+            applyPhoneEdit(
+              shadowInput,
+              (value.slice(0, pos) + value.slice(pos + 1)).replace(/\D/g, ""),
+              value.slice(0, pos).replace(/\D/g, "").length,
+            );
+          }
+        }
 
-    if (event.key === "Backspace" || event.key === "Delete") {
-      event.preventDefault();
+        return;
+      }
 
-      if (start !== end) {
-        applyPhoneEdit(
-          shadowInput,
-          (value.slice(0, start) + value.slice(end)).replace(/\D/g, ""),
-          value.slice(0, start).replace(/\D/g, "").length,
+      if (ALLOWED_PHONE_KEYS.has(event.key)) {
+        return;
+      }
+
+      if (/^[0-9]$/.test(event.key)) {
+        event.preventDefault();
+        const beforeDigits = value.slice(0, start).replace(/\D/g, "");
+        const afterDigits = value.slice(end).replace(/\D/g, "");
+        const newDigits = (beforeDigits + event.key + afterDigits).slice(
+          0,
+          MAX_PHONE_DIGITS,
         );
-      } else if (event.key === "Backspace") {
-        let pos = start - 1;
-        while (pos >= 0 && !/\d/.test(value[pos])) {
-          pos--;
+
+        if (newDigits !== beforeDigits + afterDigits) {
+          applyPhoneEdit(shadowInput, newDigits, beforeDigits.length + 1);
         }
-        if (pos >= 0) {
-          applyPhoneEdit(
-            shadowInput,
-            (value.slice(0, pos) + value.slice(pos + 1)).replace(/\D/g, ""),
-            value.slice(0, pos).replace(/\D/g, "").length,
-          );
-        }
-      } else {
-        let pos = start;
-        while (pos < value.length && !/\d/.test(value[pos])) {
-          pos++;
-        }
-        if (pos < value.length) {
-          applyPhoneEdit(
-            shadowInput,
-            (value.slice(0, pos) + value.slice(pos + 1)).replace(/\D/g, ""),
-            value.slice(0, pos).replace(/\D/g, "").length,
-          );
-        }
+
+        return;
       }
 
-      return;
-    }
-
-    if (ALLOWED_PHONE_KEYS.has(event.key)) {
-      return;
-    }
-
-    if (/^[0-9]$/.test(event.key)) {
       event.preventDefault();
-      const beforeDigits = value.slice(0, start).replace(/\D/g, "");
-      const afterDigits = value.slice(end).replace(/\D/g, "");
-      const newDigits = (beforeDigits + event.key + afterDigits).slice(
-        0,
-        MAX_PHONE_DIGITS,
-      );
-
-      if (newDigits !== beforeDigits + afterDigits) {
-        applyPhoneEdit(shadowInput, newDigits, beforeDigits.length + 1);
-      }
-
-      return;
-    }
-
-    event.preventDefault();
-  };
+    },
+    [applyPhoneEdit],
+  );
 
   useEffect(() => {
     const nextDisplayed = getDisplayedPhoneNumber(
       storedPhoneNumber,
       selectedDialCode,
     );
-    setDisplayedPhoneNumber(
-      getFormattedLocalPhoneNumber(nextDisplayed, selectedCountryIso2),
+    const nextFormattedLocalPhoneNumber = getFormattedLocalPhoneNumber(
+      nextDisplayed,
+      selectedCountryIso2,
+    );
+    setDisplayedPhoneNumber((currentDisplayedPhoneNumber) =>
+      currentDisplayedPhoneNumber === nextFormattedLocalPhoneNumber
+        ? currentDisplayedPhoneNumber
+        : nextFormattedLocalPhoneNumber,
     );
   }, [storedPhoneNumber, selectedCountryIso2, selectedDialCode]);
 
@@ -364,7 +419,7 @@ export default function CountryPhoneInput({
       document.removeEventListener("mousedown", onClickOutside);
       document.removeEventListener("keydown", onEscape);
     };
-  }, [isCountryMenuOpen]);
+  }, [closeCountryMenu, isCountryMenuOpen]);
 
   useEffect(() => {
     if (!isCountryMenuOpen) {
@@ -405,7 +460,12 @@ export default function CountryPhoneInput({
         fallbackCountry.dialCode,
       );
     }
-  }, [countryOptions, displayedPhoneNumber, selectedCountryIso2]);
+  }, [
+    countryOptions,
+    displayedPhoneNumber,
+    selectedCountryIso2,
+    updatePhoneFields,
+  ]);
 
   return (
     <div className={`mfa-phone-input mfa-phone-input--${variant}`}>
@@ -544,3 +604,5 @@ export default function CountryPhoneInput({
     </div>
   );
 }
+
+export default memo(CountryPhoneInput);
