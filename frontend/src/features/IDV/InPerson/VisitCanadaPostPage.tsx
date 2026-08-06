@@ -185,7 +185,7 @@ export default function VisitCanadaPost() {
               <GcdsSelect
                 id="selectId"
                 label={t("VisitCanadaPost.selectIdLabel")}
-                hint = {t("VisitCanadaPost.idHint")}
+                hint={t("VisitCanadaPost.idHint")}
                 name="selectId"
                 lang={currentLanguage}
                 selectId="selectId"
@@ -193,9 +193,7 @@ export default function VisitCanadaPost() {
                 required
                 errorMessage={idTypeErrorMessage}
                 onGcdsChange={createChangeHandler("idType")}
-                defaultValue={t(
-                  "VisitCanadaPost.selectIdDropdownDefaultValue",
-                )}
+                defaultValue={t("VisitCanadaPost.selectIdDropdownDefaultValue")}
               >
                 {APPROVED_DOCUMENT_VALUES.map((docValue) => (
                   <option key={docValue} value={docValue}>
