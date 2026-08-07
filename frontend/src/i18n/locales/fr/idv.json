@@ -146,6 +146,8 @@
   "ProveIdentityInPerson": {
     "heading": "Prove your identity in person",
     "description": "You will only get access to this {{rpName}} after proving your identity in person and signing back in with your CanadaLogin.",
+    "canadaPostDescription": "Select your ID type, enter the details, and get a unique barcode to bring to any Canada Post location within 30 days.",
+    "serviceCanadaDescription": "Select your ID type, enter the details, and get a unique barcode to bring to any Service Canada Centre within 30 days.",
     "continueButton": "Continue",
     "backButton": "Back"
   },
