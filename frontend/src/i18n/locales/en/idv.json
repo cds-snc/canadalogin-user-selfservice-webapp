@@ -191,7 +191,7 @@
     "hintDocumentScanningOption": "You will be asked to take a photo of yourself and then your government issued photo ID with your phone camera.",
     "signBackInNotice": "You will need to sign back in to your {{appName}} after proving your identity in person to confirm the proofing process.",
     "provincialPartnerOption": "Use your provincial sign in",
-    "hintProvincialPartnerOption": "Use your BC Service Card, Alberta.ca account or Quebec to prove your identity.",
+    "hintProvincialPartnerOption": "Use your BC Service Card, Alberta.ca Account or Quebec to prove your identity.",
     "inPersonOption": "or do it in person",
     "canadaPostLocationsOption": "Canada Post locations",
     "serviceCanadaLocationsOption": "Service Canada Centres",
@@ -246,7 +246,8 @@
     "successNoticeTitle": "Your identity information was successfully verified and proofing is complete.",
     "successNoticeDescription": "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with {{appName}} to get access.",
     "successNoticeTitleWithoutRp": "Your CanadaLogin has succesfully saved your changes",
-    "successNoticeDescriptionWithoutRp": "Continue with accessing the service"
+    "successNoticeDescriptionWithoutRp": "Continue with accessing the service",
+    "verifiedBadgeText": "Proven January 27, 2026"
   },
   "IdentityVerificationSuccess": {
     "pageTitle": "Prove your identity",
