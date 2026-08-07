@@ -89,7 +89,9 @@ export default function ConfirmIdentityDetails() {
           </GcdsHeading>
 
           <GcdsText marginBottom="300">
-            <VerifiedBadge text={t("ConfirmIdentityDetails.verifiedBadgeText")} />
+            <VerifiedBadge
+              text={t("ConfirmIdentityDetails.verifiedBadgeText")}
+            />
           </GcdsText>
 
           <ProvenInformationCard />
