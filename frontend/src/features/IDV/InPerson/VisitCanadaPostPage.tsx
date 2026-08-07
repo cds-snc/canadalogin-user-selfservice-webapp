@@ -179,21 +179,21 @@ export default function VisitCanadaPost() {
 
           <GcdsContainer>
             <GcdsFieldset
-              legend={t("ServiceCanadaCentre.enterDetailsHeading")}
+              legend={t("VisitCanadaPost.enterInfoHeading")}
               legendSize="h2"
             >
               <GcdsSelect
                 id="selectId"
-                label={t("ServiceCanadaCentre.selectIdLabel")}
+                label={t("VisitCanadaPost.selectIdLabel")}
+                hint={t("VisitCanadaPost.idHint")}
                 name="selectId"
+                lang={currentLanguage}
                 selectId="selectId"
                 value={formData.idType}
                 required
                 errorMessage={idTypeErrorMessage}
                 onGcdsChange={createChangeHandler("idType")}
-                defaultValue={t(
-                  "ServiceCanadaCentre.selectIdDropdownDefaultValue",
-                )}
+                defaultValue={t("VisitCanadaPost.selectIdDropdownDefaultValue")}
               >
                 {APPROVED_DOCUMENT_VALUES.map((docValue) => (
                   <option key={docValue} value={docValue}>
@@ -205,9 +205,10 @@ export default function VisitCanadaPost() {
               {hasSelectedIdType && (
                 <GcdsDateInput
                   id="id-expiration-date-input"
-                  legend={t("ServiceCanadaCentre.idExpirationLabel")}
+                  legend={t("VisitCanadaPost.idExpirationLabel")}
                   name="id-expiration-date-input"
                   format="full"
+                  lang={currentLanguage}
                   required
                   errorMessage={idExpiryErrorMessage}
                   onGcdsChange={createChangeHandler("idExpiryDate")}
@@ -222,7 +223,9 @@ export default function VisitCanadaPost() {
                   id="first-name-input"
                   inputId="first-name-input"
                   name="first-name-input"
-                  label={t("ServiceCanadaCentre.firstNameLabel")}
+                  lang={currentLanguage}
+                  label={t("VisitCanadaPost.givenNameLabel")}
+                  hint={t("VisitCanadaPost.givenNameHint")}
                   errorMessage={firstNameErrorMessage}
                   onGcdsChange={createChangeHandler("firstName")}
                 />
@@ -232,16 +235,19 @@ export default function VisitCanadaPost() {
                   id="last-name-input"
                   inputId="last-name-input"
                   name="last-name-input"
-                  label={t("ServiceCanadaCentre.lastNameLabel")}
+                  lang={currentLanguage}
+                  label={t("VisitCanadaPost.familyNameLabel")}
+                  hint={t("VisitCanadaPost.familyNameHint")}
                   errorMessage={lastNameErrorMessage}
                   onGcdsChange={createChangeHandler("lastName")}
                 />
 
                 <GcdsDateInput
                   id="date-of-birth-input"
-                  legend={t("ServiceCanadaCentre.dateOfBirthdayLabel")}
+                  legend={t("VisitCanadaPost.dobLabel")}
                   name="date-of-birth-input"
                   format="full"
+                  lang={currentLanguage}
                   required
                   errorMessage={dateOfBirthErrorMessage}
                   onGcdsChange={createChangeHandler("dateOfBirth")}
@@ -254,8 +260,8 @@ export default function VisitCanadaPost() {
                       id="address-input"
                       inputId="address-input"
                       name="address-input"
-                      label={t("ServiceCanadaCentre.addressLabel")}
-                      hint={t("ServiceCanadaCentre.addressHint")}
+                      label={t("VisitCanadaPost.addressLabel")}
+                      hint={t("VisitCanadaPost.addressHint")}
                       onGcdsChange={createChangeHandler("address")}
                     />
 
@@ -264,9 +270,9 @@ export default function VisitCanadaPost() {
                       name="select-province"
                       selectId="select-province"
                       defaultValue={t(
-                        "ServiceCanadaCentre.selectIdDropdownDefaultValue",
+                        "VisitCanadaPost.selectIdDropdownDefaultValue",
                       )}
-                      label={t("ServiceCanadaCentre.provinceLabel")}
+                      label={t("VisitCanadaPost.provinceLabel")}
                       onGcdsChange={createChangeHandler("province")}
                     >
                       {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
