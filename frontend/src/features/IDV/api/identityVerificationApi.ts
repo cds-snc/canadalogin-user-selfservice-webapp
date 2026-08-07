@@ -8,6 +8,14 @@ import type {
 } from "../../../types/services";
 import type { OnlineIdentityVerificationMockResponse } from "../../../types/user";
 
+export type OnlineIdentityVerificationResponse = {
+  case_id: string;
+  status: "pending" | "in_progress" | "verified" | "failed" | "cancelled";
+  verification_code_display?: string | null;
+  online_verification_url?: string | null;
+  expires_at?: string | null;
+};
+
 axios.defaults.withCredentials = true;
 
 export const identityVerificationApi = {
@@ -52,6 +60,17 @@ export const identityVerificationApi = {
         `${config.apiUrl}/v1/identity-verification/online/mock-success-response`,
       );
       return response.data as OnlineIdentityVerificationMockResponse;
+    } catch (error) {
+      handleApiError(error as ApiErrorLike);
+    }
+  },
+  postOnlineIdentityVerificationResponse: async () => {
+    try {
+      const response = await axios.post<OnlineIdentityVerificationResponse>(
+        `${config.apiUrl}/v1/identity-verification/online`,
+        {},
+      );
+      return response.data;
     } catch (error) {
       handleApiError(error as ApiErrorLike);
     }

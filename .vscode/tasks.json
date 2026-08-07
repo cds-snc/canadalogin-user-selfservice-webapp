@@ -4,7 +4,7 @@
     {
       "label": "redis: start (selfservice)",
       "type": "shell",
-      "command": "brew services start redis",
+      "command": "if command -v brew >/dev/null 2>&1; then brew services start redis; else redis-cli ping >/dev/null 2>&1 || redis-server --daemonize yes; fi",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -13,7 +13,7 @@
     {
       "label": "redis: stop (selfservice)",
       "type": "shell",
-      "command": "brew services stop redis",
+      "command": "if command -v brew >/dev/null 2>&1; then brew services stop redis; else redis-cli shutdown >/dev/null 2>&1 || true; fi",
       "options": {
         "cwd": "${workspaceFolder}"
       },

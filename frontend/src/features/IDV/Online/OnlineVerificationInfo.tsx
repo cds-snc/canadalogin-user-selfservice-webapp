@@ -9,60 +9,34 @@ import {
   GcdsHeading,
 } from "@gcds-core/components-react";
 import { Trans, useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router";
-import { useUser } from "../../../components/Providers/useUser";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
-import { path } from "../../../utils/routeHelpers";
-import type { OnlineIdentityVerificationMockResponse } from "../../../types/user";
-import { identityVerificationApi } from "../api/identityVerificationApi";
+import { useNavigate } from "react-router";
+import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import {
+  identityVerificationApi,
+  type OnlineIdentityVerificationResponse,
+} from "../api/identityVerificationApi";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
-import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 
 export default function OnlineVerificationInfo() {
   const navigate = useNavigate();
-  const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
-  const { state, dispatch } = useUser();
-
-  const confirmIdentityDetailsPage = path(PAGES.idvDetailsConfirmationPage, {
-    language,
-    journeyType,
-  });
-
-  const { updateProfileSuccess } = userProfileDispatch(dispatch);
 
   const handleContinue = async (
-    response: OnlineIdentityVerificationMockResponse | undefined,
+    response: OnlineIdentityVerificationResponse | undefined,
   ) => {
-    if (!response?.data) {
+    if (!response?.online_verification_url) {
       return;
     }
-
-    if (state.userProfile) {
-      const {
-        verification_id,
-        verification_status,
-        verification_method,
-        claims,
-      } = response.data;
-
-      updateProfileSuccess({
-        ...state.userProfile,
-        verifiedClaims: {
-          verificationId: verification_id,
-          verificationStatus: verification_status,
-          verificationMethod: verification_method,
-          claims,
-        },
-      });
-    }
-
-    navigate(confirmIdentityDetailsPage);
+    console.log(
+      "response.online_verification_url",
+      response.online_verification_url,
+    );
+    window.location.assign(response.online_verification_url);
   };
 
   const onContinue = () => {
     identityVerificationApi
-      .getOnlineIdentityVerificationMockResponse()
+      .postOnlineIdentityVerificationResponse()
       .then((response) => handleContinue(response))
       .catch(() => {
         // TODO: handle API error
