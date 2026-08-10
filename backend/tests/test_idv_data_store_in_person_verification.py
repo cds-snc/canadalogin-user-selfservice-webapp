@@ -8,7 +8,7 @@ from httpx import AsyncClient, HTTPStatusError, Request, Response
 from unittest.mock import AsyncMock, MagicMock, patch
 
 identity_verification_module = importlib.import_module(
-    "app.idv_data_store.services.identity_verification"
+    "app.identity_verification.services.in_person_identity_verification"
 )
 create_in_person_identity_verification_case = (
     identity_verification_module.create_in_person_identity_verification_case
