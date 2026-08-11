@@ -66,11 +66,10 @@ export const identityVerificationApi = {
   },
   postOnlineIdentityVerification: async () => {
     try {
-      const response = await axios.post<OnlineIdentityVerificationResponse>(
-        `${config.apiUrl}/v1/identity-verification/online`,
-        {},
-      );
-      return response.data;
+      const response = await axios.post<
+        AuthServiceResponse<OnlineIdentityVerificationResponse>
+      >(`${config.apiUrl}/v1/identity-verification/online`, {});
+      return response.data.data;
     } catch (error) {
       handleApiError(error as ApiErrorLike);
     }
