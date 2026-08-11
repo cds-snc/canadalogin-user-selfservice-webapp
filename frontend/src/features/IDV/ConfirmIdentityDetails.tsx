@@ -11,25 +11,19 @@ import {
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { IDV_JOURNEY_TYPE } from "./constants";
-import { useUser } from "../../components/Providers/useUser";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
-import ViewLanguagePreferences from "../../features/LanguagePreference/components/ViewLanguagePreference";
 import ProvenInformationCard from "../IDV/ProvenInformationCard";
-import ViewProfileNameCard from "../ProfileName/components/ViewProfileNameCard";
-import ViewContactPhoneNumber from "../ContactPhoneNumber/components/ViewContactPhoneNumber";
-import DisplayEmailInfo from "../ProfileName/components/ViewEmailInfo";
 import { identityVerificationApi } from "./api/identityVerificationApi";
+import VerifiedBadge from "../../components/Badges/VerifiedBadge";
 import { path } from "../../utils/routeHelpers";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
   const { language, journeyType } = useParams();
-  const { state } = useUser();
   const { relyingPartyUrl, relyingPartyName, hasRelyingParty } =
     useRelyingPartyInfo();
 
-  const phoneNumbers = state?.userProfile?.phoneNumbers || [];
   const fallbackRedirectUrl = relyingPartyUrl || "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
 
@@ -87,42 +81,31 @@ export default function ConfirmIdentityDetails() {
           <GcdsHeading tag="h1" marginTop="0">
             {t("ConfirmIdentityDetails.pageTitle")}
           </GcdsHeading>
+
           <GcdsText>{t("ConfirmIdentityDetails.description")}</GcdsText>
-        </GcdsContainer>
 
-        <ProvenInformationCard />
-
-        <GcdsContainer>
-          <GcdsHeading tag="h2" marginTop="0">
-            {t("ConfirmIdentityDetails.contactInfo")}
+          <GcdsHeading tag="h2" marginTop="0" marginBottom="0">
+            {t("ConfirmIdentityDetails.identityProofingDetails")}
           </GcdsHeading>
-          <GcdsContainer className="sectionCard">
-            <ViewProfileNameCard isConfirmIdentityDetails />
-            <div className="separator" />
-            <DisplayEmailInfo />
-            <div className="separator" />
-            <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />
-          </GcdsContainer>
-        </GcdsContainer>
 
-        <GcdsContainer>
-          <GcdsHeading tag="h2" marginTop="0">
-            {t("ConfirmIdentityDetails.communication")}
-          </GcdsHeading>
-          <GcdsContainer className="sectionCard">
-            <ViewLanguagePreferences />
-          </GcdsContainer>
-        </GcdsContainer>
+          <GcdsText marginBottom="300">
+            <VerifiedBadge
+              text={t("ConfirmIdentityDetails.verifiedBadgeText")}
+            />
+          </GcdsText>
 
-        <GcdsButton
-          type="button"
-          onGcdsClick={(event) => {
-            event.preventDefault();
-            void handleContinue();
-          }}
-        >
-          {t("ConfirmIdentityDetails.confirmAndContinue")}
-        </GcdsButton>
+          <ProvenInformationCard />
+
+          <GcdsButton
+            type="button"
+            onGcdsClick={(event) => {
+              event.preventDefault();
+              void handleContinue();
+            }}
+          >
+            {t("ConfirmIdentityDetails.confirmAndContinue")}
+          </GcdsButton>
+        </GcdsContainer>
       </GcdsGrid>
     </GcdsContainer>
   );

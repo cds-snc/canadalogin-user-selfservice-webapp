@@ -1,6 +1,6 @@
 import logging
 from fastapi import HTTPException, status
-from httpx import HTTPStatusError, TimeoutException
+from httpx import HTTPStatusError, RequestError, TimeoutException
 from authlib.integrations.starlette_client import OAuthError
 from pydantic import ValidationError
 
@@ -68,6 +68,14 @@ class RequestErrorHandler:
             raise HTTPException(
                 status_code=status.HTTP_504_GATEWAY_TIMEOUT,
                 detail=f"{context} timed out",
+            ) from exc
+
+        elif isinstance(exc, RequestError):
+            url = str(exc.request.url) if exc.request else "unknown"
+            logger.error("%s upstream request failed (url=%s)", context, url)
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"{context} failed",
             ) from exc
 
         elif isinstance(exc, ValidationError):
