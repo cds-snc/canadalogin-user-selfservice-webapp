@@ -17,9 +17,12 @@ from app.identity_verification.services.redirect_target_url import (
     get_identity_verification_redirect_url,
     store_identity_verification_target_url,
 )
-from app.identity_verification.online_idv import (
+from app.identity_verification.schemas import (
     CreateIdentityVerificationResponse,
-    CreateOnlineIdentityVerificationRequest,
+    CreateOnlineIdentityVerificationRequest
+)
+
+from app.identity_verification.services.online_identity_verification import (
     create_online_identity_verification,
 )
 

@@ -16,60 +16,15 @@ from app.idv_data_store.services.verified_claims import (
     exchange_token_for_idv_data_store,
 )
 from app.utils.request_error_handler import RequestErrorHandler
+from app.identity_verification.schemas import (
+    CreateIdentityVerificationResponse,
+    ReissueOnlineSessionResponse,
+    CreateOnlineIdentityVerificationRequest
+)
 
-
-async def _exchange_online_token_with_fallback(
-    global_http_client: AsyncClient,
-    user_access_token: str,
-) -> str:
-    """Exchange the user token for an online-IDV scope and retry with the
-    in-person scope when the configured online scope is rejected as bad input.
-    """
-    settings = get_configuration()
-    idv_settings = settings.idv_data_store_config
-    online_scope = idv_settings.IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES
-    fallback_scope = idv_settings.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES
-
-    try:
-        return await exchange_token_for_idv_data_store(
-            global_http_client, user_access_token, scope=online_scope
-        )
-    except HTTPException as exc:
-        if (
-            exc.status_code == status.HTTP_400_BAD_REQUEST
-            and online_scope != fallback_scope
-        ):
-            return await exchange_token_for_idv_data_store(
-                global_http_client, user_access_token, scope=fallback_scope
-            )
-        raise
-
-
-class CaseStatus(str, Enum):
-    pending = "pending"
-    in_progress = "in_progress"
-    verified = "verified"
-    failed = "failed"
-    cancelled = "cancelled"
-
-
-class CreateOnlineIdentityVerificationRequest(BaseModel):
-    required_by_rp_client_id: Optional[str] = None
-
-
-class CreateIdentityVerificationResponse(BaseModel):
-    case_id: str
-    status: CaseStatus
-    verification_code_display: Optional[str] = None
-    online_verification_url: Optional[str] = None
-    expires_at: Optional[datetime] = None
-
-
-class ReissueOnlineSessionResponse(BaseModel):
-    case_id: str
-    status: CaseStatus
-    online_verification_url: str
-
+from app.idv_data_store.services.verified_claims import (
+    exchange_token_for_idv_data_store,
+)
 
 def _resolve_online_verification_url(base_url: str, response_data: dict) -> dict:
     """Prepend the IDV data store base URL to a relative online_verification_url path."""
@@ -106,9 +61,12 @@ async def _post_online_verification_request(
     endpoint: str,
     context: str,
     payload: Optional[dict] = None,
-):
-    idv_scoped_access_token = await _exchange_online_token_with_fallback(
-        global_http_client, user_access_token
+    ):
+
+    online_scope = idv_settings.IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES
+
+    idv_scoped_access_token = await exchange_token_for_idv_data_store(
+        global_http_client, user_access_token, scope=online_scope
     )
 
     try:
