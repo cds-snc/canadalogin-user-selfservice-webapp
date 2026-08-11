@@ -1,15 +1,10 @@
-from datetime import datetime
-from enum import Enum
 import logging
 import secrets
 from typing import Optional
 from urllib.parse import urljoin
-
-from fastapi import HTTPException, status
+from fastapi import status
 from httpx import AsyncClient
-from pydantic import BaseModel
 
-logger = logging.getLogger(__name__)
 
 from app.config import get_configuration
 from app.idv_data_store.services.verified_claims import (
@@ -19,12 +14,10 @@ from app.utils.request_error_handler import RequestErrorHandler
 from app.identity_verification.schemas import (
     CreateIdentityVerificationResponse,
     ReissueOnlineSessionResponse,
-    CreateOnlineIdentityVerificationRequest
 )
 
-from app.idv_data_store.services.verified_claims import (
-    exchange_token_for_idv_data_store,
-)
+logger = logging.getLogger(__name__)
+
 
 def _resolve_online_verification_url(base_url: str, response_data: dict) -> dict:
     """Prepend the IDV data store base URL to a relative online_verification_url path."""
@@ -61,8 +54,10 @@ async def _post_online_verification_request(
     endpoint: str,
     context: str,
     payload: Optional[dict] = None,
-    ):
+):
+    settings = get_configuration()
 
+    idv_settings = settings.idv_data_store_config
     online_scope = idv_settings.IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES
 
     idv_scoped_access_token = await exchange_token_for_idv_data_store(
@@ -149,5 +144,3 @@ async def reissue_online_session(
         response_data,
     )
     return ReissueOnlineSessionResponse(**response_data)
-
-

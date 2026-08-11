@@ -48,7 +48,9 @@ def _mock_response(json_data):
 
 class TestCreateOnlineIdentityVerification:
     @pytest.mark.asyncio
-    @patch.object(online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION)
+    @patch.object(
+        online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION
+    )
     @patch.object(online_idv_module, "exchange_token_for_idv_data_store")
     async def test_falls_back_to_in_person_scope_when_online_scope_rejected(
         self,
@@ -99,7 +101,9 @@ class TestCreateOnlineIdentityVerification:
         )
 
     @pytest.mark.asyncio
-    @patch.object(online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION)
+    @patch.object(
+        online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION
+    )
     @patch.object(online_idv_module, "exchange_token_for_idv_data_store")
     async def test_success_creates_case_and_returns_response(
         self,
@@ -138,14 +142,18 @@ class TestCreateOnlineIdentityVerification:
 
         call_args = mock_http_client.post.call_args
         url = call_args[0][0] if call_args[0] else call_args.kwargs.get("url")
-        assert url == "https://idv-data-store.example.com/v1/identity-verifications/online"
+        assert (
+            url == "https://idv-data-store.example.com/v1/identity-verifications/online"
+        )
         assert call_args.kwargs["json"] == {"required_by_rp_client_id": "rp-client-id"}
         assert call_args.kwargs["headers"]["Authorization"] == (
             "Bearer idv-scoped-access-token"
         )
 
     @pytest.mark.asyncio
-    @patch.object(online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION)
+    @patch.object(
+        online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION
+    )
     @patch.object(online_idv_module, "exchange_token_for_idv_data_store")
     @patch.object(online_idv_module, "reissue_online_session")
     async def test_conflict_reissues_existing_session(
@@ -192,7 +200,9 @@ class TestCreateOnlineIdentityVerification:
 
 class TestReissueOnlineSession:
     @pytest.mark.asyncio
-    @patch.object(online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION)
+    @patch.object(
+        online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION
+    )
     @patch.object(online_idv_module, "exchange_token_for_idv_data_store")
     async def test_success_reissues_session_and_returns_response(
         self,

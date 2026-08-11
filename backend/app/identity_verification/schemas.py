@@ -1,8 +1,12 @@
 from pydantic import BaseModel
+from enum import Enum
+from typing import Optional
+from datetime import datetime
 
 
 class StoreTargetUrlRequest(BaseModel):
     target_url: str
+
 
 class CaseStatus(str, Enum):
     pending = "pending"

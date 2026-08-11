@@ -19,7 +19,7 @@ from app.identity_verification.services.redirect_target_url import (
 )
 from app.identity_verification.schemas import (
     CreateIdentityVerificationResponse,
-    CreateOnlineIdentityVerificationRequest
+    CreateOnlineIdentityVerificationRequest,
 )
 
 from app.identity_verification.services.online_identity_verification import (
