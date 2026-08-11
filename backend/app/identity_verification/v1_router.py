@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from fastapi import APIRouter, Depends, Request, status
 from app.auth.services.auth_user_session import get_users_current_session
@@ -15,6 +16,13 @@ from app.idv_data_store.services.in_person_verification import (
 from app.identity_verification.services.redirect_target_url import (
     get_identity_verification_redirect_url,
     store_identity_verification_target_url,
+)
+from app.identity_verification.schemas import (
+    CreateOnlineIdentityVerificationRequest,
+)
+
+from app.identity_verification.services.online_identity_verification import (
+    create_online_identity_verification,
 )
 
 logger = logging.getLogger(__name__)
@@ -119,3 +127,30 @@ async def get_target_url(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await get_identity_verification_redirect_url(request)
+
+
+@router.post(
+    "/online",
+    response_model=ResponseModel,
+    status_code=status.HTTP_201_CREATED,
+    tags=["Identity Verification"],
+    summary="Create Online Identity Verification Case",
+    description="Creates an online identity verification case and returns the browser start URL.",
+)
+async def create_online_identity_verification_case(
+    request: Request,
+    payload: Optional[CreateOnlineIdentityVerificationRequest] = None,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    create_response = await create_online_identity_verification(
+        request.app.state.request_client,
+        user_access_token,
+        required_by_rp_client_id=(
+            payload.required_by_rp_client_id if payload is not None else None
+        ),
+    )
+    return ResponseModel(
+        success=True,
+        message="Online identity verification case created",
+        data=create_response.model_dump(),
+    )

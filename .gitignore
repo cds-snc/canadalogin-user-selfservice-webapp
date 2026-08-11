@@ -40,3 +40,4 @@ frontend/test-results/
 
 # Build output
 frontend/dist
+dump.rdb
