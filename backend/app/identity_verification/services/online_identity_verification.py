@@ -19,17 +19,22 @@ from app.identity_verification.schemas import (
 logger = logging.getLogger(__name__)
 
 
+def _get_idv_settings():
+    return get_configuration().idv_data_store_config
+
+
 def _resolve_online_verification_url(base_url: str, response_data: dict) -> dict:
     """Prepend the IDV data store base URL to a relative online_verification_url path."""
     idv_verification_url = response_data.get("online_verification_url")
     if idv_verification_url:
-        resolved = urljoin(f"{base_url.rstrip('/')}/", idv_verification_url.lstrip("/"))
+        idv_settings = _get_idv_settings()
+        resolved = urljoin(f"{idv_settings.IDV_DATA_STORE_BASE_URL.rstrip('/')}/", idv_verification_url.lstrip("/"))
         logger.info("Resolved online_verification_url to: %s", resolved)
         response_data["online_verification_url"] = resolved
     return response_data
 
 
-async def _dispatch_online_verification_request(
+async def _dispatch_reissue_online_verification_session_id(
     global_http_client: AsyncClient,
     user_access_token: str,
     endpoint: str,
@@ -55,11 +60,7 @@ async def _post_online_verification_request(
     context: str,
     payload: Optional[dict] = None,
 ):
-    settings = get_configuration()
-
-    idv_settings = settings.idv_data_store_config
-    online_scope = idv_settings.IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES
-
+    online_scope = _get_idv_settings().IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES
     idv_scoped_access_token = await exchange_token_for_idv_data_store(
         global_http_client, user_access_token, scope=online_scope
     )
@@ -133,14 +134,11 @@ async def reissue_online_session(
     case_id: str,
 ) -> ReissueOnlineSessionResponse:
     settings = get_configuration()
-    response_data = await _dispatch_online_verification_request(
+    response_data = await _dispatch_reissue_online_verification_session_id(
         global_http_client,
         user_access_token,
         settings.idv_data_store_online_session_endpoint(case_id),
         context="idv-data-store online verification reissue session request",
     )
-    response_data = _resolve_online_verification_url(
-        settings.idv_data_store_config.IDV_DATA_STORE_BASE_URL,
-        response_data,
-    )
+    response_data = _resolve_online_verification_url(response_data)
     return ReissueOnlineSessionResponse(**response_data)
