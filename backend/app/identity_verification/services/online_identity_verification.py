@@ -2,9 +2,9 @@ import logging
 import secrets
 from typing import Optional
 from urllib.parse import urljoin
+
 from fastapi import status
 from httpx import AsyncClient
-
 
 from app.config import get_configuration
 from app.idv_data_store.services.verified_claims import (
@@ -20,11 +20,26 @@ logger = logging.getLogger(__name__)
 
 
 def _get_idv_settings():
+    """Fetch IDV data store configuration settings.
+    
+    Returns:
+        IdvDataStoreConfig object with all IDV-related configuration
+    """
     return get_configuration().idv_data_store_config
 
 
-def _resolve_online_verification_url(base_url: str, response_data: dict) -> dict:
-    """Prepend the IDV data store base URL to a relative online_verification_url path."""
+def _resolve_online_verification_url(response_data: dict) -> dict:
+    """Prepend the IDV data store base URL to a relative online_verification_url path.
+    
+    The IDV data store returns relative URLs that must be joined with the base URL
+    to create complete, usable verification URLs for the client.
+    
+    Args:
+        response_data: Response dictionary potentially containing online_verification_url
+        
+    Returns:
+        Modified response_data with resolved online_verification_url, or unchanged if no URL present
+    """
     idv_verification_url = response_data.get("online_verification_url")
     if idv_verification_url:
         idv_settings = _get_idv_settings()
@@ -37,25 +52,6 @@ def _resolve_online_verification_url(base_url: str, response_data: dict) -> dict
     return response_data
 
 
-async def _dispatch_reissue_online_verification_session_id(
-    global_http_client: AsyncClient,
-    user_access_token: str,
-    endpoint: str,
-    context: str,
-    payload: Optional[dict] = None,
-) -> dict:
-    response = await _post_online_verification_request(
-        global_http_client,
-        user_access_token,
-        endpoint,
-        context,
-        payload=payload,
-    )
-
-    response.raise_for_status()
-    return response.json()
-
-
 async def _post_online_verification_request(
     global_http_client: AsyncClient,
     user_access_token: str,
@@ -63,6 +59,25 @@ async def _post_online_verification_request(
     context: str,
     payload: Optional[dict] = None,
 ):
+    """Execute an HTTP POST request to an IDV data store endpoint.
+    
+    Performs RFC 8693 OAuth 2.0 Token Exchange to obtain an IDV-scoped access token,
+    then makes the upstream request with proper headers including an idempotency key
+    for safe retry semantics.
+    
+    Args:
+        global_http_client: Shared AsyncClient for making HTTP requests
+        user_access_token: User's access token from IBM Verify
+        endpoint: Full URL of the IDV endpoint to call
+        context: Context string for error logging and reporting
+        payload: Optional JSON payload for the request body
+        
+    Returns:
+        httpx.Response object with status code and raw response body
+        
+    Raises:
+        HTTPException: Converted from any RequestError via RequestErrorHandler
+    """
     online_scope = _get_idv_settings().IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES
     idv_scoped_access_token = await exchange_token_for_idv_data_store(
         global_http_client, user_access_token, scope=online_scope
@@ -91,6 +106,20 @@ async def create_online_identity_verification(
     user_access_token: str,
     required_by_rp_client_id: Optional[str] = None,
 ) -> CreateIdentityVerificationResponse:
+    """Create a new online identity verification case for the user.
+    
+    Initiates the online identity verification flow. If an open case already
+    exists for the user (409 conflict), automatically reissues the existing
+    session instead of creating a duplicate.
+    
+    Args:
+        global_http_client: Shared AsyncClient for making HTTP requests
+        user_access_token: User's access token from IBM Verify
+        required_by_rp_client_id: Optional RP client ID to associate with the case
+        
+    Returns:
+        CreateIdentityVerificationResponse with case ID, status, and browser start URL
+    """
     settings = get_configuration()
     payload = {}
     if required_by_rp_client_id is not None:
@@ -104,6 +133,7 @@ async def create_online_identity_verification(
         payload=payload,
     )
 
+    # Handle 409 Conflict: An open case already exists for this user
     if response.status_code == status.HTTP_409_CONFLICT:
         try:
             body = response.json()
@@ -114,6 +144,10 @@ async def create_online_identity_verification(
         if detail.get("error") == "open_case_exists":
             existing_case_id = detail.get("existing_case_id")
             if existing_case_id:
+                logger.info(
+                    "Open case exists for user, reissuing session for case_id: %s",
+                    existing_case_id,
+                )
                 reissued_response = await reissue_online_session(
                     global_http_client,
                     user_access_token,
@@ -123,11 +157,13 @@ async def create_online_identity_verification(
                     **reissued_response.model_dump()
                 )
 
+    # Raise exception for other errors (4xx, 5xx)
     response.raise_for_status()
-    response_data = _resolve_online_verification_url(
-        settings.idv_data_store_config.IDV_DATA_STORE_BASE_URL,
-        response.json(),
-    )
+
+    # Parse and resolve the response
+    response_data = response.json()
+    response_data = _resolve_online_verification_url(response_data)
+
     return CreateIdentityVerificationResponse(**response_data)
 
 
@@ -136,12 +172,33 @@ async def reissue_online_session(
     user_access_token: str,
     case_id: str,
 ) -> ReissueOnlineSessionResponse:
+    """Reissue an online verification session for an existing case.
+    
+    Generates a fresh browser start URL for a verification case that already exists,
+    without creating a duplicate case. Used when a case exists but the user needs
+    a new session link.
+    
+    Args:
+        global_http_client: Shared AsyncClient for making HTTP requests
+        user_access_token: User's access token from IBM Verify
+        case_id: Unique identifier of the existing verification case
+        
+    Returns:
+        ReissueOnlineSessionResponse with updated case details and new verification URL
+    """
     settings = get_configuration()
-    response_data = await _dispatch_reissue_online_verification_session_id(
+
+    response = await _post_online_verification_request(
         global_http_client,
         user_access_token,
         settings.idv_data_store_online_session_endpoint(case_id),
         context="idv-data-store online verification reissue session request",
     )
+
+    # Raise exception for errors (4xx, 5xx)
+    response.raise_for_status()
+
+    # Parse and resolve the response
+    response_data = response.json()
     response_data = _resolve_online_verification_url(response_data)
     return ReissueOnlineSessionResponse(**response_data)
