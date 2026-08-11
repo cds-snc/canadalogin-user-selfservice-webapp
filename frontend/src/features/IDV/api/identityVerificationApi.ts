@@ -64,7 +64,7 @@ export const identityVerificationApi = {
       handleApiError(error as ApiErrorLike);
     }
   },
-  postOnlineIdentityVerificationResponse: async () => {
+  postOnlineIdentityVerification: async () => {
     try {
       const response = await axios.post<OnlineIdentityVerificationResponse>(
         `${config.apiUrl}/v1/identity-verification/online`,

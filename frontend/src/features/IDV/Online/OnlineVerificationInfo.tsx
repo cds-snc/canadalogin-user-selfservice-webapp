@@ -32,7 +32,7 @@ export default function OnlineVerificationInfo() {
 
   const onContinue = () => {
     identityVerificationApi
-      .postOnlineIdentityVerificationResponse()
+      .postOnlineIdentityVerification()
       .then((response) => handleContinue(response))
       .catch(() => {
         // TODO: handle API error
