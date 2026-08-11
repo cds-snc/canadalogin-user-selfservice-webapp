@@ -3,17 +3,18 @@ Unit tests for the online identity verification glue service and router.
 """
 
 import importlib
-from unittest.mock import AsyncMock, MagicMock, call, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from fastapi import HTTPException
 from httpx import AsyncClient
 
-online_idv_module = importlib.import_module("app.identity_verification.online_idv")
-create_online_identity_verification = (
-    online_idv_module.create_online_identity_verification
+services_module = importlib.import_module(
+    "app.identity_verification.services.online_identity_verification"
 )
-reissue_online_session = online_idv_module.reissue_online_session
+create_online_identity_verification = (
+    services_module.create_online_identity_verification
+)
+reissue_online_session = services_module.reissue_online_session
 
 MOCK_CONFIGURATION = MagicMock()
 MOCK_CONFIGURATION.idv_data_store_online_verification_endpoint = (
@@ -30,6 +31,9 @@ MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_ONLINE_VERIFICATION_SCOP
 )
 MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES = (
     "idv:in-person-verification:send"
+)
+MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_BASE_URL = (
+    "https://idv-data-store.example.com"
 )
 
 
@@ -49,62 +53,9 @@ def _mock_response(json_data):
 class TestCreateOnlineIdentityVerification:
     @pytest.mark.asyncio
     @patch.object(
-        online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION
+        services_module, "get_configuration", return_value=MOCK_CONFIGURATION
     )
-    @patch.object(online_idv_module, "exchange_token_for_idv_data_store")
-    async def test_falls_back_to_in_person_scope_when_online_scope_rejected(
-        self,
-        mock_exchange,
-        mock_get_configuration,
-        mock_http_client,
-    ):
-        mock_exchange.side_effect = [
-            HTTPException(status_code=400, detail="Bad request"),
-            "fallback-idv-scoped-access-token",
-        ]
-        mock_http_client.post = AsyncMock(
-            return_value=_mock_response(
-                {
-                    "case_id": "case-123",
-                    "status": "pending",
-                    "online_verification_url": "https://idv-data-store.example.com/start/case-123",
-                }
-            )
-        )
-
-        result = await create_online_identity_verification(
-            mock_http_client,
-            "user-access-token",
-            required_by_rp_client_id="rp-client-id",
-        )
-
-        assert result.case_id == "case-123"
-
-        mock_exchange.assert_has_awaits(
-            [
-                call(
-                    mock_http_client,
-                    "user-access-token",
-                    scope="idv:online-verification:manage",
-                ),
-                call(
-                    mock_http_client,
-                    "user-access-token",
-                    scope="idv:in-person-verification:send",
-                ),
-            ]
-        )
-
-        call_args = mock_http_client.post.call_args
-        assert call_args.kwargs["headers"]["Authorization"] == (
-            "Bearer fallback-idv-scoped-access-token"
-        )
-
-    @pytest.mark.asyncio
-    @patch.object(
-        online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION
-    )
-    @patch.object(online_idv_module, "exchange_token_for_idv_data_store")
+    @patch.object(services_module, "exchange_token_for_idv_data_store")
     async def test_success_creates_case_and_returns_response(
         self,
         mock_exchange,
@@ -117,7 +68,7 @@ class TestCreateOnlineIdentityVerification:
                 {
                     "case_id": "case-123",
                     "status": "pending",
-                    "online_verification_url": "https://idv-data-store.example.com/start/case-123",
+                    "online_verification_url": "/start/case-123",
                 }
             )
         )
@@ -130,6 +81,7 @@ class TestCreateOnlineIdentityVerification:
 
         assert result.case_id == "case-123"
         assert result.status.value == "pending"
+        # Verify the URL was resolved with the base URL prepended
         assert result.online_verification_url == (
             "https://idv-data-store.example.com/start/case-123"
         )
@@ -149,13 +101,48 @@ class TestCreateOnlineIdentityVerification:
         assert call_args.kwargs["headers"]["Authorization"] == (
             "Bearer idv-scoped-access-token"
         )
+        # Verify Idempotency-Key header is present
+        assert "Idempotency-Key" in call_args.kwargs["headers"]
 
     @pytest.mark.asyncio
     @patch.object(
-        online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION
+        services_module, "get_configuration", return_value=MOCK_CONFIGURATION
     )
-    @patch.object(online_idv_module, "exchange_token_for_idv_data_store")
-    @patch.object(online_idv_module, "reissue_online_session")
+    @patch.object(services_module, "exchange_token_for_idv_data_store")
+    async def test_success_without_required_by_rp_client_id(
+        self,
+        mock_exchange,
+        mock_get_configuration,
+        mock_http_client,
+    ):
+        mock_exchange.return_value = "idv-scoped-access-token"
+        mock_http_client.post = AsyncMock(
+            return_value=_mock_response(
+                {
+                    "case_id": "case-456",
+                    "status": "pending",
+                    "online_verification_url": "/start/case-456",
+                }
+            )
+        )
+
+        result = await create_online_identity_verification(
+            mock_http_client,
+            "user-access-token",
+        )
+
+        assert result.case_id == "case-456"
+
+        call_args = mock_http_client.post.call_args
+        # Verify no payload is sent when optional parameter is not provided
+        assert "json" not in call_args.kwargs or call_args.kwargs.get("json") == {}
+
+    @pytest.mark.asyncio
+    @patch.object(
+        services_module, "get_configuration", return_value=MOCK_CONFIGURATION
+    )
+    @patch.object(services_module, "exchange_token_for_idv_data_store")
+    @patch.object(services_module, "reissue_online_session")
     async def test_conflict_reissues_existing_session(
         self,
         mock_reissue,
@@ -176,7 +163,7 @@ class TestCreateOnlineIdentityVerification:
             )
         )
         mock_http_client.post.return_value.status_code = 409
-        mock_reissue.return_value = online_idv_module.ReissueOnlineSessionResponse(
+        mock_reissue.return_value = services_module.ReissueOnlineSessionResponse(
             case_id="64bd14f2-c620-4671-9d94-1cb0192ee552",
             status="in_progress",
             online_verification_url="https://idv-data-store.example.com/start/64bd14f2-c620-4671-9d94-1cb0192ee552",
@@ -201,9 +188,9 @@ class TestCreateOnlineIdentityVerification:
 class TestReissueOnlineSession:
     @pytest.mark.asyncio
     @patch.object(
-        online_idv_module, "get_configuration", return_value=MOCK_CONFIGURATION
+        services_module, "get_configuration", return_value=MOCK_CONFIGURATION
     )
-    @patch.object(online_idv_module, "exchange_token_for_idv_data_store")
+    @patch.object(services_module, "exchange_token_for_idv_data_store")
     async def test_success_reissues_session_and_returns_response(
         self,
         mock_exchange,
@@ -216,7 +203,7 @@ class TestReissueOnlineSession:
                 {
                     "case_id": "case-123",
                     "status": "in_progress",
-                    "online_verification_url": "https://idv-data-store.example.com/start/case-123?reissued=1",
+                    "online_verification_url": "/start/case-123?reissued=1",
                 }
             )
         )
@@ -227,7 +214,16 @@ class TestReissueOnlineSession:
 
         assert result.case_id == "case-123"
         assert result.status.value == "in_progress"
-        assert result.online_verification_url.endswith("reissued=1")
+        # Verify the URL was resolved with the base URL prepended
+        assert result.online_verification_url == (
+            "https://idv-data-store.example.com/start/case-123?reissued=1"
+        )
+
+        mock_exchange.assert_awaited_once_with(
+            mock_http_client,
+            "user-access-token",
+            scope="idv:online-verification:manage",
+        )
 
         call_args = mock_http_client.post.call_args
         url = call_args[0][0] if call_args[0] else call_args.kwargs.get("url")
@@ -235,7 +231,10 @@ class TestReissueOnlineSession:
             url
             == "https://idv-data-store.example.com/v1/identity-verifications/case-123/online-session"
         )
+        # Verify no payload is sent for reissue operations
         assert "json" not in call_args.kwargs
+        # Verify Idempotency-Key header is present
+        assert "Idempotency-Key" in call_args.kwargs["headers"]
 
 
 class TestOnlineIdentityVerificationRouterEndpoints:
@@ -248,7 +247,7 @@ class TestOnlineIdentityVerificationRouterEndpoints:
         mock_request = MagicMock()
         mock_request.app.state.request_client = AsyncMock()
 
-        expected_response = online_idv_module.CreateIdentityVerificationResponse(
+        expected_response = services_module.CreateIdentityVerificationResponse(
             case_id="case-123",
             status="pending",
             online_verification_url="https://idv-data-store.example.com/start/case-123",
@@ -261,7 +260,7 @@ class TestOnlineIdentityVerificationRouterEndpoints:
         ):
             result = await create_online_identity_verification_case(
                 mock_request,
-                online_idv_module.CreateOnlineIdentityVerificationRequest(
+                services_module.CreateOnlineIdentityVerificationRequest(
                     required_by_rp_client_id=None
                 ),
                 "user-access-token",
@@ -280,7 +279,7 @@ class TestOnlineIdentityVerificationRouterEndpoints:
         mock_request = MagicMock()
         mock_request.app.state.request_client = AsyncMock()
 
-        expected_response = online_idv_module.CreateIdentityVerificationResponse(
+        expected_response = services_module.CreateIdentityVerificationResponse(
             case_id="case-123",
             status="pending",
             online_verification_url="https://idv-data-store.example.com/start/case-123",

@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 def _get_idv_settings():
     """Fetch IDV data store configuration settings.
-    
+
     Returns:
         IdvDataStoreConfig object with all IDV-related configuration
     """
@@ -30,13 +30,13 @@ def _get_idv_settings():
 
 def _resolve_online_verification_url(response_data: dict) -> dict:
     """Prepend the IDV data store base URL to a relative online_verification_url path.
-    
+
     The IDV data store returns relative URLs that must be joined with the base URL
     to create complete, usable verification URLs for the client.
-    
+
     Args:
         response_data: Response dictionary potentially containing online_verification_url
-        
+
     Returns:
         Modified response_data with resolved online_verification_url, or unchanged if no URL present
     """
@@ -60,21 +60,21 @@ async def _post_online_verification_request(
     payload: Optional[dict] = None,
 ):
     """Execute an HTTP POST request to an IDV data store endpoint.
-    
+
     Performs RFC 8693 OAuth 2.0 Token Exchange to obtain an IDV-scoped access token,
     then makes the upstream request with proper headers including an idempotency key
     for safe retry semantics.
-    
+
     Args:
         global_http_client: Shared AsyncClient for making HTTP requests
         user_access_token: User's access token from IBM Verify
         endpoint: Full URL of the IDV endpoint to call
         context: Context string for error logging and reporting
         payload: Optional JSON payload for the request body
-        
+
     Returns:
         httpx.Response object with status code and raw response body
-        
+
     Raises:
         HTTPException: Converted from any RequestError via RequestErrorHandler
     """
@@ -107,16 +107,16 @@ async def create_online_identity_verification(
     required_by_rp_client_id: Optional[str] = None,
 ) -> CreateIdentityVerificationResponse:
     """Create a new online identity verification case for the user.
-    
+
     Initiates the online identity verification flow. If an open case already
     exists for the user (409 conflict), automatically reissues the existing
     session instead of creating a duplicate.
-    
+
     Args:
         global_http_client: Shared AsyncClient for making HTTP requests
         user_access_token: User's access token from IBM Verify
         required_by_rp_client_id: Optional RP client ID to associate with the case
-        
+
     Returns:
         CreateIdentityVerificationResponse with case ID, status, and browser start URL
     """
@@ -173,16 +173,16 @@ async def reissue_online_session(
     case_id: str,
 ) -> ReissueOnlineSessionResponse:
     """Reissue an online verification session for an existing case.
-    
+
     Generates a fresh browser start URL for a verification case that already exists,
     without creating a duplicate case. Used when a case exists but the user needs
     a new session link.
-    
+
     Args:
         global_http_client: Shared AsyncClient for making HTTP requests
         user_access_token: User's access token from IBM Verify
         case_id: Unique identifier of the existing verification case
-        
+
     Returns:
         ReissueOnlineSessionResponse with updated case details and new verification URL
     """
