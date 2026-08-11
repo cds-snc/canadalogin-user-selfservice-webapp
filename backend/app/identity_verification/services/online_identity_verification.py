@@ -163,7 +163,9 @@ async def create_online_identity_verification(
     try:
         response.raise_for_status()
     except Exception as exc:
-        RequestErrorHandler.handle(exc, context="idv-data-store online verification create request")
+        RequestErrorHandler.handle(
+            exc, context="idv-data-store online verification create request"
+        )
 
     # Parse and resolve the response
     response_data = response.json()
