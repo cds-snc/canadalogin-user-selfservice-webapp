@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from httpx import AsyncClient
+from app.identity_verification.schemas import CreateOnlineIdentityVerificationRequest
 
 services_module = importlib.import_module(
     "app.identity_verification.services.online_identity_verification"
@@ -52,9 +53,7 @@ def _mock_response(json_data):
 
 class TestCreateOnlineIdentityVerification:
     @pytest.mark.asyncio
-    @patch.object(
-        services_module, "get_configuration", return_value=MOCK_CONFIGURATION
-    )
+    @patch.object(services_module, "get_configuration", return_value=MOCK_CONFIGURATION)
     @patch.object(services_module, "exchange_token_for_idv_data_store")
     async def test_success_creates_case_and_returns_response(
         self,
@@ -105,9 +104,7 @@ class TestCreateOnlineIdentityVerification:
         assert "Idempotency-Key" in call_args.kwargs["headers"]
 
     @pytest.mark.asyncio
-    @patch.object(
-        services_module, "get_configuration", return_value=MOCK_CONFIGURATION
-    )
+    @patch.object(services_module, "get_configuration", return_value=MOCK_CONFIGURATION)
     @patch.object(services_module, "exchange_token_for_idv_data_store")
     async def test_success_without_required_by_rp_client_id(
         self,
@@ -138,9 +135,7 @@ class TestCreateOnlineIdentityVerification:
         assert "json" not in call_args.kwargs or call_args.kwargs.get("json") == {}
 
     @pytest.mark.asyncio
-    @patch.object(
-        services_module, "get_configuration", return_value=MOCK_CONFIGURATION
-    )
+    @patch.object(services_module, "get_configuration", return_value=MOCK_CONFIGURATION)
     @patch.object(services_module, "exchange_token_for_idv_data_store")
     @patch.object(services_module, "reissue_online_session")
     async def test_conflict_reissues_existing_session(
@@ -187,9 +182,7 @@ class TestCreateOnlineIdentityVerification:
 
 class TestReissueOnlineSession:
     @pytest.mark.asyncio
-    @patch.object(
-        services_module, "get_configuration", return_value=MOCK_CONFIGURATION
-    )
+    @patch.object(services_module, "get_configuration", return_value=MOCK_CONFIGURATION)
     @patch.object(services_module, "exchange_token_for_idv_data_store")
     async def test_success_reissues_session_and_returns_response(
         self,
@@ -260,9 +253,7 @@ class TestOnlineIdentityVerificationRouterEndpoints:
         ):
             result = await create_online_identity_verification_case(
                 mock_request,
-                services_module.CreateOnlineIdentityVerificationRequest(
-                    required_by_rp_client_id=None
-                ),
+                CreateOnlineIdentityVerificationRequest(required_by_rp_client_id=None),
                 "user-access-token",
             )
 

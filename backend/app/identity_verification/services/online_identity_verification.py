@@ -1,6 +1,6 @@
 import logging
 import secrets
-from typing import Optional
+from typing import Any, Optional
 from urllib.parse import urljoin
 
 from fastapi import status
@@ -28,7 +28,7 @@ def _get_idv_settings():
     return get_configuration().idv_data_store_config
 
 
-def _resolve_online_verification_url(response_data: dict) -> dict:
+def _resolve_online_verification_url(response_data: dict[str, Any]) -> dict[str, Any]:
     """Prepend the IDV data store base URL to a relative online_verification_url path.
 
     The IDV data store returns relative URLs that must be joined with the base URL
@@ -57,7 +57,7 @@ async def _post_online_verification_request(
     user_access_token: str,
     endpoint: str,
     context: str,
-    payload: Optional[dict] = None,
+    payload: Optional[dict[str, Any]] = None,
 ):
     """Execute an HTTP POST request to an IDV data store endpoint.
 
@@ -153,6 +153,8 @@ async def create_online_identity_verification(
                     user_access_token,
                     existing_case_id,
                 )
+
+                # Reissue flow already returns a validated model.
                 return CreateIdentityVerificationResponse(
                     **reissued_response.model_dump()
                 )
