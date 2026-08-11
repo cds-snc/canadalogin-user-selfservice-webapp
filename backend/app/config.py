@@ -108,7 +108,6 @@ class IdvDataStoreConfig(BaseSettings):
     """
 
     IDV_DATA_STORE_BASE_URL: str = "https://idv.dev2.login-connexion.alpha.canada.ca"
-
     IDV_DATA_STORE_STS_CLIENT_ID: str = ""
     IDV_DATA_STORE_STS_CLIENT_SECRET: str = ""
     IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES: str = Field(
