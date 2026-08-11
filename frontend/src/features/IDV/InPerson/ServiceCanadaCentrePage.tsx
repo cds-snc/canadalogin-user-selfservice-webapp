@@ -274,7 +274,10 @@ export default function ServiceCanadaCentrePage() {
             )}
           </GcdsFieldset>
           {hasSelectedIdType && (
-            <>
+            <GcdsFieldset
+              legend={t("ServiceCanadaCentre.enterDetailsIdHeading")}
+              legendSize="h2"
+            >
               <GcdsInput
                 required
                 id="first-name-input"
@@ -343,7 +346,7 @@ export default function ServiceCanadaCentrePage() {
                   />
                 </>
               )}
-            </>
+            </GcdsFieldset>
           )}
 
           <GcdsGrid
