@@ -134,7 +134,7 @@ async def get_target_url(
     "/online",
     response_model=CreateIdentityVerificationResponse,
     status_code=status.HTTP_201_CREATED,
-    tags=["Verifications"],
+    tags=["Identity Verification"],
     summary="Create Online Identity Verification Case",
     description="Creates an online identity verification case and returns the browser start URL.",
 )
