@@ -27,10 +27,6 @@ export default function OnlineVerificationInfo() {
     if (!response?.online_verification_url) {
       return;
     }
-    console.log(
-      "response.online_verification_url",
-      response.online_verification_url,
-    );
     window.location.assign(response.online_verification_url);
   };
 
