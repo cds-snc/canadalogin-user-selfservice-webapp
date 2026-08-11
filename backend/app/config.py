@@ -110,12 +110,28 @@ class IdvDataStoreConfig(BaseSettings):
     IDV_DATA_STORE_BASE_URL: str = "https://idv.dev2.login-connexion.alpha.canada.ca"
     IDV_DATA_STORE_STS_CLIENT_ID: str = ""
     IDV_DATA_STORE_STS_CLIENT_SECRET: str = ""
+    IDV_DATA_STORE_DISABLE_TLS_VERIFY: bool = Field(
+        default=False,
+        description=(
+            "Disable TLS certificate verification for outbound HTTPS calls to "
+            "idv-data-store only. Intended for local development with self-signed "
+            "certificates."
+        ),
+    )
     IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES: str = Field(
         default="idv:in-person-verification:send",
         description=(
             "Space-separated list of idv-data-store scopes requested from the "
             "IBM Verify STS client (token exchange) when calling in-person "
             "verification endpoints."
+        ),
+    )
+    IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES: str = Field(
+        default="idv:auth:verified-claims",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from the "
+            "IBM Verify STS client (token exchange) when calling "
+            "identity-verifications endpoints."
         ),
     )
     IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES: str = Field(

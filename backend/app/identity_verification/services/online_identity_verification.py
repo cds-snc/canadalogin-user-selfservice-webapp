@@ -19,6 +19,21 @@ from app.identity_verification.schemas import (
 logger = logging.getLogger(__name__)
 
 
+async def _post_to_idv_data_store(
+    global_http_client: AsyncClient,
+    endpoint: str,
+    **request_kwargs,
+):
+    """POST to idv-data-store with optional local TLS verification bypass."""
+    settings = get_configuration()
+    if settings.idv_data_store_config.IDV_DATA_STORE_DISABLE_TLS_VERIFY:
+        async with AsyncClient(
+            verify=False, timeout=global_http_client.timeout
+        ) as client:
+            return await client.post(endpoint, **request_kwargs)
+    return await global_http_client.post(endpoint, **request_kwargs)
+
+
 def _get_idv_settings():
     """Fetch IDV data store configuration settings.
 
@@ -94,7 +109,9 @@ async def _post_online_verification_request(
         if payload is not None:
             request_kwargs["json"] = payload
 
-        response = await global_http_client.post(endpoint, **request_kwargs)
+        response = await _post_to_idv_data_store(
+            global_http_client, endpoint, **request_kwargs
+        )
     except Exception as exc:
         RequestErrorHandler.handle(exc, context=context)
 

@@ -13,6 +13,21 @@ from app.utils.schemas import ResponseModel
 logger = logging.getLogger(__name__)
 
 
+async def _post_to_idv_data_store(
+    global_http_client: AsyncClient,
+    endpoint: str,
+    **request_kwargs,
+):
+    """POST to idv-data-store with optional local TLS verification bypass."""
+    settings = get_configuration()
+    if settings.idv_data_store_config.IDV_DATA_STORE_DISABLE_TLS_VERIFY:
+        async with AsyncClient(
+            verify=False, timeout=global_http_client.timeout
+        ) as client:
+            return await client.post(endpoint, **request_kwargs)
+    return await global_http_client.post(endpoint, **request_kwargs)
+
+
 async def create_in_person_identity_verification_case(
     global_http_client: AsyncClient,
     user_access_token: str,
@@ -37,7 +52,8 @@ async def create_in_person_identity_verification_case(
     request_body.setdefault("applicant", {})
 
     try:
-        response = await global_http_client.post(
+        response = await _post_to_idv_data_store(
+            global_http_client,
             settings.idv_data_store_identity_verification_in_person_endpoint,
             headers={
                 "Authorization": f"Bearer {idv_scoped_access_token}",
@@ -81,7 +97,8 @@ async def get_last_email_sent(
     )
 
     try:
-        response = await global_http_client.post(
+        response = await _post_to_idv_data_store(
+            global_http_client,
             settings.idv_data_store_in_person_verification_last_email_endpoint,
             headers={
                 "Authorization": f"Bearer {idv_scoped_access_token}",
