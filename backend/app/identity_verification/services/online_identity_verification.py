@@ -28,7 +28,10 @@ def _resolve_online_verification_url(base_url: str, response_data: dict) -> dict
     idv_verification_url = response_data.get("online_verification_url")
     if idv_verification_url:
         idv_settings = _get_idv_settings()
-        resolved = urljoin(f"{idv_settings.IDV_DATA_STORE_BASE_URL.rstrip('/')}/", idv_verification_url.lstrip("/"))
+        resolved = urljoin(
+            f"{idv_settings.IDV_DATA_STORE_BASE_URL.rstrip('/')}/",
+            idv_verification_url.lstrip("/"),
+        )
         logger.info("Resolved online_verification_url to: %s", resolved)
         response_data["online_verification_url"] = resolved
     return response_data
