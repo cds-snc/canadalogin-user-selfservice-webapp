@@ -18,7 +18,6 @@ from app.identity_verification.services.redirect_target_url import (
     store_identity_verification_target_url,
 )
 from app.identity_verification.schemas import (
-    CreateIdentityVerificationResponse,
     CreateOnlineIdentityVerificationRequest,
 )
 
@@ -132,7 +131,7 @@ async def get_target_url(
 
 @router.post(
     "/online",
-    response_model=CreateIdentityVerificationResponse,
+    response_model=ResponseModel,
     status_code=status.HTTP_201_CREATED,
     tags=["Identity Verification"],
     summary="Create Online Identity Verification Case",
@@ -143,10 +142,15 @@ async def create_online_identity_verification_case(
     payload: Optional[CreateOnlineIdentityVerificationRequest] = None,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await create_online_identity_verification(
+    create_response = await create_online_identity_verification(
         request.app.state.request_client,
         user_access_token,
         required_by_rp_client_id=(
             payload.required_by_rp_client_id if payload is not None else None
         ),
+    )
+    return ResponseModel(
+        success=True,
+        message="Online identity verification case created",
+        data=create_response.model_dump(),
     )

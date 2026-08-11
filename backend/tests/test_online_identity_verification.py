@@ -257,7 +257,9 @@ class TestOnlineIdentityVerificationRouterEndpoints:
                 "user-access-token",
             )
 
-        assert result.case_id == "case-123"
+        assert result.success is True
+        assert result.message == "Online identity verification case created"
+        assert result.data["case_id"] == "case-123"
 
     @pytest.mark.asyncio
     async def test_create_online_identity_verification_case_endpoint_without_body(
@@ -287,7 +289,9 @@ class TestOnlineIdentityVerificationRouterEndpoints:
                 "user-access-token",
             )
 
-        assert result.case_id == "case-123"
+        assert result.success is True
+        assert result.message == "Online identity verification case created"
+        assert result.data["case_id"] == "case-123"
         mock_create_online.assert_awaited_once_with(
             mock_request.app.state.request_client,
             "user-access-token",
