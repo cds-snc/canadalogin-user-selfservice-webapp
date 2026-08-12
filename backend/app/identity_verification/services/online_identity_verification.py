@@ -26,7 +26,7 @@ async def _post_to_idv_data_store(
 ):
     """POST to idv-data-store with optional local TLS verification bypass."""
     settings = get_configuration()
-    if settings.idv_data_store_config.IDV_DATA_STORE_DISABLE_TLS_VERIFY:
+    if settings.idv_data_store_config.IDV_DATA_STORE_DISABLE_TLS_VERIFY is True:
         async with AsyncClient(
             verify=False, timeout=global_http_client.timeout
         ) as client:
@@ -113,7 +113,7 @@ async def _post_online_verification_request(
             global_http_client, endpoint, **request_kwargs
         )
     except Exception as exc:
-        RequestErrorHandler.handle(exc, context=context)
+        return RequestErrorHandler.handle(exc, context=context)
 
     return response
 

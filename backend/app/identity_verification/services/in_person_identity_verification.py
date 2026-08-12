@@ -20,7 +20,7 @@ async def _post_to_idv_data_store(
 ):
     """POST to idv-data-store with optional local TLS verification bypass."""
     settings = get_configuration()
-    if settings.idv_data_store_config.IDV_DATA_STORE_DISABLE_TLS_VERIFY:
+    if settings.idv_data_store_config.IDV_DATA_STORE_DISABLE_TLS_VERIFY is True:
         async with AsyncClient(
             verify=False, timeout=global_http_client.timeout
         ) as client:
@@ -64,7 +64,7 @@ async def create_in_person_identity_verification_case(
         )
         response.raise_for_status()
     except Exception as exc:
-        RequestErrorHandler.handle(
+        return RequestErrorHandler.handle(
             exc,
             context="idv-data-store in-person identity verification create request",
         )
@@ -107,7 +107,7 @@ async def get_last_email_sent(
         )
         response.raise_for_status()
     except Exception as exc:
-        RequestErrorHandler.handle(
+        return RequestErrorHandler.handle(
             exc,
             context="idv-data-store in-person verification last-email-sent request",
         )
