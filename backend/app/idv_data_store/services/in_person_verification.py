@@ -35,5 +35,6 @@ async def get_last_email_sent(
     user_access_token: str,
 ) -> ResponseModel:
     service = IdentityDataService(global_http_client, user_access_token)
+    service.getClaims()
     result = await service.in_person().get_last_email_sent()
     return _to_response_model(result)

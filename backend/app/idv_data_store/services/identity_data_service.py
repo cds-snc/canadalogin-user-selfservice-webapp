@@ -3,7 +3,7 @@ import secrets
 from typing import Any, Optional, TypeVar
 from urllib.parse import urljoin
 
-from fastapi import Request, status
+from fastapi import Depends, Request, status
 from httpx import AsyncClient
 from pydantic import BaseModel
 
@@ -229,7 +229,7 @@ class IdentityDataService:
 
 def get_identity_data_service(
     request: Request,
-    user_access_token: Depends(get_users_current_session),
+    user_access_token: str = Depends(get_users_current_session),
 ) -> IdentityDataService:
     return IdentityDataService(
         http_client=request.app.state.request_client,
