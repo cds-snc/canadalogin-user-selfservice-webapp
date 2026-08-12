@@ -110,28 +110,20 @@ class IdvDataStoreConfig(BaseSettings):
     IDV_DATA_STORE_BASE_URL: str = "https://idv.dev2.login-connexion.alpha.canada.ca"
     IDV_DATA_STORE_STS_CLIENT_ID: str = ""
     IDV_DATA_STORE_STS_CLIENT_SECRET: str = ""
-    IDV_DATA_STORE_VALIDATIONS_WRITE_SCOPES: str = Field(
+    IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES: str = Field(
+        default="idv:in-person-verification:send",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from the "
+            "IBM Verify STS client (token exchange) when calling in-person "
+            "verification endpoints."
+        ),
+    )
+    IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES: str = Field(
         default="idv:validations:write",
         description=(
             "Space-separated list of idv-data-store scopes requested from the "
-            "IBM Verify STS client (token exchange) when creating or submitting "
-            "identity validation records."
-        ),
-    )
-    IDV_DATA_STORE_VALIDATIONS_READ_SCOPES: str = Field(
-        default="idv:validations:read",
-        description=(
-            "Space-separated list of idv-data-store scopes requested from the "
-            "IBM Verify STS client (token exchange) when reading identity "
-            "validation records."
-        ),
-    )
-    IDV_DATA_STORE_VALIDATIONS_UPDATE_SCOPES: str = Field(
-        default="idv:validations:update",
-        description=(
-            "Space-separated list of idv-data-store scopes requested from the "
-            "IBM Verify STS client (token exchange) when updating identity "
-            "validation records."
+            "IBM Verify STS client (token exchange) when calling online "
+            "verification endpoints."
         ),
     )
     IDV_DATA_STORE_AUTH_USERINFO_SCOPES: str = Field(

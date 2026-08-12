@@ -1,10 +1,11 @@
 import logging
 import secrets
-from typing import Any, Optional
+from typing import Any, Optional, TypeVar
 from urllib.parse import urljoin
 
 from fastapi import Request, status
 from httpx import AsyncClient
+from pydantic import BaseModel
 
 from app.config import get_configuration
 from app.identity_verification.schemas import (
@@ -23,6 +24,7 @@ from app.idv_data_store.client.storage_service.token_exchange import (
 from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
+ModelT = TypeVar("ModelT", bound=BaseModel)
 
 
 class ClaimsOperations:
@@ -51,18 +53,18 @@ class InPersonOperations:
 
     async def send_code(self) -> InPersonVerificationResponse:
         settings = get_configuration()
-        return await self._service._dispatch_typed(
+        return await self._service._request_model(
             settings.idv_data_store_in_person_verification_send_endpoint,
-            scope=settings.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_WRITE_SCOPES,
+            scope=settings.idv_data_store_config.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES,
             context="idv-data-store in-person verification send request",
             response_model=InPersonVerificationResponse,
         )
 
     async def get_last_email_sent(self) -> LastEmailSentResponse:
         settings = get_configuration()
-        return await self._service._dispatch_typed(
+        return await self._service._request_model(
             settings.idv_data_store_in_person_verification_last_email_endpoint,
-            scope=settings.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_READ_SCOPES,
+            scope=settings.idv_data_store_config.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES,
             context="idv-data-store in-person verification last-email-sent request",
             response_model=LastEmailSentResponse,
         )
@@ -76,7 +78,7 @@ class OnlineOperations:
         settings = get_configuration()
         response = await self._service._post(
             settings.idv_data_store_online_session_endpoint(case_id),
-            scope=settings.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_UPDATE_SCOPES,
+            scope=settings.idv_data_store_config.IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES,
             context="idv-data-store online verification reissue session request",
             include_idempotency_key=True,
         )
@@ -111,7 +113,7 @@ class IdentityDataService:
 
         response = await self._post(
             settings.idv_data_store_online_verification_endpoint,
-            scope=settings.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_WRITE_SCOPES,
+            scope=settings.idv_data_store_config.IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES,
             context="idv-data-store online verification create request",
             payload=request_payload,
             include_idempotency_key=True,
@@ -157,16 +159,14 @@ class IdentityDataService:
     def online(self) -> OnlineOperations:
         return OnlineOperations(self)
 
-    async def _dispatch_typed(
+    async def _request_model(
         self,
         endpoint: str,
         *,
         scope: str,
         context: str,
-        response_model: (
-            type[InPersonVerificationResponse] | type[LastEmailSentResponse]
-        ),
-    ) -> InPersonVerificationResponse | LastEmailSentResponse:
+        response_model: type[ModelT],
+    ) -> ModelT:
         response = await self._post(
             endpoint,
             scope=scope,

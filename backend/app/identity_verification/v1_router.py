@@ -9,7 +9,7 @@ from app.identity_verification.services.create_identity_verification import (
     idv_mock_success_response,
     create_identity_verification,
 )
-from app.idv_data_store.services.in_person_verification import (
+from app.identity_verification.services.in_person_verification import (
     send_in_person_verification_code,
     get_last_email_sent,
 )

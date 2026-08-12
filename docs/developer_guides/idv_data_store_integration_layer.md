@@ -190,7 +190,7 @@ A useful internal shape is:
 async def _get_scoped_token(self, scope: str) -> str:
     ...
 
-async def _dispatch_typed(
+async def _request_model(
     self,
     endpoint: str,
     *,

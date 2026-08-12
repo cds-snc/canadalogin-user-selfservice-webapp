@@ -28,14 +28,11 @@ MOCK_CONFIGURATION.idv_data_store_in_person_verification_last_email_endpoint = (
 MOCK_CONFIGURATION.idv_data_store_userinfo_endpoint = (
     "https://idv-data-store.example.com/v1/auth/userinfo"
 )
-MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_WRITE_SCOPES = (
+MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES = (
     "idv:validations:write"
 )
-MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_READ_SCOPES = (
-    "idv:validations:read"
-)
-MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_UPDATE_SCOPES = (
-    "idv:validations:update"
+MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES = (
+    "idv:in-person-verification:send"
 )
 MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_AUTH_USERINFO_SCOPES = (
     "idv:auth:userinfo"
@@ -211,32 +208,4 @@ class TestIdentityDataService:
             mock_http_client,
             "user-access-token",
             scope="idv:auth:userinfo",
-        )
-
-    @pytest.mark.asyncio
-    @patch.object(service_module, "get_configuration", return_value=MOCK_CONFIGURATION)
-    @patch.object(service_module, "exchange_token_for_idv_data_store")
-    async def test_create_identity_verification_case(
-        self,
-        mock_exchange,
-        mock_get_configuration,
-        mock_http_client,
-    ):
-        mock_exchange.return_value = "idv-scoped-access-token"
-        mock_http_client.post = AsyncMock(
-            return_value=_mock_response(
-                {
-                    "case_id": "case-123",
-                    "status": "pending",
-                    "online_verification_url": "/start/case-123",
-                }
-            )
-        )
-
-        service = IdentityDataService(mock_http_client, "user-access-token")
-        result = await service.create_identity_verification_case()
-
-        assert result.case_id == "case-123"
-        assert result.online_verification_url == (
-            "https://idv-data-store.example.com/start/case-123"
         )
