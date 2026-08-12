@@ -145,8 +145,8 @@
   "ProveIdentityInPerson": {
     "heading": "Prouvez votre identité en personne",
     "description": "Pour accéder à ce {{rpName}}, vous devez prouver votre identité en personne, puis vous reconnecter à l’aide de votre identifiant ConnexionCanada.",
-    "canadaPostDescription": "Select your ID type, enter the details, and get a unique barcode to bring to any Canada Post location within 30 days.",
-    "serviceCanadaDescription": "Select your ID type, enter the details, and get a unique barcode to bring to any Service Canada Centre within 30 days.",
+    "canadaPostDescription": "Sélectionnez le type de document d’identité concerné et saisissez les renseignements correspondants. Vous obtiendrez un code-barres unique à présenter dans n’importe quel bureau Postes Canada dans un délai de 30 jours.",
+    "serviceCanadaDescription": "Sélectionnez le type de document d’identité concerné et saisissez les renseignements correspondants. Vous obtiendrez un code-barres unique à présenter dans n’importe quel centre Service Canada dans un délai de 30 jours.",
     "continueButton": "Continuer",
     "backButton": "Précédent"
   },
