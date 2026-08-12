@@ -95,7 +95,9 @@ export default function ProofingBarcodeCanadaPostPage() {
             {t("ProofingBarcodeCanadaPost.codeValidDays")}{" "}
             <strong>{email}</strong>
           </GcdsText>
-          <GcdsText>{t("ProofingBarcodeCanadaPost.visitInstruction")}</GcdsText>
+          <GcdsText>
+            {t("ProofingBarcodeCanadaPost.visitInstruction", { validityDate: t("ProofingBarcodeCanadaPost.codeValidityDate") })}
+          </GcdsText>
         </GcdsContainer>
 
         <AcceptableIdsDetails
