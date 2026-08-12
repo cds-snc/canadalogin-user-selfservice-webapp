@@ -76,13 +76,13 @@ async def idv_mock_success(
 )
 async def send_in_person_verification(
     request: Request,
-    payload: CreateInPersonIdentityVerificationRequest | None = None,
+    payload: CreateInPersonIdentityVerificationRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await create_in_person_identity_verification_case(
         request.app.state.request_client,
         user_access_token,
-        payload.model_dump(exclude_none=True) if payload else None,
+        payload.model_dump(exclude_none=True),
     )
 
 

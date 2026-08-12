@@ -240,7 +240,14 @@ class TestInPersonVerificationRouterEndpoints:
         mock_request.app.state.request_client = AsyncMock()
 
         payload = CreateInPersonIdentityVerificationRequest(
-            verification_provider="service_canada"
+            verification_provider="service_canada",
+            applicant={
+                "first_name": "Jane",
+                "last_name": "Doe",
+                "date_of_birth": "1990-05-15",
+                "id_type": "driverLicence",
+                "id_expiry_date": "2030-05-15",
+            },
         )
 
         expected_response = identity_verification_module.ResponseModel(

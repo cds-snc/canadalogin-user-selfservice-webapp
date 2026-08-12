@@ -13,18 +13,18 @@ class InPersonApplicantAddressRequest(BaseModel):
 
 
 class InPersonApplicantRequest(BaseModel):
-    first_name: str | None = None
-    last_name: str | None = None
-    date_of_birth: str | None = None
+    first_name: str
+    last_name: str
+    date_of_birth: str
     address: InPersonApplicantAddressRequest | None = None
-    id_type: str | None = None
-    id_expiry_date: str | None = None
+    id_type: str
+    id_expiry_date: str
 
 
 class CreateInPersonIdentityVerificationRequest(BaseModel):
     required_by_rp_client_id: str | None = None
     verification_provider: str = "service_canada"
-    applicant: InPersonApplicantRequest | None = None
+    applicant: InPersonApplicantRequest
 
 
 class StoreTargetUrlRequest(BaseModel):

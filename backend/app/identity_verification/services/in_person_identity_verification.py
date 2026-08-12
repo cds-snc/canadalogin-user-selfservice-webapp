@@ -9,6 +9,7 @@ from app.idv_data_store.services.verified_claims import (
 )
 from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
+from app.utils.tls import should_disable_tls_verify_for_localhost
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +19,8 @@ async def _post_to_idv_data_store(
     endpoint: str,
     **request_kwargs,
 ):
-    """POST to idv-data-store with optional local TLS verification bypass."""
-    settings = get_configuration()
-    if settings.idv_data_store_config.IDV_DATA_STORE_DISABLE_TLS_VERIFY is True:
+    """POST to idv-data-store with local-only localhost TLS verification bypass."""
+    if should_disable_tls_verify_for_localhost(endpoint):
         async with AsyncClient(
             verify=False, timeout=global_http_client.timeout
         ) as client:
