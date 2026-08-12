@@ -21,6 +21,8 @@ from app.idv_data_store.services.schemas import (
 from app.idv_data_store.services.token_exchange import (
     exchange_token_for_idv_data_store,
 )
+from app.auth.services.auth_user_session import get_users_current_session
+
 from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
@@ -227,7 +229,7 @@ class IdentityDataService:
 
 def get_identity_data_service(
     request: Request,
-    user_access_token: str,
+    user_access_token: Depends(get_users_current_session),
 ) -> IdentityDataService:
     return IdentityDataService(
         http_client=request.app.state.request_client,
