@@ -261,93 +261,87 @@ export default function ServiceCanadaCentrePage() {
             </GcdsSelect>
 
             {hasSelectedIdType && (
-              <GcdsDateInput
-                id="id-expiration-date-input"
-                legend={t("ServiceCanadaCentre.idExpirationLabel")}
-                name="id-expiration-date-input"
-                lang={currentLanguage}
-                format="full"
-                required
-                errorMessage={idExpiryErrorMessage}
-                onGcdsChange={createChangeHandler("idExpiryDate")}
-              />
+              <>
+                <GcdsDateInput
+                  id="id-expiration-date-input"
+                  legend={t("ServiceCanadaCentre.idExpirationLabel")}
+                  name="id-expiration-date-input"
+                  lang={currentLanguage}
+                  format="full"
+                  required
+                  errorMessage={idExpiryErrorMessage}
+                  onGcdsChange={createChangeHandler("idExpiryDate")}
+                />
+                <GcdsInput
+                  required
+                  id="first-name-input"
+                  inputId="first-name-input"
+                  name="first-name-input"
+                  lang={currentLanguage}
+                  label={t("ServiceCanadaCentre.firstNameLabel")}
+                  hint={t("ServiceCanadaCentre.firstNameHint")}
+                  errorMessage={firstNameErrorMessage}
+                  onGcdsChange={createChangeHandler("firstName")}
+                />
+                <GcdsInput
+                  required
+                  id="last-name-input"
+                  inputId="last-name-input"
+                  name="last-name-input"
+                  lang={currentLanguage}
+                  label={t("ServiceCanadaCentre.lastNameLabel")}
+                  hint={t("ServiceCanadaCentre.lastNameHint")}
+                  errorMessage={lastNameErrorMessage}
+                  onGcdsChange={createChangeHandler("lastName")}
+                />
+                <GcdsDateInput
+                  id="date-of-birth-input"
+                  legend={t("ServiceCanadaCentre.dateOfBirthdayLabel")}
+                  name="date-of-birth-input"
+                  lang={currentLanguage}
+                  format="full"
+                  required
+                  errorMessage={dateOfBirthErrorMessage}
+                  onGcdsChange={createChangeHandler("dateOfBirth")}
+                  onBlur={() => setIsDateOfBirthTouched(true)}
+                />
+                {showAddressAndProvinceFields && (
+                  <>
+                    <GcdsInput
+                      inputId="address-input"
+                      name="address-input"
+                      label={t("ServiceCanadaCentre.addressLabel")}
+                      hint={t("ServiceCanadaCentre.addressHint")}
+                      onGcdsChange={createChangeHandler("address")}
+                    />
+                    <GcdsSelect
+                      id="select-province"
+                      name="select-province"
+                      selectId="select-province"
+                      defaultValue={t(
+                        "ServiceCanadaCentre.selectIdDropdownDefaultValue",
+                      )}
+                      label={t("ServiceCanadaCentre.provinceLabel")}
+                      style={{ maxWidth: "100%" }}
+                      onGcdsChange={createChangeHandler("province")}
+                    >
+                      {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
+                        <option key={province.code} value={province.code}>
+                          {province.labels[currentLanguage]}
+                        </option>
+                      ))}
+                    </GcdsSelect>
+                    <GcdsInput
+                      inputId="postalcode-input"
+                      name="postalcode-input"
+                      label={t("ServiceCanadaCentre.postalcodeLabel")}
+                      onGcdsChange={createChangeHandler("postalcode")}
+                    />
+                  </>
+                )}
+              </>
             )}
           </GcdsFieldset>
-          {hasSelectedIdType && (
-            <GcdsFieldset
-              legend={t("ServiceCanadaCentre.enterDetailsIdHeading")}
-              legendSize="h2"
-            >
-              <GcdsInput
-                required
-                id="first-name-input"
-                inputId="first-name-input"
-                name="first-name-input"
-                lang={currentLanguage}
-                label={t("ServiceCanadaCentre.firstNameLabel")}
-                hint={t("ServiceCanadaCentre.firstNameHint")}
-                errorMessage={firstNameErrorMessage}
-                onGcdsChange={createChangeHandler("firstName")}
-              />
-              <GcdsInput
-                required
-                id="last-name-input"
-                inputId="last-name-input"
-                name="last-name-input"
-                lang={currentLanguage}
-                label={t("ServiceCanadaCentre.lastNameLabel")}
-                hint={t("ServiceCanadaCentre.lastNameHint")}
-                errorMessage={lastNameErrorMessage}
-                onGcdsChange={createChangeHandler("lastName")}
-              />
-              <GcdsDateInput
-                id="date-of-birth-input"
-                legend={t("ServiceCanadaCentre.dateOfBirthdayLabel")}
-                name="date-of-birth-input"
-                lang={currentLanguage}
-                format="full"
-                required
-                errorMessage={dateOfBirthErrorMessage}
-                onGcdsChange={createChangeHandler("dateOfBirth")}
-                onBlur={() => setIsDateOfBirthTouched(true)}
-              />
-              {showAddressAndProvinceFields && (
-                <>
-                  <GcdsInput
-                    inputId="address-input"
-                    name="address-input"
-                    label={t("ServiceCanadaCentre.addressLabel")}
-                    hint={t("ServiceCanadaCentre.addressHint")}
-                    onGcdsChange={createChangeHandler("address")}
-                  />
-
-                  <GcdsSelect
-                    id="select-province"
-                    name="select-province"
-                    selectId="select-province"
-                    defaultValue={t(
-                      "ServiceCanadaCentre.selectIdDropdownDefaultValue",
-                    )}
-                    label={t("ServiceCanadaCentre.provinceLabel")}
-                    style={{ maxWidth: "100%" }}
-                    onGcdsChange={createChangeHandler("province")}
-                  >
-                    {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
-                      <option key={province.code} value={province.code}>
-                        {province.labels[currentLanguage]}
-                      </option>
-                    ))}
-                  </GcdsSelect>
-                  <GcdsInput
-                    inputId="postalcode-input"
-                    name="postalcode-input"
-                    label={t("ServiceCanadaCentre.postalcodeLabel")}
-                    onGcdsChange={createChangeHandler("postalcode")}
-                  />
-                </>
-              )}
-            </GcdsFieldset>
-          )}
 
           <GcdsGrid
             columns="1"
