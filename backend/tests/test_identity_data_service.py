@@ -5,7 +5,7 @@ import pytest
 from httpx import AsyncClient
 
 service_module = importlib.import_module(
-    "app.idv_data_store.client.storage_service.identity_data_service"
+    "app.idv_data_store.services.identity_data_service"
 )
 IdentityDataService = service_module.IdentityDataService
 

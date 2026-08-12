@@ -1,4 +1,4 @@
-from app.idv_data_store.client.storage_service.identity_data_service import (
+from app.idv_data_store.services.identity_data_service import (
     IdentityDataService,
 )
 

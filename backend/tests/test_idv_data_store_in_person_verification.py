@@ -8,7 +8,7 @@ import pytest
 from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from app.idv_data_store.client.storage_service.schemas import (
+from app.idv_data_store.services.schemas import (
     InPersonVerificationResponse,
     LastEmailSentResponse,
 )

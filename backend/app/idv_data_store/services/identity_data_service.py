@@ -13,12 +13,12 @@ from app.identity_verification.schemas import (
     CreateOnlineIdentityVerificationRequest,
     ReissueOnlineSessionResponse,
 )
-from app.idv_data_store.client.storage_service.schemas import (
+from app.idv_data_store.services.schemas import (
     ClaimsResponse,
     InPersonVerificationResponse,
     LastEmailSentResponse,
 )
-from app.idv_data_store.client.storage_service.token_exchange import (
+from app.idv_data_store.services.token_exchange import (
     exchange_token_for_idv_data_store,
 )
 from app.utils.request_error_handler import RequestErrorHandler
