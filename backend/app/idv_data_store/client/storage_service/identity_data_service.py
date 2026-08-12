@@ -51,44 +51,21 @@ class InPersonOperations:
 
     async def send_code(self) -> InPersonVerificationResponse:
         settings = get_configuration()
-        return await self._dispatch(
+        return await self._service._dispatch_typed(
             settings.idv_data_store_in_person_verification_send_endpoint,
+            scope=settings.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_WRITE_SCOPES,
             context="idv-data-store in-person verification send request",
+            response_model=InPersonVerificationResponse,
         )
 
     async def get_last_email_sent(self) -> LastEmailSentResponse:
         settings = get_configuration()
-        return await self._dispatch(
+        return await self._service._dispatch_typed(
             settings.idv_data_store_in_person_verification_last_email_endpoint,
+            scope=settings.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_READ_SCOPES,
             context="idv-data-store in-person verification last-email-sent request",
+            response_model=LastEmailSentResponse,
         )
-
-    async def _dispatch(
-        self,
-        endpoint: str,
-        context: str,
-    ) -> InPersonVerificationResponse | LastEmailSentResponse:
-        settings = get_configuration()
-        response = await self._service._post(
-            endpoint,
-            scope=(
-                settings.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_READ_SCOPES
-                if endpoint
-                == settings.idv_data_store_in_person_verification_last_email_endpoint
-                else settings.idv_data_store_config.IDV_DATA_STORE_VALIDATIONS_WRITE_SCOPES
-            ),
-            context=context,
-        )
-
-        try:
-            response.raise_for_status()
-        except Exception as exc:
-            RequestErrorHandler.handle(exc, context=context)
-
-        payload = response.json()
-        if endpoint == settings.idv_data_store_in_person_verification_last_email_endpoint:
-            return LastEmailSentResponse(**payload)
-        return InPersonVerificationResponse(**payload)
 
 
 class OnlineOperations:
@@ -128,7 +105,9 @@ class IdentityDataService:
         settings = get_configuration()
         request_payload: dict[str, Any] = {}
         if payload is not None and payload.required_by_rp_client_id is not None:
-            request_payload["required_by_rp_client_id"] = payload.required_by_rp_client_id
+            request_payload["required_by_rp_client_id"] = (
+                payload.required_by_rp_client_id
+            )
 
         response = await self._post(
             settings.idv_data_store_online_verification_endpoint,
@@ -177,6 +156,29 @@ class IdentityDataService:
 
     def online(self) -> OnlineOperations:
         return OnlineOperations(self)
+
+    async def _dispatch_typed(
+        self,
+        endpoint: str,
+        *,
+        scope: str,
+        context: str,
+        response_model: (
+            type[InPersonVerificationResponse] | type[LastEmailSentResponse]
+        ),
+    ) -> InPersonVerificationResponse | LastEmailSentResponse:
+        response = await self._post(
+            endpoint,
+            scope=scope,
+            context=context,
+        )
+
+        try:
+            response.raise_for_status()
+        except Exception as exc:
+            RequestErrorHandler.handle(exc, context=context)
+
+        return response_model(**response.json())
 
     async def _post(
         self,

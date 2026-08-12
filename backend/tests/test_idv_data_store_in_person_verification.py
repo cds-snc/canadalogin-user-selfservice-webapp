@@ -21,6 +21,7 @@ send_in_person_verification_code = (
 )
 get_last_email_sent = in_person_verification_module.get_last_email_sent
 
+
 @pytest.fixture
 def mock_http_client():
     return AsyncMock(spec=AsyncClient)
@@ -53,13 +54,13 @@ class TestSendInPersonVerificationCode:
         assert result.success is True
         assert result.message == "In-person verification email sent"
         assert result.data["verification_code"] == "AB12CD34EF"
-        mock_service_class.assert_called_once_with(mock_http_client, "user-access-token")
+        mock_service_class.assert_called_once_with(
+            mock_http_client, "user-access-token"
+        )
 
     @pytest.mark.asyncio
     @patch.object(in_person_verification_module, "IdentityDataService")
-    async def test_upstream_error_bubbles(
-        self, mock_service_class, mock_http_client
-    ):
+    async def test_upstream_error_bubbles(self, mock_service_class, mock_http_client):
         mock_service = MagicMock()
         mock_service.in_person.return_value.send_code = AsyncMock(
             side_effect=RuntimeError("boom")
@@ -67,7 +68,9 @@ class TestSendInPersonVerificationCode:
         mock_service_class.return_value = mock_service
 
         with pytest.raises(RuntimeError, match="boom"):
-            await send_in_person_verification_code(mock_http_client, "user-access-token")
+            await send_in_person_verification_code(
+                mock_http_client, "user-access-token"
+            )
 
 
 class TestGetLastEmailSent:

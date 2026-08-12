@@ -119,6 +119,10 @@ class OnlineOperations:
 
 The grouped operation objects are lightweight namespaces. They should delegate back to shared transport methods on the parent service rather than implement separate authentication flows.
 
+The dispatch helper should live on the parent integration service, not inside an
+operation namespace. In other words, the design should follow a parent-owned
+dispatch shape rather than an `in_person._dispatch(...)` shape.
+
 ## Authentication and Token Exchange
 
 Token exchange should be handled only inside the integration layer.
@@ -186,11 +190,28 @@ A useful internal shape is:
 async def _get_scoped_token(self, scope: str) -> str:
     ...
 
-async def _request(
+async def _dispatch_typed(
     self,
-    method: str,
     endpoint: str,
+    *,
     scope: str,
+    context: str,
+    response_model: type[BaseModel],
+):
+    response = await self._post(
+        endpoint,
+        scope=scope,
+        context=context,
+    )
+    response.raise_for_status()
+    return response_model(**response.json())
+
+async def _post(
+    self,
+    endpoint: str,
+    *,
+    scope: str,
+    context: str,
     *,
     json: dict | None = None,
 ):

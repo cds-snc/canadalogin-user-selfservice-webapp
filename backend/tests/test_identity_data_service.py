@@ -95,6 +95,44 @@ class TestIdentityDataService:
     @pytest.mark.asyncio
     @patch.object(service_module, "get_configuration", return_value=MOCK_CONFIGURATION)
     @patch.object(service_module, "exchange_token_for_idv_data_store")
+    @patch.object(service_module.OnlineOperations, "reissue_session")
+    async def test_create_identity_verification_case_reissues_open_case(
+        self,
+        mock_reissue_session,
+        mock_exchange,
+        mock_get_configuration,
+        mock_http_client,
+    ):
+        mock_exchange.return_value = "idv-scoped-access-token"
+        mock_http_client.post = AsyncMock(
+            return_value=_mock_response(
+                {
+                    "detail": {
+                        "error": "open_case_exists",
+                        "message": "An open case already exists for this user",
+                        "existing_case_id": "64bd14f2-c620-4671-9d94-1cb0192ee552",
+                    }
+                },
+                status_code=409,
+            )
+        )
+        mock_reissue_session.return_value = service_module.ReissueOnlineSessionResponse(
+            case_id="64bd14f2-c620-4671-9d94-1cb0192ee552",
+            status="in_progress",
+            online_verification_url="https://idv-data-store.example.com/start/64bd14f2-c620-4671-9d94-1cb0192ee552",
+        )
+
+        service = IdentityDataService(mock_http_client, "user-access-token")
+        result = await service.create_identity_verification_case()
+
+        assert result.case_id == "64bd14f2-c620-4671-9d94-1cb0192ee552"
+        mock_reissue_session.assert_awaited_once_with(
+            "64bd14f2-c620-4671-9d94-1cb0192ee552",
+        )
+
+    @pytest.mark.asyncio
+    @patch.object(service_module, "get_configuration", return_value=MOCK_CONFIGURATION)
+    @patch.object(service_module, "exchange_token_for_idv_data_store")
     async def test_reissue_online_session(
         self,
         mock_exchange,
@@ -178,7 +216,7 @@ class TestIdentityDataService:
     @pytest.mark.asyncio
     @patch.object(service_module, "get_configuration", return_value=MOCK_CONFIGURATION)
     @patch.object(service_module, "exchange_token_for_idv_data_store")
-    async def test_get_claims(
+    async def test_create_identity_verification_case(
         self,
         mock_exchange,
         mock_get_configuration,
@@ -188,13 +226,17 @@ class TestIdentityDataService:
         mock_http_client.post = AsyncMock(
             return_value=_mock_response(
                 {
-                    "given_name": "Test",
-                    "family_name": "User",
+                    "case_id": "case-123",
+                    "status": "pending",
+                    "online_verification_url": "/start/case-123",
                 }
             )
         )
 
         service = IdentityDataService(mock_http_client, "user-access-token")
-        result = await service.claims().get()
+        result = await service.create_identity_verification_case()
 
-        assert result.claims["given_name"] == "Test"
+        assert result.case_id == "case-123"
+        assert result.online_verification_url == (
+            "https://idv-data-store.example.com/start/case-123"
+        )

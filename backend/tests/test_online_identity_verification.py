@@ -20,6 +20,7 @@ create_online_identity_verification = (
 )
 reissue_online_session = services_module.reissue_online_session
 
+
 @pytest.fixture
 def mock_http_client():
     return AsyncMock(spec=AsyncClient)
@@ -98,7 +99,9 @@ class TestCreateOnlineIdentityVerification:
         )
         mock_service_class.return_value = mock_service
 
-        result = await create_online_identity_verification(mock_http_client, "user-access-token")
+        result = await create_online_identity_verification(
+            mock_http_client, "user-access-token"
+        )
 
         assert result.case_id == "64bd14f2-c620-4671-9d94-1cb0192ee552"
 
