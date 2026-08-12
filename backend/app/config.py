@@ -110,20 +110,36 @@ class IdvDataStoreConfig(BaseSettings):
     IDV_DATA_STORE_BASE_URL: str = "https://idv.dev2.login-connexion.alpha.canada.ca"
     IDV_DATA_STORE_STS_CLIENT_ID: str = ""
     IDV_DATA_STORE_STS_CLIENT_SECRET: str = ""
-    IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES: str = Field(
-        default="idv:in-person-verification:send",
+    IDV_DATA_STORE_VALIDATIONS_WRITE_SCOPES: str = Field(
+        default="idv:validations:write",
         description=(
             "Space-separated list of idv-data-store scopes requested from the "
-            "IBM Verify STS client (token exchange) when calling in-person "
-            "verification endpoints."
+            "IBM Verify STS client (token exchange) when creating or submitting "
+            "identity validation records."
         ),
     )
-    IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES: str = Field(
-        default="openid profile email idv:auth:verified-claims",
+    IDV_DATA_STORE_VALIDATIONS_READ_SCOPES: str = Field(
+        default="idv:validations:read",
         description=(
             "Space-separated list of idv-data-store scopes requested from the "
-            "IBM Verify STS client (token exchange) when calling online "
-            "verification endpoints."
+            "IBM Verify STS client (token exchange) when reading identity "
+            "validation records."
+        ),
+    )
+    IDV_DATA_STORE_VALIDATIONS_UPDATE_SCOPES: str = Field(
+        default="idv:validations:update",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from the "
+            "IBM Verify STS client (token exchange) when updating identity "
+            "validation records."
+        ),
+    )
+    IDV_DATA_STORE_AUTH_USERINFO_SCOPES: str = Field(
+        default="idv:auth:userinfo",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from the "
+            "IBM Verify STS client (token exchange) when fetching delegated "
+            "userinfo claims."
         ),
     )
     model_config = SettingsConfigDict(
@@ -230,6 +246,11 @@ class Configuration(BaseSettings):
     def idv_data_store_online_session_endpoint(self, case_id: str) -> str:
         """idv-data-store's endpoint for reissuing an online verification session URL."""
         return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/identity-verifications/{case_id}/online-session"
+
+    @property
+    def idv_data_store_userinfo_endpoint(self) -> str:
+        """idv-data-store's endpoint for fetching delegated userinfo for an exchanged access token."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/auth/userinfo"
 
 
 @lru_cache

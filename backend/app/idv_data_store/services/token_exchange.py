@@ -1,4 +1,8 @@
-import logging
+from app.idv_data_store.client.storage_service.token_exchange import (
+    exchange_token_for_idv_data_store,
+)
+
+__all__ = ["exchange_token_for_idv_data_store"]import logging
 
 from httpx import AsyncClient
 
@@ -24,10 +28,9 @@ async def exchange_token_for_idv_data_store(
     on the STS client is what plays that role.
 
     The user's original, broadly-scoped access_token is never shared with
-    idv-data-store — only this narrowly-scoped, exchanged access_token is.
+    idv-data-store - only this narrowly-scoped, exchanged access_token is.
 
-    `scope` is supplied by the calling flow (e.g. in-person verification uses
-    IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES).
+    `scope` is supplied by the calling flow.
     """
     settings = get_configuration()
     idv_settings = settings.idv_data_store_config

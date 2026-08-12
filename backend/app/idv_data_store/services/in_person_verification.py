@@ -1,84 +1,39 @@
-import logging
+from typing import Any
 
+from pydantic import BaseModel
 from httpx import AsyncClient
 
-from app.config import get_configuration
-from app.idv_data_store.services.verified_claims import (
-    exchange_token_for_idv_data_store,
+from app.idv_data_store.client.storage_service.identity_data_service import (
+    IdentityDataService,
 )
-from app.utils.request_error_handler import RequestErrorHandler
 from app.utils.schemas import ResponseModel
 
-logger = logging.getLogger(__name__)
 
+def _to_response_model(result: BaseModel) -> ResponseModel:
+    data: Any = result.data
+    if isinstance(data, BaseModel):
+        data = data.model_dump()
 
-async def _dispatch_in_person_verification_request(
-    global_http_client: AsyncClient,
-    user_access_token: str,
-    endpoint: str,
-    context: str,
-) -> ResponseModel:
-    """Shared plumbing for the in-person-verification endpoints: exchange the
-    user's access_token for one scoped to idv-data-store's in-person
-    verification scope, then call the given idv-data-store endpoint using the
-    exchanged token directly as Authorization Bearer.
-
-    idv-data-store's in-person-verification endpoints already respond with
-    a body matching this app's ResponseModel shape (success/message/data),
-    so the response is passed through as-is.
-    """
-    settings = get_configuration()
-    idv_settings = settings.idv_data_store_config
-    scope = idv_settings.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES
-
-    idv_scoped_access_token = await exchange_token_for_idv_data_store(
-        global_http_client, user_access_token, scope=scope
+    return ResponseModel(
+        success=result.success,
+        message=result.message,
+        data=data,
     )
-
-    try:
-        response = await global_http_client.post(
-            endpoint,
-            headers={
-                "Authorization": f"Bearer {idv_scoped_access_token}",
-                "Accept": "application/json",
-            },
-        )
-        response.raise_for_status()
-    except Exception as exc:
-        RequestErrorHandler.handle(exc, context=context)
-
-    return ResponseModel(**response.json())
 
 
 async def send_in_person_verification_code(
     global_http_client: AsyncClient,
     user_access_token: str,
 ) -> ResponseModel:
-    """End-to-end: exchange the user's access_token for one scoped to
-    idv-data-store's in-person-verification scope, then trigger idv-data-store
-    to generate a verification code and send it via GC Notify.
-    """
-    settings = get_configuration()
-    return await _dispatch_in_person_verification_request(
-        global_http_client,
-        user_access_token,
-        settings.idv_data_store_in_person_verification_send_endpoint,
-        context="idv-data-store in-person verification send request",
-    )
+    service = IdentityDataService(global_http_client, user_access_token)
+    result = await service.in_person().send_code()
+    return _to_response_model(result)
 
 
 async def get_last_email_sent(
     global_http_client: AsyncClient,
     user_access_token: str,
 ) -> ResponseModel:
-    """End-to-end: exchange the user's access_token for one scoped to
-    idv-data-store's in-person-verification scope, then fetch the timestamp
-    of the last in-person verification email sent to the user.
-    """
-    settings = get_configuration()
-    return await _dispatch_in_person_verification_request(
-        global_http_client,
-        user_access_token,
-        settings.idv_data_store_in_person_verification_last_email_endpoint,
-        context="idv-data-store in-person verification last-email-sent request",
-    )
+    service = IdentityDataService(global_http_client, user_access_token)
+    result = await service.in_person().get_last_email_sent()
+    return _to_response_model(result)
