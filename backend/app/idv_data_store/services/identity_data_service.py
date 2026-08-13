@@ -9,9 +9,6 @@ from app.identity_verification.schemas import (
     CreateIdentityVerificationResponse,
     CreateOnlineIdentityVerificationRequest,
 )
-from app.identity_verification.schemas import (
-    ReissueOnlineSessionResponse as ReissueOnlineSessionResponse,
-)
 from app.idv_data_store.services.base_idv_data_store_service import (
     BaseIdvDataStoreService,
 )
