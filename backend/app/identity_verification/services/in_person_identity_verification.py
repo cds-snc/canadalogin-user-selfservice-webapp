@@ -11,7 +11,9 @@ from app.utils.schemas import ResponseModel
 class InPersonIdentityVerificationService(BaseIdvDataStoreService):
     async def create_case(self, payload: dict | None = None) -> ResponseModel:
         settings = get_configuration()
-        scope = settings.idv_data_store_config.IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES
+        scope = (
+            settings.idv_data_store_config.IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES
+        )
 
         request_body = dict(payload) if payload else {}
         request_body.setdefault("verification_provider", "service_canada")
@@ -47,7 +49,9 @@ class InPersonIdentityVerificationService(BaseIdvDataStoreService):
 
     async def get_last_email_sent(self) -> ResponseModel:
         settings = get_configuration()
-        scope = settings.idv_data_store_config.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES
+        scope = (
+            settings.idv_data_store_config.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES
+        )
 
         response = await self._post(
             settings.idv_data_store_in_person_verification_last_email_endpoint,

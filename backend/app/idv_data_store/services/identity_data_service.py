@@ -81,14 +81,16 @@ class InPersonOperations:
             success=True,
             message="In-person identity verification case created",
             data={
-                "verification_code": body.get("verification_code_display")
-                if isinstance(body, dict)
-                else None,
+                "verification_code": (
+                    body.get("verification_code_display")
+                    if isinstance(body, dict)
+                    else None
+                ),
                 "case_id": body.get("case_id") if isinstance(body, dict) else None,
                 "status": body.get("status") if isinstance(body, dict) else None,
-                "verification_expires_at": body.get("expires_at")
-                if isinstance(body, dict)
-                else None,
+                "verification_expires_at": (
+                    body.get("expires_at") if isinstance(body, dict) else None
+                ),
             },
         )
 
