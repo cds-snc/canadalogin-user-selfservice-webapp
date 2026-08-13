@@ -149,17 +149,6 @@ export default function ProofingBarcodeCanadaPostPage() {
 
               <div>
                 <GcdsText marginTop="0" marginBottom="0">
-                  <strong>{t("ProofingBarcodeCanadaPost.address")}</strong>
-                </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {address}
-                </GcdsText>
-              </div>
-
-              <div className="separator" style={{ margin: "0" }} />
-
-              <div>
-                <GcdsText marginTop="0" marginBottom="0">
                   <strong>{t("ProofingBarcodeCanadaPost.idSelected")}</strong>
                 </GcdsText>
                 <GcdsText marginTop="200" marginBottom="0">
