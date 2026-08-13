@@ -8,6 +8,9 @@ service_module = importlib.import_module(
     "app.idv_data_store.services.identity_data_service"
 )
 IdentityDataService = service_module.IdentityDataService
+base_module = importlib.import_module(
+    "app.idv_data_store.services.base_idv_data_store_service"
+)
 
 MOCK_CONFIGURATION = MagicMock()
 MOCK_CONFIGURATION.idv_data_store_online_verification_endpoint = (
@@ -19,8 +22,8 @@ MOCK_CONFIGURATION.idv_data_store_online_session_endpoint = MagicMock(
         f"{case_id}/online-session"
     )
 )
-MOCK_CONFIGURATION.idv_data_store_in_person_verification_send_endpoint = (
-    "https://idv-data-store.example.com/v1/in-person-verification/send"
+MOCK_CONFIGURATION.idv_data_store_identity_verification_in_person_endpoint = (
+    "https://idv-data-store.example.com/v1/identity-verifications/in-person"
 )
 MOCK_CONFIGURATION.idv_data_store_in_person_verification_last_email_endpoint = (
     "https://idv-data-store.example.com/v1/in-person-verification/last-email-sent"
@@ -33,6 +36,9 @@ MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_ONLINE_VERIFICATION_SCOP
 )
 MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES = (
     "idv:in-person-verification:send"
+)
+MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES = (
+    "idv:auth:verified-claims"
 )
 MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_AUTH_USERINFO_SCOPES = (
     "idv:auth:userinfo"
@@ -58,7 +64,7 @@ def _mock_response(json_data, status_code=200):
 class TestIdentityDataService:
     @pytest.mark.asyncio
     @patch.object(service_module, "get_configuration", return_value=MOCK_CONFIGURATION)
-    @patch.object(service_module, "exchange_token_for_idv_data_store")
+    @patch.object(base_module, "exchange_token_for_idv_data_store")
     async def test_create_identity_verification_case(
         self,
         mock_exchange,
@@ -91,7 +97,7 @@ class TestIdentityDataService:
 
     @pytest.mark.asyncio
     @patch.object(service_module, "get_configuration", return_value=MOCK_CONFIGURATION)
-    @patch.object(service_module, "exchange_token_for_idv_data_store")
+    @patch.object(base_module, "exchange_token_for_idv_data_store")
     @patch.object(service_module.OnlineOperations, "reissue_session")
     async def test_create_identity_verification_case_reissues_open_case(
         self,
@@ -129,7 +135,7 @@ class TestIdentityDataService:
 
     @pytest.mark.asyncio
     @patch.object(service_module, "get_configuration", return_value=MOCK_CONFIGURATION)
-    @patch.object(service_module, "exchange_token_for_idv_data_store")
+    @patch.object(base_module, "exchange_token_for_idv_data_store")
     async def test_reissue_online_session(
         self,
         mock_exchange,
@@ -157,7 +163,7 @@ class TestIdentityDataService:
 
     @pytest.mark.asyncio
     @patch.object(service_module, "get_configuration", return_value=MOCK_CONFIGURATION)
-    @patch.object(service_module, "exchange_token_for_idv_data_store")
+    @patch.object(base_module, "exchange_token_for_idv_data_store")
     async def test_send_in_person_code(
         self,
         mock_exchange,
@@ -180,10 +186,15 @@ class TestIdentityDataService:
 
         assert result.success is True
         assert result.data.verification_code == "AB12CD34EF"
+        mock_exchange.assert_awaited_once_with(
+            mock_http_client,
+            "user-access-token",
+            scope="idv:auth:verified-claims",
+        )
 
     @pytest.mark.asyncio
     @patch.object(service_module, "get_configuration", return_value=MOCK_CONFIGURATION)
-    @patch.object(service_module, "exchange_token_for_idv_data_store")
+    @patch.object(base_module, "exchange_token_for_idv_data_store")
     async def test_get_userinfo_claims(
         self,
         mock_exchange,

@@ -2,14 +2,12 @@ from typing import Optional
 
 from httpx import AsyncClient
 
-from app.identity_verification.schemas import CreateOnlineIdentityVerificationRequest
-from app.idv_data_store.services.identity_data_service import (
-    IdentityDataService,
-)
 from app.identity_verification.schemas import (
     CreateIdentityVerificationResponse,
+    CreateOnlineIdentityVerificationRequest,
     ReissueOnlineSessionResponse,
 )
+from app.idv_data_store.services.identity_data_service import IdentityDataService
 
 
 async def create_online_identity_verification(

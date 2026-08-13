@@ -1,5 +1,4 @@
 import logging
-import secrets
 from typing import Any, Optional, TypeVar
 from urllib.parse import urljoin
 
@@ -7,22 +6,21 @@ from fastapi import Depends, Request, status
 from httpx import AsyncClient
 from pydantic import BaseModel
 
+from app.auth.services.auth_user_session import get_users_current_session
 from app.config import get_configuration
 from app.identity_verification.schemas import (
     CreateIdentityVerificationResponse,
     CreateOnlineIdentityVerificationRequest,
     ReissueOnlineSessionResponse,
 )
+from app.idv_data_store.services.base_idv_data_store_service import (
+    BaseIdvDataStoreService,
+)
 from app.idv_data_store.services.schemas import (
     ClaimsResponse,
     InPersonVerificationResponse,
     LastEmailSentResponse,
 )
-from app.idv_data_store.services.token_exchange import (
-    exchange_token_for_idv_data_store,
-)
-from app.auth.services.auth_user_session import get_users_current_session
-
 from app.utils.request_error_handler import RequestErrorHandler
 
 logger = logging.getLogger(__name__)
@@ -55,11 +53,43 @@ class InPersonOperations:
 
     async def send_code(self) -> InPersonVerificationResponse:
         settings = get_configuration()
-        return await self._service._request_model(
-            settings.idv_data_store_in_person_verification_send_endpoint,
-            scope=settings.idv_data_store_config.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES,
-            context="idv-data-store in-person verification send request",
-            response_model=InPersonVerificationResponse,
+        response = await self._service._post(
+            settings.idv_data_store_identity_verification_in_person_endpoint,
+            scope=settings.idv_data_store_config.IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES,
+            context="idv-data-store in-person identity verification create request",
+            include_idempotency_key=True,
+            payload={
+                "verification_provider": "service_canada",
+                "applicant": {},
+            },
+        )
+
+        try:
+            response.raise_for_status()
+        except Exception as exc:
+            RequestErrorHandler.handle(
+                exc,
+                context="idv-data-store in-person identity verification create request",
+            )
+
+        body = response.json()
+        # Backward compatibility: support both legacy and new upstream response shapes.
+        if isinstance(body, dict) and "success" in body and "message" in body:
+            return InPersonVerificationResponse(**body)
+
+        return InPersonVerificationResponse(
+            success=True,
+            message="In-person identity verification case created",
+            data={
+                "verification_code": body.get("verification_code_display")
+                if isinstance(body, dict)
+                else None,
+                "case_id": body.get("case_id") if isinstance(body, dict) else None,
+                "status": body.get("status") if isinstance(body, dict) else None,
+                "verification_expires_at": body.get("expires_at")
+                if isinstance(body, dict)
+                else None,
+            },
         )
 
     async def get_last_email_sent(self) -> LastEmailSentResponse:
@@ -97,11 +127,7 @@ class OnlineOperations:
         return ReissueOnlineSessionResponse(**response_data)
 
 
-class IdentityDataService:
-    def __init__(self, http_client: AsyncClient, user_access_token: str):
-        self._http_client = http_client
-        self._user_access_token = user_access_token
-
+class IdentityDataService(BaseIdvDataStoreService):
     async def create_identity_verification_case(
         self,
         payload: Optional[CreateOnlineIdentityVerificationRequest] = None,
@@ -181,37 +207,6 @@ class IdentityDataService:
             RequestErrorHandler.handle(exc, context=context)
 
         return response_model(**response.json())
-
-    async def _post(
-        self,
-        endpoint: str,
-        *,
-        scope: str,
-        context: str,
-        payload: Optional[dict[str, Any]] = None,
-        include_idempotency_key: bool = False,
-    ):
-        idv_scoped_access_token = await exchange_token_for_idv_data_store(
-            self._http_client,
-            self._user_access_token,
-            scope=scope,
-        )
-
-        headers = {
-            "Authorization": f"Bearer {idv_scoped_access_token}",
-            "Accept": "application/json",
-        }
-        if include_idempotency_key:
-            headers["Idempotency-Key"] = str(secrets.randbelow(10**16))
-
-        request_kwargs = {"headers": headers}
-        if payload is not None:
-            request_kwargs["json"] = payload
-
-        try:
-            return await self._http_client.post(endpoint, **request_kwargs)
-        except Exception as exc:
-            RequestErrorHandler.handle(exc, context=context)
 
     def _resolve_online_verification_url(
         self,

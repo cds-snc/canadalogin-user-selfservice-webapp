@@ -157,7 +157,24 @@ export default function ServiceCanadaCentrePage() {
     setShowErrorSummary(false);
 
     const response =
-      await inPersonIdentityVerificationApi.sendInPersonVerificationCode();
+      await inPersonIdentityVerificationApi.sendInPersonVerificationCode({
+        verificationProvider: "service_canada",
+        applicant: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          dateOfBirth: formData.dateOfBirth,
+          address: formData.address
+            ? {
+                streetAddress: formData.address,
+                region: formData.province,
+                postalCode: formData.postalcode,
+                country: "CA",
+              }
+            : undefined,
+          idType: formData.idType,
+          idExpiryDate: formData.idExpiryDate,
+        },
+      });
 
     if (!response?.data?.verificationCode) {
       return;
