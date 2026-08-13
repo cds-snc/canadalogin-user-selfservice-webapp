@@ -91,34 +91,18 @@ class BaseIdvDataStoreService:
         endpoint: str,
         request_kwargs: dict[str, Any],
     ) -> Response:
+        async def execute(client: AsyncClient) -> Response:
+            if method == "get":
+                return await client.get(endpoint, **request_kwargs)
+            if method == "post":
+                return await client.post(endpoint, **request_kwargs)
+            return await client.request(method.upper(), endpoint, **request_kwargs)
+
         if should_disable_tls_verify_for_localhost(endpoint):
             async with AsyncClient(
                 verify=False,
                 timeout=self._http_client.timeout,
             ) as local_client:
-                return await self._perform_request(
-                    local_client,
-                    method,
-                    endpoint,
-                    request_kwargs,
-                )
+                return await execute(local_client)
 
-        return await self._perform_request(
-            self._http_client,
-            method,
-            endpoint,
-            request_kwargs,
-        )
-
-    async def _perform_request(
-        self,
-        client: AsyncClient,
-        method: str,
-        endpoint: str,
-        request_kwargs: dict[str, Any],
-    ) -> Response:
-        if method == "get":
-            return await client.get(endpoint, **request_kwargs)
-        if method == "post":
-            return await client.post(endpoint, **request_kwargs)
-        return await client.request(method.upper(), endpoint, **request_kwargs)
+        return await execute(self._http_client)
