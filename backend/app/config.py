@@ -118,6 +118,14 @@ class IdvDataStoreConfig(BaseSettings):
             "verification endpoints."
         ),
     )
+    IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES: str = Field(
+        default="idv:auth:verified-claims",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from the "
+            "IBM Verify STS client (token exchange) when calling "
+            "identity-verifications endpoints."
+        ),
+    )
     IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES: str = Field(
         default="openid profile email idv:auth:verified-claims",
         description=(
@@ -211,10 +219,10 @@ class Configuration(BaseSettings):
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
 
     @property
-    def idv_data_store_in_person_verification_send_endpoint(self) -> str:
-        """idv-data-store's endpoint for generating and sending an in-person
-        verification code email for an already-exchanged access_token."""
-        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/in-person-verification/send"
+    def idv_data_store_identity_verification_in_person_endpoint(self) -> str:
+        """idv-data-store's endpoint for creating an in-person identity
+        verification case for an already-exchanged access_token."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/identity-verifications/in-person"
 
     @property
     def idv_data_store_in_person_verification_last_email_endpoint(self) -> str:

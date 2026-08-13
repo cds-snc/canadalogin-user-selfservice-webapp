@@ -4,6 +4,29 @@ from typing import Optional
 from datetime import datetime
 
 
+class InPersonApplicantAddressRequest(BaseModel):
+    street_address: str | None = None
+    locality: str | None = None
+    region: str | None = None
+    postal_code: str | None = None
+    country: str | None = None
+
+
+class InPersonApplicantRequest(BaseModel):
+    first_name: str
+    last_name: str
+    date_of_birth: str
+    address: InPersonApplicantAddressRequest | None = None
+    id_type: str
+    id_expiry_date: str
+
+
+class CreateInPersonIdentityVerificationRequest(BaseModel):
+    required_by_rp_client_id: str | None = None
+    verification_provider: str = "service_canada"
+    applicant: InPersonApplicantRequest
+
+
 class StoreTargetUrlRequest(BaseModel):
     target_url: str
 

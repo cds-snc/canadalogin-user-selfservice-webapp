@@ -4,13 +4,16 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Request, status
 from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.schemas import ResponseModel
-from app.identity_verification.schemas import StoreTargetUrlRequest
+from app.identity_verification.schemas import (
+    CreateInPersonIdentityVerificationRequest,
+    StoreTargetUrlRequest,
+)
 from app.identity_verification.services.create_identity_verification import (
     idv_mock_success_response,
     create_identity_verification,
 )
-from app.idv_data_store.services.in_person_verification import (
-    send_in_person_verification_code,
+from app.identity_verification.services.in_person_identity_verification import (
+    create_in_person_identity_verification_case,
     get_last_email_sent,
 )
 from app.identity_verification.services.redirect_target_url import (
@@ -68,16 +71,18 @@ async def idv_mock_success(
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,
     tags=["Identity Verification"],
-    summary="Send an in-person identity verification code to the user",
-    description="Sends an email via GC Notify containing a verification code the user must present at a Service Canada Centre.",
+    summary="Create an in-person identity verification case",
+    description="Creates an in-person identity verification case in idv-data-store and returns the generated verification code metadata.",
 )
 async def send_in_person_verification(
     request: Request,
+    payload: CreateInPersonIdentityVerificationRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await send_in_person_verification_code(
+    return await create_in_person_identity_verification_case(
         request.app.state.request_client,
         user_access_token,
+        payload.model_dump(exclude_none=True),
     )
 
 

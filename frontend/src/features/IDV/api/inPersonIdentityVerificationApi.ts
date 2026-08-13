@@ -9,10 +9,33 @@ type InPersonVerificationApiResponse = {
   success: boolean;
   message: string;
   data?: {
+    case_id?: string;
+    status?: string;
     verification_code?: string;
+    verification_code_display?: string;
     verification_expires_at?: string;
+    expires_at?: string;
     verification_validity_days?: number;
     sent_at?: string;
+  };
+};
+
+export type SendInPersonVerificationCodeRequest = {
+  requiredByRpClientId?: string;
+  verificationProvider?: "service_canada" | "canada_post";
+  applicant?: {
+    firstName?: string;
+    lastName?: string;
+    dateOfBirth?: string;
+    address?: {
+      streetAddress?: string;
+      locality?: string;
+      region?: string;
+      postalCode?: string;
+      country?: string;
+    };
+    idType?: string;
+    idExpiryDate?: string;
   };
 };
 
@@ -37,12 +60,41 @@ export type InPersonVerificationCodeResponse = {
 
 export const inPersonIdentityVerificationApi = {
   /**
-   * Sends in-person verification email and returns generated verification metadata.
+   * Creates an in-person identity verification case and returns generated verification metadata.
    */
-  sendInPersonVerificationCode: async () => {
+  sendInPersonVerificationCode: async (
+    payload?: SendInPersonVerificationCodeRequest,
+  ) => {
     try {
+      const requestBody = payload
+        ? {
+            required_by_rp_client_id: payload.requiredByRpClientId,
+            verification_provider:
+              payload.verificationProvider ?? "service_canada",
+            applicant: payload.applicant
+              ? {
+                  first_name: payload.applicant.firstName,
+                  last_name: payload.applicant.lastName,
+                  date_of_birth: payload.applicant.dateOfBirth,
+                  address: payload.applicant.address
+                    ? {
+                        street_address: payload.applicant.address.streetAddress,
+                        locality: payload.applicant.address.locality,
+                        region: payload.applicant.address.region,
+                        postal_code: payload.applicant.address.postalCode,
+                        country: payload.applicant.address.country,
+                      }
+                    : undefined,
+                  id_type: payload.applicant.idType,
+                  id_expiry_date: payload.applicant.idExpiryDate,
+                }
+              : undefined,
+          }
+        : {};
+
       const response = await axios.post(
         `${config.apiUrl}/v1/identity-verification/in-person`,
+        requestBody,
       );
 
       const responseData = response.data as InPersonVerificationApiResponse;
@@ -50,8 +102,12 @@ export const inPersonIdentityVerificationApi = {
       return {
         ...responseData,
         data: {
-          verificationCode: responseData.data?.verification_code,
-          verificationExpiresAt: responseData.data?.verification_expires_at,
+          verificationCode:
+            responseData.data?.verification_code ??
+            responseData.data?.verification_code_display,
+          verificationExpiresAt:
+            responseData.data?.verification_expires_at ??
+            responseData.data?.expires_at,
           verificationValidityDays:
             responseData.data?.verification_validity_days,
           sentAt: responseData.data?.sent_at,

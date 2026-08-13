@@ -11,12 +11,27 @@ from app.idv_data_store.services.verified_claims import (
     exchange_token_for_idv_data_store,
 )
 from app.utils.request_error_handler import RequestErrorHandler
+from app.utils.tls import should_disable_tls_verify_for_localhost
 from app.identity_verification.schemas import (
     CreateIdentityVerificationResponse,
     ReissueOnlineSessionResponse,
 )
 
 logger = logging.getLogger(__name__)
+
+
+async def _post_to_idv_data_store(
+    global_http_client: AsyncClient,
+    endpoint: str,
+    **request_kwargs,
+):
+    """POST to idv-data-store with local-only localhost TLS verification bypass."""
+    if should_disable_tls_verify_for_localhost(endpoint):
+        async with AsyncClient(
+            verify=False, timeout=global_http_client.timeout
+        ) as client:
+            return await client.post(endpoint, **request_kwargs)
+    return await global_http_client.post(endpoint, **request_kwargs)
 
 
 def _get_idv_settings():
@@ -94,9 +109,11 @@ async def _post_online_verification_request(
         if payload is not None:
             request_kwargs["json"] = payload
 
-        response = await global_http_client.post(endpoint, **request_kwargs)
+        response = await _post_to_idv_data_store(
+            global_http_client, endpoint, **request_kwargs
+        )
     except Exception as exc:
-        RequestErrorHandler.handle(exc, context=context)
+        return RequestErrorHandler.handle(exc, context=context)
 
     return response
 

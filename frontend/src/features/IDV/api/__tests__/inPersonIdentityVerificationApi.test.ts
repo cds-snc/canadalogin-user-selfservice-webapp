@@ -48,6 +48,7 @@ describe("inPersonIdentityVerificationApi", () => {
 
     expect(mockedAxios.post).toHaveBeenCalledWith(
       "http://localhost:8000/v1/identity-verification/in-person",
+      {},
     );
     expect(result).toEqual({
       success: true,
@@ -79,6 +80,70 @@ describe("inPersonIdentityVerificationApi", () => {
       data: {
         verificationCode: undefined,
         verificationExpiresAt: undefined,
+        verificationValidityDays: undefined,
+        sentAt: undefined,
+      },
+    });
+  });
+
+  it("maps and sends applicant payload for create in-person case", async () => {
+    mockedAxios.post.mockResolvedValue({
+      data: {
+        success: true,
+        message: "In-person identity verification case created",
+        data: {
+          verification_code_display: "AB1-2CD-34E",
+          expires_at: "2026-08-12T20:58:26.760127+00:00",
+        },
+      },
+    });
+
+    const result =
+      await inPersonIdentityVerificationApi.sendInPersonVerificationCode({
+        verificationProvider: "service_canada",
+        applicant: {
+          firstName: "Jane",
+          lastName: "Doe",
+          dateOfBirth: "1990-05-15",
+          address: {
+            streetAddress: "123 Main St",
+            region: "ON",
+            postalCode: "K1A 0B1",
+            country: "CA",
+          },
+          idType: "driverLicence",
+          idExpiryDate: "2030-05-15",
+        },
+      });
+
+    expect(mockedAxios.post).toHaveBeenCalledWith(
+      "http://localhost:8000/v1/identity-verification/in-person",
+      {
+        required_by_rp_client_id: undefined,
+        verification_provider: "service_canada",
+        applicant: {
+          first_name: "Jane",
+          last_name: "Doe",
+          date_of_birth: "1990-05-15",
+          address: {
+            street_address: "123 Main St",
+            locality: undefined,
+            region: "ON",
+            postal_code: "K1A 0B1",
+            country: "CA",
+          },
+          id_type: "driverLicence",
+          id_expiry_date: "2030-05-15",
+        },
+      },
+    );
+
+    expect(result).toEqual({
+      success: true,
+      message: "In-person identity verification case created",
+      data: {
+        verificationCode: "AB1-2CD-34E",
+        verificationExpiresAt: "2026-08-12T20:58:26.760127+00:00",
         verificationValidityDays: undefined,
         sentAt: undefined,
       },
