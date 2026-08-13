@@ -2,12 +2,12 @@ from typing import Optional
 
 from httpx import AsyncClient
 
+from app.config import get_configuration
 from app.identity_verification.schemas import (
     CreateIdentityVerificationResponse,
-    CreateOnlineIdentityVerificationRequest,
     ReissueOnlineSessionResponse,
 )
-from app.idv_data_store.services.identity_data_service import IdentityDataService
+from app.idv_data_store.services.online_operations import OnlineOperations
 
 
 async def create_online_identity_verification(
@@ -15,11 +15,16 @@ async def create_online_identity_verification(
     user_access_token: str,
     required_by_rp_client_id: Optional[str] = None,
 ) -> CreateIdentityVerificationResponse:
-    service = IdentityDataService(global_http_client, user_access_token)
-    payload = CreateOnlineIdentityVerificationRequest(
-        required_by_rp_client_id=required_by_rp_client_id,
+    settings = get_configuration()
+    operation = OnlineOperations(
+        global_http_client,
+        user_access_token,
+        settings=settings,
     )
-    return await service.create_identity_verification_case(payload)
+    payload = {}
+    if required_by_rp_client_id is not None:
+        payload["required_by_rp_client_id"] = required_by_rp_client_id
+    return await operation.create_case(payload)
 
 
 async def reissue_online_session(
@@ -27,5 +32,10 @@ async def reissue_online_session(
     user_access_token: str,
     case_id: str,
 ) -> ReissueOnlineSessionResponse:
-    service = IdentityDataService(global_http_client, user_access_token)
-    return await service.online().reissue_session(case_id)
+    settings = get_configuration()
+    operation = OnlineOperations(
+        global_http_client,
+        user_access_token,
+        settings=settings,
+    )
+    return await operation.reissue_session(case_id)

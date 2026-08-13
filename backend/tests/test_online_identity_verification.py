@@ -8,9 +8,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from httpx import AsyncClient
 from app.identity_verification.schemas import CreateOnlineIdentityVerificationRequest
-from app.idv_data_store.services.identity_data_service import (
-    IdentityDataService,
-)
+from app.idv_data_store.services.online_operations import OnlineOperations
 
 services_module = importlib.import_module(
     "app.identity_verification.services.online_identity_verification"
@@ -28,21 +26,21 @@ def mock_http_client():
 
 class TestCreateOnlineIdentityVerification:
     @pytest.mark.asyncio
-    @patch.object(services_module, "IdentityDataService")
+    @patch.object(services_module, "OnlineOperations")
     async def test_success_creates_case_and_returns_response(
         self,
-        mock_service_class,
+        mock_operation_class,
         mock_http_client,
     ):
-        mock_service = MagicMock(spec=IdentityDataService)
-        mock_service.create_identity_verification_case = AsyncMock(
+        mock_operation = MagicMock(spec=OnlineOperations)
+        mock_operation.create_case = AsyncMock(
             return_value=services_module.CreateIdentityVerificationResponse(
                 case_id="case-123",
                 status="pending",
                 online_verification_url="https://idv-data-store.example.com/start/case-123",
             )
         )
-        mock_service_class.return_value = mock_service
+        mock_operation_class.return_value = mock_operation
 
         result = await create_online_identity_verification(
             mock_http_client,
@@ -52,26 +50,26 @@ class TestCreateOnlineIdentityVerification:
 
         assert result.case_id == "case-123"
         assert result.status.value == "pending"
-        mock_service.create_identity_verification_case.assert_awaited_once()
-        payload = mock_service.create_identity_verification_case.await_args.args[0]
-        assert payload.required_by_rp_client_id == "rp-client-id"
+        mock_operation.create_case.assert_awaited_once_with(
+            {"required_by_rp_client_id": "rp-client-id"}
+        )
 
     @pytest.mark.asyncio
-    @patch.object(services_module, "IdentityDataService")
+    @patch.object(services_module, "OnlineOperations")
     async def test_success_without_required_by_rp_client_id(
         self,
-        mock_service_class,
+        mock_operation_class,
         mock_http_client,
     ):
-        mock_service = MagicMock(spec=IdentityDataService)
-        mock_service.create_identity_verification_case = AsyncMock(
+        mock_operation = MagicMock(spec=OnlineOperations)
+        mock_operation.create_case = AsyncMock(
             return_value=services_module.CreateIdentityVerificationResponse(
                 case_id="case-456",
                 status="pending",
                 online_verification_url="https://idv-data-store.example.com/start/case-456",
             )
         )
-        mock_service_class.return_value = mock_service
+        mock_operation_class.return_value = mock_operation
 
         result = await create_online_identity_verification(
             mock_http_client,
@@ -79,25 +77,24 @@ class TestCreateOnlineIdentityVerification:
         )
 
         assert result.case_id == "case-456"
-        payload = mock_service.create_identity_verification_case.await_args.args[0]
-        assert payload.required_by_rp_client_id is None
+        mock_operation.create_case.assert_awaited_once_with({})
 
     @pytest.mark.asyncio
-    @patch.object(services_module, "IdentityDataService")
-    async def test_conflict_logic_is_delegated_to_central_service(
+    @patch.object(services_module, "OnlineOperations")
+    async def test_conflict_logic_is_delegated_to_online_operations(
         self,
-        mock_service_class,
+        mock_operation_class,
         mock_http_client,
     ):
-        mock_service = MagicMock(spec=IdentityDataService)
-        mock_service.create_identity_verification_case = AsyncMock(
+        mock_operation = MagicMock(spec=OnlineOperations)
+        mock_operation.create_case = AsyncMock(
             return_value=services_module.CreateIdentityVerificationResponse(
                 case_id="64bd14f2-c620-4671-9d94-1cb0192ee552",
                 status="in_progress",
                 online_verification_url="https://idv-data-store.example.com/start/64bd14f2-c620-4671-9d94-1cb0192ee552",
             )
         )
-        mock_service_class.return_value = mock_service
+        mock_operation_class.return_value = mock_operation
 
         result = await create_online_identity_verification(
             mock_http_client, "user-access-token"
@@ -108,21 +105,21 @@ class TestCreateOnlineIdentityVerification:
 
 class TestReissueOnlineSession:
     @pytest.mark.asyncio
-    @patch.object(services_module, "IdentityDataService")
+    @patch.object(services_module, "OnlineOperations")
     async def test_success_reissues_session_and_returns_response(
         self,
-        mock_service_class,
+        mock_operation_class,
         mock_http_client,
     ):
-        mock_service = MagicMock(spec=IdentityDataService)
-        mock_service.online.return_value.reissue_session = AsyncMock(
+        mock_operation = MagicMock(spec=OnlineOperations)
+        mock_operation.reissue_session = AsyncMock(
             return_value=services_module.ReissueOnlineSessionResponse(
                 case_id="case-123",
                 status="in_progress",
                 online_verification_url="https://idv-data-store.example.com/start/case-123?reissued=1",
             )
         )
-        mock_service_class.return_value = mock_service
+        mock_operation_class.return_value = mock_operation
 
         result = await reissue_online_session(
             mock_http_client, "user-access-token", "case-123"
@@ -130,9 +127,7 @@ class TestReissueOnlineSession:
 
         assert result.case_id == "case-123"
         assert result.status.value == "in_progress"
-        mock_service.online.return_value.reissue_session.assert_awaited_once_with(
-            "case-123"
-        )
+        mock_operation.reissue_session.assert_awaited_once_with("case-123")
 
 
 class TestOnlineIdentityVerificationRouterEndpoints:
