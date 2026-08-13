@@ -13,22 +13,7 @@ async def exchange_token_for_idv_data_store(
     user_access_token: str,
     scope: str,
 ) -> str:
-    """RFC 8693 OAuth 2.0 Token Exchange against IBM Verify.
-
-    Exchanges the user's own access_token (issued to this app's OIDC
-    client) for a new access_token scoped only to idv-data-store, using a
-    dedicated IBM Verify STS client whose "Custom scopes and API access"
-    configuration is restricted to only ever mint the requested delegated
-    scope for the target idv-data-store endpoint. IBM Verify
-    has no `resource`/`audience` request parameter; this scope restriction
-    on the STS client is what plays that role.
-
-    The user's original, broadly-scoped access_token is never shared with
-    idv-data-store — only this narrowly-scoped, exchanged access_token is.
-
-    `scope` is supplied by the calling flow (e.g. in-person verification uses
-    IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES).
-    """
+    """RFC 8693 OAuth 2.0 Token Exchange against IBM Verify."""
     settings = get_configuration()
     idv_settings = settings.idv_data_store_config
 
@@ -60,5 +45,6 @@ async def exchange_token_for_idv_data_store(
             ValueError("Missing access_token in token exchange response"),
             context="IBM Verify token exchange response",
         )
+
     logger.info("Token exchange for idv-data-store succeeded")
     return exchanged_access_token
