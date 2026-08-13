@@ -189,7 +189,6 @@ describe("ProofingBarcodeCanadaPostPage", () => {
           givenName: "Name",
           lastName: "Lastname",
           dateOfBirth: "2000-10-15",
-          address: "123 Main Street",
           idSelected: "Email statement",
           acceptableIds: ["Passport", "Driver's licence"],
         }}
@@ -207,7 +206,6 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Lastname")).toBeInTheDocument();
     expect(screen.getByText("2000-10-15")).toBeInTheDocument();
-    expect(screen.getByText("123 Main Street")).toBeInTheDocument();
     expect(screen.getByText("Email statement")).toBeInTheDocument();
     expect(screen.getByText("Passport")).toBeInTheDocument();
   });
