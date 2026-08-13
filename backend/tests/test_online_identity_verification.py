@@ -8,7 +8,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from httpx import AsyncClient
 from app.identity_verification.schemas import CreateOnlineIdentityVerificationRequest
-from app.idv_data_store.services.online_operations import OnlineOperations
+from app.identity_verification.services.online_identity_verification import (
+    OnlineIdentityVerificationClient,
+)
 
 services_module = importlib.import_module(
     "app.identity_verification.services.online_identity_verification"
@@ -26,13 +28,13 @@ def mock_http_client():
 
 class TestCreateOnlineIdentityVerification:
     @pytest.mark.asyncio
-    @patch.object(services_module, "OnlineOperations")
+    @patch.object(services_module, "OnlineIdentityVerificationClient")
     async def test_success_creates_case_and_returns_response(
         self,
         mock_operation_class,
         mock_http_client,
     ):
-        mock_operation = MagicMock(spec=OnlineOperations)
+        mock_operation = MagicMock(spec=OnlineIdentityVerificationClient)
         mock_operation.create_case = AsyncMock(
             return_value=services_module.CreateIdentityVerificationResponse(
                 case_id="case-123",
@@ -55,13 +57,13 @@ class TestCreateOnlineIdentityVerification:
         )
 
     @pytest.mark.asyncio
-    @patch.object(services_module, "OnlineOperations")
+    @patch.object(services_module, "OnlineIdentityVerificationClient")
     async def test_success_without_required_by_rp_client_id(
         self,
         mock_operation_class,
         mock_http_client,
     ):
-        mock_operation = MagicMock(spec=OnlineOperations)
+        mock_operation = MagicMock(spec=OnlineIdentityVerificationClient)
         mock_operation.create_case = AsyncMock(
             return_value=services_module.CreateIdentityVerificationResponse(
                 case_id="case-456",
@@ -80,13 +82,13 @@ class TestCreateOnlineIdentityVerification:
         mock_operation.create_case.assert_awaited_once_with({})
 
     @pytest.mark.asyncio
-    @patch.object(services_module, "OnlineOperations")
+    @patch.object(services_module, "OnlineIdentityVerificationClient")
     async def test_conflict_logic_is_delegated_to_online_operations(
         self,
         mock_operation_class,
         mock_http_client,
     ):
-        mock_operation = MagicMock(spec=OnlineOperations)
+        mock_operation = MagicMock(spec=OnlineIdentityVerificationClient)
         mock_operation.create_case = AsyncMock(
             return_value=services_module.CreateIdentityVerificationResponse(
                 case_id="64bd14f2-c620-4671-9d94-1cb0192ee552",
@@ -105,13 +107,13 @@ class TestCreateOnlineIdentityVerification:
 
 class TestReissueOnlineSession:
     @pytest.mark.asyncio
-    @patch.object(services_module, "OnlineOperations")
+    @patch.object(services_module, "OnlineIdentityVerificationClient")
     async def test_success_reissues_session_and_returns_response(
         self,
         mock_operation_class,
         mock_http_client,
     ):
-        mock_operation = MagicMock(spec=OnlineOperations)
+        mock_operation = MagicMock(spec=OnlineIdentityVerificationClient)
         mock_operation.reissue_session = AsyncMock(
             return_value=services_module.ReissueOnlineSessionResponse(
                 case_id="case-123",
