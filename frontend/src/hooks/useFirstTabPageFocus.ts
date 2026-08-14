@@ -36,6 +36,23 @@ const getPreferredFocusTarget = (mainContent: HTMLElement) => {
   return mainContent;
 };
 
+const isWithinMainContent = (
+  element: Element | null,
+  mainContentId: string,
+) => {
+  if (!element) {
+    return false;
+  }
+
+  const mainContent = document.getElementById(mainContentId);
+
+  if (!mainContent) {
+    return false;
+  }
+
+  return mainContent.contains(element);
+};
+
 // Focus helper used by the first Tab interception.
 // If a target is not naturally focusable, make it programmatically focusable.
 const focusTopOfMainContent = (mainContentId: string) => {
@@ -70,6 +87,9 @@ export const useFirstTabPageFocus = ({
   const forceInterceptNextTabRef = useRef(false);
   // Tracks the current top focus target so we can detect view swaps on the same URL.
   const lastFocusTargetRef = useRef<HTMLElement | null>(null);
+  // Set when pointer interaction originates in main content. We only disable
+  // first-Tab interception for explicit pointer-driven focus changes.
+  const pointerStartedInMainContentRef = useRef(false);
 
   // Recompute top target and re-arm first-Tab handling when in-page content changes.
   // This covers wizard-style flows that swap components without changing the route.
@@ -99,12 +119,15 @@ export const useFirstTabPageFocus = ({
     if (!enabled) {
       shouldHandleFirstTabRef.current = false;
       forceInterceptNextTabRef.current = false;
+      pointerStartedInMainContentRef.current = false;
       return;
     }
 
     // On route/query/hash changes, enable first-Tab behavior unless this is hash navigation.
     shouldHandleFirstTabRef.current = !hash;
     forceInterceptNextTabRef.current = !hash;
+    // Navigation boundaries should clear pointer intent from the previous view.
+    pointerStartedInMainContentRef.current = false;
 
     // Wait one frame so the route content has rendered before calculating the top target.
     const frameId = window.requestAnimationFrame(() => {
@@ -141,6 +164,68 @@ export const useFirstTabPageFocus = ({
       observer.disconnect();
     };
   }, [enabled, mainContentId, refreshFocusTarget]);
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target;
+
+      if (!(target instanceof Element)) {
+        pointerStartedInMainContentRef.current = false;
+        return;
+      }
+
+      pointerStartedInMainContentRef.current = isWithinMainContent(
+        target,
+        mainContentId,
+      );
+    };
+
+    window.addEventListener("pointerdown", onPointerDown, true);
+
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown, true);
+    };
+  }, [enabled, mainContentId]);
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    // If focus lands in the current page content (for example via mouse click),
+    // preserve native Tab order and stop forcing first-Tab interception.
+    const onFocusIn = (event: FocusEvent) => {
+      const target = event.target;
+
+      if (!(target instanceof Element)) {
+        return;
+      }
+
+      if (!isWithinMainContent(target, mainContentId)) {
+        pointerStartedInMainContentRef.current = false;
+        return;
+      }
+
+      if (!pointerStartedInMainContentRef.current) {
+        return;
+      }
+
+      pointerStartedInMainContentRef.current = false;
+
+      forceInterceptNextTabRef.current = false;
+      shouldHandleFirstTabRef.current = false;
+    };
+
+    window.addEventListener("focusin", onFocusIn, true);
+
+    return () => {
+      window.removeEventListener("focusin", onFocusIn, true);
+    };
+  }, [enabled, mainContentId]);
 
   useEffect(() => {
     // Capture Tab key presses before native tabbing so we can redirect only once.
