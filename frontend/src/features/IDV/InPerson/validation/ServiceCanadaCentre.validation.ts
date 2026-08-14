@@ -21,6 +21,7 @@ export interface ServiceCanadaCentreFormData {
   lastName: string;
   dateOfBirth: string;
   address: string;
+  cityTown: string;
   province: string;
   postalcode: string;
 }
