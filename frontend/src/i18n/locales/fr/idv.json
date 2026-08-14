@@ -47,6 +47,7 @@
     "dateOfBirthdayLabel": "Date de naissance",
     "addressLabel": "Adresse",
     "addressHint": "Entrez votre adresse",
+    "cityTownLabel": "Ville, village ou communauté",
     "provinceLabel": "Province/territoire",
     "postalcodeLabel": "Code postal"
   },
