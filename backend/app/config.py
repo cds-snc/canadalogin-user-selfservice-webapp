@@ -127,7 +127,7 @@ class IdvDataStoreConfig(BaseSettings):
         ),
     )
     IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES: str = Field(
-        default="idv:validations:write",
+        default="idv:auth:verified-claims",
         description=(
             "Space-separated list of idv-data-store scopes requested from the "
             "IBM Verify STS client (token exchange) when calling online "
