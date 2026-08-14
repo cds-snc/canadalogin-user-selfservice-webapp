@@ -12,6 +12,7 @@ import {
   getFormattedLocalPhoneNumber,
   getFormattedPhoneNumber,
   getInitialCountry,
+  getMaxPhoneDigitsForCountry,
   getStoredPhoneNumber,
   isPhoneNumberValidForCountry,
 } from "./utils";
@@ -239,11 +240,15 @@ function CountryPhoneInput({
 
   const onPhoneInputChange = useCallback(
     (event: CustomEvent<string>) => {
+      const maxDigits = getMaxPhoneDigitsForCountry(
+        selectedCountryIso2,
+        selectedDialCode,
+      );
       const nextLocalPhoneNumber = (
         (event.target as HTMLInputElement).value ?? ""
       )
         .replace(/\D/g, "")
-        .slice(0, MAX_PHONE_DIGITS);
+        .slice(0, maxDigits || MAX_PHONE_DIGITS);
       updatePhoneFields(
         nextLocalPhoneNumber,
         selectedCountryIso2,

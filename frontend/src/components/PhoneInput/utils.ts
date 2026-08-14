@@ -2,6 +2,7 @@ import {
   AsYouType,
   CountryCode,
   getCountryCallingCode,
+  isPossiblePhoneNumber,
   isValidPhoneNumber,
   parsePhoneNumberFromString,
 } from "libphonenumber-js";
@@ -9,6 +10,7 @@ import { countryMapping } from "../../utils/constants";
 import {
   COUNTRY_NAME_OVERRIDES,
   DEFAULT_COUNTRY_ISO2,
+  MAX_PHONE_DIGITS,
   SUPPORTED_COUNTRY_ISO2,
 } from "./constants";
 import type { CountryOption } from "./types";
@@ -94,11 +96,48 @@ export const getFormattedPhoneNumber = (
   return `+${dialCode} ${trimmed}`;
 };
 
+export const getMaxPhoneDigitsForCountry = (
+  countryIso2: string,
+  dialCode: string,
+): number => {
+  if (!countryIso2 || !dialCode) {
+    return MAX_PHONE_DIGITS;
+  }
+
+  let maxDigits = 0;
+
+  for (let length = 1; length <= MAX_PHONE_DIGITS; length++) {
+    const candidate = `+${dialCode}${"9".repeat(length)}`;
+    try {
+      if (
+        isPossiblePhoneNumber(
+          candidate,
+          countryIso2.toUpperCase() as CountryCode,
+        )
+      ) {
+        maxDigits = Math.max(maxDigits, length);
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return maxDigits || MAX_PHONE_DIGITS;
+};
+
 export const getFormattedLocalPhoneNumber = (
   localPhoneNumber: string,
   countryIso2: string,
 ): string => {
-  const digitsOnly = localPhoneNumber.replace(/\D/g, "");
+  const digitsOnly = localPhoneNumber
+    .replace(/\D/g, "")
+    .slice(
+      0,
+      getMaxPhoneDigitsForCountry(
+        countryIso2,
+        getDialCodeForCountry(countryIso2),
+      ),
+    );
   if (!digitsOnly) {
     return "";
   }
@@ -160,14 +199,27 @@ export const isPhoneNumberValidForCountry = (
   dialCode: string,
 ): boolean => {
   const digits = localPhoneNumber.replace(/\D/g, "");
-  if (!digits || !countryIso2) {
+  if (!digits || !countryIso2 || !dialCode) {
     return false;
   }
 
+  const maxDigits = getMaxPhoneDigitsForCountry(countryIso2, dialCode);
+  if (digits.length > maxDigits) {
+    return false;
+  }
+
+  const fullPhoneNumber = `+${dialCode}${digits}`;
+
   try {
-    return isValidPhoneNumber(
-      `+${dialCode}${digits}`,
-      countryIso2.toUpperCase() as CountryCode,
+    return (
+      isPossiblePhoneNumber(
+        fullPhoneNumber,
+        countryIso2.toUpperCase() as CountryCode,
+      ) &&
+      isValidPhoneNumber(
+        fullPhoneNumber,
+        countryIso2.toUpperCase() as CountryCode,
+      )
     );
   } catch {
     return false;
