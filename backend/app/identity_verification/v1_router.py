@@ -1,20 +1,31 @@
 import logging
+from typing import Optional
 
 from fastapi import APIRouter, Depends, Request, status
 from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.schemas import ResponseModel
-from app.identity_verification.schemas import StoreTargetUrlRequest
+from app.identity_verification.schemas import (
+    CreateInPersonIdentityVerificationRequest,
+    StoreTargetUrlRequest,
+)
 from app.identity_verification.services.create_identity_verification import (
     idv_mock_success_response,
     create_identity_verification,
 )
-from app.idv_data_store.services.in_person_verification import (
-    send_in_person_verification_code,
+from app.identity_verification.services.in_person_identity_verification import (
+    create_in_person_identity_verification_case,
     get_last_email_sent,
 )
 from app.identity_verification.services.redirect_target_url import (
     get_identity_verification_redirect_url,
     store_identity_verification_target_url,
+)
+from app.identity_verification.schemas import (
+    CreateOnlineIdentityVerificationRequest,
+)
+
+from app.identity_verification.services.online_identity_verification import (
+    create_online_identity_verification,
 )
 
 logger = logging.getLogger(__name__)
@@ -60,16 +71,18 @@ async def idv_mock_success(
     response_model=ResponseModel,
     status_code=status.HTTP_200_OK,
     tags=["Identity Verification"],
-    summary="Send an in-person identity verification code to the user",
-    description="Sends an email via GC Notify containing a verification code the user must present at a Service Canada Centre.",
+    summary="Create an in-person identity verification case",
+    description="Creates an in-person identity verification case in idv-data-store and returns the generated verification code metadata.",
 )
 async def send_in_person_verification(
     request: Request,
+    payload: CreateInPersonIdentityVerificationRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    return await send_in_person_verification_code(
+    return await create_in_person_identity_verification_case(
         request.app.state.request_client,
         user_access_token,
+        payload.model_dump(exclude_none=True),
     )
 
 
@@ -119,3 +132,30 @@ async def get_target_url(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await get_identity_verification_redirect_url(request)
+
+
+@router.post(
+    "/online",
+    response_model=ResponseModel,
+    status_code=status.HTTP_201_CREATED,
+    tags=["Identity Verification"],
+    summary="Create Online Identity Verification Case",
+    description="Creates an online identity verification case and returns the browser start URL.",
+)
+async def create_online_identity_verification_case(
+    request: Request,
+    payload: Optional[CreateOnlineIdentityVerificationRequest] = None,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    create_response = await create_online_identity_verification(
+        request.app.state.request_client,
+        user_access_token,
+        required_by_rp_client_id=(
+            payload.required_by_rp_client_id if payload is not None else None
+        ),
+    )
+    return ResponseModel(
+        success=True,
+        message="Online identity verification case created",
+        data=create_response.model_dump(),
+    )

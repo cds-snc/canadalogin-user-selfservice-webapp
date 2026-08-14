@@ -35,3 +35,5 @@ When making changes to the authentication flows, please update the corresponding
   [developer_guides/provincial-partner-dev-dev2-integration.md](developer_guides/provincial-partner-dev-dev2-integration.md)
 - In-person identity verification code generation sequence (frontend -> backend -> idv-data-store):
   [developer_guides/idv_in_person_verification_flow.md](developer_guides/idv_in_person_verification_flow.md)
+- Proposed central backend integration layer for idv-data-store:
+  [developer_guides/idv_data_store_integration_layer.md](developer_guides/idv_data_store_integration_layer.md)

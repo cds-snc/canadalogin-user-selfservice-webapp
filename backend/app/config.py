@@ -107,7 +107,7 @@ class IdvDataStoreConfig(BaseSettings):
     delegated-user endpoints.
     """
 
-    IDV_DATA_STORE_BASE_URL: str = "http://localhost:8100"
+    IDV_DATA_STORE_BASE_URL: str = "https://idv.dev2.login-connexion.alpha.canada.ca"
     IDV_DATA_STORE_STS_CLIENT_ID: str = ""
     IDV_DATA_STORE_STS_CLIENT_SECRET: str = ""
     IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES: str = Field(
@@ -116,6 +116,30 @@ class IdvDataStoreConfig(BaseSettings):
             "Space-separated list of idv-data-store scopes requested from the "
             "IBM Verify STS client (token exchange) when calling in-person "
             "verification endpoints."
+        ),
+    )
+    IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES: str = Field(
+        default="idv:auth:verified-claims",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from the "
+            "IBM Verify STS client (token exchange) when calling "
+            "identity-verifications endpoints."
+        ),
+    )
+    IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES: str = Field(
+        default="idv:validations:write",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from the "
+            "IBM Verify STS client (token exchange) when calling online "
+            "verification endpoints."
+        ),
+    )
+    IDV_DATA_STORE_AUTH_USERINFO_SCOPES: str = Field(
+        default="idv:auth:userinfo",
+        description=(
+            "Space-separated list of idv-data-store scopes requested from the "
+            "IBM Verify STS client (token exchange) when fetching delegated "
+            "userinfo claims."
         ),
     )
     model_config = SettingsConfigDict(
@@ -203,16 +227,30 @@ class Configuration(BaseSettings):
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
 
     @property
-    def idv_data_store_in_person_verification_send_endpoint(self) -> str:
-        """idv-data-store's endpoint for generating and sending an in-person
-        verification code email for an already-exchanged access_token."""
-        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/in-person-verification/send"
+    def idv_data_store_identity_verification_in_person_endpoint(self) -> str:
+        """idv-data-store's endpoint for creating an in-person identity
+        verification case for an already-exchanged access_token."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/identity-verifications/in-person"
 
     @property
     def idv_data_store_in_person_verification_last_email_endpoint(self) -> str:
         """idv-data-store's endpoint for retrieving the last in-person
         verification email sent timestamp for an already-exchanged access_token."""
         return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/in-person-verification/last-email-sent"
+
+    @property
+    def idv_data_store_online_verification_endpoint(self) -> str:
+        """idv-data-store's endpoint for creating an online identity verification case."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/identity-verifications/online"
+
+    def idv_data_store_online_session_endpoint(self, case_id: str) -> str:
+        """idv-data-store's endpoint for reissuing an online verification session URL."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/identity-verifications/{case_id}/online-session"
+
+    @property
+    def idv_data_store_userinfo_endpoint(self) -> str:
+        """idv-data-store's endpoint for fetching delegated userinfo for an exchanged access token."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/auth/userinfo"
 
 
 @lru_cache

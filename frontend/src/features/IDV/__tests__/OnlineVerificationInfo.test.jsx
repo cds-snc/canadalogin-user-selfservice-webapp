@@ -8,7 +8,7 @@ import OnlineVerificationInfo from "../Online/OnlineVerificationInfo";
 // ────────────────────────────────────────────────
 const mockNavigate = vi.fn();
 const mockDispatch = vi.fn();
-const mockGetOnlineIdentityVerificationMockResponse = vi.hoisted(() => vi.fn());
+const mockPostOnlineIdentityVerification = vi.hoisted(() => vi.fn());
 let mockDevOnlyFeature = true;
 
 vi.mock("react-router", async () => {
@@ -64,8 +64,7 @@ vi.mock("../api/identityVerificationApi", async () => {
   return {
     ...actual,
     identityVerificationApi: {
-      getOnlineIdentityVerificationMockResponse:
-        mockGetOnlineIdentityVerificationMockResponse,
+      postOnlineIdentityVerification: mockPostOnlineIdentityVerification,
     },
   };
 });
@@ -117,24 +116,10 @@ describe("OnlineVerificationInfo", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
-    mockGetOnlineIdentityVerificationMockResponse.mockResolvedValue({
-      success: true,
-      message: "ok",
-      data: {
-        verification_id: "verification-123",
-        verification_status: "success",
-        verification_method: "online",
-        claims: {
-          given_name: "Jane",
-          family_name: "Doe",
-          name: "Jane Doe",
-          email: "jane@example.com",
-          birthdate: "1990-05-15",
-          address: {
-            formatted: "123 Main Street, Ottawa, ON K1A 0B1, Canada",
-          },
-        },
-      },
+    mockPostOnlineIdentityVerification.mockResolvedValue({
+      case_id: "verification-123",
+      status: "in_progress",
+      online_verification_url: undefined,
     });
   });
 
@@ -227,30 +212,14 @@ describe("OnlineVerificationInfo", () => {
     expect(mockNavigate).toHaveBeenCalledTimes(1);
   });
 
-  it("stores verified claims and navigates when Continue button is clicked", async () => {
+  it("calls online verification API when Continue button is clicked", async () => {
     render(<OnlineVerificationInfo />);
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
     await waitFor(() => {
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: "UPDATE_PROFILE_SUCCESS",
-        payload: expect.objectContaining({
-          verifiedClaims: {
-            verificationId: "verification-123",
-            verificationStatus: "success",
-            verificationMethod: "online",
-            claims: expect.objectContaining({
-              birthdate: "1990-05-15",
-            }),
-          },
-        }),
-      });
+      expect(mockPostOnlineIdentityVerification).toHaveBeenCalledTimes(1);
     });
-
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/update/details-confirmation",
-    );
   });
 
   it("renders the more information notice", () => {

@@ -25,7 +25,6 @@ type ProofingBarcodeCanadaPostState = {
   givenName?: string;
   lastName?: string;
   dateOfBirth?: string;
-  address?: string;
   idSelected?: string;
   acceptableIds?: string[];
 };
@@ -57,7 +56,6 @@ export default function ProofingBarcodeCanadaPostPage() {
   const givenName = locationState?.givenName?.trim() || "--";
   const lastName = locationState?.lastName?.trim() || "--";
   const dateOfBirth = locationState?.dateOfBirth?.trim() || "--";
-  const address = locationState?.address?.trim() || "--";
   const rawIdSelected = locationState?.idSelected?.trim() || "";
   const idSelected = rawIdSelected
     ? isApprovedDocumentValue(rawIdSelected)
@@ -95,7 +93,11 @@ export default function ProofingBarcodeCanadaPostPage() {
             {t("ProofingBarcodeCanadaPost.codeValidDays")}{" "}
             <strong>{email}</strong>
           </GcdsText>
-          <GcdsText>{t("ProofingBarcodeCanadaPost.visitInstruction")}</GcdsText>
+          <GcdsText>
+            {t("ProofingBarcodeCanadaPost.visitInstruction", {
+              validityDate: t("ProofingBarcodeCanadaPost.codeValidityDate"),
+            })}
+          </GcdsText>
         </GcdsContainer>
 
         <AcceptableIdsDetails
@@ -138,17 +140,6 @@ export default function ProofingBarcodeCanadaPostPage() {
                 </GcdsText>
                 <GcdsText marginTop="200" marginBottom="0">
                   {dateOfBirth}
-                </GcdsText>
-              </div>
-
-              <div className="separator" style={{ margin: "0" }} />
-
-              <div>
-                <GcdsText marginTop="0" marginBottom="0">
-                  <strong>{t("ProofingBarcodeCanadaPost.address")}</strong>
-                </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {address}
                 </GcdsText>
               </div>
 

@@ -1,6 +1,6 @@
 import pytest
 from fastapi import HTTPException
-from httpx import HTTPStatusError, Request, Response
+from httpx import HTTPStatusError, Request, RequestError, Response
 from pydantic import BaseModel, ValidationError
 from authlib.integrations.starlette_client import OAuthError
 from httpx import TimeoutException
@@ -102,6 +102,16 @@ def test_handle_timeout_exception():
         RequestErrorHandler.handle(exc, context="timeout test")
     assert e.value.status_code == 504
     assert "timeout test timed out" in e.value.detail
+
+
+def test_handle_request_error():
+    exc = RequestError(
+        "connection failed", request=Request("POST", "https://example.test/upstream")
+    )
+    with pytest.raises(HTTPException) as e:
+        RequestErrorHandler.handle(exc, context="upstream request test")
+    assert e.value.status_code == 502
+    assert "upstream request test failed" in e.value.detail
 
 
 def test_handle_unexpected_exception():

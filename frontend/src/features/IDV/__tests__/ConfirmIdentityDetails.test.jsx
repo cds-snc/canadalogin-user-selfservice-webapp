@@ -9,8 +9,6 @@ let mockDevOnlyFeature = true;
 let mockJourneyType;
 let mockUserState = {
   userProfile: {
-    userName: "test@example.com",
-    phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
     name: {
       formatted: "Jane Doe",
     },
@@ -120,8 +118,6 @@ describe("ConfirmIdentityDetails", () => {
     });
     mockUserState = {
       userProfile: {
-        userName: "test@example.com",
-        phoneNumbers: [{ value: "+16135551234", type: "mobile" }],
         name: {
           formatted: "Jane Doe",
         },
@@ -152,45 +148,15 @@ describe("ConfirmIdentityDetails", () => {
         name: "Confirm what will be saved to your CanadaLogin",
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Contact information" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Communication" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("This name is used for display purposes only"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("This email is used for signing in and contacting you:"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "This number is used for 2-step verification and contacting you:",
-      ),
-    ).toBeInTheDocument();
   });
 
-  it("shows verified badges when name, email, and phone exist", () => {
+  it("shows verified badge", () => {
     render(<ConfirmIdentityDetails />);
 
-    expect(screen.getAllByTestId("verified-badge")).toHaveLength(2);
-  });
-
-  it("shows verified badge only for existing values", () => {
-    mockUserState = {
-      userProfile: {
-        userName: "",
-        phoneNumbers: [],
-        name: {
-          formatted: "Jane Doe",
-        },
-      },
-    };
-
-    render(<ConfirmIdentityDetails />);
-
-    expect(screen.getAllByTestId("verified-badge")).toHaveLength(1);
+    const badges = screen.getAllByTestId("verified-badge");
+    expect(
+      badges.some((b) => b.textContent === "Proven January 27, 2026"),
+    ).toBe(true);
   });
 
   it("shows the existing RP success notice when RP details are available", () => {

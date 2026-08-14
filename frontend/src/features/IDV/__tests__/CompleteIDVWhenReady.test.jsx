@@ -135,7 +135,7 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByRole("heading", {
-          name: "Prove your identity when you’re ready",
+          name: "Localized RP needs you to prove your identity",
         }),
       ).toBeInTheDocument();
     });
@@ -144,6 +144,12 @@ describe("CompleteIdentityProofingPage", () => {
   describe("RP name resolution", () => {
     it("uses localized RP name when available", () => {
       setup();
+
+      expect(
+        screen.getByRole("heading", {
+          name: "Localized RP needs you to prove your identity",
+        }),
+      ).toBeInTheDocument();
 
       expect(
         screen.getByText(
@@ -175,6 +181,12 @@ describe("CompleteIdentityProofingPage", () => {
         dispatch: vi.fn(),
         state: { relyingPartyInfo: { localized: {} } },
       });
+
+      expect(
+        screen.getByRole("heading", {
+          name: "Prove your identity",
+        }),
+      ).toBeInTheDocument();
 
       expect(
         screen.queryByText(
