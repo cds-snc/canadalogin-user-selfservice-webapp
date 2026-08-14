@@ -95,25 +95,16 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-}));
-
-// Mock react-phone-input-2
-vi.mock("react-phone-input-2", () => ({
-  default: ({ inputProps, specialLabel, value, className, onChange }) => (
-    <div data-testid="phone-input-container">
-      <label htmlFor="phone-input">{specialLabel}</label>
+  GcdsInput: ({ inputId, id, name, label, value, onGcdsInput, onKeyDown }) => (
+    <div data-testid="gcds-input-wrap">
+      <label htmlFor={inputId || id}>{label}</label>
       <input
-        {...inputProps}
-        id="phone-input"
+        id={inputId || id}
+        name={name}
+        value={value ?? ""}
         data-testid="phone-input"
-        value={value}
-        onChange={(e) => {
-          const phone = e.target.value.replace("+", "");
-          const country = { countryCode: "CA", iso2: "ca" };
-          const formatted = e.target.value;
-          onChange(phone, country, e, formatted);
-        }}
-        className={className}
+        onChange={(e) => onGcdsInput?.({ target: e.target })}
+        onKeyDown={onKeyDown}
       />
     </div>
   ),
@@ -121,10 +112,16 @@ vi.mock("react-phone-input-2", () => ({
 
 // Mock libphonenumber-js
 vi.mock("libphonenumber-js", () => ({
-  isValidPhoneNumber: vi.fn((number) => {
-    // Mock validation - return true for valid-looking phone numbers
-    return number && number.length >= 10;
-  }),
+  isValidPhoneNumber: vi.fn((number) => number && number.length >= 10),
+  parsePhoneNumberFromString: vi.fn(() => null),
+  AsYouType: class {
+    input(digits) {
+      return digits;
+    }
+  },
+  getCountryCallingCode: vi.fn(
+    (code) => ({ CA: "1", US: "1", GB: "44" })[code] ?? "1",
+  ),
 }));
 
 // Mock react-router
@@ -145,12 +142,12 @@ vi.mock("../../../utils/constants", async () => {
     countryMapping: {
       countries: ["ca", "us"],
       localization: {
-        "United States": "United States",
-        Canada: "Canada",
+        ca: "Canada",
+        us: "United States",
       },
       frLocalization: {
-        "United States": "États-Unis",
-        Canada: "Canada",
+        ca: "Canada",
+        us: "États-Unis",
       },
     },
   };
@@ -272,7 +269,7 @@ describe("EnterPhoneNumber Component", () => {
     );
     expect(mockOnChangePhoneForm).toHaveBeenCalledWith(
       "formattedPhoneNumber",
-      "+15551234567",
+      "+1 15551234567",
     );
   });
 

@@ -9,6 +9,7 @@
     "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
     "gcAccountDirectory": "répertoire des comptes GC",
     "countryLabel": "Pays",
+    "countrySearchLabel": "Recherchez votre pays",
     "phoneLabel": "Numéro de téléphone",
     "countryNotListed": "Mon pays n'apparaît pas dans la liste",
     "countryNotSupported": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n'apparaît pas dans la liste, vous ne pouvez pas créer d'identifiant ConnexionCanada à l'heure actuelle. Nous nous excusons des désagréments que cela pourrait causer.",

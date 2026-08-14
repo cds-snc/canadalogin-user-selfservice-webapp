@@ -9,13 +9,9 @@ import {
   GcdsRadios,
   GcdsText,
 } from "@gcds-core/components-react";
-import { isValidPhoneNumber, CountryCode } from "libphonenumber-js";
-import { useEffect, useState } from "react";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/material.css";
+import { useState } from "react";
 import { useParams } from "react-router";
 import {
-  countryMapping,
   EXTERNAL_NAVIGATION_LINKS,
   FLOW_TYPES,
   PAGES,
@@ -23,65 +19,10 @@ import {
 import { useTranslation } from "react-i18next";
 import { path } from "../../../../utils/routeHelpers";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
-import type { ReactElement } from "react";
 import {
-  getDisplayedPhoneNumber,
-  getStoredPhoneNumber,
-} from "../../../../utils/mfaPhoneNumber";
-
-type PhoneInputCountryData = {
-  countryCode?: string;
-  dialCode?: string;
-  iso2?: string;
-};
-
-type PhoneInputChangeEvent = Event | React.ChangeEvent<HTMLInputElement>;
-
-interface TypedPhoneInputProps {
-  inputProps?: Record<string, unknown>;
-  specialLabel?: string;
-  country?: string;
-  preferredCountries?: string[];
-  onlyCountries?: string[];
-  className?: string;
-  localization?: Record<string, string>;
-  value?: string;
-  placeholder?: string;
-  enableSearch?: boolean;
-  disableCountryCode?: boolean;
-  disableCountryGuess?: boolean;
-  countryCodeEditable?: boolean;
-  disableSearchIcon?: boolean;
-  defaultErrorMessage?: string;
-  onChange?: (
-    phone: string,
-    country: PhoneInputCountryData,
-    event: PhoneInputChangeEvent,
-    formattedValue: string,
-  ) => void;
-  isValid?: (inputNumber: string, country: PhoneInputCountryData) => boolean;
-}
-
-const TypedPhoneInput = PhoneInput as unknown as (
-  props: TypedPhoneInputProps,
-) => ReactElement;
-
-const getFormattedPhoneNumber = (
-  formattedPhoneNumber: string,
-  dialCode: string,
-) => {
-  const trimmedFormattedPhoneNumber = formattedPhoneNumber.trim();
-
-  if (!trimmedFormattedPhoneNumber) {
-    return "";
-  }
-
-  if (trimmedFormattedPhoneNumber.startsWith("+")) {
-    return trimmedFormattedPhoneNumber;
-  }
-
-  return `+${dialCode} ${trimmedFormattedPhoneNumber}`;
-};
+  CountryPhoneInput,
+  type PhoneInputChangePayload,
+} from "../../../../components/PhoneInput";
 
 interface PhoneFormData {
   phoneNumber: string;
@@ -110,34 +51,23 @@ const RadioButtons = ({
   phoneFormData,
 }: RadioButtonsProps) => {
   const { t } = useTranslation("mfa");
-  // Set up radio buttons
-  const configureRadioOptions = (): RadioOption[] => {
-    const radioOptionsValues: RadioOption[] = [];
-
-    const smsLabel = `${t("AddMFANumber.textMessage")}`;
-    const smsOtpRadioOption: RadioOption = {
-      label: smsLabel,
+  const radioOptions: RadioOption[] = [
+    {
+      label: t("AddMFANumber.textMessage"),
       id: `sms-radio-${FLOW_TYPES.sms}`,
       value: FLOW_TYPES.sms,
       hint: t("AddMFANumber.textMessageHint"),
       checked: phoneFormData.otpType === FLOW_TYPES.sms,
-    };
-    radioOptionsValues.push(smsOtpRadioOption);
-
-    const voiceLabel = `${t("AddMFANumber.voiceCall")}`;
-    const voiceOtpRadioOption: RadioOption = {
-      label: voiceLabel,
+    },
+    {
+      label: t("AddMFANumber.voiceCall"),
       id: `voice-radio-${FLOW_TYPES.voice}`,
       value: FLOW_TYPES.voice,
       hint: t("AddMFANumber.voiceCallHint"),
       checked: phoneFormData.otpType === FLOW_TYPES.voice,
-    };
-    radioOptionsValues.push(voiceOtpRadioOption);
+    },
+  ];
 
-    return radioOptionsValues;
-  };
-
-  const radioOptions = configureRadioOptions();
   return (
     <GcdsRadios
       name="radio"
@@ -152,9 +82,7 @@ const RadioButtons = ({
   );
 };
 
-interface MyCountryIsNotListedProps {}
-
-const MyCountryIsNotListed = ({}: MyCountryIsNotListedProps) => {
+const MyCountryIsNotListed = () => {
   const { t } = useTranslation("mfa");
   return (
     <GcdsText>
@@ -186,22 +114,12 @@ export default function AddMFAPhoneNumber({
 }: AddMFAPhoneNumberProps) {
   const { language } = useParams();
   const [phoneNumberValid, setPhoneNumberValid] = useState(true);
-  const [selectedDialCode, setSelectedDialCode] = useState("1");
-  const [displayedPhoneNumber, setDisplayedPhoneNumber] = useState(() =>
-    getDisplayedPhoneNumber(phoneFormData.phoneNumber, "1"),
-  );
   const { t } = useTranslation(["mfa", "common"]);
   const backtoProfilePage = path(PAGES.ProfileHome, { language: language });
   const privacyNoticeHref =
     language === "fr"
       ? `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/confidentialite/`
       : `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/privacy/`;
-
-  const isPhoneNumberValid = (phoneNumber: string, country: string) => {
-    const capitalize = country.toUpperCase() as CountryCode;
-    const validatedPhoneNumber = isValidPhoneNumber(phoneNumber, capitalize);
-    return validatedPhoneNumber;
-  };
 
   const doSubmit = async () => {
     try {
@@ -223,57 +141,16 @@ export default function AddMFAPhoneNumber({
     void doSubmit();
   };
 
-  const submitFromInputEnter: React.KeyboardEventHandler<HTMLInputElement> = (
-    ev,
-  ) => {
-    if (ev.key !== "Enter") {
-      return;
-    }
-
-    ev.preventDefault();
-    if (!phoneNumberValid || !phoneFormData.phoneNumber) {
-      return;
-    }
-    void doSubmit();
+  const onPhoneDataChange = ({
+    storedPhoneNumber,
+    formattedPhoneNumber,
+    isValid,
+  }: PhoneInputChangePayload) => {
+    onChangePhoneForm("phoneNumber", storedPhoneNumber);
+    onChangePhoneForm("formattedPhoneNumber", formattedPhoneNumber);
+    setPhoneNumberValid(isValid);
+    setErrorCode("");
   };
-
-  useEffect(() => {
-    setDisplayedPhoneNumber(
-      getDisplayedPhoneNumber(phoneFormData.phoneNumber, selectedDialCode),
-    );
-  }, [phoneFormData.phoneNumber, selectedDialCode]);
-
-  useEffect(() => {
-    const addAccessibilityAttributes = () => {
-      const countryList = document.querySelector(
-        '.country-list[role="listbox"]',
-      );
-
-      if (countryList && !countryList.getAttribute("aria-label")) {
-        countryList.setAttribute(
-          "aria-label",
-          t("AddMFANumber.countryListAriaLabel"),
-        );
-      }
-    };
-
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (mutation.type === "childList") {
-          addAccessibilityAttributes();
-        }
-      }
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    addAccessibilityAttributes();
-
-    return () => observer.disconnect();
-  }, [t]);
 
   return (
     <GcdsContainer role="main">
@@ -306,95 +183,21 @@ export default function AddMFAPhoneNumber({
             </GcdsErrorMessage>
           )}
           <form onSubmit={onSubmitHandler}>
-            <div
-              className="mfa-phone-input"
-              data-country-search-label={t("AddMFANumber.countrySearchLabel")}
-            >
-              <div className="mfa-phone-input__labels" aria-hidden="true">
-                <span className="mfa-phone-input__label mfa-phone-input__label--country">
-                  {t("AddMFANumber.countryLabel")}
-                </span>
-                <span className="mfa-phone-input__label">
-                  {t("AddMFANumber.phoneLabel")}
-                </span>
-              </div>
-
-              <div
-                className="mfa-phone-input__control-wrap"
-                data-country-dial-code={`+${selectedDialCode}`}
-              >
-                <TypedPhoneInput
-                  inputProps={{
-                    name: "phone",
-                    required: true,
-                    autoFocus: true,
-                    "aria-label": t("AddMFANumber.phoneLabel"),
-                    onKeyDown: submitFromInputEnter,
-                  }}
-                  specialLabel={t("AddMFANumber.phoneLabel")}
-                  country={"ca"}
-                  preferredCountries={["ca"]}
-                  onlyCountries={
-                    countryMapping.countries as unknown as string[]
-                  }
-                  className="high-res mfa-phone-input__control"
-                  localization={
-                    language === "fr"
-                      ? countryMapping.frLocalization
-                      : countryMapping.localization
-                  }
-                  value={displayedPhoneNumber}
-                  placeholder=""
-                  enableSearch={true}
-                  disableCountryCode={true}
-                  disableCountryGuess={true}
-                  countryCodeEditable={true}
-                  disableSearchIcon={false}
-                  onChange={(
-                    phone: string,
-                    country: {
-                      countryCode?: string;
-                      dialCode?: string;
-                      iso2?: string;
-                    },
-                    _event: PhoneInputChangeEvent,
-                    formatted: string,
-                  ) => {
-                    const dialCode = country.dialCode ?? selectedDialCode;
-                    const storedPhoneNumber = getStoredPhoneNumber(
-                      phone,
-                      dialCode,
-                    );
-                    const nextDisplayedPhoneNumber = getDisplayedPhoneNumber(
-                      storedPhoneNumber,
-                      dialCode,
-                    );
-
-                    setSelectedDialCode(dialCode);
-                    setDisplayedPhoneNumber(nextDisplayedPhoneNumber);
-                    onChangePhoneForm("phoneNumber", storedPhoneNumber);
-                    onChangePhoneForm(
-                      "formattedPhoneNumber",
-                      storedPhoneNumber
-                        ? getFormattedPhoneNumber(formatted, dialCode)
-                        : "",
-                    );
-                    const isNumberValid = isPhoneNumberValid(
-                      phone,
-                      country.countryCode ?? "",
-                    );
-                    setPhoneNumberValid(isNumberValid);
-                    setErrorCode("");
-                  }}
-                  isValid={(
-                    inputNumber: string,
-                    country: { iso2?: string },
-                  ) => {
-                    return isPhoneNumberValid(inputNumber, country.iso2 ?? "");
-                  }}
-                />
-              </div>
-            </div>
+            <CountryPhoneInput
+              language={language}
+              storedPhoneNumber={phoneFormData.phoneNumber}
+              variant="mfa"
+              optionIdPrefix="mfa"
+              inputId="mfa-phone-number"
+              inputName="phone"
+              labels={{
+                country: t("AddMFANumber.countryLabel"),
+                countrySearch: t("AddMFANumber.countrySearchLabel"),
+                countryNotSupported: t("AddMFANumber.countryNotSupported"),
+                phone: t("AddMFANumber.phoneLabel"),
+              }}
+              onChange={onPhoneDataChange}
+            />
           </form>
         </section>
 
