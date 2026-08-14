@@ -349,39 +349,39 @@ export default function ServiceCanadaCentrePage() {
                 )}
               </>
             )}
-
-            <GcdsGrid
-              columns="1"
-              columnsDesktop="max-content max-content"
-              gap="200"
-            >
-              <GcdsButton type="button" onClick={onContinue}>
-                {t("ServiceCanadaCentre.continueButton")}
-              </GcdsButton>
-              <GcdsButton
-                type="button"
-                buttonRole="secondary"
-                onClick={() => {
-                  navigate(-1);
-                }}
-              >
-                {t("ServiceCanadaCentre.chooseDifferentMethodButton")}
-              </GcdsButton>
-            </GcdsGrid>
-
-            <GcdsNotice
-              noticeRole="info"
-              noticeTitleTag="h2"
-              noticeTitle={t("ServiceCanadaCentre.moreInfoTitle")}
-            >
-              {
-                //TODO: populate with real URL once available
-              }
-              <GcdsLink href={"#"} external={true}>
-                {t("ServiceCanadaCentre.learnMoreLink")}
-              </GcdsLink>
-            </GcdsNotice>
           </GcdsFieldset>
+
+          <GcdsGrid
+            columns="1"
+            columnsDesktop="max-content max-content"
+            gap="200"
+          >
+            <GcdsButton type="button" onClick={onContinue}>
+              {t("ServiceCanadaCentre.continueButton")}
+            </GcdsButton>
+            <GcdsButton
+              type="button"
+              buttonRole="secondary"
+              onClick={() => {
+                navigate(-1);
+              }}
+            >
+              {t("ServiceCanadaCentre.chooseDifferentMethodButton")}
+            </GcdsButton>
+          </GcdsGrid>
+
+          <GcdsNotice
+            noticeRole="info"
+            noticeTitleTag="h2"
+            noticeTitle={t("ServiceCanadaCentre.moreInfoTitle")}
+          >
+            {
+              //TODO: populate with real URL once available
+            }
+            <GcdsLink href={"#"} external={true}>
+              {t("ServiceCanadaCentre.learnMoreLink")}
+            </GcdsLink>
+          </GcdsNotice>
         </GcdsGrid>
       </form>
     </GcdsContainer>
