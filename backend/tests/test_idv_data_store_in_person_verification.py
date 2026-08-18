@@ -15,7 +15,7 @@ create_in_person_identity_verification_case = (
 get_last_email_sent = identity_verification_module.get_last_email_sent
 
 base_module = importlib.import_module(
-    "app.idv_data_store.services.base_idv_data_store_service"
+    "app.identity_verification.services.base_idv_data_store_service"
 )
 
 MOCK_CONFIGURATION = MagicMock()

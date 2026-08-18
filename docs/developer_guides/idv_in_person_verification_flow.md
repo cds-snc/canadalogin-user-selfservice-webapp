@@ -111,7 +111,9 @@ sequenceDiagram
 - Frontend API client: `frontend/src/features/IDV/api/inPersonIdentityVerificationApi.ts`
 - Frontend Service Canada page: `frontend/src/features/IDV/InPerson/ServiceCanadaCentrePage.tsx`
 - Backend route: `backend/app/identity_verification/v1_router.py`
-- Backend idv-data-store integration: `backend/app/idv_data_store/services/in_person_verification.py`
+- Backend in-person service: `backend/app/identity_verification/services/in_person_identity_verification.py`
+- Backend base data store service: `backend/app/identity_verification/services/base_idv_data_store_service.py`
+- Backend token exchange: `backend/app/identity_verification/services/token_exchange.py`
 - idv-data-store route: `app/in_person_verification/router.py`
 - idv-data-store service: `app/in_person_verification/services/send_in_person_verification_code.py`
 - idv-data-store auth dependency: `app/security/auth.py`

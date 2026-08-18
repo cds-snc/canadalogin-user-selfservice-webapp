@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from httpx import AsyncClient, Response
 
-from app.idv_data_store.services.token_exchange import (
+from app.identity_verification.services.token_exchange import (
     exchange_token_for_idv_data_store,
 )
 from app.utils.request_error_handler import RequestErrorHandler

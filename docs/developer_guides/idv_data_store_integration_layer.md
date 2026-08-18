@@ -1,355 +1,118 @@
-# IDV Data Store Integration Layer Proposal
+# IDV Data Store Integration Layer
 
-This document proposes a central integration layer for all communication from the selfservice backend to idv-data-store.
+This document describes the integration layer for all communication from the selfservice backend to idv-data-store.
 
-The goal is to give backend developers a single, predictable API for delegated-user IDV operations while keeping token exchange, scope selection, endpoint resolution, and HTTP error handling in one place.
+## Current Module Structure
 
-## Goals
+All idv-data-store integration code lives under `backend/app/identity_verification/`:
 
-- Centralize all idv-data-store communication behind one backend-facing service.
-- Hide IBM Verify token exchange from feature modules.
-- Give developers a stable API shaped like:
-  - `service.create_identity_verification_case(payload)`
-  - `service.claims().get()`
-- Keep request-scoped dependencies explicit.
-- Reduce duplicated plumbing across online, claims, and in-person IDV flows.
+```
+identity_verification/
+  __init__.py
+  schemas.py                            # Pydantic request/response models
+  v1_router.py                          # FastAPI routes
+  services/
+    token_exchange.py                   # RFC 8693 token exchange against IBM Verify
+    base_idv_data_store_service.py      # Shared HTTP transport base class
+    in_person_identity_verification.py  # InPersonIdentityVerificationClient
+    online_identity_verification.py     # OnlineIdentityVerificationClient
+    create_identity_verification.py     # Bluink-specific flow (NOT idv-data-store)
+    redirect_target_url.py              # Redis-backed RP target URL storage
+```
 
-## Proposed Backend API
+`create_identity_verification.py` and `redirect_target_url.py` are **not** part of the idv-data-store integration:
+- `create_identity_verification.py` — Bluink pre-registration API (separate third party)
+- `redirect_target_url.py` — Redis session storage for post-IDV redirect URL
 
-The recommended usage is a request-scoped service instance:
+## Current Classes
+
+### `BaseIdvDataStoreService` (`services/base_idv_data_store_service.py`)
+
+Shared base class for all idv-data-store operations. Provides:
+
+- `_get(endpoint, *, scope, context)` / `_post(endpoint, *, scope, context, payload, include_idempotency_key)`
+- `_request(...)` — exchanges the user token via `exchange_token_for_idv_data_store`, builds headers (`Authorization`, `Accept`, optional `Idempotency-Key`), dispatches the request
+- `_dispatch_request(...)` — handles localhost TLS bypass, delegates to the shared `AsyncClient`
+
+Every outbound call performs a fresh token exchange. No tokens are cached or reused across operations.
+
+### `InPersonIdentityVerificationClient(BaseIdvDataStoreService)` (`services/in_person_identity_verification.py`)
+
+| Method | Endpoint | Scope config key | Returns |
+| --- | --- | --- | --- |
+| `send_code(payload)` | `POST /v1/identity-verifications/in-person` | `IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES` | `ResponseModel` |
+| `get_last_email_sent()` | `POST /v1/in-person-verification/last-email-sent` | `IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES` | `ResponseModel` |
+
+`send_code` defaults `verification_provider` to `"service_canada"` if not provided. Response data shape:
+```python
+{
+    "verification_code": body.get("verification_code_display"),
+    "case_id": body.get("case_id"),
+    "status": body.get("status"),
+    "verification_expires_at": body.get("expires_at"),
+}
+```
+
+Module-level functions `create_in_person_identity_verification_case` and `get_last_email_sent` instantiate the client and delegate to it. These are what the router calls:
 
 ```python
-identity_data_service = IdentityDataService(
-    http_client=request.app.state.request_client,
-    user_access_token=user_access_token,
+settings = get_configuration()
+operation = InPersonIdentityVerificationClient(
+    global_http_client,
+    user_access_token,
+    settings=settings,
 )
-
-case = await identity_data_service.create_identity_verification_case(
-    service_canada_payload
-)
-
-claims = await identity_data_service.claims().get()
+return await operation.send_code(payload)
 ```
 
-This is preferred over a static API such as `IdentityDataService.create_identity_verification_case(...)` because every call depends on two runtime values:
+### `OnlineIdentityVerificationClient(BaseIdvDataStoreService)` (`services/online_identity_verification.py`)
 
-- the shared `AsyncClient`
-- the authenticated user's access token
+| Method | Endpoint | Scope config key | Returns |
+| --- | --- | --- | --- |
+| `create_case(payload)` | `POST /v1/identity-verifications/online` | `IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES` | `CreateIdentityVerificationResponse` |
+| `reissue_session(case_id)` | `POST /v1/identity-verifications/{case_id}/online-session` | `IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES` | `ReissueOnlineSessionResponse` |
 
-Those values only exist at request time, so the service should be instantiated per request or provided through a FastAPI dependency.
+`create_case` handles a `409 open_case_exists` conflict by automatically calling `reissue_session` for the existing case. Both methods resolve relative `online_verification_url` values against `IDV_DATA_STORE_BASE_URL` before returning.
 
-## Why a Central Integration Layer
+Unlike in-person, online operations return typed domain objects — the router wraps them in `ResponseModel`.
 
-Today, the backend's idv-data-store plumbing is spread across multiple modules:
+### `token_exchange.py`
 
-- token exchange logic
-- scope selection
-- endpoint resolution
-- request header construction
-- response parsing
-- upstream error mapping
+`exchange_token_for_idv_data_store(http_client, user_access_token, scope)` performs RFC 8693 OAuth 2.0 Token Exchange against IBM Verify using `IDV_DATA_STORE_STS_CLIENT_ID` / `IDV_DATA_STORE_STS_CLIENT_SECRET`. Returns a narrowly-scoped delegated access token sent as `Authorization: Bearer` to idv-data-store.
 
-That distribution makes the integration harder to extend and easier to misuse. A feature module should not need to know:
+Called exclusively by `BaseIdvDataStoreService._request`. Feature modules must not call it directly.
 
-- which delegated scope to request
-- how to exchange the user's token
-- which endpoint path to call
-- which headers or idempotency values to send
+## Schemas (`schemas.py`)
 
-The integration layer should own all of that.
-
-## Design Overview
-
-The proposed design has three layers:
-
-1. `IdentityDataService` facade
-2. shared transport and authentication logic
-3. grouped operation namespaces such as claims, online, and in-person
-
-Conceptually:
-
-```text
-router/service module
-  -> IdentityDataService
-    -> scoped token exchange
-    -> shared HTTP request helper
-    -> idv-data-store endpoint
-```
-
-## Proposed Service Shape
-
-```python
-class IdentityDataService:
-    def __init__(self, http_client: AsyncClient, user_access_token: str):
-        ...
-
-    async def create_identity_verification_case(
-        self,
-        payload: CreateIdentityVerificationCaseRequest,
-    ) -> CreateIdentityVerificationResponse:
-        ...
-
-    def claims(self) -> "ClaimsOperations":
-        ...
-
-    def in_person(self) -> "InPersonOperations":
-        ...
-
-    def online(self) -> "OnlineOperations":
-        ...
-
-
-class ClaimsOperations:
-    async def get(self) -> ClaimsResponse:
-        ...
-
-
-class InPersonOperations:
-    async def send_code(self) -> InPersonVerificationResponse:
-        ...
-
-    async def get_last_email_sent(self) -> LastEmailSentResponse:
-        ...
-
-
-class OnlineOperations:
-    async def reissue_session(self, case_id: str) -> ReissueOnlineSessionResponse:
-        ...
-```
-
-The grouped operation objects are lightweight namespaces. They should delegate back to shared transport methods on the parent service rather than implement separate authentication flows.
-
-The dispatch helper should live on the parent integration service, not inside an
-operation namespace. In other words, the design should follow a parent-owned
-dispatch shape rather than an `in_person._dispatch(...)` shape.
-
-## Authentication and Token Exchange
-
-Token exchange should be handled only inside the integration layer.
-
-A new token exchange should happen for every outbound idv-data-store call. The
-integration layer should not reuse or cache exchanged tokens across operations,
-even within the same request.
-
-The sequence is:
-
-1. Receive the signed-in user's IBM Verify access token.
-2. Exchange it through IBM Verify's RFC 8693 token exchange flow for the
-    specific operation being invoked.
-3. Request only the scope needed for the target idv-data-store endpoint.
-4. Send the exchanged delegated token to idv-data-store as `Authorization: Bearer <token>`.
-
-Feature modules should never call token exchange directly.
-
-## Scope Ownership
-
-The integration layer should decide which scope to use for each operation.
-
-Available idv-data-store scopes:
-
-| Scope | Description |
+| Model | Purpose |
 | --- | --- |
-| `idv:validations:write` | Submit new identity validations. |
-| `idv:validations:read` | Read identity validation records. |
-| `idv:validations:update` | Update elements of identity validations. |
-| `idv:validations:delete` | Delete or revoke identity validations. |
-| `idv:claims:query` | Execute OIDC4IDA-compliant claims queries. |
-| `idv:auth:userinfo` | Fetch userinfo claims for an already-exchanged access token. |
-| `idv:admin` | Administrative operations such as registry management and audit log access. |
+| `CreateInPersonIdentityVerificationRequest` | Router body for `POST /in-person` |
+| `InPersonApplicantRequest` / `InPersonApplicantAddressRequest` | Nested applicant fields |
+| `CreateOnlineIdentityVerificationRequest` | Router body for `POST /online` |
+| `CreateIdentityVerificationResponse` | Typed response from `OnlineIdentityVerificationClient.create_case` |
+| `ReissueOnlineSessionResponse` | Typed response from `OnlineIdentityVerificationClient.reissue_session` |
+| `CaseStatus` | Enum: `pending`, `in_progress`, `verified`, `failed`, `cancelled` |
+| `StoreTargetUrlRequest` | Router body for `POST /target-url` |
 
-Recommended mapping is per operation, not one broad scope per feature area.
+## Active Scopes and Config Keys
 
-Examples:
+Scopes are configured in `IdvDataStoreConfig` (read from env):
 
-- `create_identity_verification_case(...)` uses `idv:validations:write`.
-- `claims().get()` uses `idv:auth:userinfo`.
-- a future `validation(case_id).get()` style read operation would use `idv:validations:read`.
-- a future update operation would use `idv:validations:update`.
-- a future revoke or delete operation would use `idv:validations:delete`.
-- a future structured claims-query operation could use `idv:claims:query`.
+| Config key | Default scope | Used by |
+| --- | --- | --- |
+| `IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES` | `idv:auth:verified-claims` | `InPersonIdentityVerificationClient.send_code` |
+| `IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES` | `idv:in-person-verification:send` | `InPersonIdentityVerificationClient.get_last_email_sent` |
+| `IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES` | `idv:auth:verified-claims` | `OnlineIdentityVerificationClient` (both methods) |
+| `IDV_DATA_STORE_AUTH_USERINFO_SCOPES` | `idv:auth:userinfo` | Reserved — not yet wired to a client |
 
-This keeps scope management centralized and prevents accidental reuse of the wrong delegated token.
+## Active Endpoints
 
-## Shared Transport Responsibilities
+Resolved from `Configuration` properties using `IDV_DATA_STORE_BASE_URL`:
 
-The shared transport layer should be the only place that knows how to:
-
-- exchange the user token for an idv-data-store-scoped token
-- perform that token exchange on every idv-data-store call
-- resolve configured endpoint URLs
-- build request headers
-- add idempotency headers where required
-- send HTTP requests through the shared `AsyncClient`
-- normalize upstream failures through `RequestErrorHandler`
-- validate and parse idv-data-store responses
-- resolve relative URLs returned by idv-data-store into complete URLs when needed
-
-A useful internal shape is:
-
-```python
-async def _get_scoped_token(self, scope: str) -> str:
-    ...
-
-async def _request_model(
-    self,
-    endpoint: str,
-    *,
-    scope: str,
-    context: str,
-    response_model: type[BaseModel],
-):
-    response = await self._post(
-        endpoint,
-        scope=scope,
-        context=context,
-    )
-    response.raise_for_status()
-    return response_model(**response.json())
-
-async def _post(
-    self,
-    endpoint: str,
-    *,
-    scope: str,
-    context: str,
-    *,
-    json: dict | None = None,
-):
-    token = await self._get_scoped_token(scope)
-    ...
-```
-
-This gives the service one enforcement point for delegated authentication behavior while keeping the per-call token exchange rule consistent across all operations.
-
-## Response Boundary
-
-The integration layer should return typed domain objects rather than the backend's
-outward-facing `ResponseModel` wrapper.
-
-Recommended boundary:
-
-- integration layer returns typed responses such as `CreateIdentityVerificationResponse`
-- route handlers wrap those results in `ResponseModel`
-
-Example:
-
-```python
-result = await identity_data_service.claims().get()
-
-return ResponseModel(
-    success=True,
-    message="Verified identity claims retrieved successfully",
-    data=result.model_dump(),
-)
-```
-
-This keeps the integration client reusable and easier to test while preserving
-the existing route contract.
-
-## FastAPI Integration
-
-To keep calling code concise, a dependency factory can create the service:
-
-```python
-def get_identity_data_service(request: Request, user_access_token: str) -> IdentityDataService:
-    return IdentityDataService(
-        http_client=request.app.state.request_client,
-        user_access_token=user_access_token,
-    )
-```
-
-Then route handlers can depend on it directly:
-
-```python
-async def handler(
-    identity_data_service: IdentityDataService = Depends(get_identity_data_service),
-):
-    return await identity_data_service.claims().get()
-```
-
-This gives developers the ergonomics of a simple service without hiding request-scoped state.
-
-## Proposed Responsibilities by Module
-
-Suggested ownership, regardless of exact folder names:
-
-- `IdentityDataService`: public facade used by backend feature modules
-- transport/auth module: token exchange and low-level HTTP request execution
-- claims operations: delegated userinfo retrieval and future claims-query support
-- online operations: case creation and online session reissue
-- in-person operations: send verification code and fetch last-email-sent metadata
-- schemas module: request and response types for idv-data-store interactions
-
-## Naming Cleanup
-
-Token exchange should not conceptually live under a claims operation module.
-
-Current code had a naming inconsistency where token exchange lived beside a
-claims-specific module. The integration-layer refactor should correct that by
-making token exchange its own transport or auth concern.
-
-Target direction:
-
-- `token_exchange` is a shared authentication concern
-- `claims` is an operation group that uses token exchange, but does not own it
-
-This keeps module names aligned with their actual responsibilities.
-
-## Migration Strategy
-
-This should be implemented incrementally.
-
-### Phase 1
-
-Create the new integration layer and move token exchange behind it.
-
-### Phase 2
-
-Refactor existing callers to use `IdentityDataService`:
-
-- online identity verification flows
-- claims retrieval
-- in-person verification flows
-
-### Phase 3
-
-Remove old direct token-exchange imports from feature-specific modules once all callers are migrated.
-
-## Non-Goals
-
-This proposal does not require:
-
-- changing the external frontend API
-- changing existing router paths
-- merging unrelated Bluink-specific flows into idv-data-store if they are not part of the delegated-user integration
-
-The goal is to centralize idv-data-store integration concerns, not to redesign the full identity-verification domain.
-
-## Assumptions To Confirm
-
-- Token exchange belongs in a dedicated transport or auth module, not in a claims-specific module.
-- `claims().get()` remains the desired developer-facing API shape even if the internal module names change.
-- Scope selection is internal to the integration layer and not provided by callers.
-- Every outbound idv-data-store call performs its own token exchange.
-- Operation-to-scope mapping should be as narrow as possible and use the explicit idv-data-store scopes above.
-
-## Summary
-
-The recommended design is a request-scoped `IdentityDataService` facade that owns:
-
-- delegated token exchange
-- scope selection
-- endpoint and request construction
-- idv-data-store response handling
-
-For the initial refactor, it should preserve the current `ResponseModel` return shape and clean up the token-exchange naming boundary.
-The router layer can keep returning `ResponseModel`, but the integration layer itself should use the correct typed objects.
-
-The intended developer experience becomes:
-
-```python
-await identity_data_service.create_identity_verification_case(payload)
-await identity_data_service.claims().get()
-```
-
-with all authentication and transport details handled internally by the integration layer.
+| Property | Path |
+| --- | --- |
+| `idv_data_store_identity_verification_in_person_endpoint` | `/v1/identity-verifications/in-person` |
+| `idv_data_store_in_person_verification_last_email_endpoint` | `/v1/in-person-verification/last-email-sent` |
+| `idv_data_store_online_verification_endpoint` | `/v1/identity-verifications/online` |
+| `idv_data_store_online_session_endpoint(case_id)` | `/v1/identity-verifications/{case_id}/online-session` |
+| `idv_data_store_userinfo_endpoint` | `/v1/auth/userinfo` |
