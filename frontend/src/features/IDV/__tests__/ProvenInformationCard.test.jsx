@@ -2,6 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import ProvenInformationCard from "../ProvenInformationCard";
+import i18n from "../../../i18n/test";
 
 const mockNavigate = vi.fn();
 const mockFlags = vi.hoisted(() => ({
@@ -50,7 +51,7 @@ vi.mock("../../../utils/constants", async () => {
 });
 
 vi.mock("@gcds-core/components-react", () => ({
-  GcdsContainer: ({ children }) => <div>{children}</div>,
+  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
   GcdsHeading: ({ children, tag }) => {
     const Tag = tag ?? "h2";
@@ -73,14 +74,15 @@ describe("ProvenInformationCard", () => {
     claims: {
       given_name: "Jane",
       family_name: "Doe",
-      birthdate: "February 1, 1990",
+      birthdate: "1990-02-01",
       id_document: "Passport: Expires June 25, 2030",
     },
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
+    await i18n.changeLanguage("en");
   });
 
   it("renders null when DEV_ONLY_FEATURE is false", () => {
@@ -104,6 +106,15 @@ describe("ProvenInformationCard", () => {
     expect(
       screen.getByRole("heading", { name: "Date of birth" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("February 1, 1990")).toBeInTheDocument();
+  });
+
+  it("renders the date of birth in the selected French language", async () => {
+    await i18n.changeLanguage("fr");
+
+    render(<ProvenInformationCard claims={claims} />);
+
+    expect(screen.getByText("1 février 1990")).toBeInTheDocument();
   });
 
   it("renders the ID document section heading", () => {
@@ -130,7 +141,9 @@ describe("ProvenInformationCard", () => {
   });
 
   it("renders an empty name when claims have no name", () => {
-    render(<ProvenInformationCard claims={{ claims: {} }} />);
+    const { container } = render(<ProvenInformationCard claims={{ claims: {} }} />);
+
     expect(screen.getByRole("heading", { name: "Name" })).toBeInTheDocument();
+    expect(container.querySelectorAll(".separator")).toHaveLength(1);
   });
 });

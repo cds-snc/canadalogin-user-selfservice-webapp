@@ -6,7 +6,8 @@ import importlib
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from httpx import AsyncClient
+from fastapi import HTTPException
+from httpx import AsyncClient, HTTPStatusError, Request, Response
 from app.identity_verification.schemas import CreateOnlineIdentityVerificationRequest
 from app.identity_verification.services.online_identity_verification import (
     OnlineIdentityVerificationClient,
@@ -15,16 +16,35 @@ from app.identity_verification.services.online_identity_verification import (
 services_module = importlib.import_module(
     "app.identity_verification.services.online_identity_verification"
 )
+base_module = importlib.import_module(
+    "app.identity_verification.services.base_idv_data_store_service"
+)
 create_online_identity_verification = (
     services_module.create_online_identity_verification
 )
 reissue_online_session = services_module.reissue_online_session
 get_verified_claims = services_module.get_verified_claims
 
+MOCK_CONFIGURATION = MagicMock()
+MOCK_CONFIGURATION.idv_data_store_verified_claims_endpoint = (
+    "https://idv-data-store.example.com/v1/identity-verifications/claims"
+)
+MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES = (
+    "idv:auth:verified-claims"
+)
+
 
 @pytest.fixture
 def mock_http_client():
     return AsyncMock(spec=AsyncClient)
+
+
+def _mock_response(json_data, status_code=200):
+    response = MagicMock()
+    response.status_code = status_code
+    response.json.return_value = json_data
+    response.raise_for_status = MagicMock()
+    return response
 
 
 class TestCreateOnlineIdentityVerification:
@@ -134,6 +154,77 @@ class TestReissueOnlineSession:
 
 
 class TestGetVerifiedClaims:
+    @pytest.mark.asyncio
+    @patch.object(base_module, "exchange_token_for_idv_data_store")
+    async def test_client_get_verified_claims_fetches_claims_from_data_store(
+        self,
+        mock_exchange,
+        mock_http_client,
+    ):
+        expected_claims = {
+            "status": "verified",
+            "case_id": "case-123",
+            "verified_claims": {
+                "claims": {"given_name": "Ada", "family_name": "Lovelace"}
+            },
+        }
+        mock_exchange.return_value = "idv-scoped-access-token"
+        mock_http_client.get = AsyncMock(return_value=_mock_response(expected_claims))
+        client = OnlineIdentityVerificationClient(
+            mock_http_client,
+            "user-access-token",
+            settings=MOCK_CONFIGURATION,
+        )
+
+        result = await client.get_verified_claims()
+
+        assert result == expected_claims
+        mock_exchange.assert_awaited_once_with(
+            mock_http_client,
+            "user-access-token",
+            scope="idv:auth:verified-claims",
+        )
+        mock_http_client.get.assert_awaited_once_with(
+            "https://idv-data-store.example.com/v1/identity-verifications/claims",
+            headers={
+                "Authorization": "Bearer idv-scoped-access-token",
+                "Accept": "application/json",
+            },
+        )
+
+    @pytest.mark.asyncio
+    @patch.object(base_module, "exchange_token_for_idv_data_store")
+    async def test_client_get_verified_claims_handles_non_success_response(
+        self,
+        mock_exchange,
+        mock_http_client,
+    ):
+        request = Request(
+            "GET",
+            "https://idv-data-store.example.com/v1/identity-verifications/claims",
+        )
+        response = Response(status_code=502, request=request)
+        http_error = HTTPStatusError(
+            "Bad Gateway",
+            request=request,
+            response=response,
+        )
+        mock_exchange.return_value = "idv-scoped-access-token"
+        mock_response = _mock_response({"message": "Bad Gateway"}, status_code=502)
+        mock_response.raise_for_status.side_effect = http_error
+        mock_http_client.get = AsyncMock(return_value=mock_response)
+        client = OnlineIdentityVerificationClient(
+            mock_http_client,
+            "user-access-token",
+            settings=MOCK_CONFIGURATION,
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            await client.get_verified_claims()
+
+        assert exc_info.value.status_code == 502
+        assert exc_info.value.detail == "idv-data-store verified claims request failed"
+
     @pytest.mark.asyncio
     @patch.object(services_module, "OnlineIdentityVerificationClient")
     async def test_success_gets_verified_claims(

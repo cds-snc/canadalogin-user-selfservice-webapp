@@ -29,7 +29,7 @@ type ProfileHomeLocationState = {
 
 export default function ProfileHome() {
   const location = useLocation();
-  const { t } = useTranslation("profile");
+  const { t, i18n } = useTranslation("profile");
   const { state } = useUser();
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
   const [identityVerificationClaims, setIdentityVerificationClaims] =
@@ -55,7 +55,7 @@ export default function ProfileHome() {
       : undefined;
   const verificationTime = verifiedClaims?.verification?.time;
   const provenDate = verificationTime
-    ? new Intl.DateTimeFormat(undefined, {
+    ? new Intl.DateTimeFormat(i18n.language, {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -73,7 +73,7 @@ export default function ProfileHome() {
             showIDVSuccessNotice={showIDVSuccessNotice}
           />
         )}
-        {DEV_ONLY_FEATURE && !showIDVSuccessNotice && (
+        {DEV_ONLY_FEATURE && !showIDVSuccessNotice && !verifiedClaims && (
           <GcdsContainer className="idvNoticeSpacing">
             <CompleteIdentityProofingNotice />
           </GcdsContainer>
@@ -84,7 +84,11 @@ export default function ProfileHome() {
               <GcdsHeading tag="h2" marginTop="0">
                 {t("ProfileHome.provenInformation")}
               </GcdsHeading>
-              {provenDate && <VerifiedBadge text={`Proven ${provenDate}`} />}
+              {provenDate && (
+                <VerifiedBadge
+                  text={`${t("ProfileHome.verified")} ${provenDate}`}
+                />
+              )}
             </GcdsGrid>
 
             <ProvenInformationCard claims={verifiedClaims} />
