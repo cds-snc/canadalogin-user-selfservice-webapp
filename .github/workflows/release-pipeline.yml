@@ -40,7 +40,7 @@ jobs:
     outputs:
       envs: ${{ steps.check-envs.outputs.envs }}
     steps:
-      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           fetch-depth: 0
 
@@ -78,7 +78,7 @@ jobs:
       release_tag: ${{ steps.detect-release-tag.outputs.release_tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Fetch tags
         run: git fetch --prune --unshallow --tags
@@ -106,7 +106,7 @@ jobs:
     needs: [notify-slack-about-deploy, detect-release-tag]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -158,10 +158,10 @@ jobs:
     needs: [notify-slack-about-deploy, release-please, detect-release-tag]
     steps:
       - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Audit DNS requests
-        uses: cds-snc/dns-proxy-action@7b6ba63b4f045de61c98a3c1b99fdd08f32b0784 # main
+        uses: cds-snc/dns-proxy-action@9ad793100229573be3f5ba78cc69ec523f2c8b7e # main
         env:
           DNS_PROXY_FORWARDTOSENTINEL: "true"
           DNS_PROXY_LOGANALYTICSWORKSPACEID: ${{ secrets.LOG_ANALYTICS_WORKSPACE_ID }}
@@ -221,7 +221,7 @@ jobs:
           docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:$RELEASE_TAG"
 
       - name: Docker generate SBOM
-        uses: cds-snc/security-tools/.github/actions/generate-sbom@d123fa2b895f7ef5b400fad333d2101b103b2e64 # v4.0.4
+        uses: cds-snc/security-tools/.github/actions/generate-sbom@837a88b6337d4842543184c8eac97a8adac8f302 # v4.0.3
         env:
           TRIVY_DB_REPOSITORY: ${{ vars.TRIVY_DB_REPOSITORY }}
         with:
@@ -243,7 +243,7 @@ jobs:
       - run: echo "Deploying frontend to ${{ matrix.environment }} environment..."
 
       - name: Checkout repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Fetch tags
         run: git fetch --prune --unshallow --tags
@@ -308,7 +308,7 @@ jobs:
       - run: echo "Deploying backend to ${{ matrix.environment }} environment..."
 
       - name: Checkout repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Fetch tags
         run: git fetch --prune --unshallow --tags
@@ -383,10 +383,23 @@ jobs:
             --task-definition ${{ vars.ECS_SERVICE }} \
             --query taskDefinition > task-definition.json
 
+      - name: Preserve task definition tags
+        if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
+        run: |
+          # describe-task-definition never returns tags, so registering a new
+          # revision from this file would otherwise drop them (causing Terraform
+          # to see tag drift on unrelated PRs). Carry the current tags forward.
+          TAGS=$(aws ecs list-tags-for-resource \
+            --resource-arn ${{ env.CURRENT_TASK_DEF_ARN }} \
+            --query "tags" --output json)
+
+          jq --argjson tags "$TAGS" '. + {tags: $tags}' task-definition.json > task-definition.tmp.json
+          mv task-definition.tmp.json task-definition.json
+
       - name: Update ECS task image
         if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
         id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@138c24f321fdbdf7edee4a685519d253cae2cdea # v1.9.0
+        uses: aws-actions/amazon-ecs-render-task-definition@6853cfae8c3a7d978fbf68b5a55453395541dfbb # v1.8.5
         with:
           task-definition: task-definition.json
           container-name: ${{ vars.ECS_SERVICE }}
@@ -394,7 +407,7 @@ jobs:
 
       - name: Deploy updated ECS task
         if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
-        uses: aws-actions/amazon-ecs-deploy-task-definition@c465972ecbd160473f22e683363b422a5412a3de # v2.6.3
+        uses: aws-actions/amazon-ecs-deploy-task-definition@a310a830f5c14e583e35d84e4e1ec7dd177c3c9c # v2.6.2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ vars.ECS_SERVICE }}
@@ -420,7 +433,7 @@ jobs:
     needs: [release-please]
     steps:
       - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Fetch tags
         run: git fetch --prune --unshallow --tags
@@ -434,7 +447,7 @@ jobs:
           echo "STAGING_SHA=${STAGING_SHA}" >> $GITHUB_ENV
 
       - name: Checkout staging version
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: ${{ env.STAGING_SHA }}
 
