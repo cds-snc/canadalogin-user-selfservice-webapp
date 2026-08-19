@@ -6,4 +6,4 @@ flake8==7.3.0
 black==26.5.1
 pytest-asyncio==1.4.0
 respx==0.23.1
-semgrep==1.170.1
+semgrep==1.172.0
