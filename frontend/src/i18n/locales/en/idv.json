@@ -103,9 +103,10 @@
   "ProofingBarcodeCanadaPost": {
     "heading": "Take your proofing barcode to Canada Post",
     "barcodeAriaLabel": "Barcode for code {{code}}",
-    "codeValidDays": "The code is valid for 30 days and has been emailed to",
+    "codeValidDaysDynamic": "This code is valid for {{validityDays}} days (expires {{expiryDate}}) and has been emailed to",
+    "codeValidDays": "This code is valid for {{validityDays}} days and has been emailed to",
     "codeValidityDate": "July 24, 2027",
-    "visitInstruction": "Visit a Canada Post before {{validityDate}} with your proofing barcode and your passport.",
+    "visitInstruction": "Visit a Canada Post with your proofing barcode and your {{idSelected}}.",
     "listOfIds": "List of acceptable IDs",
     "acceptableIdOption1": "Canadian passport",
     "acceptableIdOption2": "Provincial or territorial driver's licence",
