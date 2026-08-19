@@ -10,7 +10,7 @@
     "dobYear": "Date of birth year must be after 1900.",
     "dobFuture": "Date of birth cannot be in the future.",
     "addressRequired": "Address is required.",
-    "provinceRequired": "Province / State is required.",
+    "provinceRequired": "Province/ Territory is required.",
     "countryRequired": "Country is required.",
     "idTypeRequired": "Select an ID type.",
     "idExpiryRequired": "ID expiry date is required."
@@ -30,13 +30,13 @@
     "learnMoreLink": "Apprenez-en davantage sur la confirmation d’identité en centre Service Canada",
     "selectIdLabel": "Quel type de document d’identité avez-vous",
     "selectIdDropdownDefaultValue": "Sélectionnez une option",
-    "driverLicenceOption": "Provincial/Territorial Driver’s Licence",
-    "photoIDHealthCardOption": "Provincial/Territorial Photo ID Health Card",
-    "photoIDServiceCardOption": "Provincial/Territorial Photo ID Service Card",
-    "passportOption": "Canadian and International Passport",
-    "canadianPRCardOption": "Canadian PR Card",
-    "indianStatusOption": "Secure Certificate of Indian Status",
-    "noIds": "I don’t have any of these IDs",
+    "driverLicenceOption": "Permis de conduire provincial/territorial",
+    "photoIDHealthCardOption": "Carte d’assurance maladie provinciale/territoriale avec photo",
+    "photoIDServiceCardOption": "Carte d’identité/de service provinciale/territoriale avec photo",
+    "passportOption": "Passeport canadien ou international",
+    "canadianPRCardOption": "Carte de résident permanent canadienne",
+    "indianStatusOption": "Certificat sécurisé de statut d’Indien",
+    "noIds": "Je ne possède aucun des documents d’identité ci-dessus",
     "idHint": "Vous devrez vous munir de ce document d’identité lors de votre rendez-vous",
     "idExpirationLabel": "Date d’expiration",
     "enterDetailsIdHeading": "Enter your details as shown on the ID",
@@ -136,8 +136,7 @@
   "ProvincialVerificationConnected": {
     "pageTitle": "Prove your identity",
     "heading": "Your CanadaLogin account is now connected to your BC Service Card",
-    "body": "Continue to confirm your verified identity details.",
-    "continueButton": "Continue"
+    "body": "Continue to confirm your verified identity details."
   },
   "ProveIdentityOnline": {
     "heading": "Prouvez votre identité en ligne",
@@ -206,18 +205,17 @@
     "signedInSuccessNotice": "Connexion effectuée à l’aide de votre identifiant ConnexionCanada",
     "fallbackRpName": "RP Name",
     "bodyText": "Ce processus ne sera nécessaire qu’une seule fois pour tous les services exigeant une confirmation d’identité.",
-    "errorNoticeTitle": "Your identity could not be verified",
-    "errorNoticeDescription": "You will need to try again with another method"
+    "errorNoticeTitle": "Nous n’avons pas pu vérifier votre identité",
+    "errorNoticeDescription": "Vous devrez essayer à nouveau à l’aide d’une autre méthode"
   },
   "CompleteIdentityProofing": {
-    "pageTitle": "Complete identity proofing",
     "headingWithRpName": "{{rpName}} needs you to prove your identity",
     "headingWithoutRpName": "Prove your identity",
     "noticeTitle": "Get access to more services",
     "noticeDescription": "Complete identity proofing to secure your CanadaLogin, make recovery easier, and access more Government of Canada services.",
     "noticeCta": "Complete identity proofing",
-    "accessRPServicePortalTitle": "You need to complete identity proofing to access {{rpServicePortal}}.",
-    "accessRPServicePortalText": "Whether you need to find your ID or take a break, you can sign out and prove your identity when you sign back in.",
+    "accessRPServicePortalTitle": "Pour accéder à {{rpServicePortal}}, vous devez d'abord procéder à la confirmation d’identité.",
+    "accessRPServicePortalText": "Si vous avez besoin d’une pause ou d’un peu de temps pour trouver votre document d’identité, reconnectez-vous à l’aide de votre identifiant ConnexionCanada lorsque vous serez prêt ou prête et vous accéderez à cette étape.",
     "listOfAcceptableIds": "List of acceptable IDs",
     "buttonStartIdentity": "Start proving identity",
     "signOut": "Sign out",

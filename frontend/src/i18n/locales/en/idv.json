@@ -10,7 +10,7 @@
     "dobYear": "Date of birth year must be after 1900.",
     "dobFuture": "Date of birth cannot be in the future.",
     "addressRequired": "Address is required.",
-    "provinceRequired": "Province / State is required.",
+    "provinceRequired": "Province/ Territory is required.",
     "countryRequired": "Country is required.",
     "idTypeRequired": "Select an ID type.",
     "idExpiryRequired": "ID expiry date is required."
@@ -211,7 +211,6 @@
     "errorNoticeDescription": "You will need to try again with another method"
   },
   "CompleteIdentityProofing": {
-    "pageTitle": "Complete identity proofing",
     "headingWithRpName": "{{rpName}} needs you to prove your identity",
     "headingWithoutRpName": "Prove your identity",
     "noticeTitle": "Get access to more services",
