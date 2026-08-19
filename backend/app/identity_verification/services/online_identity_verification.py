@@ -10,7 +10,7 @@ from app.identity_verification.schemas import (
     CreateIdentityVerificationResponse,
     ReissueOnlineSessionResponse,
 )
-from app.idv_data_store.services.base_idv_data_store_service import (
+from app.identity_verification.services.base_idv_data_store_service import (
     BaseIdvDataStoreService,
 )
 from app.utils.request_error_handler import RequestErrorHandler
