@@ -383,6 +383,19 @@ jobs:
             --task-definition ${{ vars.ECS_SERVICE }} \
             --query taskDefinition > task-definition.json
 
+      - name: Preserve task definition tags
+        if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
+        run: |
+          # describe-task-definition never returns tags, so registering a new
+          # revision from this file would otherwise drop them (causing Terraform
+          # to see tag drift on unrelated PRs). Carry the current tags forward.
+          TAGS=$(aws ecs list-tags-for-resource \
+            --resource-arn ${{ env.CURRENT_TASK_DEF_ARN }} \
+            --query "tags" --output json)
+
+          jq --argjson tags "$TAGS" '. + {tags: $tags}' task-definition.json > task-definition.tmp.json
+          mv task-definition.tmp.json task-definition.json
+
       - name: Update ECS task image
         if: steps.check-deployment-needed.outputs.deployment_needed == 'true'
         id: task-def
