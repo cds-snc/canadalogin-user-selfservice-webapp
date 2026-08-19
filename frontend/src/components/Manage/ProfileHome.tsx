@@ -4,6 +4,7 @@ import {
   GcdsGrid,
   GcdsText,
 } from "@gcds-core/components-react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 
 import { useTranslation } from "react-i18next";
@@ -17,6 +18,10 @@ import ProvenInformationCard from "../../features/IDV/ProvenInformationCard";
 import ViewEmailInfo from "../../features/ProfileName/components/ViewEmailInfo";
 import CompleteIdentityProofingNotice from "../../features/IDV/components/CompleteIdentityProofingNotice";
 import IdentityInfoSuccessNotice from "../../features/IDV/components/IdentityInfoSuccessNotice";
+import {
+  identityVerificationApi,
+  type IdentityVerificationClaimsResponse,
+} from "../../features/IDV/api/identityVerificationApi";
 
 type ProfileHomeLocationState = {
   showIDVSuccessNotice?: boolean;
@@ -27,9 +32,35 @@ export default function ProfileHome() {
   const { t } = useTranslation("profile");
   const { state } = useUser();
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
+  const [identityVerificationClaims, setIdentityVerificationClaims] =
+    useState<IdentityVerificationClaimsResponse>();
   const showIDVSuccessNotice = Boolean(
     (location.state as ProfileHomeLocationState | null)?.showIDVSuccessNotice,
   );
+
+  useEffect(() => {
+    if (!DEV_ONLY_FEATURE) {
+      return;
+    }
+
+    void identityVerificationApi
+      .getClaims()
+      .then(setIdentityVerificationClaims)
+      .catch(() => undefined);
+  }, []);
+
+  const verifiedClaims =
+    identityVerificationClaims?.status === "verified"
+      ? identityVerificationClaims.verified_claims
+      : undefined;
+  const verificationTime = verifiedClaims?.verification?.time;
+  const provenDate = verificationTime
+    ? new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(verificationTime))
+    : undefined;
 
   return (
     <GcdsContainer role="main">
@@ -47,16 +78,16 @@ export default function ProfileHome() {
             <CompleteIdentityProofingNotice />
           </GcdsContainer>
         )}
-        {DEV_ONLY_FEATURE && (
+        {DEV_ONLY_FEATURE && verifiedClaims && (
           <GcdsContainer>
             <GcdsGrid columns="1fr auto" className="gridInline">
               <GcdsHeading tag="h2" marginTop="0">
                 {t("ProfileHome.provenInformation")}
               </GcdsHeading>
-              <VerifiedBadge text={"Proven January 27, 2026"} />
+              {provenDate && <VerifiedBadge text={`Proven ${provenDate}`} />}
             </GcdsGrid>
 
-            <ProvenInformationCard />
+            <ProvenInformationCard claims={verifiedClaims} />
           </GcdsContainer>
         )}
         <GcdsContainer>

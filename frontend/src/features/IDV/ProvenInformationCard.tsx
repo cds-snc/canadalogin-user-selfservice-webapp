@@ -8,17 +8,26 @@ import {
 
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { useUser } from "../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 import { IDV_JOURNEY_TYPE } from "./constants";
+import type { IdentityVerificationClaimsResponse } from "./api/identityVerificationApi";
 
-export default function ProvenInformationCard() {
+type ProvenInformationCardProps = {
+  claims?: NonNullable<IdentityVerificationClaimsResponse["verified_claims"]>;
+};
+
+export default function ProvenInformationCard({
+  claims,
+}: ProvenInformationCardProps) {
   const { t } = useTranslation("profile");
   const navigate = useNavigate();
   const { language } = useParams();
-  const { state } = useUser();
-  const name = state?.userProfile?.name?.formatted || "";
+  const name = [claims?.claims?.given_name, claims?.claims?.family_name]
+    .filter(Boolean)
+    .join(" ");
+  const dateOfBirth = claims?.claims?.birthdate;
+  const idDocument = claims?.claims?.id_document;
 
   const startIdentityVerificationFlow = path(
     PAGES.idvStartIdentityProofingPage,
@@ -27,10 +36,6 @@ export default function ProvenInformationCard() {
       journeyType: IDV_JOURNEY_TYPE.UPDATE,
     },
   );
-
-  // TODO: populate from IDV API once available
-  const dateOfBirth = "February 1, 1990";
-  const idDocument = "Passport: Expires June 25, 2030";
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -50,23 +55,33 @@ export default function ProvenInformationCard() {
 
         <GcdsContainer className="separator" style={{ margin: "0" }} />
 
-        <GcdsContainer>
-          <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-            {t("ProvenInformationCard.dateOfBirth")}
-          </GcdsHeading>
-          <GcdsText marginTop="200" marginBottom="0">
-            {dateOfBirth}
-          </GcdsText>
-        </GcdsContainer>
+        {dateOfBirth && (
+          <>
+            <GcdsContainer className="separator" style={{ margin: "0" }} />
 
-        <div className="separator" style={{ margin: "0" }} />
+            <GcdsContainer>
+              <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+                {t("ProvenInformationCard.dateOfBirth")}
+              </GcdsHeading>
+              <GcdsText marginTop="200" marginBottom="0">
+                {dateOfBirth}
+              </GcdsText>
+            </GcdsContainer>
+          </>
+        )}
 
-        <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-          {t("ProvenInformationCard.idDocument")}
-        </GcdsHeading>
-        <GcdsText marginTop="200" marginBottom="0">
-          {idDocument}
-        </GcdsText>
+        {idDocument && (
+          <>
+            <div className="separator" style={{ margin: "0" }} />
+
+            <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+              {t("ProvenInformationCard.idDocument")}
+            </GcdsHeading>
+            <GcdsText marginTop="200" marginBottom="0">
+              {idDocument}
+            </GcdsText>
+          </>
+        )}
 
         <div className="separator" style={{ margin: "0" }} />
 

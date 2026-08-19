@@ -68,6 +68,16 @@ vi.mock("@gcds-core/components-react", () => ({
 }));
 
 describe("ProvenInformationCard", () => {
+  const claims = {
+    verification: { time: "2026-01-27T12:00:00Z" },
+    claims: {
+      given_name: "Jane",
+      family_name: "Doe",
+      birthdate: "February 1, 1990",
+      id_document: "Passport: Expires June 25, 2030",
+    },
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
@@ -75,36 +85,36 @@ describe("ProvenInformationCard", () => {
 
   it("renders null when DEV_ONLY_FEATURE is false", () => {
     mockFlags.devOnlyFeature = false;
-    const { container } = render(<ProvenInformationCard />);
+    const { container } = render(<ProvenInformationCard claims={claims} />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it("renders the Name section heading", () => {
-    render(<ProvenInformationCard />);
+    render(<ProvenInformationCard claims={claims} />);
     expect(screen.getByRole("heading", { name: "Name" })).toBeInTheDocument();
   });
 
   it("renders the formatted name from user context", () => {
-    render(<ProvenInformationCard />);
+    render(<ProvenInformationCard claims={claims} />);
     expect(screen.getByText("Jane Doe")).toBeInTheDocument();
   });
 
   it("renders the Date of birth section heading", () => {
-    render(<ProvenInformationCard />);
+    render(<ProvenInformationCard claims={claims} />);
     expect(
       screen.getByRole("heading", { name: "Date of birth" }),
     ).toBeInTheDocument();
   });
 
   it("renders the ID document section heading", () => {
-    render(<ProvenInformationCard />);
+    render(<ProvenInformationCard claims={claims} />);
     expect(
       screen.getByRole("heading", { name: "ID document saved to CanadaLogin" }),
     ).toBeInTheDocument();
   });
 
   it("renders the update info description text", () => {
-    render(<ProvenInformationCard />);
+    render(<ProvenInformationCard claims={claims} />);
     expect(
       screen.getByText(
         "To update this information, you'll need to complete identity proofing again.",
@@ -113,27 +123,14 @@ describe("ProvenInformationCard", () => {
   });
 
   it("renders the Update information button", () => {
-    render(<ProvenInformationCard />);
+    render(<ProvenInformationCard claims={claims} />);
     expect(screen.getByTestId("update-button")).toHaveTextContent(
       "Update information",
     );
   });
 
-  it("renders an empty name when userProfile has no formatted name", () => {
-    vi.mocked(vi.importActual("../../../components/Providers/useUser")).catch(
-      () => {},
-    );
-
-    // Re-mock with no formatted name
-    vi.doMock("../../../components/Providers/useUser", () => ({
-      useUser: () => ({
-        state: { userProfile: { userName: "user@example.com", name: {} } },
-        dispatch: vi.fn(),
-      }),
-    }));
-
-    render(<ProvenInformationCard />);
-    // Component renders without crashing
+  it("renders an empty name when claims have no name", () => {
+    render(<ProvenInformationCard claims={{ claims: {} }} />);
     expect(screen.getByRole("heading", { name: "Name" })).toBeInTheDocument();
   });
 });

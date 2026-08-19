@@ -26,6 +26,7 @@ from app.identity_verification.schemas import (
 
 from app.identity_verification.services.online_identity_verification import (
     create_online_identity_verification,
+    get_verified_claims,
 )
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,25 @@ async def user_identity_verification_registeration(
     return await create_identity_verification(
         request.app.state.request_client, user_access_token
     )
+
+
+@router.get(
+    "/claims",
+    response_model=ResponseModel,
+    status_code=status.HTTP_200_OK,
+    tags=["Identity Verification"],
+    summary="Get the current user's identity verification claims",
+    description="Returns the authenticated user's verified identity claims, when available.",
+)
+async def get_identity_verification_claims(
+    request: Request,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    claims = await get_verified_claims(
+        request.app.state.request_client,
+        user_access_token,
+    )
+    return ResponseModel(success=True, message="Verified claims retrieved", data=claims)
 
 
 @router.get(

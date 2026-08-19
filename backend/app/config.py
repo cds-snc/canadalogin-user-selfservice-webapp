@@ -243,6 +243,11 @@ class Configuration(BaseSettings):
         """idv-data-store's endpoint for creating an online identity verification case."""
         return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/identity-verifications/online"
 
+    @property
+    def idv_data_store_verified_claims_endpoint(self) -> str:
+        """idv-data-store's endpoint for the current user's verified claims."""
+        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/users/me/identity-verification/claims"
+
     def idv_data_store_online_session_endpoint(self, case_id: str) -> str:
         """idv-data-store's endpoint for reissuing an online verification session URL."""
         return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/identity-verifications/{case_id}/online-session"

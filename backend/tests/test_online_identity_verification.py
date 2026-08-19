@@ -19,6 +19,7 @@ create_online_identity_verification = (
     services_module.create_online_identity_verification
 )
 reissue_online_session = services_module.reissue_online_session
+get_verified_claims = services_module.get_verified_claims
 
 
 @pytest.fixture
@@ -132,7 +133,57 @@ class TestReissueOnlineSession:
         mock_operation.reissue_session.assert_awaited_once_with("case-123")
 
 
+class TestGetVerifiedClaims:
+    @pytest.mark.asyncio
+    @patch.object(services_module, "OnlineIdentityVerificationClient")
+    async def test_success_gets_verified_claims(
+        self,
+        mock_operation_class,
+        mock_http_client,
+    ):
+        mock_operation = MagicMock(spec=OnlineIdentityVerificationClient)
+        expected_claims = {"given_name": "Ada", "family_name": "Lovelace"}
+        mock_operation.get_verified_claims = AsyncMock(return_value=expected_claims)
+        mock_operation_class.return_value = mock_operation
+
+        result = await get_verified_claims(mock_http_client, "user-access-token")
+
+        assert result == expected_claims
+        mock_operation_class.assert_called_once_with(
+            mock_http_client,
+            "user-access-token",
+            settings=services_module.get_configuration(),
+        )
+        mock_operation.get_verified_claims.assert_awaited_once_with()
+
+
 class TestOnlineIdentityVerificationRouterEndpoints:
+    @pytest.mark.asyncio
+    async def test_get_identity_verification_claims_endpoint(self):
+        from app.identity_verification.v1_router import get_identity_verification_claims
+
+        mock_request = MagicMock()
+        mock_request.app.state.request_client = AsyncMock()
+        expected_claims = {"given_name": "Ada", "family_name": "Lovelace"}
+
+        with patch.object(
+            importlib.import_module("app.identity_verification.v1_router"),
+            "get_verified_claims",
+            AsyncMock(return_value=expected_claims),
+        ) as mock_get_claims:
+            result = await get_identity_verification_claims(
+                mock_request,
+                "user-access-token",
+            )
+
+        assert result.success is True
+        assert result.message == "Verified claims retrieved"
+        assert result.data == expected_claims
+        mock_get_claims.assert_awaited_once_with(
+            mock_request.app.state.request_client,
+            "user-access-token",
+        )
+
     @pytest.mark.asyncio
     async def test_create_online_identity_verification_case_endpoint(self):
         from app.identity_verification.v1_router import (
