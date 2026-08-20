@@ -26,6 +26,8 @@ from app.identity_verification.schemas import (
 
 from app.identity_verification.services.online_identity_verification import (
     create_online_identity_verification,
+)
+from app.identity_verification.services.identity_verification_claims import (
     get_verified_claims,
 )
 

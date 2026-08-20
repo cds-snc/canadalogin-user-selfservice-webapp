@@ -85,23 +85,6 @@ class OnlineIdentityVerificationClient(BaseIdvDataStoreService):
         response_data = self.resolve_online_verification_url(response.json())
         return ReissueOnlineSessionResponse(**response_data)
 
-    async def get_verified_claims(self) -> dict:
-        response = await self._get(
-            self._settings.idv_data_store_verified_claims_endpoint,
-            scope=self._settings.idv_data_store_config.IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES,
-            context="idv-data-store verified claims request",
-        )
-
-        try:
-            response.raise_for_status()
-        except Exception as exc:
-            RequestErrorHandler.handle(
-                exc,
-                context="idv-data-store verified claims request",
-            )
-
-        return response.json()
-
     def resolve_online_verification_url(
         self,
         response_data: dict,
@@ -145,16 +128,3 @@ async def reissue_online_session(
         settings=settings,
     )
     return await operation.reissue_session(case_id)
-
-
-async def get_verified_claims(
-    global_http_client: AsyncClient,
-    user_access_token: str,
-) -> dict:
-    settings = get_configuration()
-    operation = OnlineIdentityVerificationClient(
-        global_http_client,
-        user_access_token,
-        settings=settings,
-    )
-    return await operation.get_verified_claims()
