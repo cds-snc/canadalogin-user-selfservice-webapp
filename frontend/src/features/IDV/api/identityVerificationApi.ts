@@ -16,9 +16,37 @@ export type OnlineIdentityVerificationResponse = {
   expires_at?: string | null;
 };
 
+export type IdentityVerificationClaimsResponse = {
+  status: "pending" | "in_progress" | "verified" | "failed" | "cancelled";
+  case_id: string;
+  verified_claims?: {
+    verification?: {
+      trust_framework?: string | null;
+      assurance_level?: string | null;
+      time?: string | null;
+    };
+    claims?: {
+      given_name?: string | null;
+      family_name?: string | null;
+      birthdate?: string | null;
+      id_document?: string | null;
+    };
+  };
+};
+
 axios.defaults.withCredentials = true;
 
 export const identityVerificationApi = {
+  getClaims: async () => {
+    try {
+      const response = await axios.get<
+        AuthServiceResponse<IdentityVerificationClaimsResponse>
+      >(`${config.apiUrl}/v1/identity-verification/claims`);
+      return response.data.data;
+    } catch (error) {
+      handleApiError(error as ApiErrorLike);
+    }
+  },
   /**
    * Starts the online identity verification process and returns the URL to redirect the user to bluink
    */

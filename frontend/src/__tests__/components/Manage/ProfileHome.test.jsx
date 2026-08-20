@@ -1,11 +1,13 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import ProfileHome from "../../../components/Manage/ProfileHome";
+import i18n from "../../../i18n/test";
 
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
 let mockLocationState = null;
+const mockGetClaims = vi.hoisted(() => vi.fn());
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -46,6 +48,12 @@ vi.mock("../../../utils/constants", () => ({
 
 vi.mock("../../../utils/routeHelpers", () => ({
   path: vi.fn(() => "/en/update-email"),
+}));
+
+vi.mock("../../../features/IDV/api/identityVerificationApi", () => ({
+  identityVerificationApi: {
+    getClaims: mockGetClaims,
+  },
 }));
 
 vi.mock("@gcds-core/components-react", () => ({
@@ -114,10 +122,22 @@ vi.mock("../../../features/IDV/components/IdentityInfoSuccessNotice", () => ({
 }));
 
 describe("ProfileHome", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
     mockLocationState = null;
+    await i18n.changeLanguage("en");
+    mockGetClaims.mockResolvedValue({
+      status: "verified",
+      case_id: "case-123",
+      verified_claims: {
+        verification: { time: "2026-01-27T12:00:00Z" },
+        claims: {
+          given_name: "Jane",
+          family_name: "Doe",
+        },
+      },
+    });
   });
 
   it("renders the main container with role=main", () => {
@@ -171,13 +191,17 @@ describe("ProfileHome", () => {
     expect(screen.queryByTestId("gcds-link")).not.toBeInTheDocument();
   });
 
-  it("renders the Proven information section when DEV_ONLY_FEATURE is true", () => {
+  it("renders the Proven information section when DEV_ONLY_FEATURE is true", async () => {
     render(<ProfileHome />);
-    expect(screen.getByTestId("idv-complete-notice")).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Proven information" }),
-    ).toBeInTheDocument();
-    expect(screen.getByTestId("proven-information-card")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Proven information" }),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId("proven-information-card")).toBeInTheDocument();
+      expect(
+        screen.queryByTestId("idv-complete-notice"),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it("hides the Proven information section when DEV_ONLY_FEATURE is false", () => {
@@ -192,12 +216,29 @@ describe("ProfileHome", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders the verified badge for proven information when DEV_ONLY_FEATURE is true", () => {
+  it("renders the verified badge for proven information when DEV_ONLY_FEATURE is true", async () => {
     render(<ProfileHome />);
-    const badges = screen.getAllByTestId("verified-badge");
-    expect(
-      badges.some((b) => b.textContent === "Proven January 27, 2026"),
-    ).toBe(true);
+    await waitFor(() => {
+      const badges = screen.getAllByTestId("verified-badge");
+      expect(
+        badges.some((b) => b.textContent === "Verified January 27, 2026"),
+      ).toBe(true);
+    });
+  });
+
+  it("renders the verified badge date in the selected French language", async () => {
+    await i18n.changeLanguage("fr");
+
+    render(<ProfileHome />);
+
+    await waitFor(() => {
+      const badges = screen.getAllByTestId("verified-badge");
+      expect(
+        badges.some(
+          (b) => b.textContent === "Vérification effectuée 27 janvier 2026",
+        ),
+      ).toBe(true);
+    });
   });
 
   it("renders the IDV success notice when location state enables it and DEV_ONLY_FEATURE is true", () => {
