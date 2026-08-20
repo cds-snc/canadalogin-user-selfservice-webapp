@@ -189,7 +189,6 @@ export default function ProofingBarcodeCanadaPostPage() {
 
               <div className="separator" style={{ margin: "0" }} />
 
-              {/* <GcdsGrid columns="1fr auto" className="gridInline"> */}
               <GcdsGrid
                 columns="1"
                 columnsDesktop="max-content max-content"

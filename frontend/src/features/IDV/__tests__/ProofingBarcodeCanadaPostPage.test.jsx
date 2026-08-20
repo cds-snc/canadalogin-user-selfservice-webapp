@@ -205,7 +205,11 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Lastname")).toBeInTheDocument();
-    expect(screen.getByText("2000-10-15")).toBeInTheDocument();
+    expect(
+      screen.getByText((content, element) => {
+        return element && element.textContent === "2000-10-15";
+      }),
+    ).toBeInTheDocument();
     expect(screen.getByText("Email statement")).toBeInTheDocument();
     expect(screen.getByText("Passport")).toBeInTheDocument();
   });
