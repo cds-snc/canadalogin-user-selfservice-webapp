@@ -65,6 +65,7 @@ function normalizePasswordUpdateTransaction(
   return {
     ...data,
     expiry: data.expiry ?? data.expiryTime ?? null,
+    created: data.created ?? data.creationTime ?? null,
   };
 }
 
@@ -348,6 +349,7 @@ export default function ChangePasswordIndex() {
         setErrorMessage={setCustomErrorMessage}
         errorMessage={errorMessage}
         otpExpiry={otpSentResponse?.expiry}
+        otpCreatedAt={otpSentResponse?.created ?? otpSentResponse?.creationTime}
         onCancel={() => navigate(backToSecuritySettingsPage)}
         showTryAnotherWay={userPhoneFactors.length > 1}
       />

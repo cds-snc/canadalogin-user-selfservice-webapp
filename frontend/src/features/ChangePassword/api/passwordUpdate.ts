@@ -12,6 +12,8 @@ export type PasswordUpdateTransactionData = {
   trxId: string;
   expiryTime?: string | null;
   expiry?: string | null;
+  creationTime?: string | null;
+  created?: string | null;
   [key: string]: unknown;
 };
 
@@ -57,6 +59,10 @@ export const passwordUpdate = {
           ...response.data.data,
           expiry:
             response.data.data.expiry ?? response.data.data.expiryTime ?? null,
+          created:
+            response.data.data.created ??
+            response.data.data.creationTime ??
+            null,
         };
       }
 

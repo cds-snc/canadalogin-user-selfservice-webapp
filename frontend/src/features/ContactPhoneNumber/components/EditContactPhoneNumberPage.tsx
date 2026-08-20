@@ -127,6 +127,7 @@ export default function EditContactPhoneNumberPage() {
       if (response?.data?.trxnId) {
         handlePhoneFormChange("trxnId", response.data.trxnId);
         handlePhoneFormChange("expiry", response.data.expiry ?? "");
+        handlePhoneFormChange("created", response.data.created ?? "");
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
           step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,

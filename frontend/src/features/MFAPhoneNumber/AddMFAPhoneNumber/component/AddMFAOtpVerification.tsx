@@ -63,6 +63,7 @@ interface PhoneFormData {
   mfaId: string;
   trxnId: string;
   expiry: string;
+  created?: string;
   otpType: string;
   formattedPhoneNumber: string;
 }
@@ -105,7 +106,7 @@ export default function AddMFAOtpVerification({
     hasServerExpiry,
     isExpired,
     restartFallbackCountdown,
-  } = useOtpExpiryCountdown(phoneFormData.expiry);
+  } = useOtpExpiryCountdown(phoneFormData.expiry, 10, phoneFormData.created);
 
   const displayError = localError || errorMessage || "";
 

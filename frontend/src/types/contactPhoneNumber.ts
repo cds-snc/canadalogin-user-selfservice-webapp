@@ -19,6 +19,7 @@ export type ContactPhoneFormData = {
   otp: string;
   trxnId: string;
   expiry: string;
+  created?: string;
   otpType: ContactPhoneOtpType;
   formattedPhoneNumber: string;
 };
@@ -30,6 +31,7 @@ export type ContactPhonePageContent = Record<string, string>;
 export type ContactPhoneTransactionData = {
   trxnId: string;
   expiry?: string;
+  created?: string;
 };
 
 export type ContactPhoneFormChangeHandler = <TField extends ContactPhoneField>(

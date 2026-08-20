@@ -30,6 +30,7 @@ interface EmailOtpValidationProps {
   isMaxAttemptsReached?: boolean;
   resetAttempts?: () => void;
   otpExpiry?: string | null;
+  otpCreatedAt?: string | null;
 }
 
 export default function EmailOtpValidation({
@@ -45,6 +46,7 @@ export default function EmailOtpValidation({
   isMaxAttemptsReached = false,
   resetAttempts,
   otpExpiry = null,
+  otpCreatedAt = null,
 }: EmailOtpValidationProps) {
   const { language } = useParams();
   const { t } = useTranslation(["email", "verification", "common"]);
@@ -56,7 +58,7 @@ export default function EmailOtpValidation({
     hasServerExpiry,
     isExpired,
     restartFallbackCountdown,
-  } = useOtpExpiryCountdown(otpExpiry);
+  } = useOtpExpiryCountdown(otpExpiry, 10, otpCreatedAt);
 
   const displayError = localError || errorMessage || "";
 

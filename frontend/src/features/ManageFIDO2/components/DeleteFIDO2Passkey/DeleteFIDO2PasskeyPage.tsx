@@ -346,6 +346,7 @@ export default function DeleteFIDO2PasskeyPage({
         setErrorMessage={setCustomErrorMessage}
         errorMessage={errorMessage}
         otpExpiry={otpSentResponse?.expiry}
+        otpCreatedAt={otpSentResponse?.created}
         onCancel={() => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={userPhoneFactors && userPhoneFactors.length > 1}
       />

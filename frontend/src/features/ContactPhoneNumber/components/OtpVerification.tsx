@@ -86,7 +86,7 @@ export default function OtpVerification({
     hasServerExpiry,
     isExpired,
     restartFallbackCountdown,
-  } = useOtpExpiryCountdown(phoneFormData.expiry);
+  } = useOtpExpiryCountdown(phoneFormData.expiry, 10, phoneFormData.created);
 
   const displayError = localError || errorMessage || "";
 
