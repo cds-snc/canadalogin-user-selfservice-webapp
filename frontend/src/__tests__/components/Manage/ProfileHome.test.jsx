@@ -198,7 +198,9 @@ describe("ProfileHome", () => {
         screen.getByRole("heading", { name: "Proven information" }),
       ).toBeInTheDocument();
       expect(screen.getByTestId("proven-information-card")).toBeInTheDocument();
-      expect(screen.queryByTestId("idv-complete-notice")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("idv-complete-notice"),
+      ).not.toBeInTheDocument();
     });
   });
 

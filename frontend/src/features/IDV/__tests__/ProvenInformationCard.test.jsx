@@ -141,7 +141,9 @@ describe("ProvenInformationCard", () => {
   });
 
   it("renders an empty name when claims have no name", () => {
-    const { container } = render(<ProvenInformationCard claims={{ claims: {} }} />);
+    const { container } = render(
+      <ProvenInformationCard claims={{ claims: {} }} />,
+    );
 
     expect(screen.getByRole("heading", { name: "Name" })).toBeInTheDocument();
     expect(container.querySelectorAll(".separator")).toHaveLength(1);
