@@ -16,6 +16,7 @@ base_module = importlib.import_module(
     "app.identity_verification.services.base_idv_data_store_service"
 )
 get_verified_claims = claims_module.get_verified_claims
+RealIdentityVerificationClaimsClient = claims_module.IdentityVerificationClaimsClient
 
 MOCK_CONFIGURATION = MagicMock()
 MOCK_CONFIGURATION.idv_data_store_verified_claims_endpoint = (
@@ -118,7 +119,7 @@ class TestGetVerifiedClaims:
         mock_operation_class,
         mock_http_client,
     ):
-        mock_operation = MagicMock(spec=claims_module.IdentityVerificationClaimsClient)
+        mock_operation = MagicMock(spec=RealIdentityVerificationClaimsClient)
         expected_claims = {"given_name": "Ada", "family_name": "Lovelace"}
         mock_operation.get_verified_claims = AsyncMock(return_value=expected_claims)
         mock_operation_class.return_value = mock_operation
