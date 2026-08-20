@@ -78,11 +78,7 @@ export default function ProofingBarcodeCanadaPostPage() {
         month: "long",
         day: "numeric",
       }).format(new Date(verificationExpiresAt))
-    : new Intl.DateTimeFormat("en-CA", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }).format(new Date(t("ProofingBarcodeCanadaPost.codeValidityDate")));
+    : null;
 
   const codeValidityText = formattedExpiryDate
     ? t("ProofingBarcodeCanadaPost.codeValidDaysDynamic", {
@@ -92,6 +88,10 @@ export default function ProofingBarcodeCanadaPostPage() {
     : t("ProofingBarcodeCanadaPost.codeValidDays", {
         validityDays: verificationValidityDays ?? 30,
       });
+
+  const handlePrintPage = () => {
+    window.print();
+  };
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -121,7 +121,13 @@ export default function ProofingBarcodeCanadaPostPage() {
             {codeValidityText} <strong>{email}</strong>.
           </GcdsText>
           <GcdsText marginBottom="0">
-            {t("ProofingBarcodeCanadaPost.visitInstruction", {
+            {t("ProofingBarcodeCanadaPost.visitInstruction")}{" "}
+            <strong>
+              {formattedExpiryDate
+                ? formattedExpiryDate
+                : t("ProofingBarcodeCanadaPost.codeValidityDate")}
+            </strong>{" "}
+            {t("ProofingBarcodeCanadaPost.visitInstructionCont", {
               idSelected: idSelected,
             })}
           </GcdsText>
@@ -183,7 +189,19 @@ export default function ProofingBarcodeCanadaPostPage() {
 
               <div className="separator" style={{ margin: "0" }} />
 
-              <GcdsGrid columns="1fr auto" className="gridInline">
+              {/* <GcdsGrid columns="1fr auto" className="gridInline"> */}
+              <GcdsGrid
+                columns="1"
+                columnsDesktop="max-content max-content"
+                gap="200"
+              >
+                <GcdsButton
+                  buttonRole="primary"
+                  type="button"
+                  onGcdsClick={handlePrintPage}
+                >
+                  {t("ProofingBarcodeCanadaPost.printPageButton")}
+                </GcdsButton>
                 <GcdsButton
                   buttonRole="secondary"
                   type="button"

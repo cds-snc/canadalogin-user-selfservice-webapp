@@ -102,10 +102,11 @@
   "ProofingBarcodeCanadaPost": {
     "heading": "Rendez-vous dans un bureau Postes Canada et munissez-vous de votre code-barres de confirmation",
     "barcodeAriaLabel": "Barcode for code {{code}}",
-    "codeValidDaysDynamic": "This code is valid for {{validityDays}} days (expires {{expiryDate}}) and has been emailed to",
+    "codeValidDaysDynamic": "Ce code est valide pour une durée de {{validityDays}} jours. Il vous a été envoyé par courriel à l’adresse",
     "codeValidDays": "Ce code est valide pour une durée de 30 jours. Il vous a été envoyé par courriel à l’adresse",
     "codeValidityDate": "24 juillet 2027",
     "visitInstruction": "Rendez-vous dans un bureau Postes Canada avant le",
+    "visitInstructionCont": "et munissez-vous de votre code-barres de confirmation et de votre {{idSelected}}.",
     "listOfIds": "Liste des documents d’identité admissibles",
     "acceptableIdOption1": "Canadian passport",
     "acceptableIdOption2": "Provincial or territorial driver's licence",
@@ -118,6 +119,7 @@
     "idSelected": "Document d’identité sélectionné",
     "reProofingRequired": "To update this information, you'll need to complete identity proofing again.",
     "updateInformationButton": "Mettre à jour les renseignements",
+    "printPageButton": "Imprimer la page",
     "findNearestTitle": "Trouvez le bureau Postes Canada le plus proche",
     "findNearestBody": "Confirmez votre identité dans un",
     "findNearestLink": "bureau Postes Canada proche de chez vous"

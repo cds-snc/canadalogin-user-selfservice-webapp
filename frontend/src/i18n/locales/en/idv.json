@@ -103,10 +103,11 @@
   "ProofingBarcodeCanadaPost": {
     "heading": "Take your proofing barcode to Canada Post",
     "barcodeAriaLabel": "Barcode for code {{code}}",
-    "codeValidDaysDynamic": "This code is valid for {{validityDays}} days (expires {{expiryDate}}) and has been emailed to",
+    "codeValidDaysDynamic": "This code is valid for {{validityDays}} days and has been emailed to",
     "codeValidDays": "This code is valid for {{validityDays}} days and has been emailed to",
     "codeValidityDate": "July 24, 2027",
-    "visitInstruction": "Visit a Canada Post with your proofing barcode and your {{idSelected}}.",
+    "visitInstruction": "Visit a Canada Post before",
+    "visitInstructionCont": "with your proofing barcode and your {{idSelected}}.",
     "listOfIds": "List of acceptable IDs",
     "acceptableIdOption1": "Canadian passport",
     "acceptableIdOption2": "Provincial or territorial driver's licence",
@@ -119,6 +120,7 @@
     "idSelected": "ID selected",
     "reProofingRequired": "To update this information, you'll need to complete identity proofing again.",
     "updateInformationButton": "Update information",
+    "printPageButton": "Print page",
     "findNearestTitle": "Find your nearest Canada Post",
     "findNearestBody": "Complete your identity proofing at an available",
     "findNearestLink": "Canada Post near you"
