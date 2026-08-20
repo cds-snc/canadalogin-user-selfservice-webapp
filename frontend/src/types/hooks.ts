@@ -46,6 +46,7 @@ export type PhoneFactorsMap = Record<string, string[] | OtpFactorReference[]>;
 export type OtpSentData = {
   trxnId: string;
   expiry?: string | null;
+  created?: string | null;
   [key: string]: unknown;
 };
 

@@ -51,6 +51,7 @@ async def first_step_update_password(
     client_data = UpdatePasswordClientResponsePayload(
         trxId=validated_data.trxId,
         stepsRemaining=validated_data.stepsRemaining,
+        creationTime=validated_data.nextStep.creationTime,
         expiryTime=validated_data.nextStep.expiryTime,
         method=validated_data.nextStep.method,
     )

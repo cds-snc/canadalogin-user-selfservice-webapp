@@ -1,16 +1,78 @@
 import { useEffect, useState } from "react";
 
-function getRemainingSeconds(expiry?: string | null): number | null {
-  if (!expiry) {
+type CountdownAnchor =
+  | {
+      mode: "absolute";
+      expiryMs: number;
+    }
+  | {
+      mode: "duration";
+      durationSeconds: number;
+      startedAtMs: number;
+    };
+
+function parseTimestampMs(value?: string | null): number | null {
+  if (!value) {
     return null;
   }
 
-  const expiryMs = new Date(expiry).getTime();
-  if (Number.isNaN(expiryMs)) {
+  const timestampMs = new Date(value).getTime();
+  return Number.isNaN(timestampMs) ? null : timestampMs;
+}
+
+function getMonotonicNowMs(): number {
+  if (
+    typeof performance !== "undefined" &&
+    typeof performance.now === "function"
+  ) {
+    return performance.now();
+  }
+
+  return Date.now();
+}
+
+function buildCountdownAnchor(
+  expiry?: string | null,
+  otpCreatedAt?: string | null,
+): CountdownAnchor | null {
+  const expiryMs = parseTimestampMs(expiry);
+  if (expiryMs === null) {
     return null;
   }
 
-  const remainingMs = expiryMs - Date.now();
+  const createdMs = parseTimestampMs(otpCreatedAt);
+  if (createdMs !== null && expiryMs >= createdMs) {
+    const durationSeconds = Math.max(
+      0,
+      Math.ceil((expiryMs - createdMs) / 1000),
+    );
+
+    return {
+      mode: "duration",
+      durationSeconds,
+      startedAtMs: getMonotonicNowMs(),
+    };
+  }
+
+  return {
+    mode: "absolute",
+    expiryMs,
+  };
+}
+
+function getRemainingSeconds(anchor: CountdownAnchor | null): number | null {
+  if (!anchor) {
+    return null;
+  }
+
+  if (anchor.mode === "duration") {
+    const elapsedSeconds = Math.floor(
+      (getMonotonicNowMs() - anchor.startedAtMs) / 1000,
+    );
+    return Math.max(0, anchor.durationSeconds - elapsedSeconds);
+  }
+
+  const remainingMs = anchor.expiryMs - Date.now();
   return Math.max(0, Math.ceil(remainingMs / 1000));
 }
 
@@ -24,19 +86,26 @@ function formatMinutesAndSeconds(totalSeconds: number): string {
 export function useOtpExpiryCountdown(
   otpExpiry?: string | null,
   initialFallbackSeconds = 10,
+  otpCreatedAt?: string | null,
 ) {
   const [fallbackSeconds, setFallbackSeconds] = useState(
     initialFallbackSeconds,
   );
   const [resetCounter, setResetCounter] = useState(0);
+  const [countdownAnchor, setCountdownAnchor] =
+    useState<CountdownAnchor | null>(() =>
+      buildCountdownAnchor(otpExpiry, otpCreatedAt),
+    );
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(() =>
-    getRemainingSeconds(otpExpiry),
+    getRemainingSeconds(buildCountdownAnchor(otpExpiry, otpCreatedAt)),
   );
 
   useEffect(() => {
-    setRemainingSeconds(getRemainingSeconds(otpExpiry));
+    const nextAnchor = buildCountdownAnchor(otpExpiry, otpCreatedAt);
+    setCountdownAnchor(nextAnchor);
+    setRemainingSeconds(getRemainingSeconds(nextAnchor));
     setFallbackSeconds(initialFallbackSeconds);
-  }, [otpExpiry, initialFallbackSeconds, resetCounter]);
+  }, [otpExpiry, otpCreatedAt, initialFallbackSeconds, resetCounter]);
 
   useEffect(() => {
     if (remainingSeconds === null || remainingSeconds <= 0) {
@@ -44,11 +113,11 @@ export function useOtpExpiryCountdown(
     }
 
     const timer = setTimeout(() => {
-      setRemainingSeconds(getRemainingSeconds(otpExpiry));
+      setRemainingSeconds(getRemainingSeconds(countdownAnchor));
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [otpExpiry, remainingSeconds]);
+  }, [countdownAnchor, remainingSeconds]);
 
   useEffect(() => {
     if (fallbackSeconds <= 0) {

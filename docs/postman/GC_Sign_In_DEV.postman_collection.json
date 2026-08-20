@@ -788,6 +788,162 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "IDV Data Store - Internal Claims (Rule Parity)",
+      "item": [
+        {
+          "name": "0. Register Internal Claims Caller Client",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"{{IDP_CLIENT_ID}}\",\n  \"client_name\": \"{{IDV_INTERNAL_CLIENT_NAME}}\",\n  \"allowed_scopes\": \"{{IDV_DATA_STORE_INTERNAL_CLAIMS_SCOPE}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/admin/clients",
+              "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
+              "path": ["v1", "admin", "clients"]
+            },
+            "description": "Registers the IBM Verify app client in idv-data-store so /v1/internal/users/identity-verification/claims can trust and authorize it. Returns 201 on first run, 409 if already registered."
+          },
+          "response": []
+        },
+        {
+          "name": "1. Get App Token for Internal Claims (client_credentials)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    if (body.access_token) {",
+                  "        pm.environment.set(\"IDV_INTERNAL_APP_ACCESS_TOKEN\", body.access_token);",
+                  "        console.log(\"Saved IDV_INTERNAL_APP_ACCESS_TOKEN to environment\");",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{IDP_CLIENT_ID}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{IDP_CLIENT_SECRET}}",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "{{IDV_DATA_STORE_INTERNAL_CLAIMS_SCOPE}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{IBM_VERIFY_TENANT_URL}}/oauth2/token",
+              "host": ["{{IBM_VERIFY_TENANT_URL}}"],
+              "path": ["oauth2", "token"]
+            },
+            "description": "Matches ibm_verify_verified_claims_attribute.yaml token step. Retrieves app token using client_credentials and stores it in IDV_INTERNAL_APP_ACCESS_TOKEN."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get Internal User Claims by user_id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{IDV_INTERNAL_APP_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{IDV_INTERNAL_USER_ID}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{IDV_DATA_STORE_BASE_URL}}/v1/internal/users/identity-verification/claims",
+              "host": ["{{IDV_DATA_STORE_BASE_URL}}"],
+              "path": ["v1", "internal", "users", "identity-verification", "claims"]
+            },
+            "description": "Matches ibm_verify_verified_claims_attribute.yaml claims step. Calls idv-data-store internal claims endpoint with app token and explicit user_id."
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
