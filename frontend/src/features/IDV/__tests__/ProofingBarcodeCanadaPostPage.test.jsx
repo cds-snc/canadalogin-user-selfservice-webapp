@@ -188,7 +188,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
           email: "testemail@emci.com",
           givenName: "Name",
           lastName: "Lastname",
-          dateOfBirth: "2000-10-15",
+          dateOfBirth: "January 1, 1990",
           idSelected: "Email statement",
           acceptableIds: ["Passport", "Driver's licence"],
         }}
@@ -205,11 +205,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Lastname")).toBeInTheDocument();
-    expect(
-      screen.getByText((content, element) => {
-        return element && element.textContent === "2000-10-15";
-      }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
     expect(screen.getByText("Email statement")).toBeInTheDocument();
     expect(screen.getByText("Passport")).toBeInTheDocument();
   });
