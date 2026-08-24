@@ -10,11 +10,9 @@ import {
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
-import { PAGES, DEV_ONLY_FEATURE } from "../../../utils/constants";
-
+import { PAGES } from "../../../utils/constants";
 import { useUser } from "../../Providers/useUser";
 import EnabledBadge from "../../Badges/EnabledBadge";
-import VerifiedBadge from "../../Badges/VerifiedBadge";
 
 export default function SecuritySettings() {
   const { language } = useParams();
