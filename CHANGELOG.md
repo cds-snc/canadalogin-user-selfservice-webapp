@@ -1,5 +1,65 @@
 # Changelog
 
+## [1.30.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.29.0...v1.30.0) (2026-08-24)
+
+
+### Features
+
+* (identity-verification) implemented the online bluink integration ([#1971](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1971)) ([86b9218](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/86b92185cfa2279f97c6011549d2874878df8a64))
+* Add french localization for Get ready for selfie and ID check ([#1948](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1948)) ([db484ec](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/db484ecc38d5f550cd35524a3b73e12a71535cab))
+* **identity-verification:** Centralizing for formatting and validat… ([#1927](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1927)) ([00e3a91](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/00e3a917929cce8b9e4b7d78e5ef7346bed6b0bc))
+* **identity-verification:** Centralizing for formatting and validation of date of birth ([00e3a91](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/00e3a917929cce8b9e4b7d78e5ef7346bed6b0bc))
+* **identity-verification:** Create new utility function to get rpName ([#1870](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1870)) ([04d8cc2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/04d8cc25936c6d34e6fb1af110d6ca2f3567cba2))
+* **identity-verification:** Display User Claim Info Profile Dashboard ([#1995](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1995)) ([04f1be1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/04f1be1b6c3b334bfbaf74a372be4fccda12f692))
+* **identity-verification:** IDV Data Service Integration ([#1980](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1980)) ([3b782a2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3b782a2d2359aa0d3a5facc956e474d902658186))
+* **identity-verification:** Remove fallback RP Name ([#1930](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1930)) ([ca49dad](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ca49dad4b62cd28ef8760395da70b7ea64b53f59))
+* **identity-verification:** remove services to generate and send verification code from repo ([#1943](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1943)) ([2cef9f0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2cef9f0fc9ddd790fca6088e38a520ae16be7fb4))
+* **identity-verification:** Replace RP Name in app or logic with the ([#1933](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1933)) ([01cd22e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/01cd22e4835a8a999457d00ea564578cc475b394))
+* **identity-verification:** Replace RP Name in app or logic with the new utility function created ([01cd22e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/01cd22e4835a8a999457d00ea564578cc475b394))
+* **identity-verification:** ServiceCanadaCenterPage  creates in person identity verification case ([#1979](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1979)) ([3ad3e77](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3ad3e77c169ff3340fc62a1f5a59f69596521515))
+* **otp-expiry:** Enhance OTP expiry handling with creation time and countdown adjustments ([#2001](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2001)) ([31949e6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/31949e6647e20376921dce1f6167c5d24ffc138c))
+
+
+### Bug Fixes
+
+* (identity verification) Add French localization for "Prove your identity in person" page ([#1981](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1981)) ([cbc1e62](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/cbc1e622f4259f08875aab4b934defc790fe1640))
+* (identity-verification) online verification scope ([#1990](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1990)) ([3e99a6e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3e99a6eff8dc10f7c7a84e8763e9c19dc5bdc6f5))
+* Add French localization for "[RP Service Portal] needs you to prove your identity" ([#1931](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1931)) ([d77b188](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d77b18885adf5dbeefce03c35f31832a42fe6704))
+* Add French localization for "Get ready for provincial verification" page ([#1950](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1950)) ([d8255be](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d8255bebd19e464b066f33d67202427e19f56944))
+* Add French localization for "Get ready to visit a Service Canada Centre" page ([#1967](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1967)) ([85eaf6d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/85eaf6d3ab5546e5bd5dfcacd6b87f95d2def012))
+* Add French localization for "Prove your identity online" ([#1935](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1935)) ([ee2696b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ee2696ba242a745bf1f00109a8b9df83a842e5ce))
+* Add French localization to "Get ready to visit a Canada Post location" page ([#1954](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1954)) ([0060e95](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0060e95b4b0d84cf2f006c1d00b98f85d0013b19))
+* add tests and improve tab navigation handling in useFirstTabPageFocus hook ([#1988](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1988)) ([e0dd608](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e0dd6087ea0f00052b2d0565daaecb3fb59df08f))
+* **identify-verification:** [FE] Add French locals for "Your unique code for identity proofing at Service Canada Centre" ([#1983](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1983)) ([167cb91](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/167cb914de5fe24073d2a00f1b0d5baedaaee7de))
+* **identity verification:** Add French localizations for "Confirm what will be saved to your CanadaLogin"- [#1945](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1945) ([#1958](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1958)) ([e2c9546](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e2c9546bc1767482c9b65c5e70c85102e4ee4d09))
+* **identity-verification:** [FE] Add French locals for "Take your proofing barcode to a Canada Post location" page ([#1985](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1985)) ([4eae356](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4eae356d7bd538f0dcf70cd95ab40fbab3dfe855))
+* Standardize Phone Input Implementation in Manage App and Resolve Accessibility Issues ([#1939](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1939)) ([6a922a9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6a922a9799b5375bdef01a44e6a39d0fa4f9e0cf))
+
+
+### Code Refactoring
+
+* [FE] Content changes for "Get ready to visit a Service Canada Centre" ([#1987](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1987)) ([f3b63bf](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f3b63bf91aa2eba872019128eeac68bbebbc89c1))
+* **i18n:** Fix some missing and unused localizations ([#1998](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1998)) ([6ab9c0f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6ab9c0fd8a98da1e5a17b3209cca497d943fce24))
+* **identity verification:** Revise UI for "Confirm what will be saved to your CanadaLogin" ([#1945](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1945)) ([32c8005](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/32c800509b60829a24bf2f9865b8beda3148f612))
+* **identity-verification:** [FE Content Update] Prove your identity in person ([#1944](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1944)) ([764e8e9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/764e8e973b675ba5480cc0f33e627a432ae8c704))
+* **identity-verification:** [FE] Content changes on Take your proofing barcode to a Canada Post location ([#2002](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2002)) ([114ce02](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/114ce02d4a2372ac924b9f6ca5817f57869915d9))
+* **identity-verification:** [FE] Remove Identity Verification component in Security Settings ([#2008](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2008)) ([40e6c2a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/40e6c2a88229040ba3a2a3dfbbcd451f30eed09f))
+* **identity-verification:** Moved integration layer to the corre… ([#1992](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1992)) ([987eab2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/987eab2c1cac9df42ce0dcad6c9397d620fea089))
+* **identity-verification:** Moved integration layer to the correct folder ([987eab2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/987eab2c1cac9df42ce0dcad6c9397d620fea089))
+* updated the IDV_DATA_STORE_BASE_URL to point to aws dev2 ([86c0cd0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/86c0cd047afb13ff68d4adbb4058c5505cfa0222))
+* updated the IDV_DATA_STORE_BASE_URL to point to aws dev2 ([#1970](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1970)) ([86c0cd0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/86c0cd047afb13ff68d4adbb4058c5505cfa0222))
+
+
+### Miscellaneous Chores
+
+* 244 investigate errant ecs terraform plan messages ([#1994](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1994)) ([acc16cb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/acc16cbfb8184dfe0be46f00abe2a92f062e2098))
+* **deps-dev:** bump brace-expansion from 1.1.16 to 1.1.18 in /frontend ([#1936](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1936)) ([23d050f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/23d050f3d2af9faad03736f2a6074c726e963880))
+* **deps-dev:** bump js-yaml from 4.3.0 to 4.3.1 in /frontend ([#1956](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1956)) ([6149d75](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6149d75dd80d24fc671b841ef9a2b2986bef3a97))
+* **deps:** lock file maintenance ([#1905](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1905)) ([97b1ad5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/97b1ad59237cba5639d1fbbfafe0e678e72a6b80))
+* **deps:** update all minor dependencies ([#1938](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1938)) ([2bb8b84](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2bb8b842746f2556da4562fc365a0b0995ab0780))
+* **deps:** update all patch dependencies ([#1937](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1937)) ([a239143](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a239143190010de125f1ebcc2e887d8ccc4a80d0))
+* **deps:** update github/codeql-action action to v3.37.6 ([#1959](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1959)) ([0f109ac](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0f109acc8de122ef62e5173d67d508404e7b00dc))
+
 ## [1.29.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.28.0...v1.29.0) (2026-07-29)
 
 
