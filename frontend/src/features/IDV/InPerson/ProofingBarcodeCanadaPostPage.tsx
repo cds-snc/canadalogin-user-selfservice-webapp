@@ -14,6 +14,7 @@ import { useUser } from "../../../components/Providers/useUser";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
+import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.validation";
 import {
   APPROVED_DOCUMENT_VALUES,
   type ApprovedDocumentValue,
@@ -27,6 +28,8 @@ type ProofingBarcodeCanadaPostState = {
   dateOfBirth?: string;
   idSelected?: string;
   acceptableIds?: string[];
+  verificationExpiresAt?: string;
+  verificationValidityDays?: number;
 };
 
 const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
@@ -55,7 +58,11 @@ export default function ProofingBarcodeCanadaPostPage() {
   const email = state?.userProfile?.userName ?? "";
   const givenName = locationState?.givenName?.trim() || "--";
   const lastName = locationState?.lastName?.trim() || "--";
-  const dateOfBirth = locationState?.dateOfBirth?.trim() || "--";
+  const dateOfBirth = formatDateOfBirthForDisplay(
+    locationState?.dateOfBirth?.trim() || "--",
+  );
+  const verificationExpiresAt = locationState?.verificationExpiresAt;
+  const verificationValidityDays = locationState?.verificationValidityDays;
   const rawIdSelected = locationState?.idSelected?.trim() || "";
   const idSelected = rawIdSelected
     ? isApprovedDocumentValue(rawIdSelected)
@@ -64,6 +71,27 @@ export default function ProofingBarcodeCanadaPostPage() {
     : "--";
 
   const acceptableIds = locationState?.acceptableIds;
+
+  const formattedExpiryDate = verificationExpiresAt
+    ? new Intl.DateTimeFormat("en-CA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(verificationExpiresAt))
+    : null;
+
+  const codeValidityText = formattedExpiryDate
+    ? t("ProofingBarcodeCanadaPost.codeValidDaysDynamic", {
+        expiryDate: formattedExpiryDate,
+        validityDays: verificationValidityDays ?? 30,
+      })
+    : t("ProofingBarcodeCanadaPost.codeValidDays", {
+        validityDays: verificationValidityDays ?? 30,
+      });
+
+  const handlePrintPage = () => {
+    window.print();
+  };
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -90,12 +118,17 @@ export default function ProofingBarcodeCanadaPostPage() {
 
         <GcdsContainer>
           <GcdsText>
-            {t("ProofingBarcodeCanadaPost.codeValidDays")}{" "}
-            <strong>{email}</strong>
+            {codeValidityText} <strong>{email}</strong>.
           </GcdsText>
-          <GcdsText>
-            {t("ProofingBarcodeCanadaPost.visitInstruction", {
-              validityDate: t("ProofingBarcodeCanadaPost.codeValidityDate"),
+          <GcdsText marginBottom="0">
+            {t("ProofingBarcodeCanadaPost.visitInstruction")}{" "}
+            <strong>
+              {formattedExpiryDate
+                ? formattedExpiryDate
+                : t("ProofingBarcodeCanadaPost.codeValidityDate")}
+            </strong>{" "}
+            {t("ProofingBarcodeCanadaPost.visitInstructionCont", {
+              idSelected: idSelected,
             })}
           </GcdsText>
         </GcdsContainer>
@@ -156,7 +189,18 @@ export default function ProofingBarcodeCanadaPostPage() {
 
               <div className="separator" style={{ margin: "0" }} />
 
-              <GcdsGrid columns="1fr auto" className="gridInline">
+              <GcdsGrid
+                columns="1"
+                columnsDesktop="max-content max-content"
+                gap="200"
+              >
+                <GcdsButton
+                  buttonRole="primary"
+                  type="button"
+                  onGcdsClick={handlePrintPage}
+                >
+                  {t("ProofingBarcodeCanadaPost.printPageButton")}
+                </GcdsButton>
                 <GcdsButton
                   buttonRole="secondary"
                   type="button"
