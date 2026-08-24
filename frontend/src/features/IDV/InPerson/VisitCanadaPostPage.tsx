@@ -37,9 +37,16 @@ import {
   getSharedDateOfBirthMessages,
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
+import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.validation";
 import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
+import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 
 const ERROR_SUMMARY_ID = "visit-canada-post-error-summary";
+
+const toOptionalTrimmed = (value: string): string | undefined => {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
 
 export default function VisitCanadaPost() {
   const { t } = useTranslation("idv");
@@ -139,6 +146,65 @@ export default function VisitCanadaPost() {
     hasSubmitted && summaryErrorCodes.lastName
       ? getLastNameRequiredOrInvalidMessage(t)
       : "";
+
+  const onContinue = async () => {
+    setHasSubmitted(true);
+
+    if (!isFormValid) {
+      setShowErrorSummary(true);
+      setIsDateOfBirthTouched(true);
+      // Re-trigger focus/scroll if user submits invalid data multiple times.
+      setSummaryFocusTrigger((previous) => previous + 1);
+      return;
+    }
+
+    setShowErrorSummary(false);
+
+    const response =
+      await inPersonIdentityVerificationApi.sendInPersonVerificationCode({
+        verificationProvider: "canada_post",
+        applicant: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          dateOfBirth: formData.dateOfBirth,
+          // Canada Post path requires an address object in the payload.
+          address: {
+            streetAddress: toOptionalTrimmed(formData.address),
+            region: toOptionalTrimmed(formData.province),
+            country: "CA",
+          },
+          idType: formData.idType,
+          idExpiryDate: formData.idExpiryDate,
+        },
+      });
+
+    if (!response?.data?.verificationCode) {
+      return;
+    }
+
+    const navigationState = {
+      idvCode: response.data.verificationCode,
+      givenName: formData.firstName,
+      lastName: formData.lastName,
+      dateOfBirth: formatDateOfBirthForDisplay(formData.dateOfBirth),
+      idSelected: formData.idType,
+      verificationExpiresAt: response.data.verificationExpiresAt,
+      verificationValidityDays: response.data.verificationValidityDays,
+      ...(requiresAddressAndProvince(formData.idType)
+        ? { address: formData.address }
+        : {}),
+    };
+
+    navigate(
+      path(PAGES.idvProofingBarcodeCanadaPostPage, {
+        language,
+        journeyType,
+      }),
+      {
+        state: navigationState,
+      },
+    );
+  };
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -294,39 +360,9 @@ export default function VisitCanadaPost() {
           >
             <GcdsButton
               type="button"
-              onGcdsClick={(event: Event) => {
+              onGcdsClick={async (event: Event) => {
                 event.preventDefault();
-                setHasSubmitted(true);
-
-                if (!isFormValid) {
-                  setShowErrorSummary(true);
-                  setIsDateOfBirthTouched(true);
-                  // Re-trigger focus/scroll if user submits invalid data multiple times.
-                  setSummaryFocusTrigger((previous) => previous + 1);
-                  return;
-                }
-
-                setShowErrorSummary(false);
-
-                const navigationState = {
-                  givenName: formData.firstName,
-                  lastName: formData.lastName,
-                  dateOfBirth: formData.dateOfBirth,
-                  idSelected: formData.idType,
-                  ...(requiresAddressAndProvince(formData.idType)
-                    ? { address: formData.address }
-                    : {}),
-                };
-
-                navigate(
-                  path(PAGES.idvProofingBarcodeCanadaPostPage, {
-                    language,
-                    journeyType,
-                  }),
-                  {
-                    state: navigationState,
-                  },
-                );
+                await onContinue();
               }}
             >
               {t("VisitCanadaPost.continueButton")}

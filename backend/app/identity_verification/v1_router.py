@@ -91,7 +91,7 @@ async def idv_mock_success(
 @router.post(
     "/in-person",
     response_model=ResponseModel,
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
     tags=["Identity Verification"],
     summary="Create an in-person identity verification case",
     description="Creates an in-person identity verification case in idv-data-store and returns the generated verification code metadata.",
@@ -104,7 +104,7 @@ async def send_in_person_verification(
     return await create_in_person_identity_verification_case(
         request.app.state.request_client,
         user_access_token,
-        payload.model_dump(exclude_none=True),
+        payload.model_dump(mode="json", exclude_none=True),
     )
 
 

@@ -4,7 +4,10 @@ import importlib
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from httpx import AsyncClient
+from authlib.integrations.starlette_client import OAuthError
+from fastapi import HTTPException
+from httpx import AsyncClient, Request, Response
+from pydantic import ValidationError
 
 identity_verification_module = importlib.import_module(
     "app.identity_verification.services.in_person_identity_verification"
@@ -44,6 +47,89 @@ def _mock_response(json_data, status_code=200):
     response.json.return_value = json_data
     response.raise_for_status = MagicMock()
     return response
+
+
+def _httpx_error_response(status_code: int, payload: dict):
+    return Response(
+        status_code=status_code,
+        json=payload,
+        request=Request(
+            "POST",
+            "https://idv-data-store.example.com/v1/identity-verifications/in-person",
+        ),
+    )
+
+
+class TestCreateInPersonIdentityVerificationRequestSchema:
+    def test_rejects_unknown_verification_provider(self):
+        from app.identity_verification.schemas import (
+            CreateInPersonIdentityVerificationRequest,
+        )
+
+        with pytest.raises(ValidationError):
+            CreateInPersonIdentityVerificationRequest(
+                verification_provider="unknown_provider",
+                applicant={
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "date_of_birth": "1990-05-15",
+                    "id_type": "driverLicence",
+                    "id_expiry_date": "2030-05-15",
+                },
+            )
+
+    def test_rejects_invalid_date_fields(self):
+        from app.identity_verification.schemas import (
+            CreateInPersonIdentityVerificationRequest,
+        )
+
+        with pytest.raises(ValidationError):
+            CreateInPersonIdentityVerificationRequest(
+                verification_provider="service_canada",
+                applicant={
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "date_of_birth": "not-a-date",
+                    "id_type": "driverLicence",
+                    "id_expiry_date": "not-a-date",
+                },
+            )
+
+    def test_rejects_canada_post_without_address(self):
+        from app.identity_verification.schemas import (
+            CreateInPersonIdentityVerificationRequest,
+        )
+
+        with pytest.raises(ValidationError):
+            CreateInPersonIdentityVerificationRequest(
+                verification_provider="canada_post",
+                applicant={
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "date_of_birth": "1990-05-15",
+                    "id_type": "driverLicence",
+                    "id_expiry_date": "2030-05-15",
+                },
+            )
+
+    def test_accepts_canada_post_with_address_object(self):
+        from app.identity_verification.schemas import (
+            CreateInPersonIdentityVerificationRequest,
+        )
+
+        request = CreateInPersonIdentityVerificationRequest(
+            verification_provider="canada_post",
+            applicant={
+                "first_name": "Jane",
+                "last_name": "Doe",
+                "date_of_birth": "1990-05-15",
+                "id_type": "driverLicence",
+                "id_expiry_date": "2030-05-15",
+                "address": {},
+            },
+        )
+
+        assert request.applicant.address is not None
 
 
 class TestCreateInPersonIdentityVerificationCase:
@@ -143,6 +229,97 @@ class TestCreateInPersonIdentityVerificationCase:
             "applicant": {},
         }
 
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "status_code,error_payload,expected_status,expected_detail",
+        [
+            (400, {"messageId": "BadRequest"}, 400, "BadRequest"),
+            (404, {"messageId": "NotFound"}, 404, "NotFound"),
+            (429, {"messageId": "TooManyRequests"}, 429, "TooManyRequests"),
+            (
+                500,
+                {"detail": "ServerError"},
+                500,
+                "idv-data-store in-person identity verification create request failed",
+            ),
+        ],
+    )
+    async def test_maps_http_status_errors_to_api_errors(
+        self,
+        status_code,
+        error_payload,
+        expected_status,
+        expected_detail,
+        mock_http_client,
+    ):
+        with (
+            patch.object(
+                identity_verification_module,
+                "get_configuration",
+                return_value=MOCK_CONFIGURATION,
+            ),
+            patch.object(
+                base_module, "exchange_token_for_idv_data_store"
+            ) as mock_exchange,
+        ):
+            mock_exchange.return_value = "idv-scoped-access-token"
+            mock_http_client.post = AsyncMock(
+                return_value=_httpx_error_response(status_code, error_payload)
+            )
+
+            with pytest.raises(HTTPException) as exc_info:
+                await create_in_person_identity_verification_case(
+                    mock_http_client,
+                    "user-access-token",
+                    {
+                        "verification_provider": "service_canada",
+                        "applicant": {
+                            "first_name": "Jane",
+                            "last_name": "Doe",
+                            "date_of_birth": "1990-05-15",
+                            "id_type": "driverLicence",
+                            "id_expiry_date": "2030-05-15",
+                        },
+                    },
+                )
+
+        assert exc_info.value.status_code == expected_status
+        assert expected_detail in str(exc_info.value.detail)
+
+    @pytest.mark.asyncio
+    @patch.object(
+        identity_verification_module,
+        "get_configuration",
+        return_value=MOCK_CONFIGURATION,
+    )
+    @patch.object(base_module, "exchange_token_for_idv_data_store")
+    async def test_maps_401_to_oauth_error(
+        self,
+        mock_exchange,
+        mock_get_configuration,
+        mock_http_client,
+    ):
+        mock_exchange.return_value = "idv-scoped-access-token"
+        mock_http_client.post = AsyncMock(
+            return_value=_httpx_error_response(401, {"messageId": "Unauthorized"})
+        )
+
+        with pytest.raises(OAuthError):
+            await create_in_person_identity_verification_case(
+                mock_http_client,
+                "user-access-token",
+                {
+                    "verification_provider": "service_canada",
+                    "applicant": {
+                        "first_name": "Jane",
+                        "last_name": "Doe",
+                        "date_of_birth": "1990-05-15",
+                        "id_type": "driverLicence",
+                        "id_expiry_date": "2030-05-15",
+                    },
+                },
+            )
+
 
 class TestGetLastEmailSent:
     @pytest.mark.asyncio
@@ -216,7 +393,7 @@ class TestInPersonVerificationRouterEndpoints:
         mock_create_case.assert_awaited_once_with(
             mock_request.app.state.request_client,
             "user-access-token",
-            payload.model_dump(exclude_none=True),
+            payload.model_dump(mode="json", exclude_none=True),
         )
 
     @pytest.mark.asyncio

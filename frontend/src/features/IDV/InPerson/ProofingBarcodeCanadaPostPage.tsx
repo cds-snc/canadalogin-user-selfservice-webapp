@@ -48,7 +48,7 @@ export default function ProofingBarcodeCanadaPostPage() {
   const locationState =
     (location.state as ProofingBarcodeCanadaPostState | null) ?? null;
 
-  const barcodeValue = "CP387DHROGJ";
+  const barcodeValue = locationState?.idvCode ?? "CP387DHROGJ";
 
   const visitCanadaPostPage = path(PAGES.idvVisitCanadaPostPage, {
     language,
