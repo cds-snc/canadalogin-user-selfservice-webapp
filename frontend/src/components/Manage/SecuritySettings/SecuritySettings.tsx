@@ -10,11 +10,9 @@ import {
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
-import { PAGES, DEV_ONLY_FEATURE } from "../../../utils/constants";
-
+import { PAGES } from "../../../utils/constants";
 import { useUser } from "../../Providers/useUser";
 import EnabledBadge from "../../Badges/EnabledBadge";
-import VerifiedBadge from "../../Badges/VerifiedBadge";
 
 export default function SecuritySettings() {
   const { language } = useParams();
@@ -66,23 +64,6 @@ export default function SecuritySettings() {
           </GcdsLink>
         </GcdsGrid>
       </GcdsContainer>
-      {DEV_ONLY_FEATURE && (
-        <GcdsContainer className="sectionCard">
-          <GcdsHeading tag="h3" marginTop="300">
-            Identity Verification
-          </GcdsHeading>
-          <GcdsText>
-            Some services require users to complete identity verification prior
-            to being granted access to the service.
-          </GcdsText>
-          <GcdsGrid columns="1fr" gap="300" align-items="center">
-            <VerifiedBadge text="Identity Verified" />
-            <GcdsLink href={manage2FAVerificationsPage} size="regular">
-              View Details
-            </GcdsLink>
-          </GcdsGrid>
-        </GcdsContainer>
-      )}
     </GcdsContainer>
   );
 }
