@@ -178,18 +178,17 @@ export default function VisitCanadaPost() {
         },
       });
 
-    if (!response?.data?.verificationCode) {
+    if (!response?.success) {
       return;
     }
 
     const navigationState = {
-      idvCode: response.data.verificationCode,
       givenName: formData.firstName,
       lastName: formData.lastName,
       dateOfBirth: formatDateOfBirthForDisplay(formData.dateOfBirth),
       idSelected: formData.idType,
-      verificationExpiresAt: response.data.verificationExpiresAt,
-      verificationValidityDays: response.data.verificationValidityDays,
+      verificationExpiresAt: response.data?.verificationExpiresAt,
+      verificationValidityDays: response.data?.verificationValidityDays,
       ...(requiresAddressAndProvince(formData.idType)
         ? { address: formData.address }
         : {}),

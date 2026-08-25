@@ -178,11 +178,7 @@ describe("VisitCanadaPost", () => {
     mockSendInPersonVerificationCode.mockResolvedValue({
       success: true,
       message: "In-person identity verification case created",
-      data: {
-        verificationCode: "CP12345678",
-        verificationExpiresAt: "2026-08-12T20:58:26.760127+00:00",
-        verificationValidityDays: 30,
-      },
+      data: {},
     });
     Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
       configurable: true,
@@ -359,18 +355,18 @@ describe("VisitCanadaPost", () => {
         },
       });
 
-      expect(mockNavigate).toHaveBeenCalledWith(expect.any(String), {
-        state: {
-          idvCode: "CP12345678",
-          givenName: "Jane",
-          lastName: "Doe",
-          dateOfBirth: "May 15, 1990",
-          address: "123 Main St",
-          idSelected: "driverLicence",
-          verificationExpiresAt: "2026-08-12T20:58:26.760127+00:00",
-          verificationValidityDays: 30,
-        },
-      });
+      expect(mockNavigate).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          state: expect.objectContaining({
+            givenName: "Jane",
+            lastName: "Doe",
+            dateOfBirth: "May 15, 1990",
+            address: "123 Main St",
+            idSelected: "driverLicence",
+          }),
+        }),
+      );
     });
 
     const [targetPath, navigationOptions] = mockNavigate.mock.calls[0];
@@ -460,7 +456,7 @@ describe("VisitCanadaPost", () => {
     expect(mockNavigate.mock.calls[0][1].state).not.toHaveProperty("province");
   });
 
-  it("does not navigate when in-person API does not return a verification code", async () => {
+  it("navigates when in-person API succeeds without returning a verification code", async () => {
     mockSendInPersonVerificationCode.mockResolvedValueOnce({
       success: true,
       message: "In-person identity verification case created",
@@ -489,9 +485,8 @@ describe("VisitCanadaPost", () => {
 
     await waitFor(() => {
       expect(mockSendInPersonVerificationCode).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
     });
-
-    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it("shows error summary on invalid continue and allows submit once valid", async () => {
