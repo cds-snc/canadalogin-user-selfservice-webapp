@@ -15,6 +15,7 @@ import i18n from "../../../i18n/test";
 
 const mockNavigate = vi.fn();
 const mockFlags = vi.hoisted(() => ({ devOnlyFeature: true }));
+const mockSendInPersonVerificationCode = vi.hoisted(() => vi.fn());
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -31,6 +32,18 @@ vi.mock("../../../utils/constants", async () => {
     ...actual,
     get DEV_ONLY_FEATURE() {
       return mockFlags.devOnlyFeature;
+    },
+  };
+});
+
+vi.mock("../api/inPersonIdentityVerificationApi", async () => {
+  const actual = await vi.importActual(
+    "../api/inPersonIdentityVerificationApi",
+  );
+  return {
+    ...actual,
+    inPersonIdentityVerificationApi: {
+      sendInPersonVerificationCode: mockSendInPersonVerificationCode,
     },
   };
 });
@@ -162,6 +175,11 @@ describe("VisitCanadaPost", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
+    mockSendInPersonVerificationCode.mockResolvedValue({
+      success: true,
+      message: "In-person identity verification case created",
+      data: {},
+    });
     Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
       configurable: true,
       value: vi.fn(),
@@ -293,7 +311,7 @@ describe("VisitCanadaPost", () => {
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
-  it("navigates to ProofingBarcodeCanadaPostPage with form data when Continue is clicked", () => {
+  it("submits Canada Post payload and navigates with API response metadata", async () => {
     render(<VisitCanadaPost />);
 
     fireEvent.change(screen.getByTestId("selectId"), {
@@ -320,21 +338,43 @@ describe("VisitCanadaPost", () => {
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
+    await waitFor(() => {
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalledWith({
+        verificationProvider: "canada_post",
+        applicant: {
+          firstName: "Jane",
+          lastName: "Doe",
+          dateOfBirth: "1990-05-15",
+          address: {
+            streetAddress: "123 Main St",
+            region: "ON",
+            country: "CA",
+          },
+          idType: "driverLicence",
+          idExpiryDate: "2028-01-01",
+        },
+      });
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          state: expect.objectContaining({
+            givenName: "Jane",
+            lastName: "Doe",
+            dateOfBirth: "May 15, 1990",
+            address: "123 Main St",
+            idSelected: "driverLicence",
+          }),
+        }),
+      );
+    });
+
     const [targetPath, navigationOptions] = mockNavigate.mock.calls[0];
     expect(targetPath).toContain("in-person/canada-post/idv-code");
-    expect(mockNavigate).toHaveBeenCalledWith(expect.any(String), {
-      state: {
-        givenName: "Jane",
-        lastName: "Doe",
-        dateOfBirth: "1990-05-15",
-        address: "123 Main St",
-        idSelected: "driverLicence",
-      },
-    });
     expect(navigationOptions).toBeDefined();
   });
 
-  it("passes dateOfBirth from form state on continue", () => {
+  it("passes formatted dateOfBirth from form state on continue", async () => {
     render(<VisitCanadaPost />);
 
     fireEvent.change(screen.getByTestId("selectId"), {
@@ -355,17 +395,19 @@ describe("VisitCanadaPost", () => {
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        state: expect.objectContaining({
-          dateOfBirth: "1990-05-15",
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          state: expect.objectContaining({
+            dateOfBirth: "May 15, 1990",
+          }),
         }),
-      }),
-    );
+      );
+    });
   });
 
-  it("omits address and province from submit state when the selected ID does not require them", () => {
+  it("omits address and province from submit state when the selected ID does not require them", async () => {
     render(<VisitCanadaPost />);
 
     fireEvent.change(screen.getByTestId("selectId"), {
@@ -396,23 +438,58 @@ describe("VisitCanadaPost", () => {
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        state: expect.objectContaining({
-          dateOfBirth: "1990-05-15",
-          givenName: "Jane",
-          idSelected: "passport",
-          lastName: "Doe",
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          state: expect.objectContaining({
+            dateOfBirth: "May 15, 1990",
+            givenName: "Jane",
+            idSelected: "passport",
+            lastName: "Doe",
+          }),
         }),
-      }),
-    );
+      );
+    });
 
     expect(mockNavigate.mock.calls[0][1].state).not.toHaveProperty("address");
     expect(mockNavigate.mock.calls[0][1].state).not.toHaveProperty("province");
   });
 
-  it("shows error summary on invalid continue and allows submit once valid", () => {
+  it("navigates when in-person API succeeds without returning a verification code", async () => {
+    mockSendInPersonVerificationCode.mockResolvedValueOnce({
+      success: true,
+      message: "In-person identity verification case created",
+      data: {},
+    });
+
+    render(<VisitCanadaPost />);
+
+    fireEvent.change(screen.getByTestId("selectId"), {
+      target: { value: "passport" },
+    });
+    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
+      target: { value: "2028-01-01" },
+    });
+    fireEvent.change(screen.getByTestId("first-name-input"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("last-name-input"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
+      target: { value: "1990-05-15" },
+    });
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    await waitFor(() => {
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("shows error summary on invalid continue and allows submit once valid", async () => {
     render(<VisitCanadaPost />);
 
     const continueButton = screen.getByTestId("continue-button");
@@ -449,8 +526,11 @@ describe("VisitCanadaPost", () => {
 
     fireEvent.click(continueButton);
 
-    expect(mockNavigate).toHaveBeenCalled();
-    expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalled();
+      expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
+    });
   });
 
   it("shows the follow-up required field errors after selecting an ID type", () => {
