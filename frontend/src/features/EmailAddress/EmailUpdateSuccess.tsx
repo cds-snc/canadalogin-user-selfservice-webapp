@@ -23,15 +23,20 @@ export default function EmailUpdateSuccess({
   onBackToProfile,
   onSignOut,
 }: EmailUpdateSuccessProps) {
-  const { language } = useParams();
+  const { language = "en" } = useParams<{ language?: string }>();
   const { t } = useTranslation("email");
 
   return (
     <GcdsContainer role="main">
-      <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
+      <GcdsNotice
+        noticeRole="success"
+        noticeTitleTag="h2"
+        noticeTitle={t("EmailUpdateSuccess.successTitle")}
+        lang={language}
+      >
         <GcdsText>
           {t("EmailUpdateSuccess.emailUpdatedTo")}{" "}
-          <strong>{newEmailAddress}</strong>
+          <strong>{newEmailAddress}</strong>.
         </GcdsText>
       </GcdsNotice>
 
@@ -40,7 +45,7 @@ export default function EmailUpdateSuccess({
       </GcdsHeading>
 
       <GcdsText marginBottom="300" lang={language}>
-        <strong>{t("EmailUpdateSuccess.onlyConnectedServices")}</strong>
+        {t("EmailUpdateSuccess.onlyConnectedServices")}
       </GcdsText>
 
       <GcdsText marginBottom="300" lang={language}>
@@ -55,9 +60,23 @@ export default function EmailUpdateSuccess({
         {t("EmailUpdateSuccess.period")}
       </GcdsText>
 
+      <GcdsNotice
+        noticeRole="warning"
+        noticeTitleTag="h2"
+        noticeTitle={t("EmailUpdateSuccess.syncNoticeTitle")}
+        lang={language}
+      >
+        <GcdsText>{t("EmailUpdateSuccess.syncNoticeDescription")}</GcdsText>
+        <GcdsText>
+          <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+            {t("EmailUpdateSuccess.servicesLinkText")}
+          </GcdsLink>
+        </GcdsText>
+      </GcdsNotice>
+
       <GcdsGrid columns="max-content max-content" gap="200">
         <SubmitButton
-          currentLang={language ?? "en"}
+          currentLang={language}
           style={{ width: "fit-content" }}
           onClick={onBackToProfile}
         >

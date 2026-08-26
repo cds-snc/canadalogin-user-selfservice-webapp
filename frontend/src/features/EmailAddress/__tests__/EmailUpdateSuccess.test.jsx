@@ -147,17 +147,21 @@ describe("EmailUpdateSuccess", () => {
 
       expect(screen.getByTestId("gcds-container")).toBeInTheDocument();
       expect(screen.getByRole("main")).toBeInTheDocument();
-      expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
+      expect(screen.getAllByTestId("gcds-notice")).toHaveLength(2);
       expect(screen.getByTestId("gcds-heading")).toBeInTheDocument();
-      expect(screen.getAllByTestId("gcds-text")).toHaveLength(4);
+      expect(screen.getAllByTestId("gcds-text").length).toBeGreaterThanOrEqual(
+        6,
+      );
     });
 
     it("renders the success notice with correct type", () => {
       renderComponent();
 
-      const notice = screen.getByTestId("gcds-notice");
-      expect(notice).toHaveAttribute("data-notice-role", "success");
-      expect(notice).toHaveAttribute("data-notice-title-tag", "h2");
+      const notices = screen.getAllByTestId("gcds-notice");
+      expect(notices[0]).toHaveAttribute("data-notice-role", "success");
+      expect(notices[0]).toHaveAttribute("data-notice-title-tag", "h2");
+      expect(notices[0]).toHaveAttribute("data-notice-title", "Success");
+      expect(notices[1]).toHaveAttribute("data-notice-role", "warning");
     });
 
     it("displays the new email address in the success message", () => {
@@ -165,7 +169,7 @@ describe("EmailUpdateSuccess", () => {
 
       expect(
         screen.getByText((content) =>
-          content.includes("Your email has been updated to"),
+          content.includes("Your email address has been updated to:"),
         ),
       ).toBeInTheDocument();
       expect(screen.getByText("newemail@example.com")).toBeInTheDocument();
@@ -291,9 +295,13 @@ describe("EmailUpdateSuccess", () => {
     it("renders the GC Account directory link", () => {
       renderComponent();
 
-      const link = screen.getByTestId("gcds-link");
-      expect(link).toHaveAttribute("href", "https://account.gc.ca");
-      expect(link).toHaveTextContent("GC Account directory");
+      const links = screen.getAllByTestId("gcds-link");
+      expect(links.length).toBeGreaterThanOrEqual(2);
+      expect(links[0]).toHaveAttribute("href", "https://account.gc.ca");
+      expect(links[1]).toHaveAttribute("href", "https://account.gc.ca");
+      expect(
+        screen.getByText("Government of Canada account directory"),
+      ).toBeInTheDocument();
     });
 
     it("handles link with different href", () => {
@@ -309,8 +317,10 @@ describe("EmailUpdateSuccess", () => {
 
       renderComponent();
 
-      const link = screen.getByTestId("gcds-link");
-      expect(link).toHaveAttribute("href", "https://account.gc.ca");
+      const links = screen.getAllByTestId("gcds-link");
+      links.forEach((link) => {
+        expect(link).toHaveAttribute("href", "https://account.gc.ca");
+      });
     });
   });
 
@@ -320,12 +330,13 @@ describe("EmailUpdateSuccess", () => {
 
       const container = screen.getByTestId("gcds-container");
       const grid = screen.getByTestId("gcds-grid");
-      const notice = screen.getByTestId("gcds-notice");
+      const notices = screen.getAllByTestId("gcds-notice");
 
       expect(container).toHaveAttribute("role", "main");
       expect(grid).toHaveAttribute("data-columns", "max-content max-content");
       expect(grid).toHaveAttribute("data-gap", "200");
-      expect(notice).toHaveAttribute("data-notice-role", "success");
+      expect(notices[0]).toHaveAttribute("data-notice-role", "success");
+      expect(notices[1]).toHaveAttribute("data-notice-role", "warning");
     });
 
     it("should render text components with language attributes", () => {
@@ -390,7 +401,9 @@ describe("EmailUpdateSuccess", () => {
       renderComponent();
 
       expect(
-        screen.getByText("You may need to update your email other places"),
+        screen.getByText(
+          "You may need to update your email address other places",
+        ),
       ).toBeInTheDocument();
       expect(
         screen.getByText((content) =>
@@ -404,9 +417,16 @@ describe("EmailUpdateSuccess", () => {
       ).toBeInTheDocument();
       expect(
         screen.getByText((content) =>
-          content.includes("To search for another GC Account"),
+          content.includes(
+            "To search for another Government of Canada Account",
+          ),
         ),
       ).toBeInTheDocument();
+      const notices = screen.getAllByTestId("gcds-notice");
+      expect(notices[1]).toHaveAttribute(
+        "data-notice-title",
+        "You may need to sync this update",
+      );
     });
 
     it("renders content with proper structure", () => {
@@ -445,8 +465,9 @@ describe("EmailUpdateSuccess", () => {
     it("renders notice with proper title tag", () => {
       renderComponent();
 
-      const notice = screen.getByTestId("gcds-notice");
-      expect(notice).toHaveAttribute("data-notice-title-tag", "h2");
+      const notices = screen.getAllByTestId("gcds-notice");
+      expect(notices[0]).toHaveAttribute("data-notice-title-tag", "h2");
+      expect(notices[1]).toHaveAttribute("data-notice-title-tag", "h2");
     });
   });
 

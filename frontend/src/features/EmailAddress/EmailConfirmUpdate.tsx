@@ -58,7 +58,11 @@ export default function EmailConfirmUpdate({
         </ul>
       </GcdsNotice>
 
-      <GcdsGrid columns="max-content max-content" gap="200" marginTop="300">
+      <GcdsGrid
+        columns="max-content max-content"
+        gap="200"
+        style={{ marginTop: "1.5rem" }}
+      >
         <SubmitButton currentLang={language} onClick={() => void onSubmit()}>
           {t("EmailConfirmUpdate.confirmButton")}
         </SubmitButton>

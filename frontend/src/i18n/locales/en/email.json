@@ -47,12 +47,16 @@
     "confirmButton": "Yes, update"
   },
   "EmailUpdateSuccess": {
-    "emailUpdatedTo": "Your email has been updated to",
-    "updateOtherPlaces": "You may need to update your email other places",
+    "successTitle": "Success",
+    "emailUpdatedTo": "Your email address has been updated to:",
+    "updateOtherPlaces": "You may need to update your email address other places",
     "onlyConnectedServices": "This only changes your email with services connected to your CanadaLogin.",
     "notConnectedNotice": "If you are trying to update your email with a service that's not connected to your CanadaLogin, you'll need to go to that account.",
-    "searchOtherAccounts": "To search for another GC Account, visit the",
-    "gcAccountDirectory": "GC Account directory",
+    "searchOtherAccounts": "To search for another Government of Canada Account, visit the",
+    "gcAccountDirectory": "Government of Canada account directory",
+    "syncNoticeTitle": "You may need to sync this update",
+    "syncNoticeDescription": "To sync your updated email address from your CanadaLogin profile to your connected services, sign in to each service individually.",
+    "servicesLinkText": "You can find links to all services that can be accessed using your CanadaLogin",
     "period": ".",
     "backToProfile": "Back to profile",
     "signOut": "Sign out"

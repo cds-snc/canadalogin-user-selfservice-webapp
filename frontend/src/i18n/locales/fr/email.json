@@ -47,14 +47,18 @@
     "confirmButton": "Oui, mettre à jour"
   },
   "EmailUpdateSuccess": {
-    "emailUpdatedTo": "Your email has been updated to",
-    "updateOtherPlaces": "You may need to update your email other places",
-    "onlyConnectedServices": "This only changes your email with services connected to your CanadaLogin.",
-    "notConnectedNotice": "If you are trying to update your email with a service that's not connected to your CanadaLogin, you'll need to go to that account.",
-    "searchOtherAccounts": "To search for another GC Account, visit the",
-    "gcAccountDirectory": "GC Account directory",
+    "successTitle": "Opération réussie",
+    "emailUpdatedTo": "Votre adresse courriel est maintenant :",
+    "updateOtherPlaces": "Il se peut que vous deviez modifier cette adresse courriel ailleurs",
+    "onlyConnectedServices": "Cette action ne modifie votre adresse courriel que pour les services liés à votre identifiant ConnexionCanada.",
+    "notConnectedNotice": "Si vous cherchez à mettre à jour votre adresse courriel pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "searchOtherAccounts": "Pour rechercher un autre compte du gouvernement du Canada, visitez le",
+    "gcAccountDirectory": "répertoire des comptes du gouvernement du Canada",
+    "syncNoticeTitle": "Vous pourriez avoir à synchroniser cette mise à jour",
+    "syncNoticeDescription": "Pour synchroniser la mise à jour de votre adresse courriel pour votre identifiant ConnexionCanada et les services qui y sont liés, connectez-vous à chaque service individuellement.",
+    "servicesLinkText": "Vous trouverez ici les liens vers tous les services auxquels vous pouvez accéder à l'aide de votre identifiant ConnexionCanada",
     "period": ".",
-    "backToProfile": "Back to profile",
-    "signOut": "Sign out"
+    "backToProfile": "Retour au profil",
+    "signOut": "Se déconnecter"
   }
 }
