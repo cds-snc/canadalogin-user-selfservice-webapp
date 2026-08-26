@@ -15,8 +15,6 @@ export default function ServicesWithAccessInfoSection({
   information,
 }: ServicesWithAccessInfoSectionProps) {
   const { t } = useTranslation("layout");
-  const isEmailInfo =
-    information === ServicesWithAccessInfoSectionInformation.EMAIL_ADDRESS;
   const informationMap: Record<string, string> = {
     [ServicesWithAccessInfoSectionInformation.NAME]: t(
       "ServicesWithAccessInfo.name",
@@ -32,38 +30,29 @@ export default function ServicesWithAccessInfoSection({
     ),
   };
 
-  const description = isEmailInfo
-    ? t("ServicesWithAccessInfo.emailDescription")
-    : t("ServicesWithAccessInfo.description", {
-        information: informationMap[information],
-      });
-  const notConnectedNotice = isEmailInfo
-    ? t("ServicesWithAccessInfo.emailNotConnectedNotice")
-    : t("ServicesWithAccessInfo.notConnectedNotice", {
-        information: informationMap[information],
-      });
-  const searchOtherAccounts = isEmailInfo
-    ? t("ServicesWithAccessInfo.emailSearchOtherAccounts")
-    : t("ServicesWithAccessInfo.searchOtherAccounts");
-  const gcAccountDirectory = isEmailInfo
-    ? t("ServicesWithAccessInfo.emailGcAccountDirectory")
-    : t("ServicesWithAccessInfo.gcAccountDirectory");
-
   return (
     <GcdsDetails
       detailsTitle={t("ServicesWithAccessInfo.title", {
         information: informationMap[information],
       })}
     >
-      <GcdsText>{description}</GcdsText>
-      <GcdsText>{notConnectedNotice}</GcdsText>
       <GcdsText>
-        {searchOtherAccounts}&nbsp;
+        {t("ServicesWithAccessInfo.description", {
+          information: informationMap[information],
+        })}
+      </GcdsText>
+      <GcdsText>
+        {t("ServicesWithAccessInfo.notConnectedNotice", {
+          information: informationMap[information],
+        })}
+      </GcdsText>
+      <GcdsText>
+        {t("ServicesWithAccessInfo.searchOtherAccounts")}&nbsp;
         <GcdsLink
           href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
           target="_blank"
         >
-          {gcAccountDirectory}
+          {t("ServicesWithAccessInfo.gcAccountDirectory")}
         </GcdsLink>
         .
       </GcdsText>
