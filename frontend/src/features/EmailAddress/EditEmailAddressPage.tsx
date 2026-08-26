@@ -340,7 +340,7 @@ export default function EditEmailAddressPage() {
         validatePassword={handleValidatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        parentPage={PAGES.addMFAPage}
+        parentPage={PAGES.editEmailPage}
       />
     ),
     otpSelection: (

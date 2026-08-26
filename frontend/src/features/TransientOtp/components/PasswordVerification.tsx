@@ -43,6 +43,7 @@ export default function PasswordVerification({
   const pageContentMap: Record<string, string> = {
     [PAGES.deleteMFAPage]: t("PasswordVerification.toDeleteNumber"),
     [PAGES.addMFAPage]: t("PasswordVerification.toAddPhone"),
+    [PAGES.editEmailPage]: t("PasswordVerification.toChangeEmail"),
     [PAGES.addFIDO2PasskeyPage]: t("PasswordVerification.toAddPasskey"),
     [PAGES.deleteFIDO2PasskeyPage]: t("PasswordVerification.toDeletePasskey"),
     [PAGES.password]: t("PasswordVerification.toChangePassword"),

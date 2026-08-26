@@ -173,6 +173,14 @@ describe("PasswordVerification Component", () => {
       ).toBeInTheDocument();
     });
 
+    it("renders with editEmailPage parent page content", () => {
+      renderComponent({ parentPage: PAGES.editEmailPage });
+      expect(screen.getByText(/To change your email,/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/first enter your current password\./),
+      ).toBeInTheDocument();
+    });
+
     it("renders the password input field", () => {
       renderComponent();
       expect(screen.getByTestId("password-input")).toBeInTheDocument();

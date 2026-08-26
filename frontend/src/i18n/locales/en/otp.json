@@ -31,6 +31,7 @@
   "PasswordVerification": {
     "title": "First, verify it's you",
     "toChangePassword": "To change your password,",
+    "toChangeEmail": "To change your email,",
     "enterCurrentPassword": "first enter your current password.",
     "passwordLabel": "Password",
     "forgotPassword": "Forgot your password?",

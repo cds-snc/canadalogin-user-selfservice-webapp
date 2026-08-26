@@ -32,7 +32,8 @@
   "PasswordVerification": {
     "title": "Veuillez vous authentifier",
     "toChangePassword": "Pour modifier votre mot de passe,",
-    "enterCurrentPassword": "entrez d'abord votre mot de passe actuel.",
+    "toChangeEmail": "Pour modifier votre adresse courriel,",
+    "enterCurrentPassword": "entrez d’abord votre mot de passe actuel.",
     "passwordLabel": "Mot de passe",
     "forgotPassword": "Mot de passe oublié?",
     "resetPassword": "Réinitialiser le mot de passe",
