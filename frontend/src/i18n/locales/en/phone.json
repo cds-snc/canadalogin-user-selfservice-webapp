@@ -1,6 +1,7 @@
 {
   "EnterNewPhoneNumber": {
-    "title": "Enter a new phone number",
+    "title": "Edit your contact phone number",
+    "enterNewNumberHeading": "Enter a new number",
     "description": "This will update the phone number that CanadaLogin, and services connected to your CanadaLogin may use to contact you.",
     "servicesAccessTitle": "What services have access to your contact phone number",
     "servicesAccessDescription": "The following services have access to your contact phone number:",

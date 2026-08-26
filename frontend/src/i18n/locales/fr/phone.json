@@ -1,6 +1,7 @@
 {
   "EnterNewPhoneNumber": {
-    "title": "Entrez un nouveau numéro de téléphone",
+    "title": "Modifier votre numéro de téléphone de communication",
+    "enterNewNumberHeading": "Entrez un nouveau numéro",
     "description": "Cette action modifiera le numéro de téléphone que ConnexionCanada et les services liés à votre identifiant ConnexionCanada peuvent utiliser pour vous contacter.",
     "servicesAccessTitle": "Services ayant accès à votre numéro de téléphone de communication",
     "servicesAccessDescription": "Les services suivants ont accès à votre numéro de téléphone de communication par le biais de ConnexionCanada:",
