@@ -57,6 +57,33 @@ type EmailFormData = {
   emailAddress: string;
 };
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL_LENGTH = 128;
+const NON_ASCII_CHARACTER_REGEX = /[^\u0000-\u007F]/;
+
+const normalizeEmail = (value: string | undefined | null): string =>
+  (value || "").trim().toLowerCase();
+
+const getEmailValidationErrorCode = (email: string): string | null => {
+  if (!email) {
+    return "emailRequired";
+  }
+
+  if (email.length > MAX_EMAIL_LENGTH) {
+    return "emailTooLong";
+  }
+
+  if (NON_ASCII_CHARACTER_REGEX.test(email)) {
+    return "emailAccentedCharacters";
+  }
+
+  if (!EMAIL_REGEX.test(email)) {
+    return "invalidEmail";
+  }
+
+  return null;
+};
+
 type CaughtError = { data?: { message?: string } };
 
 export default function EditEmailAddressPage() {
@@ -238,23 +265,16 @@ export default function EditEmailAddressPage() {
       flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
     });
 
-    if (!formData.emailAddress || !formData.emailAddress.trim()) {
-      setErrorCode("EMAIL_REQUIRED");
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_STEP_END,
-        step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
-        error: "EMAIL_REQUIRED",
-      });
-      return;
-    }
+    const normalizedNewEmail = normalizeEmail(formData.emailAddress);
+    const emailValidationErrorCode =
+      getEmailValidationErrorCode(normalizedNewEmail);
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.emailAddress)) {
-      setErrorCode("INVALID_EMAIL");
+    if (emailValidationErrorCode) {
+      setErrorCode(emailValidationErrorCode);
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
-        error: "INVALID_EMAIL",
+        error: emailValidationErrorCode,
       });
       return;
     }
@@ -263,7 +283,7 @@ export default function EditEmailAddressPage() {
     setErrorCode("");
     const success = await requestOtpCode({
       otpType: FLOW_TYPES.email,
-      destination: formData.emailAddress,
+      destination: normalizedNewEmail,
     });
     if (success) {
       setWizardStep("emailOtpValidation");
@@ -278,23 +298,16 @@ export default function EditEmailAddressPage() {
     try {
       setErrorCode("");
 
-      if (!formData.emailAddress || !formData.emailAddress.trim()) {
-        setErrorCode("EMAIL_REQUIRED");
-        trackEvent({
-          event: GA_FORM_EVENTS.FORM_STEP_END,
-          step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-          error: "EMAIL_REQUIRED",
-        });
-        return;
-      }
+      const normalizedNewEmail = normalizeEmail(formData.emailAddress);
+      const emailValidationErrorCode =
+        getEmailValidationErrorCode(normalizedNewEmail);
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.emailAddress)) {
-        setErrorCode("INVALID_EMAIL");
+      if (emailValidationErrorCode) {
+        setErrorCode(emailValidationErrorCode);
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-          error: "INVALID_EMAIL",
+          error: emailValidationErrorCode,
         });
         return;
       }
@@ -310,7 +323,7 @@ export default function EditEmailAddressPage() {
       }
 
       const response = await authService.update_email_with_otp(
-        formData.emailAddress,
+        normalizedNewEmail,
         userOtpValue,
         otpSentResponse.trxnId,
         FLOW_TYPES.email,

@@ -421,6 +421,89 @@ describe("EditEmailAddressPage Integration Tests", () => {
       expect(screen.getByTestId("edit-email-enter-email")).toBeInTheDocument();
     });
 
+    it("executes handleEnterEmailSubmit with email longer than 128 characters", async () => {
+      renderComponent();
+
+      // Navigate to enter email step
+      await act(async () => {
+        const validateBtn = screen.getByTestId("validate-password-btn");
+        fireEvent.click(validateBtn);
+      });
+
+      await act(async () => {
+        const nextBtn = screen.getByTestId("otp-next-btn");
+        fireEvent.click(nextBtn);
+      });
+
+      await act(async () => {
+        const verifyBtn = screen.getByTestId("verify-otp-btn");
+        fireEvent.click(verifyBtn);
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument();
+      });
+
+      const localPart = "a".repeat(123);
+      const emailInput = screen.getByTestId("email-input");
+      await act(async () => {
+        fireEvent.change(emailInput, {
+          target: { value: `${localPart}@x.com` },
+        });
+      });
+
+      await act(async () => {
+        const submitBtn = screen.getByTestId("submit-email-btn");
+        fireEvent.click(submitBtn);
+      });
+
+      // Should still be on enter email step due to validation error
+      expect(screen.getByTestId("edit-email-enter-email")).toBeInTheDocument();
+    });
+
+    it("executes handleEnterEmailSubmit with accented characters in email", async () => {
+      renderComponent();
+
+      // Navigate to enter email step
+      await act(async () => {
+        const validateBtn = screen.getByTestId("validate-password-btn");
+        fireEvent.click(validateBtn);
+      });
+
+      await act(async () => {
+        const nextBtn = screen.getByTestId("otp-next-btn");
+        fireEvent.click(nextBtn);
+      });
+
+      await act(async () => {
+        const verifyBtn = screen.getByTestId("verify-otp-btn");
+        fireEvent.click(verifyBtn);
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument();
+      });
+
+      const emailInput = screen.getByTestId("email-input");
+      await act(async () => {
+        fireEvent.change(emailInput, {
+          target: { value: "usér@example.com" },
+        });
+      });
+
+      await act(async () => {
+        const submitBtn = screen.getByTestId("submit-email-btn");
+        fireEvent.click(submitBtn);
+      });
+
+      // Should still be on enter email step due to validation error
+      expect(screen.getByTestId("edit-email-enter-email")).toBeInTheDocument();
+    });
+
     it("executes handleEnterEmailSubmit with valid email", async () => {
       renderComponent();
 
@@ -487,7 +570,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
 
       const emailInput = screen.getByTestId("email-input");
       await act(async () => {
-        fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+        fireEvent.change(emailInput, { target: { value: "new@example.com" } });
       });
 
       await act(async () => {
