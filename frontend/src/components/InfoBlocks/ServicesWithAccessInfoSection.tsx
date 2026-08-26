@@ -59,7 +59,10 @@ export default function ServicesWithAccessInfoSection({
       <GcdsText>{notConnectedNotice}</GcdsText>
       <GcdsText>
         {searchOtherAccounts}&nbsp;
-        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+        <GcdsLink
+          href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
+          target="_blank"
+        >
           {gcAccountDirectory}
         </GcdsLink>
         .

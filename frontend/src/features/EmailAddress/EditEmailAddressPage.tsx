@@ -543,7 +543,7 @@ export default function EditEmailAddressPage() {
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
             flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
           });
-          await requestOtpCode({
+          return requestOtpCode({
             otpType: FLOW_TYPES.email,
             destination: formData.emailAddress,
           });

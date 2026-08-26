@@ -83,7 +83,10 @@ export default function SuccessfullyUpdated({
       <GcdsText>{t("ProfileUpdateNameSuccess.notConnectedNotice")}</GcdsText>
       <GcdsText>
         {t("ProfileUpdateNameSuccess.searchOtherAccounts")}{" "}
-        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+        <GcdsLink
+          href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
+          target="_blank"
+        >
           {t("ProfileUpdateNameSuccess.gcAccountDirectory")}
         </GcdsLink>
       </GcdsText>

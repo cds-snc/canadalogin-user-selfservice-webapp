@@ -51,7 +51,10 @@ export default function SuccessfullyUpdated({
         </GcdsText>
         <GcdsText>
           {t("SuccessfullyUpdatedContactPhoneNumber.searchOtherAccounts")}{" "}
-          <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+          <GcdsLink
+            href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
+            target="_blank"
+          >
             {t("SuccessfullyUpdatedContactPhoneNumber.gcAccountDirectory")}
           </GcdsLink>
         </GcdsText>

@@ -95,7 +95,10 @@ export default function SuccessfullyUpdated({
       <GcdsText>{t("SuccessfullyUpdatedLanguage.notConnectedNotice")}</GcdsText>
       <GcdsText>
         {t("SuccessfullyUpdatedLanguage.searchOtherAccounts")}{" "}
-        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+        <GcdsLink
+          href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
+          target="_blank"
+        >
           {t("SuccessfullyUpdatedLanguage.gcAccountDirectory")}
         </GcdsLink>
       </GcdsText>

@@ -80,6 +80,15 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
+  GcdsNotice: ({ children, noticeRole, noticeTitle }) => (
+    <div
+      data-testid="gcds-notice"
+      data-notice-role={noticeRole}
+      data-notice-title={noticeTitle}
+    >
+      {children}
+    </div>
+  ),
   GcdsLink: ({ children, onGcdsClick }) => {
     const handleClick = (e) => {
       if (onGcdsClick) {
@@ -387,6 +396,43 @@ describe("EmailOtpValidation", () => {
 
       expect(screen.getByText("Request a new code")).toBeInTheDocument();
       expect(screen.getByText(/^00:4[89]$/)).toBeInTheDocument();
+    });
+
+    it("shows a success notice when requesting a new code succeeds", async () => {
+      mockRequestOtpCode.mockResolvedValue(true);
+      const user = userEvent.setup();
+
+      renderComponent({ otpExpiry: "2000-01-01T00:00:00.000Z" });
+
+      await user.click(screen.getAllByText("Request a new code")[0]);
+
+      expect(mockRequestOtpCode).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId("gcds-notice")).toHaveAttribute(
+        "data-notice-role",
+        "success",
+      );
+      expect(screen.getByTestId("gcds-notice")).toHaveAttribute(
+        "data-notice-title",
+        "Success",
+      );
+      expect(
+        screen.getByText("We have sent you a new code"),
+      ).toBeInTheDocument();
+    });
+
+    it("does not show a success notice when requesting a new code fails", async () => {
+      mockRequestOtpCode.mockResolvedValue(false);
+      const user = userEvent.setup();
+
+      renderComponent({ otpExpiry: "2000-01-01T00:00:00.000Z" });
+
+      await user.click(screen.getAllByText("Request a new code")[0]);
+
+      expect(mockRequestOtpCode).toHaveBeenCalledTimes(1);
+      expect(screen.queryByTestId("gcds-notice")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("We have sent you a new code"),
+      ).not.toBeInTheDocument();
     });
   });
 

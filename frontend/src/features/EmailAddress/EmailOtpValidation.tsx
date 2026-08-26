@@ -6,6 +6,7 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsLink,
+  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
 import { useParams } from "react-router";
@@ -25,7 +26,7 @@ interface EmailOtpValidationProps {
   errorMessage?: string;
   userOtpValue: string;
   handleChange: (value: string) => void;
-  requestOtpCode: () => Promise<void>;
+  requestOtpCode: () => Promise<void | boolean>;
   onBack: () => void | Promise<void>;
   isMaxAttemptsReached?: boolean;
   resetAttempts?: () => void;
@@ -52,6 +53,7 @@ export default function EmailOtpValidation({
   const { t } = useTranslation(["email", "verification", "common"]);
 
   const [localError, setLocalError] = useState("");
+  const [showResendSuccessNotice, setShowResendSuccessNotice] = useState(false);
   const {
     fallbackSeconds,
     formattedCountdown,
@@ -79,19 +81,47 @@ export default function EmailOtpValidation({
     await onSubmit();
   };
 
-  const handleResendCode = async (ev: Event) => {
-    ev.preventDefault();
+  const handleResendCode = async (ev?: Event) => {
+    ev?.preventDefault();
     if (requestOtpCode) {
-      await requestOtpCode();
-      setLocalError("");
-      restartFallbackCountdown();
-      resetAttempts?.();
+      try {
+        const resendResult = await requestOtpCode();
+        const resendSucceeded = resendResult !== false;
+
+        if (resendSucceeded) {
+          setShowResendSuccessNotice(true);
+          setLocalError("");
+          restartFallbackCountdown();
+          resetAttempts?.();
+        } else {
+          setShowResendSuccessNotice(false);
+        }
+      } catch {
+        setShowResendSuccessNotice(false);
+      }
     }
   };
 
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
+        {showResendSuccessNotice ? (
+          <GcdsNotice
+            noticeRole="success"
+            noticeTitle={t("Verification.successTitle", {
+              ns: "verification",
+            })}
+            noticeTitleTag="h2"
+            lang={language}
+          >
+            <GcdsText>
+              {t("Verification.newCodeSent", {
+                ns: "verification",
+              })}
+            </GcdsText>
+          </GcdsNotice>
+        ) : null}
+
         <GcdsHeading tag="h1" lang={language}>
           {t("EmailOtpValidation.title")}
         </GcdsHeading>

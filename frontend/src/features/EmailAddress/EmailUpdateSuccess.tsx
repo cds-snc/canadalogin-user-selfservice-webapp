@@ -60,7 +60,10 @@ export default function EmailUpdateSuccess({
 
         <GcdsText marginBottom="300" lang={language}>
           {t("EmailUpdateSuccess.searchOtherAccounts")}{" "}
-          <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+          <GcdsLink
+            href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
+            target="_blank"
+          >
             {t("EmailUpdateSuccess.gcAccountDirectory")}
           </GcdsLink>
           {t("EmailUpdateSuccess.period")}
@@ -74,7 +77,10 @@ export default function EmailUpdateSuccess({
         >
           <GcdsText>{t("EmailUpdateSuccess.syncNoticeDescription")}</GcdsText>
           <GcdsText>
-            <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+            <GcdsLink
+              href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
+              target="_blank"
+            >
               {t("EmailUpdateSuccess.servicesLinkText")}
             </GcdsLink>
           </GcdsText>
