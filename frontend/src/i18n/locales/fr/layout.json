@@ -28,6 +28,10 @@
     "notConnectedNotice": "Si vous cherchez à mettre à jour votre {{information}} pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
     "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
     "gcAccountDirectory": "répertoire des comptes du GC",
+    "emailDescription": "Seuls les services que vous avez liés à votre compte ConnexionCanada ont accès à votre adresse courriel.",
+    "emailNotConnectedNotice": "Si vous cherchez à mettre à jour votre adresse courriel pour un service qui n’est pas lié à votre compte ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "emailSearchOtherAccounts": "Pour rechercher un autre compte du gouvernement du Canada, visitez le",
+    "emailGcAccountDirectory": "répertoire des comptes du gouvernement du Canada",
     "name": "nom",
     "contactPhone": "numéro de téléphone de communication",
     "languagePreference": "langue de communication"

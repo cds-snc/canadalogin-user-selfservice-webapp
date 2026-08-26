@@ -16,12 +16,12 @@
     "cancelButton": "Cancel"
   },
   "EditEmailEnterEmail": {
-    "title": "Enter a new email address",
-    "changingAffects": "Changing your email address will affect:",
-    "signInEmail": "The email address you use to sign in",
-    "contactEmail": "The email address that CanadaLogin uses to contact you",
-    "serviceEmail": "The email address that services connected to your CanadaLogin may use to contact you",
-    "emailLabel": "Email"
+    "title": "Change your email address",
+    "changingAffects": "This will change the email address you use with your CanadaLogin. Going forward, you will use your new email address to:",
+    "signInEmail": "Sign in to your CanadaLogin",
+    "contactEmail": "Receive emails about changes to your CanadaLogin",
+    "serviceEmail": "Receive emails from services connected to your CanadaLogin",
+    "emailLabel": "New email"
   },
   "EmailOtpValidation": {
     "title": "Check your email",

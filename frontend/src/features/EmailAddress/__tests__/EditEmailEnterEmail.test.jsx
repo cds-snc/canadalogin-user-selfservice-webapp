@@ -536,21 +536,21 @@ describe("EditEmailEnterEmail", () => {
       renderComponent();
 
       // Check that all page content is rendered
-      expect(screen.getByText("Enter a new email address")).toBeInTheDocument();
-      expect(
-        screen.getByText("Changing your email address will affect:"),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText("The email address you use to sign in"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Change your email address")).toBeInTheDocument();
       expect(
         screen.getByText(
-          "The email address that CanadaLogin uses to contact you",
+          "This will change the email address you use with your CanadaLogin. Going forward, you will use your new email address to:",
         ),
       ).toBeInTheDocument();
       expect(
+        screen.getByText("Sign in to your CanadaLogin"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Receive emails about changes to your CanadaLogin"),
+      ).toBeInTheDocument();
+      expect(
         screen.getByText(
-          "The email address that services connected to your CanadaLogin may use to contact you",
+          "Receive emails from services connected to your CanadaLogin",
         ),
       ).toBeInTheDocument();
     });
@@ -610,7 +610,7 @@ describe("EditEmailEnterEmail", () => {
 
     it("handles partial page content", () => {
       renderComponent();
-      expect(screen.getByText("Enter a new email address")).toBeInTheDocument();
+      expect(screen.getByText("Change your email address")).toBeInTheDocument();
     });
 
     it("handles very long email addresses", async () => {

@@ -16,12 +16,12 @@
     "cancelButton": "Annuler"
   },
   "EditEmailEnterEmail": {
-    "title": "Enter a new email address",
-    "changingAffects": "Changing your email address will affect:",
-    "signInEmail": "The email address you use to sign in",
-    "contactEmail": "The email address that CanadaLogin uses to contact you",
-    "serviceEmail": "The email address that services connected to your CanadaLogin may use to contact you",
-    "emailLabel": "Email"
+    "title": "Modifier votre adresse courriel",
+    "changingAffects": "Cette action modifiera l’adresse courriel que vous utilisez pour votre identifiant ConnexionCanada. Dorénavant, vous utiliserez votre nouvelle adresse courriel pour réaliser les actions suivantes :",
+    "signInEmail": "Vous connecter à votre identifiant ConnexionCanada",
+    "contactEmail": "Recevoir des courriels concernant les changements apportés à votre identifiant ConnexionCanada",
+    "serviceEmail": "Recevoir des courriels des services liés à votre identifiant ConnexionCanada",
+    "emailLabel": "Nouvelle adresse courriel"
   },
   "EmailOtpValidation": {
     "title": "Check your email",
