@@ -1,0 +1,43 @@
+@media print {
+  gcds-header,
+  gcds-top-nav,
+  .gcds-top-nav,
+  .gcds-top-nav-container,
+  .gcds-header,
+  gcds-footer,
+  .gcds-footer,
+  nav,
+  [part="top-nav"],
+  [part="menu"] {
+    display: none !important;
+  }
+
+  .visit-canada-post-page {
+    max-width: 100%;
+  }
+
+  .visit-canada-post-page gcds-heading,
+  .visit-canada-post-page gcds-text {
+    zoom: 0.75;
+  }
+
+  .visit-canada-post-page .separator {
+    display: block;
+    width: 100%;
+    height: 1px;
+    min-height: 1px;
+    margin: 0;
+    border: 0;
+    border-bottom: 1px solid #a8adb4;
+    background-color: #a8adb4;
+    break-inside: avoid;
+  }
+
+  .visit-canada-post-page .visit-canada-post-print-hide {
+    display: none !important;
+  }
+
+  .visit-canada-post-page gcds-notice {
+    display: none !important;
+  }
+}

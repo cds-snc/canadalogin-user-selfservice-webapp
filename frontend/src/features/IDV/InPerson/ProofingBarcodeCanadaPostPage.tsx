@@ -18,6 +18,7 @@ import {
   APPROVED_DOCUMENT_VALUES,
   type ApprovedDocumentValue,
 } from "../data/approvedDocuments";
+import "./css/ProofingBarcodeCanadaPostPage.print.css";
 
 type ProofingBarcodeCanadaPostState = {
   idvCode?: string;
@@ -70,7 +71,7 @@ export default function ProofingBarcodeCanadaPostPage() {
   }
 
   return (
-    <GcdsContainer role="main">
+    <GcdsContainer role="main" className="visit-canada-post-page">
       <GcdsGrid columns="1" gap="450">
         <GcdsContainer>
           <GcdsHeading tag="h1" marginTop="0">
@@ -156,7 +157,10 @@ export default function ProofingBarcodeCanadaPostPage() {
 
               <div className="separator" style={{ margin: "0" }} />
 
-              <GcdsGrid columns="1fr auto" className="gridInline">
+              <GcdsGrid
+                columns="1fr auto"
+                className="gridInline visit-canada-post-print-hide"
+              >
                 <GcdsButton
                   buttonRole="secondary"
                   type="button"
