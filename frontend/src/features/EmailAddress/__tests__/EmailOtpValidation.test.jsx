@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router";
 import React from "react";
 import EmailOtpValidation from "../EmailOtpValidation";
+import i18n from "../../../i18n";
 
 // Setup test environment for GCDS components
 import "../../../setupTests";
@@ -181,9 +182,10 @@ describe("EmailOtpValidation", () => {
     );
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     mockUseParams.mockReturnValue({ language: "en" });
+    await i18n.changeLanguage("en");
   });
 
   afterEach(() => {
@@ -492,7 +494,7 @@ describe("EmailOtpValidation", () => {
       ).toBeInTheDocument();
       expect(
         screen.getByText(
-          "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+          "Your email might take a few minutes to arrive. If you cannot find the email in your inbox, check your spam folder.",
         ),
       ).toBeInTheDocument();
       expect(screen.getByText("Your code will expire in")).toBeInTheDocument();

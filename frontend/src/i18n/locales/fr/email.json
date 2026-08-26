@@ -24,17 +24,17 @@
     "emailLabel": "Nouvelle adresse courriel"
   },
   "EmailOtpValidation": {
-    "title": "Check your email",
-    "codeSent": "We have sent an email with a 6-digit code to:",
-    "emailMayTakeMinutes": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
-    "codeExpiresIn": "Your code will expire in",
+    "title": "Consultez vos courriels",
+    "codeSent": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
+    "emailMayTakeMinutes": "Le courriel pourrait quelques minutes à vous parvenir. Si vous ne trouvez pas ce courriel dans votre boîte de réception, vérifiez s’il se trouve dans votre dossier de pourriels.",
+    "codeExpiresIn": "Votre code expirera dans",
     "tenMinutes": "10 minutes.",
-    "sixDigitCode": "6-digit code",
-    "problemsWithCode": "Problems with the code?",
-    "useDifferentEmail": "Use a different email",
-    "requestNewCodeIn": "You can request a new code in",
-    "seconds": "seconds",
-    "requestNewCode": "Request a new code"
+    "sixDigitCode": "Code à 6 chiffres",
+    "problemsWithCode": "Des problèmes avec votre code?",
+    "useDifferentEmail": "Utiliser une autre adresse courriel",
+    "requestNewCodeIn": "Vous pourrez demander un nouveau code dans",
+    "seconds": "secondes",
+    "requestNewCode": "Demander un nouveau code"
   },
   "EmailConfirmUpdate": {
     "title": "Are you sure you want to update your email?",
