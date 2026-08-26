@@ -37,9 +37,13 @@
     "requestNewCode": "Request a new code"
   },
   "EmailConfirmUpdate": {
-    "title": "Are you sure you want to update your email?",
-    "requestedUpdate": "You've requested to update your email to:",
+    "title": "Are you sure you want to update your email address?",
+    "requestedUpdate": "You've requested to update your email address to:",
     "allServicesNotice": "This will update your email with <bold>all</bold> services you have connected to your <bold>CanadaLogin</bold>.",
+    "warningTitle": "Warning",
+    "warningIntro": "Updating your email address will:",
+    "warningBullet1": "Change your email address with all services you have connected to your CanadaLogin",
+    "warningBullet2": "Send a notification to your old email address",
     "confirmButton": "Yes, update"
   },
   "EmailUpdateSuccess": {

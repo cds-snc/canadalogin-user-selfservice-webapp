@@ -1,10 +1,11 @@
 import { useParams } from "react-router";
-import { useTranslation, Trans } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
+  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
 import SubmitButton from "../../components/Layout/SubmitButton";
@@ -24,7 +25,7 @@ export default function EmailConfirmUpdate({
   onSubmit,
   onCancel,
 }: EmailConfirmUpdateProps) {
-  const { language } = useParams();
+  const { language = "en" } = useParams<{ language?: string }>();
   const { t } = useTranslation(["email", "common"]);
 
   if (!formData?.emailAddress) {
@@ -33,23 +34,32 @@ export default function EmailConfirmUpdate({
 
   return (
     <GcdsContainer role="main">
-      <GcdsHeading tag="h1">{t("EmailConfirmUpdate.title")}</GcdsHeading>
+      <GcdsHeading tag="h1" lang={language}>
+        {t("EmailConfirmUpdate.title")}
+      </GcdsHeading>
+
       <GcdsText>
         {t("EmailConfirmUpdate.requestedUpdate")}{" "}
-        <strong>{formData.emailAddress}</strong>.
+        <strong>{formData.emailAddress}</strong>
       </GcdsText>
-      <GcdsText>
-        <Trans
-          i18nKey="EmailConfirmUpdate.allServicesNotice"
-          ns="email"
-          components={{ bold: <strong /> }}
-        />
-      </GcdsText>
-      <GcdsGrid columns="max-content max-content" gap="200">
-        <SubmitButton
-          currentLang={language ?? "en"}
-          onClick={() => void onSubmit()}
-        >
+
+      <GcdsNotice
+        noticeRole="warning"
+        noticeTitleTag="h2"
+        noticeTitle={t("EmailConfirmUpdate.warningTitle")}
+        lang={language}
+      >
+        <GcdsText marginBottom="200">
+          {t("EmailConfirmUpdate.warningIntro")}
+        </GcdsText>
+        <ul style={{ margin: 0, paddingInlineStart: "1.5rem" }}>
+          <li>{t("EmailConfirmUpdate.warningBullet1")}</li>
+          <li>{t("EmailConfirmUpdate.warningBullet2")}</li>
+        </ul>
+      </GcdsNotice>
+
+      <GcdsGrid columns="max-content max-content" gap="200" marginTop="300">
+        <SubmitButton currentLang={language} onClick={() => void onSubmit()}>
           {t("EmailConfirmUpdate.confirmButton")}
         </SubmitButton>
         <GcdsButton

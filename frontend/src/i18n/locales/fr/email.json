@@ -37,10 +37,14 @@
     "requestNewCode": "Demander un nouveau code"
   },
   "EmailConfirmUpdate": {
-    "title": "Are you sure you want to update your email?",
-    "requestedUpdate": "You've requested to update your email to:",
+    "title": "Voulez-vous vraiment mettre à jour votre adresse courriel?",
+    "requestedUpdate": "Vous avez demandé à remplacer votre adresse courriel par l’adresse suivante :",
     "allServicesNotice": "Cette action mettra à jour votre adresse courriel pour <bold>tous</bold> les services que vous avez connectés à votre identifiant <bold>ConnexionCanada</bold>.",
-    "confirmButton": "Yes, update"
+    "warningTitle": "Avertissement",
+    "warningIntro": "La mise à jour de votre adresse courriel aura les effets suivants :",
+    "warningBullet1": "Modification de votre adresse courriel auprès de tous les services que vous avez liés à votre identifiant ConnexionCanada",
+    "warningBullet2": "Envoi d’une notification à votre ancienne adresse courriel",
+    "confirmButton": "Oui, mettre à jour"
   },
   "EmailUpdateSuccess": {
     "emailUpdatedTo": "Your email has been updated to",
