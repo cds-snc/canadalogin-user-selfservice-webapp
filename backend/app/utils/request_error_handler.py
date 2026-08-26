@@ -51,7 +51,14 @@ class RequestErrorHandler:
                         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                         detail=body.get("messageId", "Too many requests"),
                     ) from exc
-                else:  # HTTP_400_BAD_REQUEST
+                if response_status_code == status.HTTP_404_NOT_FOUND:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail=body.get("messageId", "Not found"),
+                    ) from exc
+
+                # HTTP_400_BAD_REQUEST
+                if response_status_code == status.HTTP_400_BAD_REQUEST:
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail=body.get("messageId", "Bad request"),

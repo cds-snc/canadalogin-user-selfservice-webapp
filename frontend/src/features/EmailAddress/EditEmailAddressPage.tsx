@@ -475,6 +475,7 @@ export default function EditEmailAddressPage() {
           });
         }}
         otpExpiry={otpSentResponse?.expiry}
+        otpCreatedAt={otpSentResponse?.created}
         onBack={handleBackToEnterEmail}
         isMaxAttemptsReached={isMaxAttemptsReached}
         resetAttempts={resetAttempts}

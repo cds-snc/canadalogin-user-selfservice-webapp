@@ -16,6 +16,7 @@ import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../utils/constants";
 import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import { useOtpExpiryCountdown } from "../../../hooks/useOtpExpiryCountdown";
 import type { OtpFactor } from "../../../types/hooks";
 
 type CaughtApiError = {
@@ -23,27 +24,6 @@ type CaughtApiError = {
 };
 
 const initialTime = 10;
-
-function getRemainingSeconds(expiry?: string | null): number | null {
-  if (!expiry) {
-    return null;
-  }
-
-  const expiryMs = new Date(expiry).getTime();
-  if (Number.isNaN(expiryMs)) {
-    return null;
-  }
-
-  const remainingMs = expiryMs - Date.now();
-  return Math.max(0, Math.ceil(remainingMs / 1000));
-}
-
-function formatMinutesAndSeconds(totalSeconds: number): string {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
 
 interface OtpVerificationProps {
   userSelectedMfaFactor: OtpFactor;
@@ -59,6 +39,7 @@ interface OtpVerificationProps {
   showTryAnotherWay?: boolean;
   resetAttempts?: () => void;
   otpExpiry?: string | null;
+  otpCreatedAt?: string | null;
 }
 
 export default function OtpVerification({
@@ -74,25 +55,23 @@ export default function OtpVerification({
   showTryAnotherWay = true,
   resetAttempts,
   otpExpiry = null,
+  otpCreatedAt = null,
   onCancel,
 }: OtpVerificationProps) {
   const { language } = useParams();
   const [time, setTime] = useState(initialTime);
-  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(() =>
-    getRemainingSeconds(otpExpiry),
-  );
   const [codeRequested, setCodeRequested] = useState(false);
   const { t } = useTranslation(["verification", "common"]);
   const [localError, setLocalError] = useState("");
   const [isMaxAttemptsReached, setIsMaxAttemptsReached] = useState(false);
+  const {
+    formattedCountdown,
+    hasServerExpiry,
+    isExpired: isOtpExpired,
+  } = useOtpExpiryCountdown(otpExpiry, initialTime, otpCreatedAt);
 
   const displayError = localError || errorMessage || "";
-  const hasServerExpiry = remainingSeconds !== null;
-  const isOtpExpired = hasServerExpiry && remainingSeconds <= 0;
-  const countdownDisplay =
-    hasServerExpiry && remainingSeconds !== null
-      ? formatMinutesAndSeconds(remainingSeconds)
-      : null;
+  const countdownDisplay = hasServerExpiry ? formattedCountdown : null;
 
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
@@ -154,22 +133,6 @@ export default function OtpVerification({
     ev.preventDefault();
     void doSubmit();
   };
-
-  useEffect(() => {
-    setRemainingSeconds(getRemainingSeconds(otpExpiry));
-  }, [otpExpiry]);
-
-  useEffect(() => {
-    if (remainingSeconds === null || remainingSeconds <= 0) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setRemainingSeconds(getRemainingSeconds(otpExpiry));
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [otpExpiry, remainingSeconds]);
 
   useEffect(() => {
     if (time <= 0) {

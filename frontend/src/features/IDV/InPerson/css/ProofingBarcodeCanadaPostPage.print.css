@@ -18,7 +18,7 @@
 
   .visit-canada-post-page gcds-heading,
   .visit-canada-post-page gcds-text {
-    zoom: 0.75;
+    margin-inline-start: 0.5rem;
   }
 
   .visit-canada-post-page .separator {
@@ -37,7 +37,26 @@
     display: none !important;
   }
 
+  .visit-canada-post-page .visit-canada-post-print-banner {
+    border-bottom: 1px solid #d1d3d6;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .visit-canada-post-page .visit-canada-post-print-banner-image {
+    display: block;
+    height: 30px;
+    max-width: 100%;
+    width: auto;
+  }
+
   .visit-canada-post-page gcds-notice {
     display: none !important;
+  }
+}
+
+@media screen {
+  .visit-canada-post-page .visit-canada-post-print-banner {
+    display: none;
   }
 }

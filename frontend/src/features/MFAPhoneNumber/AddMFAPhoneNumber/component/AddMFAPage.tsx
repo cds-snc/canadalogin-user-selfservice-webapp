@@ -37,6 +37,7 @@ interface PhoneFormData {
   mfaId: string;
   trxnId: string;
   expiry: string;
+  created?: string;
   otpType: string;
   formattedPhoneNumber: string;
 }
@@ -256,12 +257,13 @@ export default function AddMFAPage() {
       const response = await addMFAPhoneNumberApi.sendMFAOTP(payload);
 
       const responseData = response as {
-        data?: { id?: string; expiry?: string };
+        data?: { id?: string; expiry?: string; created?: string };
         [key: string]: unknown;
       } | null;
       if (responseData && responseData.data && responseData.data.id) {
         handlePhoneForm("trxnId", responseData.data.id);
         handlePhoneForm("expiry", responseData.data.expiry ?? "");
+        handlePhoneForm("created", responseData.data.created ?? "");
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
           step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
@@ -642,6 +644,7 @@ export default function AddMFAPage() {
         setErrorMessage={setCustomErrorMessage}
         errorMessage={errorMessage}
         otpExpiry={otpSentResponse?.expiry}
+        otpCreatedAt={otpSentResponse?.created}
         onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         showTryAnotherWay={
           (userPhoneFactors && userPhoneFactors.length > 1) ||

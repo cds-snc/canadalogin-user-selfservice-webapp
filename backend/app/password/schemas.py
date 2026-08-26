@@ -41,6 +41,7 @@ class UpdatePasswordIbmApiResponse(BaseModel):
 class UpdatePasswordClientResponsePayload(BaseModel):
     trxId: str
     stepsRemaining: int
+    creationTime: Optional[datetime] = None
     expiryTime: Optional[datetime] = None
     method: str
     userId: Optional[str] = None

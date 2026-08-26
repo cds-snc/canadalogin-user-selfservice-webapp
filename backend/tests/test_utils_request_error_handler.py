@@ -76,6 +76,17 @@ def test_handle_http_status_error_400():
     assert "BadRequest" in e.value.detail
 
 
+def test_handle_http_status_error_404():
+    exc = make_http_status_error(
+        status_code=404,
+        json_body={"messageId": "NotFound"},
+    )
+    with pytest.raises(HTTPException) as e:
+        RequestErrorHandler.handle(exc, context="404 test")
+    assert e.value.status_code == 404
+    assert "NotFound" in e.value.detail
+
+
 def test_handle_http_status_error_401():
     exc = make_http_status_error(
         status_code=401,
