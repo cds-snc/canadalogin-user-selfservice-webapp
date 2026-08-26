@@ -28,6 +28,8 @@ def _get_endpoint_for_otp_type(otp_type: OtpType) -> str:
         return "smsotp"
     elif otp_type == OtpType.VOICE:
         return "voiceotp"
+    elif otp_type == OtpType.EMAIL:
+        return "emailotp"
     else:
         return "unknown"
 
@@ -38,7 +40,7 @@ async def handle_otp_deletion(
     user_access_token: str,
     request: Request | None = None,
 ):
-    """Delete an OTP factor enrollment (SMS or Voice) after OTP verification.
+    """Delete an OTP factor enrollment (SMS, Voice, or Email) after OTP verification.
 
     When otp is None the factor must be unvalidated — this is used by the Add MFA
     flow to clean up a lingering pending enrollment before re-enrolling.  A validated
@@ -130,7 +132,7 @@ async def handle_otp_deletion(
         )
     else:
         raise HTTPStatusError(
-            "Unable to delete MFA phone number",
+            "Unable to delete MFA factor",
             request=http_client_response.request,
             response=http_client_response,
         )
@@ -223,7 +225,7 @@ async def dispatch_otp_deletion(
     user_access_token: str,
     language: str = None,
 ):
-    """Dispatch OTP deletion to IBM Verify (SMS or Voice)"""
+    """Dispatch OTP deletion to IBM Verify (SMS, Voice, or Email)."""
     # Determine the endpoint based on OTP type first to validate
     endpoint = _get_endpoint_for_otp_type(deletion_request.otpType)
     if endpoint == "unknown":

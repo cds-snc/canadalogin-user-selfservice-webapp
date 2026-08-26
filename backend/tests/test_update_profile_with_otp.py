@@ -222,12 +222,16 @@ UPDATE_PROFILE_IMPORT_PATH = (
 UPDATE_SESSION_IMPORT_PATH = (
     "app.users.services.update_profile_with_otp.update_session_user_info"
 )
+SYNC_EMAIL_MFA_IMPORT_PATH = (
+    "app.users.services.update_profile_with_otp._sync_email_mfa_factors"
+)
 
 
 class TestUpdateProfileWithOtpVerification:
     """Test the main update_profile_with_otp_verification function"""
 
     @pytest.mark.asyncio
+    @patch(SYNC_EMAIL_MFA_IMPORT_PATH)
     @patch(UPDATE_SESSION_IMPORT_PATH)
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
@@ -238,6 +242,7 @@ class TestUpdateProfileWithOtpVerification:
         mock_get_profile,
         mock_update_profile,
         mock_update_session,
+        mock_sync_email_mfa,
     ):
         """Test successful profile update with email address change and session update"""
         # Arrange
@@ -303,6 +308,7 @@ class TestUpdateProfileWithOtpVerification:
         )
         mock_get_profile.assert_called_once()
         mock_update_profile.assert_called_once()
+        mock_sync_email_mfa.assert_called_once()
 
         # Verify session was updated with new email
         mock_update_session.assert_called_once()
@@ -311,6 +317,7 @@ class TestUpdateProfileWithOtpVerification:
         assert session_updates["email"] == "new@example.com"
 
     @pytest.mark.asyncio
+    @patch(SYNC_EMAIL_MFA_IMPORT_PATH)
     @patch(UPDATE_SESSION_IMPORT_PATH)
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
@@ -321,6 +328,7 @@ class TestUpdateProfileWithOtpVerification:
         mock_get_profile,
         mock_update_profile,
         mock_update_session,
+        mock_sync_email_mfa,
     ):
         """Test successful profile update with phone number change (no session update)"""
         # Arrange
@@ -380,6 +388,7 @@ class TestUpdateProfileWithOtpVerification:
 
         # Session should not be updated for phone changes
         mock_update_session.assert_not_called()
+        mock_sync_email_mfa.assert_not_called()
 
     @pytest.mark.asyncio
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
@@ -504,6 +513,7 @@ class TestUpdateProfileWithOtpVerification:
         assert "Profile update failed after OTP verification" in exc.value.detail
 
     @pytest.mark.asyncio
+    @patch(SYNC_EMAIL_MFA_IMPORT_PATH)
     @patch(UPDATE_SESSION_IMPORT_PATH)
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
@@ -514,6 +524,7 @@ class TestUpdateProfileWithOtpVerification:
         mock_get_profile,
         mock_update_profile,
         mock_update_session,
+        mock_sync_email_mfa,
     ):
         """Test that session update failure doesn't fail the entire operation"""
         # Arrange
@@ -571,6 +582,7 @@ class TestUpdateProfileWithOtpVerification:
         # Assert - operation still succeeds
         assert response.success is True
         assert response.data == updated_profile
+        mock_sync_email_mfa.assert_called_once()
 
 
 class TestGetUpdateFieldNames:
