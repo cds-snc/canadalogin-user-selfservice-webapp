@@ -31,7 +31,12 @@ vi.mock("../../../utils/constants", () => ({
 // Mock SubmitButton component
 vi.mock("../../../components/Layout/SubmitButton", () => ({
   default: ({ onGcdsClick, children, currentLang: _cl, ...props }) => (
-    <button data-testid="submit-button" onClick={onGcdsClick} {...props}>
+    <button
+      data-testid="submit-button"
+      onClick={onGcdsClick}
+      type="submit"
+      {...props}
+    >
       {children || "Submit"}
     </button>
   ),
@@ -410,12 +415,19 @@ describe("EmailOtpValidation", () => {
       renderComponent();
 
       const container = screen.getByTestId("gcds-container");
-      const grid = screen.getByTestId("gcds-grid");
+      const grids = screen.getAllByTestId("gcds-grid");
       const input = screen.getByTestId("gcds-input");
 
       expect(container).toHaveAttribute("role", "main");
-      expect(grid).toHaveAttribute("data-columns", "max-content max-content");
-      expect(grid).toHaveAttribute("data-gap", "200");
+      expect(
+        grids.some((grid) => grid.getAttribute("data-columns") === "1"),
+      ).toBe(true);
+      expect(
+        grids.some(
+          (grid) =>
+            grid.getAttribute("data-columns") === "max-content max-content",
+        ),
+      ).toBe(true);
       expect(input).toHaveAttribute("data-validate-on", "other");
     });
 

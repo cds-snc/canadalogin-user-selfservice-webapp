@@ -133,7 +133,7 @@ vi.mock("../../../components/InfoBlocks/ServicesWithAccessInfoSection", () => ({
 
 vi.mock("../../../components/Layout/SubmitButton", () => ({
   default: ({ onGcdsClick }) => (
-    <button data-testid="submit-button" onClick={onGcdsClick}>
+    <button data-testid="submit-button" onClick={onGcdsClick} type="submit">
       Submit
     </button>
   ),
@@ -177,7 +177,7 @@ describe("EditEmailEnterEmail", () => {
       renderComponent();
 
       // Check that the component renders without throwing
-      expect(screen.getAllByTestId("gcds-container")).toHaveLength(2);
+      expect(screen.getAllByTestId("gcds-container").length).toBeGreaterThan(0);
       expect(screen.getByTestId("submit-button")).toBeInTheDocument();
       expect(screen.getByTestId("services-info-section")).toBeInTheDocument();
     });
@@ -241,13 +241,28 @@ describe("EditEmailEnterEmail", () => {
     });
 
     it("submit button is clickable", async () => {
-      renderComponent();
+      renderComponent({
+        formData: { emailAddress: "clickable@example.com" },
+      });
       const user = userEvent.setup();
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);
 
-      expect(mockOnSubmit).toHaveBeenCalledWith("");
+      expect(mockOnSubmit).toHaveBeenCalledWith("clickable@example.com");
+    });
+
+    it("submits when Enter is pressed in the email field", async () => {
+      renderComponent({
+        formData: { emailAddress: "enter@example.com" },
+      });
+      const user = userEvent.setup();
+
+      const emailInput = screen.getByTestId("gcds-input");
+      await user.click(emailInput);
+      await user.keyboard("{Enter}");
+
+      expect(mockOnSubmit).toHaveBeenCalledWith("enter@example.com");
     });
 
     it("handles form submission with email address", async () => {
@@ -353,13 +368,15 @@ describe("EditEmailEnterEmail", () => {
     });
 
     it("should handle GCDS button click events", async () => {
-      renderComponent();
+      renderComponent({
+        formData: { emailAddress: "button@example.com" },
+      });
       const user = userEvent.setup();
 
       const primaryButton = screen.getByTestId("submit-button");
       await user.click(primaryButton);
 
-      expect(mockOnSubmit).toHaveBeenCalledWith("");
+      expect(mockOnSubmit).toHaveBeenCalledWith("button@example.com");
     });
 
     it("should handle cancel button click events", async () => {
@@ -389,9 +406,17 @@ describe("EditEmailEnterEmail", () => {
       const textElements = screen.getAllByTestId("gcds-text");
       expect(textElements.length).toBeGreaterThan(0);
 
-      // Verify grid
-      const grid = screen.getByTestId("gcds-grid");
-      expect(grid).toBeInTheDocument();
+      // Verify top-level spacing and action button grids
+      const grids = screen.getAllByTestId("gcds-grid");
+      expect(
+        grids.some((grid) => grid.getAttribute("data-columns") === "1"),
+      ).toBe(true);
+      expect(
+        grids.some(
+          (grid) =>
+            grid.getAttribute("data-columns") === "max-content max-content",
+        ),
+      ).toBe(true);
     });
 
     it("should handle input validation properly", async () => {

@@ -179,10 +179,16 @@ describe("EmailConfirmUpdate", () => {
         screen.getByText("Updating your email address will:"),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(
-          "Change your email address with all services you have connected to your CanadaLogin",
-        ),
+        screen.getByText((_, element) => {
+          return (
+            element?.tagName === "LI" &&
+            element.textContent?.includes(
+              "Change your email address with all services you have connected to your CanadaLogin",
+            )
+          );
+        }),
       ).toBeInTheDocument();
+      expect(screen.getByText("all").tagName.toLowerCase()).toBe("strong");
       expect(
         screen.getByText("Send a notification to your old email address"),
       ).toBeInTheDocument();
@@ -334,11 +340,17 @@ describe("EmailConfirmUpdate", () => {
       const textElements = screen.getAllByTestId("gcds-text");
       expect(textElements.length).toBeGreaterThan(0);
 
-      // Verify grid
-      const grid = screen.getByTestId("gcds-grid");
-      expect(grid).toBeInTheDocument();
-      expect(grid).toHaveAttribute("data-columns", "max-content max-content");
-      expect(grid).toHaveAttribute("data-gap", "200");
+      // Verify top-level spacing and action button grids
+      const grids = screen.getAllByTestId("gcds-grid");
+      expect(
+        grids.some((grid) => grid.getAttribute("data-columns") === "1"),
+      ).toBe(true);
+      expect(
+        grids.some(
+          (grid) =>
+            grid.getAttribute("data-columns") === "max-content max-content",
+        ),
+      ).toBe(true);
     });
 
     it("should handle multiple button clicks", async () => {

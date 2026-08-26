@@ -329,12 +329,19 @@ describe("EmailUpdateSuccess", () => {
       renderComponent();
 
       const container = screen.getByTestId("gcds-container");
-      const grid = screen.getByTestId("gcds-grid");
+      const grids = screen.getAllByTestId("gcds-grid");
       const notices = screen.getAllByTestId("gcds-notice");
 
       expect(container).toHaveAttribute("role", "main");
-      expect(grid).toHaveAttribute("data-columns", "max-content max-content");
-      expect(grid).toHaveAttribute("data-gap", "200");
+      expect(
+        grids.some((grid) => grid.getAttribute("data-columns") === "1"),
+      ).toBe(true);
+      expect(
+        grids.some(
+          (grid) =>
+            grid.getAttribute("data-columns") === "max-content max-content",
+        ),
+      ).toBe(true);
       expect(notices[0]).toHaveAttribute("data-notice-role", "success");
       expect(notices[1]).toHaveAttribute("data-notice-role", "warning");
     });

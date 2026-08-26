@@ -42,7 +42,7 @@
     "allServicesNotice": "Cette action mettra à jour votre adresse courriel pour <bold>tous</bold> les services que vous avez connectés à votre identifiant <bold>ConnexionCanada</bold>.",
     "warningTitle": "Avertissement",
     "warningIntro": "La mise à jour de votre adresse courriel aura les effets suivants :",
-    "warningBullet1": "Modification de votre adresse courriel auprès de tous les services que vous avez liés à votre identifiant ConnexionCanada",
+    "warningBullet1": "Modification de votre adresse courriel auprès de <bold>tous</bold> les services que vous avez liés à votre identifiant ConnexionCanada",
     "warningBullet2": "Envoi d’une notification à votre ancienne adresse courriel",
     "confirmButton": "Oui, mettre à jour"
   },

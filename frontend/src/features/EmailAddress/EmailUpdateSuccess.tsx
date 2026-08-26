@@ -28,67 +28,74 @@ export default function EmailUpdateSuccess({
 
   return (
     <GcdsContainer role="main">
-      <GcdsNotice
-        noticeRole="success"
-        noticeTitleTag="h2"
-        noticeTitle={t("EmailUpdateSuccess.successTitle")}
-        lang={language}
-      >
-        <GcdsText>
-          {t("EmailUpdateSuccess.emailUpdatedTo")}{" "}
-          <strong>{newEmailAddress}</strong>.
+      <GcdsGrid columns="1" gap="300">
+        <GcdsNotice
+          noticeRole="success"
+          noticeTitleTag="h2"
+          noticeTitle={t("EmailUpdateSuccess.successTitle")}
+          lang={language}
+        >
+          <GcdsText>
+            {t("EmailUpdateSuccess.emailUpdatedTo")}{" "}
+            <strong>{newEmailAddress}</strong>.
+          </GcdsText>
+        </GcdsNotice>
+
+        <GcdsHeading
+          tag="h1"
+          lang={language}
+          marginBottom="300"
+          marginTop="400"
+        >
+          {t("EmailUpdateSuccess.updateOtherPlaces")}
+        </GcdsHeading>
+
+        <GcdsText marginBottom="300" lang={language}>
+          {t("EmailUpdateSuccess.onlyConnectedServices")}
         </GcdsText>
-      </GcdsNotice>
 
-      <GcdsHeading tag="h1" lang={language} marginBottom="300" marginTop="400">
-        {t("EmailUpdateSuccess.updateOtherPlaces")}
-      </GcdsHeading>
+        <GcdsText marginBottom="300" lang={language}>
+          {t("EmailUpdateSuccess.notConnectedNotice")}
+        </GcdsText>
 
-      <GcdsText marginBottom="300" lang={language}>
-        {t("EmailUpdateSuccess.onlyConnectedServices")}
-      </GcdsText>
-
-      <GcdsText marginBottom="300" lang={language}>
-        {t("EmailUpdateSuccess.notConnectedNotice")}
-      </GcdsText>
-
-      <GcdsText marginBottom="300" lang={language}>
-        {t("EmailUpdateSuccess.searchOtherAccounts")}{" "}
-        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
-          {t("EmailUpdateSuccess.gcAccountDirectory")}
-        </GcdsLink>
-        {t("EmailUpdateSuccess.period")}
-      </GcdsText>
-
-      <GcdsNotice
-        noticeRole="warning"
-        noticeTitleTag="h2"
-        noticeTitle={t("EmailUpdateSuccess.syncNoticeTitle")}
-        lang={language}
-      >
-        <GcdsText>{t("EmailUpdateSuccess.syncNoticeDescription")}</GcdsText>
-        <GcdsText>
+        <GcdsText marginBottom="300" lang={language}>
+          {t("EmailUpdateSuccess.searchOtherAccounts")}{" "}
           <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
-            {t("EmailUpdateSuccess.servicesLinkText")}
+            {t("EmailUpdateSuccess.gcAccountDirectory")}
           </GcdsLink>
+          {t("EmailUpdateSuccess.period")}
         </GcdsText>
-      </GcdsNotice>
 
-      <GcdsGrid columns="max-content max-content" gap="200">
-        <SubmitButton
-          currentLang={language}
-          style={{ width: "fit-content" }}
-          onClick={onBackToProfile}
+        <GcdsNotice
+          noticeRole="warning"
+          noticeTitleTag="h2"
+          noticeTitle={t("EmailUpdateSuccess.syncNoticeTitle")}
+          lang={language}
         >
-          {t("EmailUpdateSuccess.backToProfile")}
-        </SubmitButton>
-        <GcdsButton
-          buttonRole="secondary"
-          onClick={onSignOut}
-          style={{ width: "fit-content" }}
-        >
-          {t("EmailUpdateSuccess.signOut")}
-        </GcdsButton>
+          <GcdsText>{t("EmailUpdateSuccess.syncNoticeDescription")}</GcdsText>
+          <GcdsText>
+            <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+              {t("EmailUpdateSuccess.servicesLinkText")}
+            </GcdsLink>
+          </GcdsText>
+        </GcdsNotice>
+
+        <GcdsGrid columns="max-content max-content" gap="200">
+          <SubmitButton
+            currentLang={language}
+            style={{ width: "fit-content" }}
+            onClick={onBackToProfile}
+          >
+            {t("EmailUpdateSuccess.backToProfile")}
+          </SubmitButton>
+          <GcdsButton
+            buttonRole="secondary"
+            onClick={onSignOut}
+            style={{ width: "fit-content" }}
+          >
+            {t("EmailUpdateSuccess.signOut")}
+          </GcdsButton>
+        </GcdsGrid>
       </GcdsGrid>
     </GcdsContainer>
   );

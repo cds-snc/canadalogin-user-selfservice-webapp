@@ -42,7 +42,7 @@
     "allServicesNotice": "This will update your email with <bold>all</bold> services you have connected to your <bold>CanadaLogin</bold>.",
     "warningTitle": "Warning",
     "warningIntro": "Updating your email address will:",
-    "warningBullet1": "Change your email address with all services you have connected to your CanadaLogin",
+    "warningBullet1": "Change your email address with <bold>all</bold> services you have connected to your CanadaLogin",
     "warningBullet2": "Send a notification to your old email address",
     "confirmButton": "Yes, update"
   },
