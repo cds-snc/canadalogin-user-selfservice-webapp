@@ -72,9 +72,8 @@ export default function SuccessfullyUpdated({
           noticeTitle={t("ProfileUpdateNameSuccess.successTitle")}
         >
           <GcdsText>
-            <strong>
-              {t("ProfileUpdateNameSuccess.nameUpdatedTo")} {username}
-            </strong>
+            {t("ProfileUpdateNameSuccess.nameUpdatedTo")}{" "}
+            <strong>{username}</strong>
           </GcdsText>
         </GcdsNotice>
 

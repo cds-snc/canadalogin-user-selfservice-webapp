@@ -193,9 +193,12 @@ describe("SuccessfullyUpdatedName", () => {
       </TestWrapper>,
     );
 
-    // Check for the name in the success message (rendered together in strong tag)
+    // The message prefix is plain text while only the username is bolded.
     expect(
-      screen.getByText(/Your name has been updated to\s+John Doe/),
+      screen.getByText("Your name has been updated to"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("John Doe", { selector: "strong" }),
     ).toBeInTheDocument();
     expect(
       screen.getByText("You may need to update your name other places"),
@@ -374,7 +377,10 @@ describe("SuccessfullyUpdatedName", () => {
     );
 
     expect(
-      screen.getByText(/Your name has been updated to\s+Jane Marie Smith/),
+      screen.getByText("Your name has been updated to"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Jane Marie Smith", { selector: "strong" }),
     ).toBeInTheDocument();
   });
 });
