@@ -6,6 +6,7 @@ import React from "react";
 import EditEmailAddressPage from "../EditEmailAddressPage";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
+import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations";
 
 const { mockTrackEvent } = vi.hoisted(() => ({
   mockTrackEvent: vi.fn(),
@@ -66,17 +67,52 @@ vi.mock("../../TransientOtp/components/PasswordVerification", () => ({
 }));
 
 vi.mock("../../TransientOtp/components/OtpSelection", () => ({
-  default: ({ onNext, onCancel }) => (
+  default: ({ onNext, onCancel, onSelectFIDO2, fido2Data }) => (
     <div data-testid="otp-selection">
       <button onClick={onNext} data-testid="otp-next-btn">
         Next
       </button>
+      {fido2Data?.length > 0 && (
+        <button
+          onClick={() =>
+            onSelectFIDO2?.({
+              id: "passkey-1",
+              attributes: {
+                nickname: "My passkey",
+                credentialId: "cred-1",
+              },
+            })
+          }
+          data-testid="select-passkey-btn"
+        >
+          Select Passkey
+        </button>
+      )}
       <button onClick={onCancel} data-testid="otp-cancel-btn">
         Cancel
       </button>
     </div>
   ),
 }));
+
+vi.mock(
+  "../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey",
+  () => ({
+    default: ({ onCallback, onTryAnotherWayHandler }) => (
+      <div data-testid="verify-fido2-passkey">
+        <button onClick={onCallback} data-testid="fido2-success-btn">
+          Passkey Success
+        </button>
+        <button
+          onClick={onTryAnotherWayHandler}
+          data-testid="fido2-try-another-way-btn"
+        >
+          Try Another Way
+        </button>
+      </div>
+    ),
+  }),
+);
 
 vi.mock("../../TransientOtp/components/OtpVerification", () => ({
   default: ({ validateOtpCode, onBack, onCancel }) => (
@@ -194,6 +230,14 @@ vi.mock("../../../hooks/useOtpOperations", () => ({
   })),
 }));
 
+vi.mock("../../../hooks/usePasskeyOperations", () => ({
+  usePasskeyOperations: vi.fn(() => ({
+    fido2Data: [],
+    loading: false,
+    refetch: vi.fn(),
+  })),
+}));
+
 vi.mock("../../../components/Providers/useUser", () => ({
   useUser: () => ({
     state: {
@@ -240,6 +284,11 @@ vi.mock("../../../utils/routeHelpers", () => ({
 describe("EditEmailAddressPage Integration Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(usePasskeyOperations).mockImplementation(() => ({
+      fido2Data: [],
+      loading: false,
+      refetch: vi.fn(),
+    }));
     // Mock window.location for logout tests
     delete window.location;
     window.location = { href: "" };
@@ -454,6 +503,50 @@ describe("EditEmailAddressPage Integration Tests", () => {
       await act(async () => {
         const backBtn = screen.getByTestId("back-email-otp-btn");
         fireEvent.click(backBtn);
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("allows selecting a passkey from otpSelection and continues to enter email", async () => {
+      vi.mocked(usePasskeyOperations).mockImplementation(() => ({
+        fido2Data: [
+          {
+            id: "passkey-1",
+            attributes: {
+              nickname: "My passkey",
+              credentialId: "cred-1",
+            },
+          },
+        ],
+        loading: false,
+        refetch: vi.fn(),
+      }));
+
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("select-passkey-btn"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("fido2-success-btn"));
       });
 
       await waitFor(() => {
