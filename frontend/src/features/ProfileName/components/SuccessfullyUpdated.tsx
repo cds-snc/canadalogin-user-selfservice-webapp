@@ -82,7 +82,7 @@ export default function SuccessfullyUpdated({
         </GcdsHeading>
 
         <GcdsText>
-          {t("ProfileUpdateNameSuccess.onlyConnectedServices")}
+          <strong>{t("ProfileUpdateNameSuccess.onlyConnectedServices")}</strong>
         </GcdsText>
         <GcdsText>{t("ProfileUpdateNameSuccess.notConnectedNotice")}</GcdsText>
         <GcdsText>

@@ -15,7 +15,7 @@
     "smsCodeSent": "We have sent a text message with a 6-digit verification code to:",
     "voiceCodeSent": "We have sent a 6-digit verification code via voice call to:",
     "smsMayTakeMinutes": "Your text (SMS) might take a few minutes to arrive.",
-    "callMayTakeMinutes": "Your call might take a few minutes to arrive.",
+    "callMayTakeMinutes": "Your call may take a few minutes to arrive.",
     "codeExpiresIn": "Your code will expire in",
     "tenMinutes": "10 minutes.",
     "enterCode": "Enter the code",
@@ -39,6 +39,8 @@
     "cancel": "Cancel",
     "setupSmsInstead": "Set up text (SMS) verification instead",
     "setupVoiceInstead": "Set up voice call verification instead",
+    "verifySmsInstead": "Verify with text (SMS) verification instead",
+    "verifyVoiceInstead": "Verify with voice verification instead",
     "cannotAccessPhone": "I cannot access my phone"
   },
   "CheckYourEmail": {

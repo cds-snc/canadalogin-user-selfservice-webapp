@@ -136,7 +136,11 @@ describe("ConfirmUpdate Component", () => {
     vi.clearAllMocks();
     parsePhoneNumberFromString.mockImplementation((phoneNumber) => {
       if (phoneNumber === "+15551234567") {
-        return { formatInternational: () => "+1 555 123 4567" };
+        return {
+          countryCallingCode: "1",
+          formatNational: () => "(555) 123-4567",
+          formatInternational: () => "+1 555 123 4567",
+        };
       }
       return null;
     });

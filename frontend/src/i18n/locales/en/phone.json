@@ -43,12 +43,18 @@
     "cancelButton": "Cancel"
   },
   "SuccessfullyUpdatedContactPhoneNumber": {
-    "phoneUpdatedTo": "Your contact phone number has been updated to",
-    "updateOtherPlaces": "You may need to update your phone number in other places",
-    "onlyConnectedServices": "This only changes your contact phone number with services connected to your CanadaLogin. ",
+    "successTitle": "Success",
+    "phoneUpdatedTo": "Your contact phone number has been updated to:",
+    "updateOtherPlaces": "You may need to update your contact phone number other places",
+    "onlyConnectedServices": "This only changes your contact phone number with services connected to your CanadaLogin.",
     "notConnectedNotice": "If you are trying to update your contact phone number with a service that's not connected to your CanadaLogin, you'll need to go to that account.",
-    "searchOtherAccounts": "To search for another GC Account, visit the",
-    "gcAccountDirectory": "GC Account directory.",
+    "searchOtherAccounts": "To search for another Government of Canada account, visit the",
+    "gcAccountDirectory": "Government of Canada account directory",
+    "syncNoticeTitle": "You may need to sync this update",
+    "syncNoticeDescription": "To sync your updated contact phone number from your CanadaLogin profile to your connected services, sign in to each service individually.",
+    "servicesLinkLead": "You can find links to all",
+    "servicesLinkText": "services that can be accessed using your CanadaLogin",
+    "servicesLinkSuffix": "here.",
     "backToProfile": "Back to profile",
     "signOut": "Sign out"
   }

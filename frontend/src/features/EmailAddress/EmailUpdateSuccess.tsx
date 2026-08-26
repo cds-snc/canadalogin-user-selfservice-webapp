@@ -51,7 +51,7 @@ export default function EmailUpdateSuccess({
         </GcdsHeading>
 
         <GcdsText marginBottom="300" lang={language}>
-          {t("EmailUpdateSuccess.onlyConnectedServices")}
+          <strong>{t("EmailUpdateSuccess.onlyConnectedServices")}</strong>
         </GcdsText>
 
         <GcdsText marginBottom="300" lang={language}>

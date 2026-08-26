@@ -39,6 +39,8 @@
     "cancel": "Annuler",
     "setupSmsInstead": "Configurer la vérification par message texte (SMS)",
     "setupVoiceInstead": "Configurez la vérification par appel vocal",
+    "verifySmsInstead": "Utiliser plutôt la vérification par message texte (SMS)",
+    "verifyVoiceInstead": "Utiliser plutôt la vérification par appel vocal",
     "cannotAccessPhone": "Je n'ai pas accès à mon téléphone"
   },
   "CheckYourEmail": {

@@ -195,7 +195,7 @@ export default function EnterPhoneNumber({
 
         <section>
           <MyCountryIsNotListed />
-          <GcdsHeading tag="h3">
+          <GcdsHeading tag="h2">
             {t("EnterNewPhoneNumber.verifyNumber")}
           </GcdsHeading>
           <GcdsText>{t("EnterNewPhoneNumber.verifyDescription")}</GcdsText>
