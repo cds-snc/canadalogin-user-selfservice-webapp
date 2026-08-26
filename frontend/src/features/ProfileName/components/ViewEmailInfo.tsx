@@ -17,13 +17,16 @@ type GcdsNavigationEvent = CustomEvent<string> & {
 };
 
 export default function DisplayEmailInfo() {
-  const { language } = useParams();
+  const { language = "en" } = useParams<{ language: string }>();
+  const routeLanguage = language === "fr" ? "fr" : "en";
   const navigate = useNavigate();
   const { t } = useTranslation("profile");
   const { state } = useUser();
   const email = state?.userProfile?.userName || "";
+  const emailActionLabel =
+    routeLanguage === "en" ? t("ProfileHome.change") : t("ProfileHome.edit");
   const editEmail = path(PAGES.editEmailPage, {
-    language,
+    language: routeLanguage,
   });
 
   return (
@@ -43,7 +46,7 @@ export default function DisplayEmailInfo() {
               navigate(event.detail);
             }}
           >
-            {t("ProfileHome.edit")}
+            {emailActionLabel}
           </GcdsLink>
         )}
       </GcdsGrid>
