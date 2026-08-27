@@ -87,6 +87,8 @@
     "deleteFromContact": "delete this number from your contact information. To manage your contact phone number, go to",
     "personalInformation": "Personal Information",
     "period": ".",
+    "infoTitle": "Information",
+    "infoDescription": "Deleting a phone number will send a notification to your email address",
     "confirmButton": "Yes, delete",
     "cancelButton": "Cancel"
   }

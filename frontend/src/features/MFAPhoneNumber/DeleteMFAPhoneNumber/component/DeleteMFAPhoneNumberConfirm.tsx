@@ -4,6 +4,7 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
+  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
 import { useParams } from "react-router";
@@ -37,72 +38,56 @@ export default function DeleteMFAPhoneNumberConfirm({
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="500">
+      <GcdsGrid columns="1" gap="300">
         <GcdsContainer>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "32px",
+          <GcdsGrid columns="1" gap="200">
+            <GcdsHeading tag="h1" lang={language}>
+              {t("DeleteMFAPhoneNumberConfirm.title")}
+            </GcdsHeading>
+
+            <GcdsText>
+              {t("DeleteMFAPhoneNumberConfirm.noLongerUse")}{" "}
+              <strong>{phoneFormData?.formattedPhoneNumber}</strong>{" "}
+              {t("DeleteMFAPhoneNumberConfirm.toSignIn")}
+            </GcdsText>
+
+            <GcdsText>
+              {t("DeleteMFAPhoneNumberConfirm.thisText")}{" "}
+              <strong>{t("DeleteMFAPhoneNumberConfirm.willNot")}</strong>{" "}
+              {t("DeleteMFAPhoneNumberConfirm.deleteFromContact")}{" "}
+              <GcdsLink href={backtoProfilePage}>
+                {t("DeleteMFAPhoneNumberConfirm.personalInformation")}
+              </GcdsLink>
+              {t("DeleteMFAPhoneNumberConfirm.period")}
+            </GcdsText>
+          </GcdsGrid>
+        </GcdsContainer>
+
+        <GcdsNotice
+          noticeRole="info"
+          noticeTitleTag="h2"
+          noticeTitle={t("DeleteMFAPhoneNumberConfirm.infoTitle")}
+        >
+          <GcdsText>
+            {t("DeleteMFAPhoneNumberConfirm.infoDescription")}
+          </GcdsText>
+        </GcdsNotice>
+
+        <GcdsGrid columns="max-content max-content" gap="200">
+          <GcdsButton buttonRole="danger" onGcdsClick={onSubmitHandler}>
+            {t("DeleteMFAPhoneNumberConfirm.confirmButton")}
+          </GcdsButton>
+
+          <GcdsButton
+            buttonRole="secondary"
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              onCancel();
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "18px",
-              }}
-            >
-              <GcdsHeading tag="h1" lang={language}>
-                {t("DeleteMFAPhoneNumberConfirm.title")}
-              </GcdsHeading>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "24px",
-              }}
-            >
-              <GcdsText>
-                {t("DeleteMFAPhoneNumberConfirm.noLongerUse")}{" "}
-                <strong>{phoneFormData?.formattedPhoneNumber}</strong>{" "}
-                {t("DeleteMFAPhoneNumberConfirm.toSignIn")}
-              </GcdsText>
-              <GcdsText>
-                {t("DeleteMFAPhoneNumberConfirm.thisText")}{" "}
-                {t("DeleteMFAPhoneNumberConfirm.willNot")}{" "}
-                {t("DeleteMFAPhoneNumberConfirm.deleteFromContact")}{" "}
-                <GcdsLink href={backtoProfilePage}>
-                  {t("DeleteMFAPhoneNumberConfirm.personalInformation")}
-                </GcdsLink>
-                {t("DeleteMFAPhoneNumberConfirm.period")}
-              </GcdsText>
-            </div>
-          </div>
-        </GcdsContainer>
-      </GcdsGrid>
-
-      <GcdsGrid columns="max-content max-content" gap="200">
-        <GcdsButton
-          buttonRole="danger"
-          style={{ width: "fit-content" }}
-          onGcdsClick={onSubmitHandler}
-        >
-          {t("DeleteMFAPhoneNumberConfirm.confirmButton")}
-        </GcdsButton>
-
-        <GcdsButton
-          buttonRole="secondary"
-          style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onCancel();
-          }}
-        >
-          {t("DeleteMFAPhoneNumberConfirm.cancelButton")}
-        </GcdsButton>
+            {t("DeleteMFAPhoneNumberConfirm.cancelButton")}
+          </GcdsButton>
+        </GcdsGrid>
       </GcdsGrid>
     </GcdsContainer>
   );

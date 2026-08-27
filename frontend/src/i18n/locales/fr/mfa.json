@@ -79,7 +79,7 @@
     "noSkip": "Non, ignorer pour l'instant"
   },
   "DeleteMFAPhoneNumberConfirm": {
-    "title": "Voulez-vous vraiment supprimer ce numéro?",
+    "title": "Voulez-vous vraiment supprimer ce numéro de téléphone?",
     "noLongerUse": "Vous ne pourrez plus utiliser le",
     "toSignIn": "pour vous connecter.",
     "thisText": "Cette action",
@@ -87,6 +87,8 @@
     "deleteFromContact": "ce numéro de téléphone de vos coordonnées. Pour gérer votre numéro de téléphone de communication, rendez-vous sur la page",
     "personalInformation": "Renseignements personnels",
     "period": ".",
+    "infoTitle": "Information",
+    "infoDescription": "La suppression d'un numéro de téléphone déclenchera l'envoi d'une notification à votre adresse courriel.",
     "confirmButton": "Oui, supprimer",
     "cancelButton": "Annuler"
   }
