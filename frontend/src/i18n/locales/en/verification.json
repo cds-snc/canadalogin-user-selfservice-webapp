@@ -20,6 +20,8 @@
     "tenMinutes": "10 minutes.",
     "enterCode": "Enter the code",
     "sixDigitCode": "6-digit code",
+    "addPhoneInfoTitle": "Information",
+    "addPhoneInfoDescription": "Adding a phone number will send a notification to your email address",
     "problemsWithCode": "Problems with the code?",
     "callMeInstead": "Call me instead",
     "textMeInstead": "Send me a text (SMS) instead",

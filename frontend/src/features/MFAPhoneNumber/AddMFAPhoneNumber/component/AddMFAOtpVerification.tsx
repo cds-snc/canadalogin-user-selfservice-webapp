@@ -157,18 +157,18 @@ export default function AddMFAOtpVerification({
 
   return (
     <GcdsContainer role="main">
-      {codeRequested && (
-        <GcdsNotice
-          noticeRole="success"
-          noticeTitleTag="h2"
-          noticeTitle={t("Verification.newCodeSent")}
-          data-testid="linkSuccess"
-        >
-          &nbsp;
-        </GcdsNotice>
-      )}
+      <GcdsGrid columns="1" gap="300">
+        {codeRequested && (
+          <GcdsNotice
+            noticeRole="success"
+            noticeTitleTag="h2"
+            noticeTitle={t("Verification.newCodeSent")}
+            data-testid="linkSuccess"
+          >
+            &nbsp;
+          </GcdsNotice>
+        )}
 
-      <section>
         <GcdsContainer>
           <PageHeader
             language={language}
@@ -229,12 +229,18 @@ export default function AddMFAOtpVerification({
                   minlength={6}
                 ></GcdsInput>
               </form>
+
+              <GcdsNotice
+                noticeRole="info"
+                noticeTitleTag="h2"
+                noticeTitle={t("Verification.addPhoneInfoTitle")}
+              >
+                <GcdsText>{t("Verification.addPhoneInfoDescription")}</GcdsText>
+              </GcdsNotice>
             </>
           )}
         </GcdsContainer>
-      </section>
 
-      <section>
         {!isExpired ? (
           <GcdsGrid columns="max-content max-content" gap="200">
             <SubmitButton
@@ -259,57 +265,59 @@ export default function AddMFAOtpVerification({
             </GcdsButton>
           </GcdsGrid>
         ) : null}
-      </section>
 
-      <section>
-        <GcdsHeading tag="h2">{t("Verification.problemsWithCode")}</GcdsHeading>
+        <GcdsContainer>
+          <GcdsHeading tag="h2">
+            {t("Verification.problemsWithCode")}
+          </GcdsHeading>
 
-        <GcdsText>
-          <GcdsLink
-            onGcdsClick={async () => {
-              await onSetupAlternateMFAMethod();
-            }}
-          >
-            {userMfaType === FLOW_TYPES.sms
-              ? t("Verification.setupVoiceInstead")
-              : t("Verification.setupSmsInstead")}
-          </GcdsLink>
-        </GcdsText>
-
-        <GcdsText>
-          {!isExpired && fallbackSeconds > 0 ? (
-            <span>
-              {t("Verification.requestNewCodeAvailableIn")}
-              <strong>
-                {" "}
-                {fallbackSeconds} {t("Verification.seconds")}
-              </strong>
-            </span>
-          ) : (
+          <GcdsText>
             <GcdsLink
-              onGcdsClick={() => {
-                requestNewCode();
+              onGcdsClick={async () => {
+                await onSetupAlternateMFAMethod();
               }}
             >
-              {userMfaType !== FLOW_TYPES.email
-                ? t("Verification.requestNewCode")
-                : t("Verification.sendCodeAgain")}
+              {userMfaType === FLOW_TYPES.sms
+                ? t("Verification.setupVoiceInstead")
+                : t("Verification.setupSmsInstead")}
             </GcdsLink>
-          )}
-        </GcdsText>
+          </GcdsText>
 
-        <GcdsText>
-          <GcdsLink
-            onGcdsClick={async () => {
-              clearValues();
-              await onUseDifferentPhoneNumber();
-              onBack();
-            }}
-          >
-            {t("Verification.differentPhoneNumber")}
-          </GcdsLink>
-        </GcdsText>
-      </section>
+          <GcdsText>
+            {!isExpired && fallbackSeconds > 0 ? (
+              <span>
+                {t("Verification.requestNewCodeAvailableIn")}
+                <strong>
+                  {" "}
+                  {fallbackSeconds} {t("Verification.seconds")}
+                </strong>
+              </span>
+            ) : (
+              <GcdsLink
+                onGcdsClick={() => {
+                  requestNewCode();
+                }}
+              >
+                {userMfaType !== FLOW_TYPES.email
+                  ? t("Verification.requestNewCode")
+                  : t("Verification.sendCodeAgain")}
+              </GcdsLink>
+            )}
+          </GcdsText>
+
+          <GcdsText>
+            <GcdsLink
+              onGcdsClick={async () => {
+                clearValues();
+                await onUseDifferentPhoneNumber();
+                onBack();
+              }}
+            >
+              {t("Verification.differentPhoneNumber")}
+            </GcdsLink>
+          </GcdsText>
+        </GcdsContainer>
+      </GcdsGrid>
     </GcdsContainer>
   );
 }
