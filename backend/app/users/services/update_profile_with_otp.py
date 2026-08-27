@@ -1,4 +1,5 @@
 import logging
+import re
 
 from fastapi import HTTPException, status, Request
 
@@ -22,6 +23,32 @@ from app.auth.services.auth_user_session import update_session_user_info
 from app.utils.helpers import verify_otp_before_operation
 
 logger = logging.getLogger(__name__)
+
+MAX_EMAIL_LENGTH = 128
+NON_ASCII_CHARACTER_REGEX = re.compile(r"[^\x00-\x7F]")
+
+
+def _validate_new_email_address(new_email_address: str | None) -> None:
+    """Apply business-rule validation for email updates.
+
+    These checks mirror frontend rules so direct API calls cannot bypass them.
+    """
+    if not new_email_address:
+        return
+
+    normalized_email = str(new_email_address).strip().lower()
+
+    if len(normalized_email) > MAX_EMAIL_LENGTH:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="email_too_long",
+        )
+
+    if NON_ASCII_CHARACTER_REGEX.search(normalized_email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="email_accented_characters",
+        )
 
 
 async def update_profile_with_otp_verification(
@@ -47,6 +74,8 @@ async def update_profile_with_otp_verification(
         HTTPException: For OTP verification failures or profile update errors
     """
     logger.info("Starting atomic profile update with OTP verification")
+
+    _validate_new_email_address(profile_update_data.newEmailAddress)
 
     # Step 1: Validate the OTP first using the helper function
     await verify_otp_before_operation(

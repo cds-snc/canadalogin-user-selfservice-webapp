@@ -296,7 +296,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
         ),
       ).toBeInTheDocument();
       expect(
-        screen.getByText("Your call might take a few minutes to arrive."),
+        screen.getByText("Your call may take a few minutes to arrive."),
       ).toBeInTheDocument();
     });
   });

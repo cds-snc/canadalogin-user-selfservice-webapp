@@ -83,7 +83,7 @@ export default function PasswordVerification({
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="200">
+      <GcdsGrid columns="1" gap="300">
         <GcdsContainer>
           {" "}
           <GcdsHeading tag="h1" lang={language}>

@@ -70,11 +70,11 @@ const getEmailValidationErrorCode = (email: string): string | null => {
   }
 
   if (email.length > MAX_EMAIL_LENGTH) {
-    return "emailTooLong";
+    return "email_too_long";
   }
 
   if (NON_ASCII_CHARACTER_REGEX.test(email)) {
-    return "emailAccentedCharacters";
+    return "email_accented_characters";
   }
 
   if (!EMAIL_REGEX.test(email)) {

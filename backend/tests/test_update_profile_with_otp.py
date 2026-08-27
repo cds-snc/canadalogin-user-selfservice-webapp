@@ -17,6 +17,7 @@ from app.users.services.update_profile_with_otp import (
     _build_profile_update_request,
     _get_update_field_names,
     _build_session_updates,
+    _validate_new_email_address,
 )
 
 
@@ -230,6 +231,84 @@ SYNC_EMAIL_MFA_IMPORT_PATH = (
 
 class TestUpdateProfileWithOtpVerification:
     """Test the main update_profile_with_otp_verification function"""
+
+    def test_validate_new_email_address_rejects_email_over_128_characters(self):
+        """Backend should return frontend-compatible code for long emails."""
+        valid_over_128_email = f"user@{'a' * 63}.{'b' * 56}.com"
+
+        with pytest.raises(HTTPException) as exc:
+            _validate_new_email_address(valid_over_128_email)
+
+        assert exc.value.status_code == 400
+        assert exc.value.detail == "email_too_long"
+
+    def test_validate_new_email_address_rejects_non_ascii_email(self):
+        """Backend should return frontend-compatible code for non-ASCII emails."""
+        with pytest.raises(HTTPException) as exc:
+            _validate_new_email_address("josé@example.com")
+
+        assert exc.value.status_code == 400
+        assert exc.value.detail == "email_accented_characters"
+
+    @pytest.mark.asyncio
+    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_invalid_email_too_long_prevents_otp_verification(
+        self, mock_verify_otp, mock_get_profile
+    ):
+        """Business-rule email validation should fail before OTP verification."""
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+
+        profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
+            otp="123456",
+            trxnId="test-trxn-id",
+            otpType=OtpType.EMAIL,
+            newEmailAddress=f"user@{'a' * 63}.{'b' * 56}.com",
+            phoneNumbers=None,
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request, profile_update_data, "user-token"
+            )
+
+        assert exc.value.status_code == 400
+        assert exc.value.detail == "email_too_long"
+        mock_verify_otp.assert_not_called()
+        mock_get_profile.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_invalid_email_accented_prevents_otp_verification(
+        self, mock_verify_otp, mock_get_profile
+    ):
+        """Non-ASCII email validation should fail before OTP verification."""
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+
+        profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
+            otp="123456",
+            trxnId="test-trxn-id",
+            otpType=OtpType.EMAIL,
+            newEmailAddress="josé@example.com",
+            phoneNumbers=None,
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request, profile_update_data, "user-token"
+            )
+
+        assert exc.value.status_code == 400
+        assert exc.value.detail == "email_accented_characters"
+        mock_verify_otp.assert_not_called()
+        mock_get_profile.assert_not_called()
 
     @pytest.mark.asyncio
     @patch(SYNC_EMAIL_MFA_IMPORT_PATH)

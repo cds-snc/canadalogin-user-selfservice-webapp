@@ -58,7 +58,7 @@ vi.mock("../../../../utils/functions", () => ({
         2: "We have sent a text message with a 6-digit verification code to:",
         3: "We have sent a 6-digit verification code via voice call to:",
         4: "Your text (SMS) might take a few minutes to arrive.",
-        5: "Your call might take a few minutes to arrive.",
+        5: "Your call may take a few minutes to arrive.",
         6: "Your code will expire in",
         7: "10 minutes.",
         8: "Enter the code",
@@ -356,7 +356,7 @@ describe("OtpVerification Component", () => {
         ),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/Your call might take a few minutes to arrive\./),
+        screen.getByText(/Your call may take a few minutes to arrive\./),
       ).toBeInTheDocument();
     });
 
