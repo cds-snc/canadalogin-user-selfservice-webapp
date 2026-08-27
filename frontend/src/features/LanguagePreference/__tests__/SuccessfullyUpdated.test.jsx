@@ -183,19 +183,20 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
     it("renders success notice with updated language", () => {
       setup();
 
-      const notice = screen.getByTestId("gcds-notice");
-      expect(notice).toBeInTheDocument();
-      expect(notice).toHaveAttribute("data-notice-role", "success");
+      const notices = screen.getAllByTestId("gcds-notice");
+      expect(notices).toHaveLength(2);
+      expect(notices[0]).toHaveAttribute("data-notice-role", "success");
+      expect(notices[1]).toHaveAttribute("data-notice-role", "warning");
     });
 
     it("displays the success message with language name", () => {
       setup();
 
-      const notice = screen.getByTestId("gcds-notice");
+      const notice = screen.getAllByTestId("gcds-notice")[0];
       const noticeText = within(notice).getByTestId("gcds-text");
 
       expect(noticeText).toHaveTextContent(
-        "Your language preference has been updated to French",
+        "Your language preference has been updated to: French.",
       );
     });
 
@@ -205,15 +206,14 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       expect(screen.getByTestId("gcds-heading-h1")).toBeInTheDocument();
       expect(
         screen.getByText(
-          "You may need to update your language preference in other places",
+          "You may need to update your language preference other places",
         ),
       ).toBeInTheDocument();
     });
 
-    it("renders the subheading", () => {
+    it("renders connected-services context text", () => {
       setup();
 
-      expect(screen.getByTestId("gcds-heading-h4")).toBeInTheDocument();
       expect(
         screen.getByText(
           "This only changes your language preference with services connected to your CanadaLogin.",
@@ -236,13 +236,15 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
     it("renders browser settings link", () => {
       setup();
 
-      const link = screen.getByTestId("gcds-link");
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute(
+      const links = screen.getAllByTestId("gcds-link");
+      expect(links).toHaveLength(2);
+      expect(links[0]).toHaveAttribute(
         "href",
         EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory,
       );
-      expect(screen.getByText("GC Account directory.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Government of Canada account directory"),
+      ).toBeInTheDocument();
     });
 
     it("renders return to profile button", () => {
@@ -264,10 +266,12 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
     it("renders buttons in a grid layout", () => {
       setup();
 
-      const grid = screen.getByTestId("gcds-grid");
-      expect(grid).toBeInTheDocument();
-      expect(grid).toHaveAttribute("data-columns", "max-content max-content");
-      expect(grid).toHaveAttribute("data-gap", "200");
+      const grids = screen.getAllByTestId("gcds-grid");
+      expect(grids[1]).toHaveAttribute(
+        "data-columns",
+        "max-content max-content",
+      );
+      expect(grids[1]).toHaveAttribute("data-gap", "200");
     });
   });
 
@@ -340,14 +344,14 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
     it("displays French when preferred language is fr-ca in English interface", () => {
       setup("en", "fr-ca");
 
-      const notice = screen.getByTestId("gcds-notice");
+      const notice = screen.getAllByTestId("gcds-notice")[0];
       expect(notice).toHaveTextContent("French");
     });
 
     it("displays Français when preferred language is fr-ca in French interface", () => {
       setup("fr", "fr-ca");
 
-      const notice = screen.getByTestId("gcds-notice");
+      const notice = screen.getAllByTestId("gcds-notice")[0];
       expect(notice).toHaveTextContent("Français");
     });
 
@@ -357,7 +361,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
         updatedPreferredLanguage: "en-ca",
       });
 
-      const notice = screen.getByTestId("gcds-notice");
+      const notice = screen.getAllByTestId("gcds-notice")[0];
       expect(notice).toHaveTextContent("English");
     });
 
@@ -367,7 +371,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
         updatedPreferredLanguage: "en-ca",
       });
 
-      const notice = screen.getByTestId("gcds-notice");
+      const notice = screen.getAllByTestId("gcds-notice")[0];
       expect(notice).toHaveTextContent("Anglais");
     });
   });
@@ -526,12 +530,11 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       setup();
 
       expect(screen.getByTestId("gcds-container")).toBeInTheDocument();
-      expect(screen.getByTestId("gcds-notice")).toBeInTheDocument();
+      expect(screen.getAllByTestId("gcds-notice")).toHaveLength(2);
       expect(screen.getByTestId("gcds-heading-h1")).toBeInTheDocument();
-      expect(screen.getByTestId("gcds-heading-h4")).toBeInTheDocument();
-      expect(screen.getAllByTestId("gcds-text")).toHaveLength(4);
-      expect(screen.getByTestId("gcds-link")).toBeInTheDocument();
-      expect(screen.getByTestId("gcds-grid")).toBeInTheDocument();
+      expect(screen.getAllByTestId("gcds-text")).toHaveLength(6);
+      expect(screen.getAllByTestId("gcds-link")).toHaveLength(2);
+      expect(screen.getAllByTestId("gcds-grid")).toHaveLength(2);
       expect(screen.getByTestId("gcds-button-primary")).toBeInTheDocument();
       expect(screen.getByTestId("gcds-button-secondary")).toBeInTheDocument();
     });
@@ -539,7 +542,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
     it("renders success notice with correct structure", () => {
       setup();
 
-      const notice = screen.getByTestId("gcds-notice");
+      const notice = screen.getAllByTestId("gcds-notice")[0];
       expect(notice).toHaveAttribute("data-notice-role", "success");
 
       const noticeText = notice.querySelector('[data-testid="gcds-text"]');
@@ -551,10 +554,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
 
       const headings = screen.getAllByRole("heading");
       expect(headings[0]).toHaveTextContent(
-        "You may need to update your language preference in other places",
-      );
-      expect(headings[1]).toHaveTextContent(
-        "This only changes your language preference with services connected to your CanadaLogin.",
+        "You may need to update your language preference other places",
       );
     });
   });
@@ -591,7 +591,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
           updatedPreferredLanguage: pref,
         });
 
-        const notice = screen.getByTestId("gcds-notice");
+        const notice = screen.getAllByTestId("gcds-notice")[0];
         expect(notice).toHaveTextContent(expected);
         unmount();
       });
@@ -603,10 +603,8 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       setup();
 
       const h1 = screen.getByTestId("gcds-heading-h1");
-      const h4 = screen.getByTestId("gcds-heading-h4");
 
       expect(h1.tagName).toBe("H1");
-      expect(h4.tagName).toBe("H4");
     });
 
     it("provides descriptive button text", () => {
