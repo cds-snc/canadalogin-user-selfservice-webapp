@@ -34,6 +34,8 @@
     "toChangePassword": "Pour modifier votre mot de passe,",
     "toChangeEmail": "Pour modifier votre adresse courriel,",
     "enterCurrentPassword": "entrez d’abord votre mot de passe actuel.",
+    "changePasswordInfoTitle": "Information",
+    "changePasswordInfoDescription": "La modification de votre mot de passe déclenchera l'envoi d'une notification à votre adresse courriel.",
     "passwordLabel": "Mot de passe",
     "forgotPassword": "Mot de passe oublié?",
     "resetPassword": "Réinitialiser le mot de passe",

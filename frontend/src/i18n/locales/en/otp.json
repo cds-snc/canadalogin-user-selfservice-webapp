@@ -33,6 +33,8 @@
     "toChangePassword": "To change your password,",
     "toChangeEmail": "To change your email,",
     "enterCurrentPassword": "first enter your current password.",
+    "changePasswordInfoTitle": "Information",
+    "changePasswordInfoDescription": "Updating your password will send a notification to your email address",
     "passwordLabel": "Password",
     "forgotPassword": "Forgot your password?",
     "resetPassword": "Reset your password",
