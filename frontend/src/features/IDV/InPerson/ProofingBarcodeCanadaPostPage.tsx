@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 import BarcodeDisplay from "../helpers/BarcodeDisplay";
 import { useUser } from "../../../components/Providers/useUser";
+import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
@@ -19,6 +20,7 @@ import {
   APPROVED_DOCUMENT_VALUES,
   type ApprovedDocumentValue,
 } from "../data/approvedDocuments";
+import "./css/ProofingBarcodeCanadaPostPage.print.css";
 
 type ProofingBarcodeCanadaPostState = {
   idvCode?: string;
@@ -98,23 +100,29 @@ export default function ProofingBarcodeCanadaPostPage() {
   }
 
   return (
-    <GcdsContainer role="main">
+    <GcdsContainer role="main" className="visit-canada-post-page">
       <GcdsGrid columns="1" gap="450">
-        <GcdsContainer>
-          <GcdsHeading tag="h1" marginTop="0">
-            {t("ProofingBarcodeCanadaPost.heading")}
-          </GcdsHeading>
-
-          <BarcodeDisplay
-            value={barcodeValue}
-            ariaLabel={t("ProofingBarcodeCanadaPost.barcodeAriaLabel", {
-              code: barcodeValue,
-            })}
-            height={120}
-            maxWidth="360px"
-            widthScale={0.7}
+        <GcdsContainer className="visit-canada-post-print-banner">
+          <img
+            src={governmentBannerImage}
+            alt={t("ProofingBarcodeCanadaPost.printBannerAlt")}
+            className="visit-canada-post-print-banner-image"
           />
         </GcdsContainer>
+
+        <GcdsHeading tag="h1" marginTop="0">
+          {t("ProofingBarcodeCanadaPost.heading")}
+        </GcdsHeading>
+
+        <BarcodeDisplay
+          value={barcodeValue}
+          ariaLabel={t("ProofingBarcodeCanadaPost.barcodeAriaLabel", {
+            code: barcodeValue,
+          })}
+          height={120}
+          maxWidth="22.5rem"
+          widthScale={0.7}
+        />
 
         <GcdsContainer>
           <GcdsText>
@@ -193,6 +201,7 @@ export default function ProofingBarcodeCanadaPostPage() {
                 columns="1"
                 columnsDesktop="max-content max-content"
                 gap="200"
+                className="visit-canada-post-print-hide"
               >
                 <GcdsButton
                   buttonRole="primary"
