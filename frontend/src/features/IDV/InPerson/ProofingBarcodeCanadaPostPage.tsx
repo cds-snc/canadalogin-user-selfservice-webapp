@@ -102,13 +102,13 @@ export default function ProofingBarcodeCanadaPostPage() {
   return (
     <GcdsContainer role="main" className="visit-canada-post-page">
       <GcdsGrid columns="1" gap="450">
-        <div className="visit-canada-post-print-banner">
+        <GcdsContainer className="visit-canada-post-print-banner">
           <img
             src={governmentBannerImage}
             alt={t("ProofingBarcodeCanadaPost.printBannerAlt")}
             className="visit-canada-post-print-banner-image"
           />
-        </div>
+        </GcdsContainer>
 
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProofingBarcodeCanadaPost.heading")}
@@ -120,7 +120,7 @@ export default function ProofingBarcodeCanadaPostPage() {
             code: barcodeValue,
           })}
           height={120}
-          maxWidth="360px"
+          maxWidth="22.5rem"
           widthScale={0.7}
         />
 
