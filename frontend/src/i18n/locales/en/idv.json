@@ -215,7 +215,7 @@
   },
   "CompleteIdentityProofing": {
     "headingWithRpName": "{{rpName}} needs you to prove your identity",
-    "headingWithoutRpName": "Prove your identity",
+    "headingWithoutRpName": "Prove your identity when you’re ready",
     "noticeTitle": "Get access to more services",
     "noticeDescription": "Complete identity proofing to secure your CanadaLogin, make recovery easier, and access more Government of Canada services.",
     "noticeCta": "Complete identity proofing",
