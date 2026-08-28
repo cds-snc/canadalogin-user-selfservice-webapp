@@ -4,9 +4,9 @@ import {
   GcdsText,
   GcdsGrid,
   GcdsInput,
-  GcdsNotice,
   GcdsSrOnly,
 } from "@gcds-core/components-react";
+import EmailNotificationInfoNotice from "../../../InfoBlocks/EmailNotificationInfoNotice";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { PAGES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
@@ -189,16 +189,13 @@ export default function FIDO2PasskeyList({
               {created ? new Date(created).toLocaleDateString() : ""}
             </GcdsText>
             {isEditing && (
-              <GcdsNotice
-                noticeRole="info"
-                noticeTitleTag="h3"
-                noticeTitle={t("Manage2FAVerifications.renamePasskeyInfoTitle")}
+              <EmailNotificationInfoNotice
+                title={t("Manage2FAVerifications.renamePasskeyInfoTitle")}
+                description={t(
+                  "Manage2FAVerifications.renamePasskeyInfoDescription",
+                )}
                 lang={language}
-              >
-                <GcdsText marginBottom="0">
-                  {t("Manage2FAVerifications.renamePasskeyInfoDescription")}
-                </GcdsText>
-              </GcdsNotice>
+              />
             )}
           </GcdsContainer>
           <GcdsGrid columns="max-content max-content max-content" gap="200">

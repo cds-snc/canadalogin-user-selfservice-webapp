@@ -15,6 +15,7 @@ import { FLOW_TYPES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
 import { useOtpExpiryCountdown } from "../../../../hooks/useOtpExpiryCountdown";
+import EmailNotificationInfoNotice from "../../../../components/InfoBlocks/EmailNotificationInfoNotice";
 
 interface PageHeaderProps {
   language: string | undefined;
@@ -230,13 +231,11 @@ export default function AddMFAOtpVerification({
                 ></GcdsInput>
               </form>
 
-              <GcdsNotice
-                noticeRole="info"
-                noticeTitleTag="h2"
-                noticeTitle={t("Verification.addPhoneInfoTitle")}
-              >
-                <GcdsText>{t("Verification.addPhoneInfoDescription")}</GcdsText>
-              </GcdsNotice>
+              <EmailNotificationInfoNotice
+                title={t("Verification.addPhoneInfoTitle")}
+                description={t("Verification.addPhoneInfoDescription")}
+                lang={language}
+              />
             </>
           )}
         </GcdsContainer>

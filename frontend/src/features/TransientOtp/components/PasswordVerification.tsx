@@ -7,7 +7,6 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsInput,
-  GcdsNotice,
   GcdsText,
   GcdsCheckboxes,
 } from "@gcds-core/components-react";
@@ -15,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { PAGES } from "../../../utils/constants";
 import { useParams } from "react-router";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import EmailNotificationInfoNotice from "../../../components/InfoBlocks/EmailNotificationInfoNotice";
 
 type CaughtApiError = { data?: { message?: string } };
 
@@ -121,15 +121,13 @@ export default function PasswordVerification({
         </form>
 
         {isChangePasswordFlow ? (
-          <GcdsNotice
-            noticeRole="info"
-            noticeTitleTag="h2"
-            noticeTitle={t("PasswordVerification.changePasswordInfoTitle")}
-          >
-            <GcdsText>
-              {t("PasswordVerification.changePasswordInfoDescription")}
-            </GcdsText>
-          </GcdsNotice>
+          <EmailNotificationInfoNotice
+            title={t("PasswordVerification.changePasswordInfoTitle")}
+            description={t(
+              "PasswordVerification.changePasswordInfoDescription",
+            )}
+            lang={language}
+          />
         ) : null}
 
         <GcdsGrid columns="max-content max-content" gap="200">

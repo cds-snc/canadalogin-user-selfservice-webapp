@@ -4,13 +4,13 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
 import { useParams } from "react-router";
 import { PAGES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { path } from "../../../../utils/routeHelpers";
+import EmailNotificationInfoNotice from "../../../../components/InfoBlocks/EmailNotificationInfoNotice";
 
 interface PhoneFormData {
   formattedPhoneNumber?: string;
@@ -63,15 +63,11 @@ export default function DeleteMFAPhoneNumberConfirm({
           </GcdsGrid>
         </GcdsContainer>
 
-        <GcdsNotice
-          noticeRole="info"
-          noticeTitleTag="h2"
-          noticeTitle={t("DeleteMFAPhoneNumberConfirm.infoTitle")}
-        >
-          <GcdsText>
-            {t("DeleteMFAPhoneNumberConfirm.infoDescription")}
-          </GcdsText>
-        </GcdsNotice>
+        <EmailNotificationInfoNotice
+          title={t("DeleteMFAPhoneNumberConfirm.infoTitle")}
+          description={t("DeleteMFAPhoneNumberConfirm.infoDescription")}
+          lang={language}
+        />
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton buttonRole="danger" onGcdsClick={onSubmitHandler}>

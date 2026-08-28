@@ -5,9 +5,9 @@ import {
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+import EmailNotificationInfoNotice from "../../../../components/InfoBlocks/EmailNotificationInfoNotice";
 
 interface DeleteFIDO2PasskeyConfirmProps {
   passkeyNickname?: string;
@@ -34,16 +34,11 @@ export default function DeleteFIDO2PasskeyConfirm({
           <strong>{passkeyNickname}</strong>{" "}
           {t("DeleteFIDO2PasskeyConfirm.toSignIn")}
         </GcdsText>
-        <GcdsNotice
-          noticeRole="info"
-          noticeTitleTag="h2"
-          noticeTitle={t("DeleteFIDO2PasskeyConfirm.infoTitle")}
+        <EmailNotificationInfoNotice
+          title={t("DeleteFIDO2PasskeyConfirm.infoTitle")}
+          description={t("DeleteFIDO2PasskeyConfirm.infoDescription")}
           lang={language}
-        >
-          <GcdsText marginBottom="0">
-            {t("DeleteFIDO2PasskeyConfirm.infoDescription")}
-          </GcdsText>
-        </GcdsNotice>
+        />
         <GcdsGrid columns="max-content max-content" gap="200">
           <GcdsButton
             buttonRole="danger"
