@@ -31,6 +31,11 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsGrid: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsHeading: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
+  GcdsNotice: ({ children, ...props }) => (
+    <div data-testid="notice" {...props}>
+      {children}
+    </div>
+  ),
   GcdsText: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsButton: ({ children, onGcdsClick, buttonRole, ...props }) => (
     <button data-role={buttonRole} onClick={onGcdsClick} {...props}>
@@ -60,6 +65,17 @@ describe("DeleteFIDO2PasskeyConfirm", () => {
   it("renders the passkey nickname in the body text", () => {
     render(<DeleteFIDO2PasskeyConfirm {...defaultProps} />);
     expect(screen.getByText("My Passkey")).toBeInTheDocument();
+  });
+
+  it("renders the information notice", () => {
+    render(<DeleteFIDO2PasskeyConfirm {...defaultProps} />);
+    const notice = screen.getByTestId("notice");
+    expect(notice).toBeInTheDocument();
+    expect(notice).toHaveAttribute("noticeRole", "info");
+    expect(notice).toHaveAttribute("noticeTitle", "Information");
+    expect(notice).toHaveTextContent(
+      "Deleting a passkey will send a notification to your email address.",
+    );
   });
 
   it("renders confirm and cancel buttons", () => {

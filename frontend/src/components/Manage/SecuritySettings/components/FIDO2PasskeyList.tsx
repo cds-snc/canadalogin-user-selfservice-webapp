@@ -4,6 +4,7 @@ import {
   GcdsText,
   GcdsGrid,
   GcdsInput,
+  GcdsNotice,
   GcdsSrOnly,
 } from "@gcds-core/components-react";
 import { useLocation, useNavigate, useParams } from "react-router";
@@ -156,91 +157,110 @@ export default function FIDO2PasskeyList({
 
     return (
       <GcdsContainer key={id}>
-        {isEditing ? (
-          <GcdsInput
-            label={t("Manage2FAVerifications.nameLabel")}
-            inputId="passkeyNickname"
-            name="passkeyNickname"
-            type="text"
-            validateOn="other"
-            data-testid="passkeyNickname"
-            lang={language}
-            errorMessage={errorMessage}
-            value={nicknameValue}
-            onInput={(event) => {
-              const nextValue = (event.target as HTMLInputElement).value;
+        <GcdsGrid columns="1" gap="200">
+          <GcdsContainer>
+            {isEditing ? (
+              <GcdsInput
+                label={t("Manage2FAVerifications.nameLabel")}
+                inputId="passkeyNickname"
+                name="passkeyNickname"
+                type="text"
+                validateOn="other"
+                data-testid="passkeyNickname"
+                lang={language}
+                errorMessage={errorMessage}
+                value={nicknameValue}
+                onInput={(event) => {
+                  const nextValue = (event.target as HTMLInputElement).value;
 
-              setPasskeyNicknameInputs((previous) => ({
-                ...previous,
-                [id]: nextValue,
-              }));
-            }}
-          />
-        ) : (
-          <GcdsText>
-            <strong>{nicknameValue}</strong>
-          </GcdsText>
-        )}
-        <GcdsText textRole="secondary">
-          {t("Manage2FAVerifications.createdOn")}
-          {created ? new Date(created).toLocaleDateString() : ""}
-        </GcdsText>
-        <GcdsGrid columns="max-content max-content max-content" gap="200">
-          {isEditing ? (
-            <>
-              <GcdsButton
-                id="save-fido2-button"
-                buttonRole="primary"
-                onGcdsClick={async () => {
-                  await handleRenameFIDO2(id, nicknameValue);
+                  setPasskeyNicknameInputs((previous) => ({
+                    ...previous,
+                    [id]: nextValue,
+                  }));
                 }}
-                disabled={loading}
+              />
+            ) : (
+              <GcdsText>
+                <strong>{nicknameValue}</strong>
+              </GcdsText>
+            )}
+            <GcdsText textRole="secondary">
+              {t("Manage2FAVerifications.createdOn")}
+              {created ? new Date(created).toLocaleDateString() : ""}
+            </GcdsText>
+            {isEditing && (
+              <GcdsNotice
+                noticeRole="info"
+                noticeTitleTag="h3"
+                noticeTitle={t("Manage2FAVerifications.renamePasskeyInfoTitle")}
+                lang={language}
               >
-                {t("Manage2FAVerifications.saveButton")}
-              </GcdsButton>
-              <GcdsButton
-                id="cancel-fido2-button"
-                buttonRole="secondary"
-                onClick={() => {
-                  clearPasskeyNicknameInput(id);
-                  setEditingPasskeyId(null);
-                  trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_STEP_END);
-                }}
-                disabled={loading}
-              >
-                {t("Manage2FAVerifications.cancelButton")}
-              </GcdsButton>
-            </>
-          ) : (
-            <>
-              <GcdsButton
-                id="rename-fido2-button"
-                buttonRole="secondary"
-                onGcdsClick={() => {
-                  trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_STEP_START);
-                  trackPage(pathname, RENAME_PASSKEY_PAGE_IDS.EDIT, rpParams);
-                  setEditingPasskeyId(id);
-                }}
-              >
-                {t("Manage2FAVerifications.renamePasskey")}
-                <GcdsSrOnly tag="span"> {nicknameValue}</GcdsSrOnly>
-              </GcdsButton>
-              {canDeletePasskey && (
+                <GcdsText marginBottom="0">
+                  {t("Manage2FAVerifications.renamePasskeyInfoDescription")}
+                </GcdsText>
+              </GcdsNotice>
+            )}
+          </GcdsContainer>
+          <GcdsGrid columns="max-content max-content max-content" gap="200">
+            {isEditing ? (
+              <>
                 <GcdsButton
-                  id="delete-fido2-button"
+                  id="save-fido2-button"
+                  buttonRole="primary"
+                  onGcdsClick={async () => {
+                    await handleRenameFIDO2(id, nicknameValue);
+                  }}
+                  disabled={loading}
+                >
+                  {t("Manage2FAVerifications.saveButton")}
+                </GcdsButton>
+                <GcdsButton
+                  id="cancel-fido2-button"
                   buttonRole="secondary"
                   onClick={() => {
-                    navigate(`${deletePasskeyPage}`, {
-                      state: { passkeyId: id, passkeyNickname: nicknameValue },
-                    });
+                    clearPasskeyNicknameInput(id);
+                    setEditingPasskeyId(null);
+                    trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_STEP_END);
+                  }}
+                  disabled={loading}
+                >
+                  {t("Manage2FAVerifications.cancelButton")}
+                </GcdsButton>
+              </>
+            ) : (
+              <>
+                <GcdsButton
+                  id="rename-fido2-button"
+                  buttonRole="secondary"
+                  onGcdsClick={() => {
+                    trackRenamePasskeyEvent(GA_FORM_EVENTS.FORM_STEP_START);
+                    trackPage(pathname, RENAME_PASSKEY_PAGE_IDS.EDIT, rpParams);
+                    setEditingPasskeyId(id);
                   }}
                 >
-                  {t("Manage2FAVerifications.deletePasskey")}
+                  {t("Manage2FAVerifications.renamePasskey")}
                   <GcdsSrOnly tag="span"> {nicknameValue}</GcdsSrOnly>
                 </GcdsButton>
-              )}
-            </>
-          )}
+                {canDeletePasskey && (
+                  <GcdsButton
+                    id="delete-fido2-button"
+                    buttonRole="secondary"
+                    onClick={() => {
+                      navigate(`${deletePasskeyPage}`, {
+                        state: {
+                          passkeyId: id,
+                          passkeyNickname: nicknameValue,
+                        },
+                      });
+                    }}
+                  >
+                    {t("Manage2FAVerifications.deletePasskey")}
+                    <GcdsSrOnly tag="span"> {nicknameValue}</GcdsSrOnly>
+                  </GcdsButton>
+                )}
+              </>
+            )}
+          </GcdsGrid>
         </GcdsGrid>
         <div className="separator" />
       </GcdsContainer>

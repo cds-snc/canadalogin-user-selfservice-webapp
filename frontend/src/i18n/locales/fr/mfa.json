@@ -30,7 +30,9 @@
     "learnMorePasskeys": "En savoir plus sur les clés d'accès",
     "saveButton": "Enregistrer",
     "cancelButton": "Annuler",
-    "nameLabel": "Nom"
+    "nameLabel": "Nom",
+    "renamePasskeyInfoTitle": "Information",
+    "renamePasskeyInfoDescription": "La modification du nom d’une clé d’accès déclenchera l’envoi d’une notification à votre adresse courriel."
   },
   "AddMFANumber": {
     "title": "Ajouter un numéro de téléphone",

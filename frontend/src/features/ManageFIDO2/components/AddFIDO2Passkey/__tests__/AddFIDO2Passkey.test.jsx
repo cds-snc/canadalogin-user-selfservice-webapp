@@ -2,7 +2,7 @@
  * Unit tests for AddFIDO2Passkey component
  *
  * Tests verify component behaviour:
- * - Renders heading, instruction list items, and warning notice
+ * - Renders heading, instruction list items, and information notice
  * - "Create a passkey" button calls onRegister
  * - Cancel button calls onCancel
  * - Both buttons are disabled when registrationLoading is true
@@ -26,12 +26,6 @@ vi.mock("../../../../../utils/constants", () => ({
   SERVICES: [],
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
   DEV_ONLY_FEATURE: false,
-  gcHelpCentreLinks: {
-    helpCreatingPasskey: {
-      en: "https://example.test/en/create-passkey-help",
-      fr: "https://example.test/fr/create-passkey-help",
-    },
-  },
 }));
 
 vi.mock("../../../../../assets/icons/passkey_collage.svg?react", () => ({
@@ -123,16 +117,31 @@ describe("AddFIDO2Passkey", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders the warning notice", () => {
+  it("renders the information notice", () => {
     render(<AddFIDO2Passkey {...defaultProps} />);
     const notice = screen.getByTestId("notice");
     expect(notice).toBeInTheDocument();
+    expect(notice).toHaveAttribute("data-notice-role", "info");
+    expect(notice).toHaveTextContent("Information");
     expect(notice).toHaveTextContent(
-      /Make sure\s+you control\s+the device or password manager containing your passkey\./,
+      /Make sure\s+you control\s+the device or password manager containing your passkey\.\s+Do not create\s+a passkey on a shared device\./,
     );
     expect(notice).toHaveTextContent(
-      /Do not create a passkey on a shared device\./,
+      /Adding a passkey will send a notification to your email address\./,
     );
+    expect(
+      screen.getByText("Do not create", { selector: "strong" }),
+    ).toBeInTheDocument();
+  });
+
+  it("does not render problems with passkey section", () => {
+    render(<AddFIDO2Passkey {...defaultProps} />);
+    expect(
+      screen.queryByText("Problems with passkey?"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Help with creating a passkey"),
+    ).not.toBeInTheDocument();
   });
 
   it("renders the primary and cancel buttons", () => {
