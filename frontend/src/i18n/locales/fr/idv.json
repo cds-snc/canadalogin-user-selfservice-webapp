@@ -225,7 +225,8 @@
     "signingOut": "Signing you out...",
     "signOutFailed": "Failed to sign you out. Redirecting...",
     "noDocumentsNoticeHeader": "Don't have the required documents for identity proofing?",
-    "noDocumentsNoticeText": "Si vous ne possédez aucun des documents d’identification admissibles, contactez le {{rpServicePortal}} pour trouver d’autres moyens d’accéder au service.",
+    "noDocumentsNoticeText": "Si vous ne possédez aucun des documents d’identification admissibles, contactez le ",
+    "noDocumentsNoticeTextContd": " pour trouver d’autres moyens d’accéder au service.",
     "contactLink": "{{rpServicePortal}}"
   },
   "ApprovedDocuments": {

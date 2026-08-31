@@ -228,6 +228,7 @@
     "signOutFailed": "Failed to sign you out. Redirecting...",
     "noDocumentsNoticeHeader": "Don't have the required documents for identity proofing?",
     "noDocumentsNoticeText": "If you don’t have an acceptable ID, find other ways to access the service by contacting ",
+    "noDocumentsNoticeTextContd": "",
     "contactLink": "{{rpServicePortal}}"
   },
   "ApprovedDocuments": {
