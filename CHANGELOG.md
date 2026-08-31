@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.31.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.30.0...v1.31.0) (2026-08-31)
+
+
+### Features
+
+* handle changing MFA email to new email ([#2018](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2018)) ([3fa51db](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3fa51db3817b7122005c12d9749343acb1f2a741))
+* **identity-verification:** move styling to seperate css ([#2013](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2013)) ([86363c1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/86363c137c4119da812e049e1f844278863f3b8d))
+* **identity-verification:** send the verification method and user form data service canada canada post to idv data store ([#2009](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2009)) ([7fd58e4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7fd58e4c685512e3bd8fb75919b3201b10e348a9))
+
+
+### Code Refactoring
+
+* **identity-verification:** [FE] 'You are signed in with CanadaLogin' to appear only when journeyType is required ([#2021](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2021)) ([e37814b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e37814bb567216e6c63ee593c7e23e65c2538448))
+
 ## [1.30.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.29.0...v1.30.0) (2026-08-24)
 
 
