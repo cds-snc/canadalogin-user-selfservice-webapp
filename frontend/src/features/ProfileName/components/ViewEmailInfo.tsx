@@ -7,7 +7,7 @@ import {
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { useUser } from "../../../components/Providers/useUser";
 import VerifiedBadge from "../../../components/Badges/VerifiedBadge";
 import { path } from "../../../utils/routeHelpers";
@@ -37,18 +37,16 @@ export default function DisplayEmailInfo() {
       <GcdsText>{t("ProfileHome.emailDescription")}</GcdsText>
       <GcdsGrid columns="1fr auto" className="gridInline">
         <GcdsText>{email}</GcdsText>
-        {DEV_ONLY_FEATURE && (
-          <GcdsLink
-            href={editEmail}
-            size="regular"
-            onGcdsClick={(event: GcdsNavigationEvent) => {
-              event.preventDefault();
-              navigate(event.detail);
-            }}
-          >
-            {emailActionLabel}
-          </GcdsLink>
-        )}
+        <GcdsLink
+          href={editEmail}
+          size="regular"
+          onGcdsClick={(event: GcdsNavigationEvent) => {
+            event.preventDefault();
+            navigate(event.detail);
+          }}
+        >
+          {emailActionLabel}
+        </GcdsLink>
       </GcdsGrid>
       <VerifiedBadge text={t("ProfileHome.verified")} />
     </>

@@ -185,10 +185,10 @@ describe("ProfileHome", () => {
     expect(screen.getByTestId("gcds-link")).toHaveTextContent("Change");
   });
 
-  it("hides the edit email link when DEV_ONLY_FEATURE is false", () => {
+  it("renders the edit email link when DEV_ONLY_FEATURE is false", () => {
     mockDevOnlyFeature = false;
     render(<ProfileHome />);
-    expect(screen.queryByTestId("gcds-link")).not.toBeInTheDocument();
+    expect(screen.getByTestId("gcds-link")).toHaveTextContent("Change");
   });
 
   it("renders the Proven information section when DEV_ONLY_FEATURE is true", async () => {
