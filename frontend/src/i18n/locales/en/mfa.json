@@ -30,7 +30,9 @@
     "learnMorePasskeys": "Learn more about passkeys",
     "saveButton": "Save",
     "cancelButton": "Cancel",
-    "nameLabel": "Name"
+    "nameLabel": "Name",
+    "renamePasskeyInfoTitle": "Information",
+    "renamePasskeyInfoDescription": "Renaming a passkey will send a notification to your email address"
   },
   "AddMFANumber": {
     "title": "Add a phone number",
@@ -87,6 +89,8 @@
     "deleteFromContact": "delete this number from your contact information. To manage your contact phone number, go to",
     "personalInformation": "Personal Information",
     "period": ".",
+    "infoTitle": "Information",
+    "infoDescription": "Deleting a phone number will send a notification to your email address",
     "confirmButton": "Yes, delete",
     "cancelButton": "Cancel"
   }

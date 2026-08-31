@@ -52,15 +52,20 @@
     "legallyChangeName": "votre nom sur le plan légal."
   },
   "ProfileUpdateNameSuccess": {
-    "successTitle": "Réussite",
+    "successTitle": "Opération réussie",
     "nameUpdatedTo": "Votre nom est maintenant",
-    "updateOtherPlaces": "Vous devez peut-être mettre à jour votre nom ailleurs.",
+    "updateOtherPlaces": "Il se peut que vous deviez mettre à jour votre nom ailleurs.",
     "onlyConnectedServices": "Cette action ne modifie votre nom que pour les services liés à votre identifiant ConnexionCanada.",
     "notConnectedNotice": "Si vous cherchez à mettre à jour votre nom pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
-    "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
+    "searchOtherAccounts": "Pour rechercher un autre compte du gouvernement du Canada, visitez le",
     "backToProfile": "Retour au profil",
     "signOut": "Se déconnecter",
-    "gcAccountDirectory": "répertoire des comptes du GC.",
+    "gcAccountDirectory": "répertoire des comptes du gouvernement du Canada",
+    "syncNoticeTitle": "Vous pourriez avoir à synchroniser cette mise à jour",
+    "syncNoticeDescription": "Pour synchroniser la mise à jour de votre nom entre votre profil ConnexionCanada et les services qui y sont liés, connectez-vous à chaque service individuellement.",
+    "servicesLinkLead": "Vous trouverez ici les liens de tous les",
+    "servicesLinkText": "services auxquels vous pouvez accéder à l'aide de votre identifiant ConnexionCanada",
+    "servicesLinkSuffix": ".",
     "signingOut": "Déconnexion en cours...",
     "signOutFailed": "Échec de la déconnexion. Redirection..."
   }

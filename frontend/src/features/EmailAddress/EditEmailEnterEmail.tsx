@@ -50,70 +50,68 @@ export default function EditEmailEnterEmail({
 
   return (
     <GcdsContainer role="main">
-      <GcdsHeading tag="h1" lang={language}>
-        {t("EditEmailEnterEmail.title")}
-      </GcdsHeading>
+      <GcdsGrid columns="1" gap="300">
+        <GcdsHeading tag="h1" lang={language}>
+          {t("EditEmailEnterEmail.title")}
+        </GcdsHeading>
 
-      <GcdsContainer>
-        <GcdsText marginBottom="0">
-          {t("EditEmailEnterEmail.changingAffects")}
-        </GcdsText>
-        <ul>
-          <li>
-            <GcdsText marginBottom="0">
-              {t("EditEmailEnterEmail.signInEmail")}
-            </GcdsText>
-          </li>
-          <li>
-            <GcdsText marginBottom="0">
-              {t("EditEmailEnterEmail.contactEmail")}
-            </GcdsText>
-          </li>
-          <li>
-            <GcdsText marginBottom="0">
-              {t("EditEmailEnterEmail.serviceEmail")}
-            </GcdsText>
-          </li>
-        </ul>
-      </GcdsContainer>
+        <GcdsContainer>
+          <GcdsText marginBottom="0">
+            {t("EditEmailEnterEmail.changingAffects")}
+          </GcdsText>
+          <ul>
+            <li>
+              <GcdsText marginBottom="0">
+                {t("EditEmailEnterEmail.signInEmail")}
+              </GcdsText>
+            </li>
+            <li>
+              <GcdsText marginBottom="0">
+                {t("EditEmailEnterEmail.contactEmail")}
+              </GcdsText>
+            </li>
+            <li>
+              <GcdsText marginBottom="0">
+                {t("EditEmailEnterEmail.serviceEmail")}
+              </GcdsText>
+            </li>
+          </ul>
+        </GcdsContainer>
 
-      <ServicesWithAccessInfoSection
-        currentLang={language ?? "en"}
-        information={ServicesWithAccessInfoSectionInformation.EMAIL_ADDRESS}
-      />
-      <form onSubmit={onSubmitHandler}>
-        <GcdsInput
-          style={{ marginTop: "1.5rem" }}
-          label={t("EditEmailEnterEmail.emailLabel")}
-          inputId="emailAddress"
-          name="emailAddress"
-          type="email"
-          value={formData?.emailAddress || ""}
-          errorMessage={errorMessage}
-          validateOn="other"
-          onGcdsInput={handleInputChange}
-          required
-          autoFocus
-        />
-      </form>
-
-      <GcdsGrid columns="max-content max-content" gap="200">
-        <SubmitButton
+        <ServicesWithAccessInfoSection
           currentLang={language ?? "en"}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            void onSubmit(formData?.emailAddress || "");
-          }}
+          information={ServicesWithAccessInfoSectionInformation.EMAIL_ADDRESS}
         />
-        <GcdsButton
-          buttonRole="secondary"
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            void onCancel();
-          }}
-        >
-          {t("Button.cancel", { ns: "common" })}
-        </GcdsButton>
+
+        <form onSubmit={onSubmitHandler}>
+          <GcdsGrid columns="1" gap="300">
+            <GcdsInput
+              label={t("EditEmailEnterEmail.emailLabel")}
+              inputId="emailAddress"
+              name="emailAddress"
+              type="email"
+              value={formData?.emailAddress || ""}
+              errorMessage={errorMessage}
+              validateOn="other"
+              onGcdsInput={handleInputChange}
+              required
+              autoFocus
+            />
+
+            <GcdsGrid columns="max-content max-content" gap="200">
+              <SubmitButton currentLang={language ?? "en"} />
+              <GcdsButton
+                buttonRole="secondary"
+                onGcdsClick={(ev) => {
+                  ev.preventDefault();
+                  void onCancel();
+                }}
+              >
+                {t("Button.cancel", { ns: "common" })}
+              </GcdsButton>
+            </GcdsGrid>
+          </GcdsGrid>
+        </form>
       </GcdsGrid>
     </GcdsContainer>
   );

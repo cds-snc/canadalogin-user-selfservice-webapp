@@ -110,7 +110,11 @@ describe("SuccessfullyUpdated Component", () => {
     vi.clearAllMocks();
     parsePhoneNumberFromString.mockImplementation((phoneNumber) => {
       if (phoneNumber === "+15551234567") {
-        return { formatNational: () => "(555) 123-4567" };
+        return {
+          countryCallingCode: "1",
+          formatNational: () => "(555) 123-4567",
+          formatInternational: () => "+1 555 123 4567",
+        };
       }
       return null;
     });
@@ -125,7 +129,7 @@ describe("SuccessfullyUpdated Component", () => {
 
     expect(
       screen.getByText(
-        "You may need to update your phone number in other places",
+        "You may need to update your contact phone number other places",
       ),
     ).toBeInTheDocument();
   });
@@ -137,9 +141,14 @@ describe("SuccessfullyUpdated Component", () => {
       </TestWrapper>,
     );
 
-    const notice = screen.getByTestId("gcds-notice");
-    expect(notice).toBeInTheDocument();
-    expect(notice).toHaveAttribute("data-notice-role", "success");
+    const notices = screen.getAllByTestId("gcds-notice");
+    expect(notices).toHaveLength(2);
+    expect(
+      notices.some((notice) => notice.dataset.noticeRole === "success"),
+    ).toBe(true);
+    expect(
+      notices.some((notice) => notice.dataset.noticeRole === "warning"),
+    ).toBe(true);
   });
 
   it("displays the updated phone number", () => {
@@ -150,16 +159,28 @@ describe("SuccessfullyUpdated Component", () => {
     );
 
     expect(
-      screen.getByText((content, node) => {
-        const hasText = (node) =>
-          node.textContent ===
-          "Your contact phone number has been updated to +1 (555) 123-4567";
-        const nodeHasText = hasText(node);
-        const childrenDontHaveText = Array.from(node?.children || []).every(
-          (child) => !hasText(child),
-        );
-        return nodeHasText && childrenDontHaveText;
-      }),
+      screen.getByText(/Your contact phone number has been updated to:/),
+    ).toBeInTheDocument();
+    expect(screen.getByText("+1 (555) 123-4567")).toBeInTheDocument();
+  });
+
+  it("displays warning notice with sync guidance", () => {
+    render(
+      <TestWrapper>
+        <SuccessfullyUpdated {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    expect(
+      screen.getByText("You may need to sync this update"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "To sync your updated contact phone number from your CanadaLogin profile to your connected services, sign in to each service individually.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("services that can be accessed using your CanadaLogin"),
     ).toBeInTheDocument();
   });
 
@@ -238,8 +259,9 @@ describe("SuccessfullyUpdated Component", () => {
     );
 
     expect(
-      screen.getByText("Your contact phone number has been updated to"),
+      screen.getByText(/Your contact phone number has been updated to:/),
     ).toBeInTheDocument();
+    expect(screen.getByText("+1 (555) 123-4567")).toBeInTheDocument();
   });
 
   it("handles undefined phoneFormData gracefully", () => {
@@ -257,7 +279,7 @@ describe("SuccessfullyUpdated Component", () => {
     // Should still render without crashing
     expect(
       screen.getByText(
-        "You may need to update your phone number in other places",
+        "You may need to update your contact phone number other places",
       ),
     ).toBeInTheDocument();
     expect(screen.getByText("Back to profile")).toBeInTheDocument();
@@ -282,7 +304,7 @@ describe("SuccessfullyUpdated Component", () => {
     // Should still render without crashing
     expect(
       screen.getByText(
-        "You may need to update your phone number in other places",
+        "You may need to update your contact phone number other places",
       ),
     ).toBeInTheDocument();
     expect(screen.getByText("Back to profile")).toBeInTheDocument();

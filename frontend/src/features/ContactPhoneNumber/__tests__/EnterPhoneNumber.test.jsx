@@ -219,8 +219,14 @@ describe("EnterPhoneNumber Component", () => {
     );
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Enter a new phone number",
+      "Edit your contact phone number",
     );
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "Enter a new number",
+      }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(
         "This will update the phone number that CanadaLogin, and services connected to your CanadaLogin may use to contact you.",

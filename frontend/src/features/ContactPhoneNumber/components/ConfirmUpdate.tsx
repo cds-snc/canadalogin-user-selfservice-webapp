@@ -11,6 +11,7 @@ import {
 } from "@gcds-core/components-react";
 
 import { useTranslation, Trans } from "react-i18next";
+import parsePhoneNumberFromString from "libphonenumber-js";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import { path } from "../../../utils/routeHelpers";
 import { PAGES } from "../../../utils/constants";
@@ -31,6 +32,32 @@ export default function ConfirmUpdate({
   const manage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language,
   });
+
+  const displayPhoneNumber = (() => {
+    const fallbackNumber =
+      phoneFormData.formattedPhoneNumber || phoneFormData.phoneNumber || "";
+    const sourceNumber = phoneFormData.phoneNumber || fallbackNumber;
+
+    if (!sourceNumber) {
+      return "";
+    }
+
+    try {
+      const parsedPhoneNumber = parsePhoneNumberFromString(sourceNumber);
+
+      if (parsedPhoneNumber) {
+        if (parsedPhoneNumber.countryCallingCode === "1") {
+          return `+1 ${parsedPhoneNumber.formatNational()}`;
+        }
+
+        return parsedPhoneNumber.formatInternational();
+      }
+    } catch {
+      // Fall back to previously captured formatted value.
+    }
+
+    return fallbackNumber;
+  })();
 
   const onSubmitClick = (event: CustomEvent<string | void>) => {
     event.preventDefault();
@@ -62,7 +89,7 @@ export default function ConfirmUpdate({
             {t("ConfirmContactPhoneNumberUpdate.requestedUpdate")}
           </GcdsText>
           <GcdsText marginTop="0">
-            <strong>{phoneFormData.formattedPhoneNumber}</strong>
+            <strong>{displayPhoneNumber}</strong>
           </GcdsText>
         </div>
 

@@ -48,7 +48,10 @@ export default function ServicesWithAccessInfoSection({
       </GcdsText>
       <GcdsText>
         {t("ServicesWithAccessInfo.searchOtherAccounts")}&nbsp;
-        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
+        <GcdsLink
+          href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
+          target="_blank"
+        >
           {t("ServicesWithAccessInfo.gcAccountDirectory")}
         </GcdsLink>
         .

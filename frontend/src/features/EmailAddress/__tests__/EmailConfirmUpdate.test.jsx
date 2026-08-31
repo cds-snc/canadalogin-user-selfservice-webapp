@@ -61,6 +61,15 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
+  GcdsNotice: ({ children, noticeRole, noticeTitle, noticeTitleTag }) => {
+    const Tag = noticeTitleTag || "h2";
+    return (
+      <div data-testid="gcds-notice" data-notice-role={noticeRole}>
+        <Tag data-testid="gcds-notice-title">{noticeTitle}</Tag>
+        {children}
+      </div>
+    );
+  },
   GcdsGrid: ({ children, columns, gap, marginTop }) => (
     <div
       data-testid="gcds-grid"
@@ -145,7 +154,7 @@ describe("EmailConfirmUpdate", () => {
 
       const heading = screen.getByTestId("gcds-heading");
       expect(heading).toHaveTextContent(
-        "Are you sure you want to update your email?",
+        "Are you sure you want to update your email address?",
       );
     });
 
@@ -154,20 +163,35 @@ describe("EmailConfirmUpdate", () => {
 
       expect(
         screen.getByText((content) =>
-          content.includes("You've requested to update your email to:"),
+          content.includes("You've requested to update your email address to:"),
         ),
       ).toBeInTheDocument();
       expect(screen.getByText("test@example.com")).toBeInTheDocument();
     });
 
-    it("renders all services notice text", () => {
+    it("renders warning notice text", () => {
       renderComponent();
 
-      const textElements = screen.getAllByTestId("gcds-text");
-      const noticeEl = textElements.find((el) =>
-        el.textContent?.includes("all services you have connected to your"),
+      expect(screen.getByTestId("gcds-notice-title")).toHaveTextContent(
+        "Warning",
       );
-      expect(noticeEl).toBeInTheDocument();
+      expect(
+        screen.getByText("Updating your email address will:"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText((_, element) => {
+          return (
+            element?.tagName === "LI" &&
+            element.textContent?.includes(
+              "Change your email address with all services you have connected to your CanadaLogin",
+            )
+          );
+        }),
+      ).toBeInTheDocument();
+      expect(screen.getByText("all").tagName.toLowerCase()).toBe("strong");
+      expect(
+        screen.getByText("Send a notification to your old email address"),
+      ).toBeInTheDocument();
     });
 
     it("renders submit and cancel buttons", () => {
@@ -316,11 +340,17 @@ describe("EmailConfirmUpdate", () => {
       const textElements = screen.getAllByTestId("gcds-text");
       expect(textElements.length).toBeGreaterThan(0);
 
-      // Verify grid
-      const grid = screen.getByTestId("gcds-grid");
-      expect(grid).toBeInTheDocument();
-      expect(grid).toHaveAttribute("data-columns", "max-content max-content");
-      expect(grid).toHaveAttribute("data-gap", "200");
+      // Verify top-level spacing and action button grids
+      const grids = screen.getAllByTestId("gcds-grid");
+      expect(
+        grids.some((grid) => grid.getAttribute("data-columns") === "1"),
+      ).toBe(true);
+      expect(
+        grids.some(
+          (grid) =>
+            grid.getAttribute("data-columns") === "max-content max-content",
+        ),
+      ).toBe(true);
     });
 
     it("should handle multiple button clicks", async () => {
@@ -371,20 +401,19 @@ describe("EmailConfirmUpdate", () => {
   });
 
   describe("Component Integration", () => {
-    it("renders allServicesNotice text with bold emphasis", () => {
+    it("renders warning section content", () => {
       renderComponent();
 
-      const textElements = screen.getAllByTestId("gcds-text");
-      const noticeEl = textElements.find((el) =>
-        el.textContent?.includes(
-          "This will update your email with all services you have connected to your CanadaLogin.",
-        ),
+      expect(screen.getByTestId("gcds-notice")).toHaveAttribute(
+        "data-notice-role",
+        "warning",
       );
-      expect(noticeEl).toBeInTheDocument();
-      const bolds = noticeEl.querySelectorAll("strong");
-      expect(bolds.length).toBe(2);
-      expect(bolds[0].textContent).toBe("all");
-      expect(bolds[1].textContent).toBe("CanadaLogin");
+      expect(screen.getByTestId("gcds-notice-title")).toHaveTextContent(
+        "Warning",
+      );
+      expect(
+        screen.getByText("Updating your email address will:"),
+      ).toBeInTheDocument();
     });
 
     it("passes correct props to SubmitButton", () => {
@@ -400,20 +429,19 @@ describe("EmailConfirmUpdate", () => {
 
       // Check all content is present
       expect(
-        screen.getByText("Are you sure you want to update your email?"),
+        screen.getByText("Are you sure you want to update your email address?"),
       ).toBeInTheDocument();
       expect(
         screen.getByText((content) =>
-          content.includes("You've requested to update your email to:"),
+          content.includes("You've requested to update your email address to:"),
         ),
       ).toBeInTheDocument();
-      const textElements = screen.getAllByTestId("gcds-text");
-      const noticeEl = textElements.find((el) =>
-        el.textContent?.includes(
-          "This will update your email with all services you have connected to your CanadaLogin.",
-        ),
+      expect(screen.getByTestId("gcds-notice-title")).toHaveTextContent(
+        "Warning",
       );
-      expect(noticeEl).toBeInTheDocument();
+      expect(
+        screen.getByText("Send a notification to your old email address"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -439,14 +467,15 @@ describe("EmailConfirmUpdate", () => {
       expect(strongEmail.tagName.toLowerCase()).toBe("strong");
     });
 
-    it("renders all services notice in accessible text element", () => {
+    it("renders warning section in accessible text elements", () => {
       renderComponent();
 
-      const textElements = screen.getAllByTestId("gcds-text");
-      const noticeText = textElements.find((el) =>
-        el.textContent?.includes("all services you have connected to your"),
+      expect(screen.getByTestId("gcds-notice-title")).toHaveTextContent(
+        "Warning",
       );
-      expect(noticeText).toBeInTheDocument();
+      expect(
+        screen.getByText("Updating your email address will:"),
+      ).toBeInTheDocument();
     });
   });
 

@@ -266,7 +266,7 @@ export function UserProvider({
       handleLogoutRef.current?.();
     }, timeUntilExpire) as unknown as NodeJS.Timeout;
 
-    console.log(
+    console.warn(
       `Session timers set: warning in ${timeUntilWarning}ms, expire in ${timeUntilExpire}ms`,
     );
   };

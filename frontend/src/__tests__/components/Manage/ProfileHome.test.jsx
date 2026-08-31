@@ -179,16 +179,16 @@ describe("ProfileHome", () => {
     expect(screen.getByTestId("view-language-preferences")).toBeInTheDocument();
   });
 
-  it("renders the email with edit link when DEV_ONLY_FEATURE is true", () => {
+  it("renders the email with change link when DEV_ONLY_FEATURE is true", () => {
     render(<ProfileHome />);
     expect(screen.getByText("test@example.com")).toBeInTheDocument();
-    expect(screen.getByTestId("gcds-link")).toHaveTextContent("Edit");
+    expect(screen.getByTestId("gcds-link")).toHaveTextContent("Change");
   });
 
-  it("hides the edit email link when DEV_ONLY_FEATURE is false", () => {
+  it("renders the edit email link when DEV_ONLY_FEATURE is false", () => {
     mockDevOnlyFeature = false;
     render(<ProfileHome />);
-    expect(screen.queryByTestId("gcds-link")).not.toBeInTheDocument();
+    expect(screen.getByTestId("gcds-link")).toHaveTextContent("Change");
   });
 
   it("renders the Proven information section when DEV_ONLY_FEATURE is true", async () => {

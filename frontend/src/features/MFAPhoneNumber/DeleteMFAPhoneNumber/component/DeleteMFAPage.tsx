@@ -357,7 +357,7 @@ export default function DeleteMFAPage() {
         validatePassword={handleValidatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        parentPage={PAGES.addMFAPage}
+        parentPage={PAGES.deleteMFAPage}
       />
     ),
     otpSelection: (

@@ -87,6 +87,12 @@ vi.mock("@gcds-core/components-react", () => ({
     </div>
   ),
   GcdsText: ({ children }) => <div data-testid="text">{children}</div>,
+  GcdsNotice: ({ children, noticeRole, noticeTitle }) => (
+    <div data-testid="notice" data-notice-role={noticeRole}>
+      <div data-testid="notice-title">{noticeTitle}</div>
+      {children}
+    </div>
+  ),
   GcdsCheckboxes: vi.fn(({ options, onGcdsChange, legend, ...props }) => (
     <fieldset {...props}>
       <legend>{legend}</legend>
@@ -118,7 +124,7 @@ const defaultProps = {
   validatePassword: mockValidatePassword,
   setErrorCode: mockSetErrorCode,
   errorMessage: "",
-  parentPage: "password",
+  parentPage: PAGES.password,
 };
 
 const renderComponent = (props = {}) => {
@@ -155,6 +161,15 @@ describe("PasswordVerification Component", () => {
       expect(
         screen.getByText(/first enter your current password\./),
       ).toBeInTheDocument();
+      expect(screen.getByTestId("notice")).toBeInTheDocument();
+      expect(screen.getByTestId("notice-title")).toHaveTextContent(
+        "Information",
+      );
+      expect(
+        screen.getByText(
+          "Updating your password will send a notification to your email address",
+        ),
+      ).toBeInTheDocument();
     });
 
     it("renders with deleteMFAPage parent page content", () => {
@@ -163,6 +178,7 @@ describe("PasswordVerification Component", () => {
       expect(
         screen.getByText(/first enter your current password\./),
       ).toBeInTheDocument();
+      expect(screen.queryByTestId("notice")).not.toBeInTheDocument();
     });
 
     it("renders with addMFAPage parent page content", () => {
@@ -171,6 +187,16 @@ describe("PasswordVerification Component", () => {
       expect(
         screen.getByText(/first enter your current password\./),
       ).toBeInTheDocument();
+      expect(screen.queryByTestId("notice")).not.toBeInTheDocument();
+    });
+
+    it("renders with editEmailPage parent page content", () => {
+      renderComponent({ parentPage: PAGES.editEmailPage });
+      expect(screen.getByText(/To change your email,/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/first enter your current password\./),
+      ).toBeInTheDocument();
+      expect(screen.queryByTestId("notice")).not.toBeInTheDocument();
     });
 
     it("renders the password input field", () => {
@@ -469,9 +495,15 @@ describe("PasswordVerification Component", () => {
     it("renders grid with correct columns and gap attributes", () => {
       renderComponent();
 
-      const grid = screen.getByTestId("grid");
-      expect(grid).toHaveAttribute("data-columns", "max-content max-content");
-      expect(grid).toHaveAttribute("data-gap", "200");
+      const grids = screen.getAllByTestId("grid");
+      expect(grids).toHaveLength(2);
+      expect(grids[0]).toHaveAttribute("data-columns", "1");
+      expect(grids[0]).toHaveAttribute("data-gap", "300");
+      expect(grids[1]).toHaveAttribute(
+        "data-columns",
+        "max-content max-content",
+      );
+      expect(grids[1]).toHaveAttribute("data-gap", "200");
     });
 
     it("renders buttons with correct styles", () => {

@@ -5,7 +5,7 @@
   },
   "Error": {
     "genericProblem": "Un problème est survenu",
-    "invalidEmail": "Adresse courriel invalide. L'adresse courriel doit contenir un symbole « @ » suivi d'un domaine.",
+    "invalidEmail": "Adresse courriel invalide. L’adresse courriel doit contenir un symbole « @ » suivi d’un domaine.",
     "invalidCode": "Les codes doivent être composés de six chiffres. Veuillez réessayer.",
     "passwordMinLength": "Les mots de passe sont composés d'entre 12 et 65 caractères. Veuillez réessayer.",
     "passwordLengthRange": "Les mots de passe sont composés d'entre 12 et 65 caractères. Veuillez réessayer.",
@@ -45,6 +45,9 @@
     "otp_invalid_attempts_one": "Code invalide. Il vous reste {{count}} tentative.",
     "otp_invalid_attempts_other": "Code invalide. Il vous reste {{count}} tentatives.",
     "otp_max_attempts": "Votre code a expiré. Veuillez demander un nouveau code ci-dessous.",
+    "emailRequired": "Veuillez saisir une adresse courriel pour continuer.",
+    "email_too_long": "Votre adresse courriel ne peut pas dépasser 128 caractères. Veuillez réessayer.",
+    "email_accented_characters": "Votre adresse courriel ne peut pas comporter de caractères accentués. Veuillez réessayer.",
     "password_invalid_attempts_one": "Mot de passe incorrect. Il vous reste {{count}} tentative.",
     "password_invalid_attempts_other": "Mot de passe incorrect. Il vous reste {{count}} tentatives.",
     "password_max_attempts": "Vous avez atteint la limite de tentatives de vérification. Attendez 15 minutes et réessayez.",

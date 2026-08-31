@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router";
 import React from "react";
 import EmailOtpValidation from "../EmailOtpValidation";
+import i18n from "../../../i18n";
 
 // Setup test environment for GCDS components
 import "../../../setupTests";
@@ -30,7 +31,12 @@ vi.mock("../../../utils/constants", () => ({
 // Mock SubmitButton component
 vi.mock("../../../components/Layout/SubmitButton", () => ({
   default: ({ onGcdsClick, children, currentLang: _cl, ...props }) => (
-    <button data-testid="submit-button" onClick={onGcdsClick} {...props}>
+    <button
+      data-testid="submit-button"
+      onClick={onGcdsClick}
+      type="submit"
+      {...props}
+    >
       {children || "Submit"}
     </button>
   ),
@@ -71,6 +77,15 @@ vi.mock("@gcds-core/components-react", () => ({
   },
   GcdsGrid: ({ children, columns, gap }) => (
     <div data-testid="gcds-grid" data-columns={columns} data-gap={gap}>
+      {children}
+    </div>
+  ),
+  GcdsNotice: ({ children, noticeRole, noticeTitle }) => (
+    <div
+      data-testid="gcds-notice"
+      data-notice-role={noticeRole}
+      data-notice-title={noticeTitle}
+    >
       {children}
     </div>
   ),
@@ -181,9 +196,10 @@ describe("EmailOtpValidation", () => {
     );
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     mockUseParams.mockReturnValue({ language: "en" });
+    await i18n.changeLanguage("en");
   });
 
   afterEach(() => {
@@ -381,6 +397,43 @@ describe("EmailOtpValidation", () => {
       expect(screen.getByText("Request a new code")).toBeInTheDocument();
       expect(screen.getByText(/^00:4[89]$/)).toBeInTheDocument();
     });
+
+    it("shows a success notice when requesting a new code succeeds", async () => {
+      mockRequestOtpCode.mockResolvedValue(true);
+      const user = userEvent.setup();
+
+      renderComponent({ otpExpiry: "2000-01-01T00:00:00.000Z" });
+
+      await user.click(screen.getAllByText("Request a new code")[0]);
+
+      expect(mockRequestOtpCode).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId("gcds-notice")).toHaveAttribute(
+        "data-notice-role",
+        "success",
+      );
+      expect(screen.getByTestId("gcds-notice")).toHaveAttribute(
+        "data-notice-title",
+        "Success",
+      );
+      expect(
+        screen.getByText("We have sent you a new code"),
+      ).toBeInTheDocument();
+    });
+
+    it("does not show a success notice when requesting a new code fails", async () => {
+      mockRequestOtpCode.mockResolvedValue(false);
+      const user = userEvent.setup();
+
+      renderComponent({ otpExpiry: "2000-01-01T00:00:00.000Z" });
+
+      await user.click(screen.getAllByText("Request a new code")[0]);
+
+      expect(mockRequestOtpCode).toHaveBeenCalledTimes(1);
+      expect(screen.queryByTestId("gcds-notice")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("We have sent you a new code"),
+      ).not.toBeInTheDocument();
+    });
   });
 
   describe("GCDS Component Interactions", () => {
@@ -408,12 +461,19 @@ describe("EmailOtpValidation", () => {
       renderComponent();
 
       const container = screen.getByTestId("gcds-container");
-      const grid = screen.getByTestId("gcds-grid");
+      const grids = screen.getAllByTestId("gcds-grid");
       const input = screen.getByTestId("gcds-input");
 
       expect(container).toHaveAttribute("role", "main");
-      expect(grid).toHaveAttribute("data-columns", "max-content max-content");
-      expect(grid).toHaveAttribute("data-gap", "200");
+      expect(
+        grids.some((grid) => grid.getAttribute("data-columns") === "1"),
+      ).toBe(true);
+      expect(
+        grids.some(
+          (grid) =>
+            grid.getAttribute("data-columns") === "max-content max-content",
+        ),
+      ).toBe(true);
       expect(input).toHaveAttribute("data-validate-on", "other");
     });
 
@@ -492,7 +552,7 @@ describe("EmailOtpValidation", () => {
       ).toBeInTheDocument();
       expect(
         screen.getByText(
-          "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
+          "Your email might take a few minutes to arrive. If you cannot find the email in your inbox, check your spam folder.",
         ),
       ).toBeInTheDocument();
       expect(screen.getByText("Your code will expire in")).toBeInTheDocument();

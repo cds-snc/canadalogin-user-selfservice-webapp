@@ -161,13 +161,16 @@ export default function EnterPhoneNumber({
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="500">
+      <GcdsGrid columns="1" gap="150">
         <section>
           <PageHeader language={language} />
         </section>
 
         <form onSubmit={onSubmitHandler}>
           <section>
+            <GcdsHeading tag="h2" marginTop="0">
+              {t("EnterNewPhoneNumber.enterNewNumberHeading")}
+            </GcdsHeading>
             {errorMessage ? (
               <GcdsErrorMessage messageId="message-props">
                 {errorMessage}
@@ -191,11 +194,11 @@ export default function EnterPhoneNumber({
               onChange={onPhoneDataChange}
             />
           </section>
+          <MyCountryIsNotListed />
         </form>
 
         <section>
-          <MyCountryIsNotListed />
-          <GcdsHeading tag="h3">
+          <GcdsHeading tag="h2" marginTop="0">
             {t("EnterNewPhoneNumber.verifyNumber")}
           </GcdsHeading>
           <GcdsText>{t("EnterNewPhoneNumber.verifyDescription")}</GcdsText>

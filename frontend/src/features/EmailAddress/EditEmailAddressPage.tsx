@@ -16,6 +16,7 @@ import OtpSelection from "../TransientOtp/components/OtpSelection";
 import OtpVerification from "../TransientOtp/components/OtpVerification";
 import { usePasswordValidation } from "../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../hooks/useOtpOperations";
+import { usePasskeyOperations } from "../../hooks/usePasskeyOperations";
 import { useUser } from "../../components/Providers/useUser";
 import { authService } from "../../services/authService";
 import { userProfileDispatch } from "../../utils/userProfileDispatch";
@@ -23,16 +24,29 @@ import { useFormTracking } from "../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../utils/analyticsConstants";
 import { EMAIL_ADDRESS_ANALYTICS } from "../../utils/analyticsConstants";
+import VerifyFIDO2Passkey from "../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 import EditEmailEnterEmail from "./EditEmailEnterEmail";
 import EmailOtpValidation from "./EmailOtpValidation";
 import EmailUpdateSuccess from "./EmailUpdateSuccess";
 import EmailConfirmUpdate from "./EmailConfirmUpdate";
 import type { UserProfile } from "../../types/user";
+import type { Fido2Credential } from "../../types/hooks";
 
-const EMAIL_PAGE_BY_STEP: Record<string, string> = {
+type WizardStep =
+  | "passwordVerification"
+  | "otpSelection"
+  | "otpValidation"
+  | "verifyFIDO2Passkey"
+  | "enterEmail"
+  | "emailOtpValidation"
+  | "emailConfirmUpdate"
+  | "emailUpdateSuccess";
+
+const EMAIL_PAGE_BY_STEP: Record<WizardStep, string> = {
   passwordVerification: "EditEmailPage",
   otpSelection: "EmailChangeOtpSelection",
   otpValidation: "EmailChangeOtpValidation",
+  verifyFIDO2Passkey: "EmailChangePasskeyVerification",
   enterEmail: "EmailChangeEnterEmail",
   emailOtpValidation: "EmailChangeVerifyNewEmail",
   emailConfirmUpdate: "EmailChangeConfirmUpdate",
@@ -43,12 +57,43 @@ type EmailFormData = {
   emailAddress: string;
 };
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL_LENGTH = 128;
+const NON_ASCII_CHARACTER_REGEX = /[^\u0000-\u007F]/;
+
+const normalizeEmail = (value: string | undefined | null): string =>
+  (value || "").trim().toLowerCase();
+
+const getEmailValidationErrorCode = (email: string): string | null => {
+  if (!email) {
+    return "emailRequired";
+  }
+
+  if (email.length > MAX_EMAIL_LENGTH) {
+    return "email_too_long";
+  }
+
+  if (NON_ASCII_CHARACTER_REGEX.test(email)) {
+    return "email_accented_characters";
+  }
+
+  if (!EMAIL_REGEX.test(email)) {
+    return "invalidEmail";
+  }
+
+  return null;
+};
+
 type CaughtError = { data?: { message?: string } };
 
 export default function EditEmailAddressPage() {
-  const [wizardStep, setWizardStep] = useState("passwordVerification");
+  const [wizardStep, setWizardStep] = useState<WizardStep>(
+    "passwordVerification",
+  );
   const [errorCode, setErrorCode] = useState("");
   const [userPasswordValue, setUserPasswordValue] = useState("");
+  const [selected2FAPasskey, setSelected2FAPasskey] =
+    useState<Fido2Credential | null>(null);
   const [formData, setFormData] = useState<EmailFormData>({
     emailAddress: "",
   });
@@ -79,12 +124,18 @@ export default function EditEmailAddressPage() {
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
         step:
-          userPhoneFactors && userPhoneFactors.length === 1
+          userPhoneFactors &&
+          userPhoneFactors.length === 1 &&
+          fido2Data.length === 0
             ? EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION
             : EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_SELECTION,
       });
 
-      if (userPhoneFactors && userPhoneFactors.length === 1) {
+      if (
+        userPhoneFactors &&
+        userPhoneFactors.length === 1 &&
+        fido2Data.length === 0
+      ) {
         const success = await requestOtpCode();
         if (success) {
           setWizardStep("otpValidation");
@@ -143,6 +194,11 @@ export default function EditEmailAddressPage() {
     userName,
     setErrorCode,
     fallbackNavigationPath: backToProfile,
+  });
+
+  const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
+    enabled: true,
+    setErrorCode,
   });
 
   // Get user profile dispatch method
@@ -209,23 +265,16 @@ export default function EditEmailAddressPage() {
       flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
     });
 
-    if (!formData.emailAddress || !formData.emailAddress.trim()) {
-      setErrorCode("EMAIL_REQUIRED");
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_STEP_END,
-        step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
-        error: "EMAIL_REQUIRED",
-      });
-      return;
-    }
+    const normalizedNewEmail = normalizeEmail(formData.emailAddress);
+    const emailValidationErrorCode =
+      getEmailValidationErrorCode(normalizedNewEmail);
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.emailAddress)) {
-      setErrorCode("INVALID_EMAIL");
+    if (emailValidationErrorCode) {
+      setErrorCode(emailValidationErrorCode);
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
-        error: "INVALID_EMAIL",
+        error: emailValidationErrorCode,
       });
       return;
     }
@@ -234,7 +283,7 @@ export default function EditEmailAddressPage() {
     setErrorCode("");
     const success = await requestOtpCode({
       otpType: FLOW_TYPES.email,
-      destination: formData.emailAddress,
+      destination: normalizedNewEmail,
     });
     if (success) {
       setWizardStep("emailOtpValidation");
@@ -249,23 +298,16 @@ export default function EditEmailAddressPage() {
     try {
       setErrorCode("");
 
-      if (!formData.emailAddress || !formData.emailAddress.trim()) {
-        setErrorCode("EMAIL_REQUIRED");
-        trackEvent({
-          event: GA_FORM_EVENTS.FORM_STEP_END,
-          step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-          error: "EMAIL_REQUIRED",
-        });
-        return;
-      }
+      const normalizedNewEmail = normalizeEmail(formData.emailAddress);
+      const emailValidationErrorCode =
+        getEmailValidationErrorCode(normalizedNewEmail);
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.emailAddress)) {
-        setErrorCode("INVALID_EMAIL");
+      if (emailValidationErrorCode) {
+        setErrorCode(emailValidationErrorCode);
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-          error: "INVALID_EMAIL",
+          error: emailValidationErrorCode,
         });
         return;
       }
@@ -281,7 +323,7 @@ export default function EditEmailAddressPage() {
       }
 
       const response = await authService.update_email_with_otp(
-        formData.emailAddress,
+        normalizedNewEmail,
         userOtpValue,
         otpSentResponse.trxnId,
         FLOW_TYPES.email,
@@ -331,7 +373,7 @@ export default function EditEmailAddressPage() {
     useOtpAttemptTracking(errorCode);
   const otpDisplayError = getDisplayError(errorMessage);
 
-  const steps: Record<string, React.ReactElement> = {
+  const steps: Record<WizardStep, React.ReactElement> = {
     passwordVerification: (
       <PasswordVerification
         userPasswordValue={userPasswordValue}
@@ -340,11 +382,12 @@ export default function EditEmailAddressPage() {
         validatePassword={handleValidatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        parentPage={PAGES.addMFAPage}
+        parentPage={PAGES.editEmailPage}
       />
     ),
     otpSelection: (
       <OtpSelection
+        fido2Data={fido2Data}
         userPhoneFactors={userPhoneFactors}
         onChangeUserSelectedMfaFactor={handleChangeUserMfaSelection}
         onNext={() => {
@@ -359,8 +402,36 @@ export default function EditEmailAddressPage() {
             }
           })();
         }}
+        onSelectFIDO2={(passkey) => {
+          setSelected2FAPasskey(passkey);
+          setWizardStep("verifyFIDO2Passkey");
+        }}
         parentPage={PAGES.addMFAPage}
         onCancel={handleBackToProfile}
+      />
+    ),
+    verifyFIDO2Passkey: (
+      <VerifyFIDO2Passkey
+        submitAttestationResult={true}
+        assertionOptionsRequest={{ userVerification: "required" }}
+        errorMessage={errorMessage}
+        setErrorCode={setErrorCode}
+        selectedPasskey={selected2FAPasskey}
+        onCallback={() => {
+          setWizardStep("enterEmail");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
+          });
+        }}
+        onTryAnotherWayHandler={() => {
+          setSelected2FAPasskey(null);
+          setWizardStep("otpSelection");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_SELECTION,
+          });
+        }}
       />
     ),
     otpValidation: (
@@ -405,7 +476,9 @@ export default function EditEmailAddressPage() {
         }}
         onBack={() => {
           const prevStep =
-            userPhoneFactors && userPhoneFactors.length === 1
+            userPhoneFactors &&
+            userPhoneFactors.length === 1 &&
+            fido2Data.length === 0
               ? "passwordVerification"
               : "otpSelection";
           trackEvent({
@@ -419,7 +492,8 @@ export default function EditEmailAddressPage() {
         errorMessage={errorMessage}
         onCancel={handleBackToProfile}
         showTryAnotherWay={
-          userPhoneFactors != null && userPhoneFactors.length > 1
+          (userPhoneFactors != null && userPhoneFactors.length > 1) ||
+          fido2Data.length > 0
         }
       />
     ),
@@ -469,7 +543,7 @@ export default function EditEmailAddressPage() {
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
             flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
           });
-          await requestOtpCode({
+          return requestOtpCode({
             otpType: FLOW_TYPES.email,
             destination: formData.emailAddress,
           });
@@ -519,7 +593,7 @@ export default function EditEmailAddressPage() {
     ),
   };
 
-  return localLoading || validatePasswordLoading ? (
+  return localLoading || validatePasswordLoading || passkeyLoading ? (
     <Loader text={t("OtpSelection.loading")} />
   ) : (
     <StepContent

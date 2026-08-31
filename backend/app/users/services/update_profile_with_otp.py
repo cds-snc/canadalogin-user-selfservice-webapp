@@ -1,7 +1,12 @@
 import logging
+import re
 
 from fastapi import HTTPException, status, Request
 
+from app.otp.schemas import OtpDeletionRequest, OtpEnrollmentRequest, OtpType
+from app.otp.services.delete_mfa_otp import dispatch_otp_deletion
+from app.otp.services.enroll_mfa_otp import dispatch_otp_enrollment
+from app.password.schemas import OtpType as FactorOtpType
 from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
     ProfileResponse,
@@ -9,6 +14,7 @@ from app.users.schemas import (
     EmailItem,
 )
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
+from app.users.services.otp_factors import get_user_otp_factors
 from app.users.services.update_my_profile import (
     update_profile_for_verified_changes,
     sanitize_user_profile_data,
@@ -17,6 +23,32 @@ from app.auth.services.auth_user_session import update_session_user_info
 from app.utils.helpers import verify_otp_before_operation
 
 logger = logging.getLogger(__name__)
+
+MAX_EMAIL_LENGTH = 128
+NON_ASCII_CHARACTER_REGEX = re.compile(r"[^\x00-\x7F]")
+
+
+def _validate_new_email_address(new_email_address: str | None) -> None:
+    """Apply business-rule validation for email updates.
+
+    These checks mirror frontend rules so direct API calls cannot bypass them.
+    """
+    if not new_email_address:
+        return
+
+    normalized_email = str(new_email_address).strip().lower()
+
+    if len(normalized_email) > MAX_EMAIL_LENGTH:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="email_too_long",
+        )
+
+    if NON_ASCII_CHARACTER_REGEX.search(normalized_email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="email_accented_characters",
+        )
 
 
 async def update_profile_with_otp_verification(
@@ -42,6 +74,8 @@ async def update_profile_with_otp_verification(
         HTTPException: For OTP verification failures or profile update errors
     """
     logger.info("Starting atomic profile update with OTP verification")
+
+    _validate_new_email_address(profile_update_data.newEmailAddress)
 
     # Step 1: Validate the OTP first using the helper function
     await verify_otp_before_operation(
@@ -90,6 +124,16 @@ async def update_profile_with_otp_verification(
             detail="Profile update failed after OTP verification",
         )
 
+    if profile_update_data.newEmailAddress:
+        await _sync_email_mfa_factors(
+            request=request,
+            user_access_token=user_access_token,
+            user_id=current_profile_response.id,
+            old_email=current_profile_response.userName,
+            new_email=profile_update_data.newEmailAddress,
+            preferred_language=current_profile_response.preferredLanguage,
+        )
+
     # Step 5: Update session if email/username was changed
     session_updates = _build_session_updates(profile_update_data)
     if session_updates:
@@ -110,6 +154,79 @@ async def update_profile_with_otp_verification(
         message="Profile updated successfully after OTP verification",
         data=profile_update_response.data,
     )
+
+
+async def _sync_email_mfa_factors(
+    request: Request,
+    user_access_token: str,
+    user_id: str,
+    old_email: str,
+    new_email: str,
+    preferred_language: str | None,
+) -> None:
+    """Ensure MFA email factors are rotated from old email to new email."""
+    normalized_old_email = (old_email or "").strip().lower()
+    normalized_new_email = (new_email or "").strip().lower()
+
+    if not normalized_old_email or not normalized_new_email:
+        logger.warning("Skipping email MFA sync due to missing old/new email value")
+        return
+
+    if normalized_old_email == normalized_new_email:
+        logger.info("Email MFA sync skipped because email address is unchanged")
+        return
+
+    factors_response = await get_user_otp_factors(
+        request.app.state.request_client,
+        user_access_token,
+        validated=None,
+    )
+
+    if not factors_response.success:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Unable to retrieve user MFA factors",
+        )
+
+    old_email_factor_ids: list[str] = []
+    has_new_email_factor = False
+
+    for factor in factors_response.data:
+        factor_type = getattr(factor.type, "value", str(factor.type))
+        factor_destination = (factor.destination or "").strip().lower()
+
+        if factor_type != FactorOtpType.EMAILOTP.value:
+            continue
+
+        if factor_destination == normalized_new_email:
+            has_new_email_factor = True
+
+        if factor_destination == normalized_old_email:
+            old_email_factor_ids.append(factor.id)
+
+    language = preferred_language or "en"
+
+    if not has_new_email_factor:
+        logger.info("Enrolling new email MFA factor for updated email address")
+        await dispatch_otp_enrollment(
+            global_http_client=request.app.state.request_client,
+            enrollment_request=OtpEnrollmentRequest(
+                destination=normalized_new_email,
+                otpType=OtpType.EMAIL,
+            ),
+            user_id=user_id,
+            user_access_token=user_access_token,
+            language=language,
+        )
+
+    for factor_id in old_email_factor_ids:
+        logger.info(f"Deleting old email MFA factor: {factor_id}")
+        await dispatch_otp_deletion(
+            global_http_client=request.app.state.request_client,
+            deletion_request=OtpDeletionRequest(id=factor_id, otpType=OtpType.EMAIL),
+            user_access_token=user_access_token,
+            language=language,
+        )
 
 
 def _build_profile_update_request(

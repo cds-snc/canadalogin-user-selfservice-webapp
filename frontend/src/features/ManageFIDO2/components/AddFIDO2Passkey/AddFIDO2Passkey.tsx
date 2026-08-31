@@ -1,17 +1,15 @@
 import { useParams } from "react-router";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import {
   GcdsButton,
   GcdsContainer,
   GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
-  GcdsLink,
   GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
-import { gcHelpCentreLinks } from "../../../../utils/constants";
 
 interface AddFIDO2PasskeyProps {
   errorMessage: string;
@@ -53,16 +51,27 @@ export default function AddFIDO2Passkey({
           </li>
         </ol>
         <GcdsNotice
-          noticeRole="warning"
+          noticeRole="info"
           noticeTitleTag="h2"
-          noticeTitle={" "}
+          noticeTitle={t("AddFIDO2Passkey.infoTitle")}
           lang={language}
         >
-          <GcdsText>
-            {t("AddFIDO2Passkey.deviceWarningPrefix")}{" "}
-            <strong>{t("AddFIDO2Passkey.youControl")}</strong>{" "}
-            {t("AddFIDO2Passkey.deviceWarningSuffix")}
-          </GcdsText>
+          <ul>
+            <li>
+              <GcdsText marginBottom="0">
+                <Trans
+                  ns="fido2"
+                  i18nKey="AddFIDO2Passkey.deviceWarning"
+                  components={{ bold: <strong /> }}
+                />
+              </GcdsText>
+            </li>
+            <li>
+              <GcdsText marginBottom="0">
+                {t("AddFIDO2Passkey.emailNotification")}
+              </GcdsText>
+            </li>
+          </ul>
         </GcdsNotice>
 
         {errorMessage && (
@@ -86,17 +95,6 @@ export default function AddFIDO2Passkey({
         >
           {t("AddFIDO2Passkey.cancelButton")}
         </GcdsButton>
-
-        <GcdsHeading tag="h2">{t("AddFIDO2Passkey.problemsTitle")}</GcdsHeading>
-
-        <GcdsText>
-          <GcdsLink
-            href={gcHelpCentreLinks.helpCreatingPasskey[language]}
-            target="_blank"
-          >
-            {t("AddFIDO2Passkey.helpLink")}
-          </GcdsLink>
-        </GcdsText>
       </GcdsGrid>
     </GcdsContainer>
   );

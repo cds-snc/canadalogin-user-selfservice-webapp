@@ -86,6 +86,9 @@ vi.mock("react-i18next", () => ({
         "Manage2FAVerifications.saveButton": "Save",
         "Manage2FAVerifications.cancelButton": "Cancel",
         "Manage2FAVerifications.nameLabel": "Passkey name",
+        "Manage2FAVerifications.renamePasskeyInfoTitle": "Information",
+        "Manage2FAVerifications.renamePasskeyInfoDescription":
+          "Renaming a passkey will send a notification to your email address",
       };
 
       return messages[key] ?? key;
@@ -98,6 +101,11 @@ vi.mock("@gcds-core/components-react", () => ({
     <div data-testid="gcds-container">{children}</div>
   ),
   GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
+  GcdsNotice: ({ children, noticeTitle }) => (
+    <div data-testid="rename-passkey-notice" data-notice-title={noticeTitle}>
+      {children}
+    </div>
+  ),
   GcdsGrid: ({ children }) => <div data-testid="gcds-grid">{children}</div>,
   GcdsSrOnly: () => null,
   GcdsButton: ({ children, onGcdsClick, onClick, id, disabled }) => (
@@ -208,6 +216,23 @@ describe("FIDO2PasskeyList", () => {
     );
   });
 
+  it("shows rename info notice only while editing", async () => {
+    render(<FIDO2PasskeyList userFIDO2CredentialsData={[makeCredential()]} />);
+
+    expect(
+      screen.queryByTestId("rename-passkey-notice"),
+    ).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByTestId("rename-fido2-button"));
+
+    const notice = screen.getByTestId("rename-passkey-notice");
+    expect(notice).toBeInTheDocument();
+    expect(notice).toHaveAttribute("data-notice-title", "Information");
+    expect(notice).toHaveTextContent(
+      "Renaming a passkey will send a notification to your email address",
+    );
+  });
+
   it("navigates to the delete page when Delete is clicked", async () => {
     const credential = makeCredential({
       id: "cred-1",
@@ -267,13 +292,13 @@ describe("FIDO2PasskeyList", () => {
     expect(separators).toHaveLength(2);
   });
 
-  it("renders each item inside a GcdsContainer", () => {
+  it("renders outer and content containers for each passkey item", () => {
     const credentials = [
       makeCredential({ id: "cred-1" }),
       makeCredential({ id: "cred-2" }),
     ];
     render(<FIDO2PasskeyList userFIDO2CredentialsData={credentials} />);
-    expect(screen.getAllByTestId("gcds-container")).toHaveLength(2);
+    expect(screen.getAllByTestId("gcds-container")).toHaveLength(4);
   });
 });
 

@@ -169,7 +169,7 @@ export default function AddMFAPhoneNumber({
           </GcdsText>
           <GcdsText>
             {t("AddMFANumber.privacyNoticeLead")}{" "}
-            <GcdsLink href={privacyNoticeHref}>
+            <GcdsLink href={privacyNoticeHref} target="_blank">
               {t("AddMFANumber.privacyNoticeLink")}
             </GcdsLink>{" "}
             {t("AddMFANumber.privacyNoticeSuffix")}

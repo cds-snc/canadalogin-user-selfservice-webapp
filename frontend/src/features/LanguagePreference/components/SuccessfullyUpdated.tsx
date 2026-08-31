@@ -75,48 +75,80 @@ export default function SuccessfullyUpdated({
 
   return (
     <GcdsContainer role="main">
-      <GcdsText>
-        <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
+      <GcdsGrid columns="1" gap="300">
+        <GcdsNotice
+          noticeRole="success"
+          noticeTitleTag="h2"
+          noticeTitle={t("SuccessfullyUpdatedLanguage.successTitle")}
+        >
           <GcdsText>
-            <strong>
-              {t("SuccessfullyUpdatedLanguage.languageUpdatedTo")}{" "}
-              {displayLanguageName}
-            </strong>
+            {t("SuccessfullyUpdatedLanguage.languageUpdatedTo")}{" "}
+            <strong>{displayLanguageName}</strong>.
           </GcdsText>
         </GcdsNotice>
-      </GcdsText>
 
-      <GcdsHeading tag="h1">
-        {t("SuccessfullyUpdatedLanguage.updateOtherPlaces")}
-      </GcdsHeading>
-      <GcdsHeading tag="h4">
-        {t("SuccessfullyUpdatedLanguage.onlyConnectedServices")}
-      </GcdsHeading>
-      <GcdsText>{t("SuccessfullyUpdatedLanguage.notConnectedNotice")}</GcdsText>
-      <GcdsText>
-        {t("SuccessfullyUpdatedLanguage.searchOtherAccounts")}{" "}
-        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
-          {t("SuccessfullyUpdatedLanguage.gcAccountDirectory")}
-        </GcdsLink>
-      </GcdsText>
+        <GcdsHeading tag="h1">
+          {t("SuccessfullyUpdatedLanguage.updateOtherPlaces")}
+        </GcdsHeading>
 
-      <GcdsGrid columns="max-content max-content" gap="200">
-        <SubmitButton
-          style={{ width: "fit-content" }}
-          onGcdsClick={onSubmitHandler}
-          currentLang={routeLanguage}
+        <GcdsText marginTop="0" marginBottom="0">
+          <strong>
+            {t("SuccessfullyUpdatedLanguage.onlyConnectedServices")}
+          </strong>
+        </GcdsText>
+
+        <GcdsText>
+          {t("SuccessfullyUpdatedLanguage.notConnectedNotice")}
+        </GcdsText>
+        <GcdsText>
+          {t("SuccessfullyUpdatedLanguage.searchOtherAccounts")}{" "}
+          <GcdsLink
+            href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
+            target="_blank"
+          >
+            {t("SuccessfullyUpdatedLanguage.gcAccountDirectory")}
+          </GcdsLink>
+          .
+        </GcdsText>
+
+        <GcdsNotice
+          noticeRole="warning"
+          noticeTitleTag="h2"
+          noticeTitle={t("SuccessfullyUpdatedLanguage.syncNoticeTitle")}
         >
-          {t("SuccessfullyUpdatedLanguage.backToProfile")}
-        </SubmitButton>
-        <GcdsButton
-          buttonRole="secondary"
-          style={{ width: "fit-content" }}
-          onGcdsClick={(event: Event) => {
-            void handleSignout(event);
-          }}
-        >
-          {t("SuccessfullyUpdatedLanguage.signOut")}
-        </GcdsButton>
+          <GcdsText>
+            {t("SuccessfullyUpdatedLanguage.syncNoticeDescription")}
+          </GcdsText>
+          <GcdsText>
+            {t("SuccessfullyUpdatedLanguage.servicesLinkLead")}{" "}
+            <GcdsLink
+              href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
+              target="_blank"
+            >
+              {t("SuccessfullyUpdatedLanguage.servicesLinkText")}
+            </GcdsLink>{" "}
+            {t("SuccessfullyUpdatedLanguage.servicesLinkSuffix")}
+          </GcdsText>
+        </GcdsNotice>
+
+        <GcdsGrid columns="max-content max-content" gap="200">
+          <SubmitButton
+            style={{ width: "fit-content" }}
+            onGcdsClick={onSubmitHandler}
+            currentLang={routeLanguage}
+          >
+            {t("SuccessfullyUpdatedLanguage.backToProfile")}
+          </SubmitButton>
+          <GcdsButton
+            buttonRole="secondary"
+            style={{ width: "fit-content" }}
+            onGcdsClick={(event: Event) => {
+              void handleSignout(event);
+            }}
+          >
+            {t("SuccessfullyUpdatedLanguage.signOut")}
+          </GcdsButton>
+        </GcdsGrid>
       </GcdsGrid>
     </GcdsContainer>
   );

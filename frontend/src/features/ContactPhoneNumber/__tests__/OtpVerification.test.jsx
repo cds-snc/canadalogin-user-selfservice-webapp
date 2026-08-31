@@ -204,6 +204,16 @@ describe("OtpVerification Component", () => {
         "We have sent a text message with a 6-digit verification code to:",
       ),
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByText("Your text (SMS) might take a few minutes to arrive."),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", {
+        name: "Verify with voice verification instead",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("displays voice message when otpType is voice", () => {
@@ -221,7 +231,21 @@ describe("OtpVerification Component", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText(/voice call/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "We have sent a 6-digit verification code via voice call to:",
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText("Your call may take a few minutes to arrive."),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", {
+        name: "Verify with text (SMS) verification instead",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("renders OTP input field", () => {
@@ -367,7 +391,7 @@ describe("OtpVerification Component", () => {
     );
 
     // The back action is in the second link (getAllByText returns array)
-    const backLinks = screen.getAllByText("Try another way");
+    const backLinks = screen.getAllByText("Use a different phone number");
     const backLink = backLinks[backLinks.length - 1]; // Take the last one
     fireEvent.click(backLink);
 

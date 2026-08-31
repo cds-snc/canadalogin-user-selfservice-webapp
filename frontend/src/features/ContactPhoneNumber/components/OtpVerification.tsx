@@ -252,8 +252,8 @@ export default function OtpVerification({
           }
         >
           {userMfaType === FLOW_TYPES.sms
-            ? t("Verification.setupVoiceInstead")
-            : t("Verification.setupSmsInstead")}
+            ? t("Verification.verifyVoiceInstead")
+            : t("Verification.verifySmsInstead")}
         </GcdsLink>
       </GcdsText>
 
@@ -287,7 +287,7 @@ export default function OtpVerification({
             handleLinkButtonKeyDown(event, tryAnotherWayAction)
           }
         >
-          {t("Verification.tryAnotherWay")}
+          {t("Verification.differentPhoneNumber")}
         </GcdsLink>
       </GcdsText>
     </GcdsContainer>

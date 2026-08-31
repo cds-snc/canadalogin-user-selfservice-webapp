@@ -89,6 +89,20 @@ export const getFormattedPhoneNumber = (
     return "";
   }
 
+  const digitsOnly = trimmed.replace(/\D/g, "");
+  const fullNumber = trimmed.startsWith("+")
+    ? `+${digitsOnly}`
+    : `+${dialCode}${digitsOnly}`;
+
+  const parsedPhoneNumber = parsePhoneNumberFromString(fullNumber);
+  if (parsedPhoneNumber) {
+    if (dialCode === "1") {
+      return `+${dialCode} ${parsedPhoneNumber.formatNational()}`;
+    }
+
+    return parsedPhoneNumber.formatInternational();
+  }
+
   if (trimmed.startsWith("+")) {
     return trimmed;
   }

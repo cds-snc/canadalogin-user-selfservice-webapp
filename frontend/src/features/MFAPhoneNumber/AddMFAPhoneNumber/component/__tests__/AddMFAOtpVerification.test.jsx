@@ -222,6 +222,30 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       expect(input).toHaveAttribute("minLength", "6");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
     });
+
+    it("should render add-phone information notice", () => {
+      render(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={defaultPhoneFormData}
+            errorMessage=""
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      expect(screen.getByText("Information")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "Adding a phone number will send a notification to your email address",
+        ),
+      ).toBeInTheDocument();
+    });
   });
 
   describe("Phone Number Display", () => {
@@ -296,7 +320,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
         ),
       ).toBeInTheDocument();
       expect(
-        screen.getByText("Your call might take a few minutes to arrive."),
+        screen.getByText("Your call may take a few minutes to arrive."),
       ).toBeInTheDocument();
     });
   });
@@ -738,9 +762,15 @@ describe("AddMFAOtpVerification Unit Tests", () => {
         </TestWrapper>,
       );
 
-      const grid = screen.getByTestId("gcds-grid");
-      expect(grid).toHaveAttribute("data-columns", "max-content max-content");
-      expect(grid).toHaveAttribute("data-gap", "200");
+      const buttonGrid = screen
+        .getAllByTestId("gcds-grid")
+        .find(
+          (grid) =>
+            grid.getAttribute("data-columns") === "max-content max-content" &&
+            grid.getAttribute("data-gap") === "200",
+        );
+
+      expect(buttonGrid).toBeInTheDocument();
     });
   });
 });

@@ -222,8 +222,10 @@ class TestErrorHandlingDeleteMfaOtp:
     @patch.object(delete_mfa_otp_module, "get_my_profile")
     @patch.object(delete_mfa_otp_module, "verify_otp_before_operation")
     @patch.object(delete_mfa_otp_module, "assert_remaining_mfa_factor_after_deletion")
-    async def test_dispatch_otp_deletion_unsupported_type(
+    @patch.object(delete_mfa_otp_module, "dispatch_otp_deletion")
+    async def test_dispatch_otp_deletion_email_success(
         self,
+        mock_dispatch_otp_deletion,
         mock_assert_remaining_mfa_factor_after_deletion,
         mock_verify_otp_before_operation,
         mock_get_my_profile,
@@ -232,6 +234,9 @@ class TestErrorHandlingDeleteMfaOtp:
         mock_get_my_profile.return_value = MagicMock()
         mock_verify_otp_before_operation.return_value = None
         mock_assert_remaining_mfa_factor_after_deletion.return_value = None
+        mock_dispatch_response = MagicMock()
+        mock_dispatch_response.status_code = 204
+        mock_dispatch_otp_deletion.return_value = mock_dispatch_response
 
         deletion_request = {
             "id": "factor123",
@@ -246,9 +251,9 @@ class TestErrorHandlingDeleteMfaOtp:
         response = client.request("DELETE", "/v1/otp/mfa/delete", json=deletion_request)
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
-        assert not response_json["success"]
-        assert response_json["message"] == "Unsupported OTP type: OtpType.EMAIL"
+        assert response.status_code == status.HTTP_200_OK
+        assert response_json["success"]
+        assert response_json["message"] == "email OTP factor deleted successfully"
 
     @pytest.mark.asyncio
     @patch.object(delete_mfa_otp_module, "get_my_profile")

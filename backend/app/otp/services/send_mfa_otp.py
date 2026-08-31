@@ -7,6 +7,7 @@ from app.otp.schemas import (
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_auth_request_headers
 from app.utils.schemas import ResponseModel
+from fastapi import HTTPException, status
 
 
 from httpx import AsyncClient
@@ -23,7 +24,7 @@ async def dispatch_send_mfa_otp(
     user_access_token: str,
     language: str = None,
 ):
-    """Dispatch Send MFA OTP verification to IBM Verify"""
+    """Dispatch Send MFA OTP verification to IBM Verify."""
     headers = get_auth_request_headers(user_access_token, True, language)
     settings = get_configuration().ibm_verify_config
 
@@ -31,8 +32,13 @@ async def dispatch_send_mfa_otp(
         verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/{verification_request.id}/verifications"
     elif otp_type == OtpType.VOICE:
         verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/{verification_request.id}/verifications"
+    elif otp_type == OtpType.EMAIL:
+        verification_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/{verification_request.id}/verifications"
     else:
-        raise ValueError(f"Unsupported OTP type: {otp_type}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported OTP type: {otp_type}",
+        )
 
     response = await global_http_client.post(verification_url, json={}, headers=headers)
     response.raise_for_status()
@@ -45,7 +51,7 @@ async def handle_send_mfa_otp(
     user_access_token: str,
     otp_type: OtpType,
 ):
-    """Send an MFA OTP for SMS or Voice"""
+    """Send an MFA OTP for SMS, Voice, or Email."""
 
     # Verify user profile
     my_profile_response = await get_my_profile(global_http_client, user_access_token)

@@ -193,12 +193,26 @@ describe("SuccessfullyUpdatedName", () => {
       </TestWrapper>,
     );
 
-    // Check for the name in the success message (rendered together in strong tag)
+    // The message prefix is plain text while only the username is bolded.
     expect(
-      screen.getByText(/Your name has been updated to\s+John Doe/),
+      screen.getByText("Your name has been updated to"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("You may need to update your name in other places."),
+      screen.getByText("John Doe", { selector: "strong" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("You may need to update your name other places"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "To sync your updated name from your CanadaLogin profile to your connected services, sign in to each service individually.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Government of Canada account directory"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("services that can be accessed using your CanadaLogin"),
     ).toBeInTheDocument();
     expect(screen.getByText("Sign out")).toBeInTheDocument();
     expect(screen.getByText("Back to profile")).toBeInTheDocument();
@@ -221,7 +235,7 @@ describe("SuccessfullyUpdatedName", () => {
       screen.getByText("Your name has been updated to"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("You may need to update your name in other places."),
+      screen.getByText("You may need to update your name other places"),
     ).toBeInTheDocument();
   });
 
@@ -242,7 +256,7 @@ describe("SuccessfullyUpdatedName", () => {
       screen.getByText("Your name has been updated to"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("You may need to update your name in other places."),
+      screen.getByText("You may need to update your name other places"),
     ).toBeInTheDocument();
   });
 
@@ -363,7 +377,10 @@ describe("SuccessfullyUpdatedName", () => {
     );
 
     expect(
-      screen.getByText(/Your name has been updated to\s+Jane Marie Smith/),
+      screen.getByText("Your name has been updated to"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Jane Marie Smith", { selector: "strong" }),
     ).toBeInTheDocument();
   });
 });

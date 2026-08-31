@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { PAGES } from "../../../utils/constants";
 import { useParams } from "react-router";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import EmailNotificationInfoNotice from "../../../components/InfoBlocks/EmailNotificationInfoNotice";
 
 type CaughtApiError = { data?: { message?: string } };
 
@@ -43,6 +44,7 @@ export default function PasswordVerification({
   const pageContentMap: Record<string, string> = {
     [PAGES.deleteMFAPage]: t("PasswordVerification.toDeleteNumber"),
     [PAGES.addMFAPage]: t("PasswordVerification.toAddPhone"),
+    [PAGES.editEmailPage]: t("PasswordVerification.toChangeEmail"),
     [PAGES.addFIDO2PasskeyPage]: t("PasswordVerification.toAddPasskey"),
     [PAGES.deleteFIDO2PasskeyPage]: t("PasswordVerification.toDeletePasskey"),
     [PAGES.password]: t("PasswordVerification.toChangePassword"),
@@ -50,6 +52,7 @@ export default function PasswordVerification({
 
   const parentPageContent =
     pageContentMap[parentPage] || t("PasswordVerification.toChangePassword");
+  const isChangePasswordFlow = parentPage === PAGES.password;
 
   const optionsValues = [
     {
@@ -80,60 +83,74 @@ export default function PasswordVerification({
 
   return (
     <GcdsContainer role="main">
-      <GcdsContainer className="gcds-gap">
-        <GcdsHeading tag="h1" lang={language}>
-          {t("PasswordVerification.title")}
-        </GcdsHeading>
-      </GcdsContainer>
-      <GcdsText>
-        {parentPageContent} {t("PasswordVerification.enterCurrentPassword")}
-      </GcdsText>
-      <form onSubmit={onSubmitHandler}>
-        <GcdsInput
-          inputId="passwordVerification"
-          label={t("PasswordVerification.passwordLabel")}
-          autoFocus
-          autocomplete="one-time-code"
-          name="passwordVerification"
-          type={checkedValue ? "text" : "password"}
-          validateOn="other"
-          errorMessage={errorMessage}
-          value={userPasswordValue}
-          onGcdsInput={(ev: CustomEvent<string>) => {
-            setUserPasswordValue((ev.target as HTMLInputElement).value);
-          }}
-          lang={language}
-          size={18}
-        ></GcdsInput>
-      </form>
-      <GcdsCheckboxes
-        id="password-checkbox"
-        legend={t("Password.showPassword", { ns: "password" })}
-        name="show-password-checkbox"
-        options={optionsValues}
-        onGcdsChange={() => setCheckedValue(!checkedValue)}
-      ></GcdsCheckboxes>
+      <GcdsGrid columns="1" gap="300">
+        <GcdsContainer>
+          {" "}
+          <GcdsHeading tag="h1" lang={language}>
+            {t("PasswordVerification.title")}
+          </GcdsHeading>
+          <GcdsText>
+            {parentPageContent} {t("PasswordVerification.enterCurrentPassword")}
+          </GcdsText>
+        </GcdsContainer>
 
-      <GcdsGrid columns="max-content max-content" gap="200">
-        <SubmitButton
-          currentLang={language ?? "en"}
-          style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            void doSubmit();
-          }}
-        ></SubmitButton>
+        <form onSubmit={onSubmitHandler}>
+          <GcdsInput
+            inputId="passwordVerification"
+            label={t("PasswordVerification.passwordLabel")}
+            autoFocus
+            autocomplete="one-time-code"
+            name="passwordVerification"
+            type={checkedValue ? "text" : "password"}
+            validateOn="other"
+            errorMessage={errorMessage}
+            value={userPasswordValue}
+            onGcdsInput={(ev: CustomEvent<string>) => {
+              setUserPasswordValue((ev.target as HTMLInputElement).value);
+            }}
+            lang={language}
+            size={18}
+          ></GcdsInput>
+          <GcdsCheckboxes
+            id="password-checkbox"
+            legend={t("Password.showPassword", { ns: "password" })}
+            name="show-password-checkbox"
+            options={optionsValues}
+            onGcdsChange={() => setCheckedValue(!checkedValue)}
+          ></GcdsCheckboxes>
+        </form>
 
-        <GcdsButton
-          buttonRole="secondary"
-          style={{ width: "fit-content" }}
-          onGcdsClick={(ev) => {
-            ev.preventDefault();
-            onCancel();
-          }}
-        >
-          {t("Button.cancel", { ns: "common" })}
-        </GcdsButton>
+        {isChangePasswordFlow ? (
+          <EmailNotificationInfoNotice
+            title={t("PasswordVerification.changePasswordInfoTitle")}
+            description={t(
+              "PasswordVerification.changePasswordInfoDescription",
+            )}
+            lang={language}
+          />
+        ) : null}
+
+        <GcdsGrid columns="max-content max-content" gap="200">
+          <SubmitButton
+            currentLang={language ?? "en"}
+            style={{ width: "fit-content" }}
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              void doSubmit();
+            }}
+          ></SubmitButton>
+
+          <GcdsButton
+            buttonRole="secondary"
+            style={{ width: "fit-content" }}
+            onGcdsClick={(ev) => {
+              ev.preventDefault();
+              onCancel();
+            }}
+          >
+            {t("Button.cancel", { ns: "common" })}
+          </GcdsButton>
+        </GcdsGrid>
       </GcdsGrid>
     </GcdsContainer>
   );

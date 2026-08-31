@@ -16,41 +16,49 @@
     "cancelButton": "Annuler"
   },
   "EditEmailEnterEmail": {
-    "title": "Enter a new email address",
-    "changingAffects": "Changing your email address will affect:",
-    "signInEmail": "The email address you use to sign in",
-    "contactEmail": "The email address that CanadaLogin uses to contact you",
-    "serviceEmail": "The email address that services connected to your CanadaLogin may use to contact you",
-    "emailLabel": "Email"
+    "title": "Modifier votre adresse courriel",
+    "changingAffects": "Cette action modifiera l’adresse courriel que vous utilisez pour votre identifiant ConnexionCanada. Dorénavant, vous utiliserez votre nouvelle adresse courriel pour réaliser les actions suivantes :",
+    "signInEmail": "Vous connecter à votre identifiant ConnexionCanada",
+    "contactEmail": "Recevoir des courriels concernant les changements apportés à votre identifiant ConnexionCanada",
+    "serviceEmail": "Recevoir des courriels des services liés à votre identifiant ConnexionCanada",
+    "emailLabel": "Nouvelle adresse courriel"
   },
   "EmailOtpValidation": {
-    "title": "Check your email",
-    "codeSent": "We have sent an email with a 6-digit code to:",
-    "emailMayTakeMinutes": "Your email might take a few minutes to arrive. If you do not get an email, check your spam folder.",
-    "codeExpiresIn": "Your code will expire in",
+    "title": "Consultez vos courriels",
+    "codeSent": "Nous avons envoyé un courriel contenant un code à 6 chiffres à l’adresse :",
+    "emailMayTakeMinutes": "Le courriel pourrait quelques minutes à vous parvenir. Si vous ne trouvez pas ce courriel dans votre boîte de réception, vérifiez s’il se trouve dans votre dossier de pourriels.",
+    "codeExpiresIn": "Votre code expirera dans",
     "tenMinutes": "10 minutes.",
-    "sixDigitCode": "6-digit code",
-    "problemsWithCode": "Problems with the code?",
-    "useDifferentEmail": "Use a different email",
-    "requestNewCodeIn": "You can request a new code in",
-    "seconds": "seconds",
-    "requestNewCode": "Request a new code"
+    "sixDigitCode": "Code à 6 chiffres",
+    "problemsWithCode": "Des problèmes avec votre code?",
+    "useDifferentEmail": "Utiliser une autre adresse courriel",
+    "requestNewCodeIn": "Vous pourrez demander un nouveau code dans",
+    "seconds": "secondes",
+    "requestNewCode": "Demander un nouveau code"
   },
   "EmailConfirmUpdate": {
-    "title": "Are you sure you want to update your email?",
-    "requestedUpdate": "You've requested to update your email to:",
+    "title": "Voulez-vous vraiment mettre à jour votre adresse courriel?",
+    "requestedUpdate": "Vous avez demandé à remplacer votre adresse courriel par l’adresse suivante :",
     "allServicesNotice": "Cette action mettra à jour votre adresse courriel pour <bold>tous</bold> les services que vous avez connectés à votre identifiant <bold>ConnexionCanada</bold>.",
-    "confirmButton": "Yes, update"
+    "warningTitle": "Avertissement",
+    "warningIntro": "La mise à jour de votre adresse courriel aura les effets suivants :",
+    "warningBullet1": "Modification de votre adresse courriel auprès de <bold>tous</bold> les services que vous avez liés à votre identifiant ConnexionCanada",
+    "warningBullet2": "Envoi d’une notification à votre ancienne adresse courriel",
+    "confirmButton": "Oui, mettre à jour"
   },
   "EmailUpdateSuccess": {
-    "emailUpdatedTo": "Your email has been updated to",
-    "updateOtherPlaces": "You may need to update your email other places",
-    "onlyConnectedServices": "This only changes your email with services connected to your CanadaLogin.",
-    "notConnectedNotice": "If you are trying to update your email with a service that's not connected to your CanadaLogin, you'll need to go to that account.",
-    "searchOtherAccounts": "To search for another GC Account, visit the",
-    "gcAccountDirectory": "GC Account directory",
+    "successTitle": "Opération réussie",
+    "emailUpdatedTo": "Votre adresse courriel est maintenant :",
+    "updateOtherPlaces": "Il se peut que vous deviez modifier cette adresse courriel ailleurs",
+    "onlyConnectedServices": "Cette action ne modifie votre adresse courriel que pour les services liés à votre identifiant ConnexionCanada.",
+    "notConnectedNotice": "Si vous cherchez à mettre à jour votre adresse courriel pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
+    "searchOtherAccounts": "Pour rechercher un autre compte du gouvernement du Canada, visitez le",
+    "gcAccountDirectory": "répertoire des comptes du gouvernement du Canada",
+    "syncNoticeTitle": "Vous pourriez avoir à synchroniser cette mise à jour",
+    "syncNoticeDescription": "Pour synchroniser la mise à jour de votre adresse courriel pour votre identifiant ConnexionCanada et les services qui y sont liés, connectez-vous à chaque service individuellement.",
+    "servicesLinkText": "Vous trouverez ici les liens vers tous les services auxquels vous pouvez accéder à l'aide de votre identifiant ConnexionCanada",
     "period": ".",
-    "backToProfile": "Back to profile",
-    "signOut": "Sign out"
+    "backToProfile": "Retour au profil",
+    "signOut": "Se déconnecter"
   }
 }
