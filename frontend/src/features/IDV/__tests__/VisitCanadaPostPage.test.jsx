@@ -26,6 +26,17 @@ vi.mock("react-router", async () => {
   };
 });
 
+vi.mock("../../../components/Providers/useUser", () => ({
+  useUser: () => ({
+    state: {
+      userProfile: {
+        userName: "test@example.com",
+      },
+    },
+    dispatch: vi.fn(),
+  }),
+}));
+
 vi.mock("../../../utils/constants", async () => {
   const actual = await vi.importActual("../../../utils/constants");
   return {
