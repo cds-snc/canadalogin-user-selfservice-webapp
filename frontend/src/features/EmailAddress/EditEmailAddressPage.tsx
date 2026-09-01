@@ -194,6 +194,7 @@ export default function EditEmailAddressPage() {
     userName,
     setErrorCode,
     fallbackNavigationPath: backToProfile,
+    allowEmptyFactors: true,
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
