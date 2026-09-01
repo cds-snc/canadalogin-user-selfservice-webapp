@@ -2033,6 +2033,7 @@ class TestErrorHandlingUpdateProfileWithOtp:
     @pytest.mark.asyncio
     @patch.object(update_profile_with_otp, "verify_otp_before_operation")
     @patch.object(update_profile_with_otp, "dispatch_get_my_profile_from_ibm")
+    @patch.object(update_profile_with_otp, "_build_email_mfa_sync_context")
     @patch.object(update_profile_with_otp, "_build_profile_update_request")
     @patch.object(update_profile_with_otp, "_get_update_field_names")
     @patch.object(update_profile_with_otp, "update_profile_for_verified_changes")
@@ -2041,6 +2042,7 @@ class TestErrorHandlingUpdateProfileWithOtp:
         mock_update_profile_for_verified_changes,
         mock_get_update_field_names,
         mock_build_profile_update_request,
+        mock_build_email_mfa_sync_context,
         mock_dispatch_get_my_profile_from_ibm,
         mock_verify_otp_before_operation,
         mock_test_client,
@@ -2050,6 +2052,7 @@ class TestErrorHandlingUpdateProfileWithOtp:
         mock_dispatch_get_my_profile_from_ibm.return_value = MagicMock(
             userName="John Doe"
         )
+        mock_build_email_mfa_sync_context.return_value = None
         mock_build_profile_update_request.return_value = MagicMock()
         mock_get_update_field_names.return_value = MagicMock()
         mock_update_profile_for_verified_changes.side_effect = Exception(
