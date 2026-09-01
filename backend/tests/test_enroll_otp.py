@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from app.otp.schemas import OtpEnrollmentRequest, OtpType
 from app.otp.services.enroll_mfa_otp import (
+    dispatch_otp_factor_validation,
     dispatch_otp_enrollment,
     handle_otp_enrollment,
 )
@@ -429,3 +430,84 @@ class TestDispatchFunctions:
                 assert call_args[1]["json"]["userId"] == user_id
                 assert call_args[1]["json"]["emailAddress"] == "newemail@example.com"
                 assert call_args[1]["json"]["enabled"] is True
+
+    @pytest.mark.asyncio
+    async def test_dispatch_email_otp_enrollment_adds_theme_query(
+        self, mock_email_enrollment_request
+    ):
+        mock_http_client = AsyncMock()
+        user_id = "user123"
+        user_access_token = "user_token_123"
+
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_http_client.post.return_value = mock_response
+
+        with patch(
+            "app.otp.services.enroll_mfa_otp.get_auth_request_headers"
+        ) as mock_headers:
+            mock_headers.return_value = {"Authorization": "Bearer user_token_123"}
+
+            with patch(
+                "app.otp.services.enroll_mfa_otp.get_configuration"
+            ) as mock_config:
+                mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                    "https://test.verify.ibm.com"
+                )
+
+                await dispatch_otp_enrollment(
+                    mock_http_client,
+                    mock_email_enrollment_request,
+                    user_id,
+                    user_access_token,
+                    theme_id="57eee205-04f6-463b-b9a6-32ae84aa8943",
+                )
+
+                call_args = mock_http_client.post.call_args
+                assert call_args[0][0] == (
+                    "https://test.verify.ibm.com/v2.0/factors/emailotp"
+                    "?themeId=57eee205-04f6-463b-b9a6-32ae84aa8943"
+                )
+
+    @pytest.mark.asyncio
+    async def test_dispatch_otp_factor_validation_puts_payload(self):
+        mock_http_client = AsyncMock()
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_http_client.put.return_value = mock_response
+
+        with patch(
+            "app.otp.services.enroll_mfa_otp.get_auth_request_headers"
+        ) as mock_headers:
+            mock_headers.return_value = {"Authorization": "Bearer user_token_123"}
+
+            with patch(
+                "app.otp.services.enroll_mfa_otp.get_configuration"
+            ) as mock_config:
+                mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                    "https://test.verify.ibm.com"
+                )
+
+                payload = {
+                    "id": "factor789",
+                    "userId": "user123",
+                    "type": "emailotp",
+                    "emailAddress": "newemail@example.com",
+                    "enabled": True,
+                    "validated": True,
+                }
+
+                result = await dispatch_otp_factor_validation(
+                    global_http_client=mock_http_client,
+                    factor_id="factor789",
+                    otp_type=OtpType.EMAIL,
+                    factor_payload=payload,
+                    user_access_token="user_token_123",
+                )
+
+                assert result == mock_response
+                mock_http_client.put.assert_called_once_with(
+                    "https://test.verify.ibm.com/factors/v2.0/factors/emailotp/factor789",
+                    json=payload,
+                    headers={"Authorization": "Bearer user_token_123"},
+                )

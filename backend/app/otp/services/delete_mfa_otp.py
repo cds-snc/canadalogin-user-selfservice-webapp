@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from urllib.parse import quote
 
 from app.config import get_configuration
 from app.fido2.services.authenticate_fido2_registration import submit_assertion_result
@@ -20,6 +21,17 @@ from fastapi import HTTPException, Request, status
 from httpx import AsyncClient, HTTPStatusError
 
 logger = logging.getLogger(__name__)
+
+
+def _append_theme_id_query(url: str, theme_id: str | None) -> str:
+    if not theme_id:
+        return url
+
+    normalized_theme_id = theme_id.strip()
+    if not normalized_theme_id:
+        return url
+
+    return f"{url}?themeId={quote(normalized_theme_id, safe='')}"
 
 
 def _get_endpoint_for_otp_type(otp_type: OtpType) -> str:
@@ -224,6 +236,7 @@ async def dispatch_otp_deletion(
     deletion_request: OtpDeletionRequest,
     user_access_token: str,
     language: str = None,
+    theme_id: str | None = None,
 ):
     """Dispatch OTP deletion to IBM Verify (SMS, Voice, or Email)."""
     # Determine the endpoint based on OTP type first to validate
@@ -238,7 +251,10 @@ async def dispatch_otp_deletion(
     settings = get_configuration().ibm_verify_config
 
     deletion_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/{endpoint}/{deletion_request.id}"
-    logger.info(f"Calling IBM Verify DELETE {deletion_url}")
+    if endpoint == "emailotp":
+        deletion_url = _append_theme_id_query(deletion_url, theme_id)
+
+    logger.info("Calling IBM Verify DELETE")
 
     response = await global_http_client.delete(deletion_url, headers=headers)
     response.raise_for_status()

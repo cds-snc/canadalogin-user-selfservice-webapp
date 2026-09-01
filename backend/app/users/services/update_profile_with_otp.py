@@ -1,11 +1,17 @@
+import json
 import logging
 import re
+from dataclasses import dataclass
 
 from fastapi import HTTPException, status, Request
 
+from app.config import get_configuration
 from app.otp.schemas import OtpDeletionRequest, OtpEnrollmentRequest, OtpType
 from app.otp.services.delete_mfa_otp import dispatch_otp_deletion
-from app.otp.services.enroll_mfa_otp import dispatch_otp_enrollment
+from app.otp.services.enroll_mfa_otp import (
+    dispatch_otp_enrollment,
+    dispatch_otp_factor_validation,
+)
 from app.password.schemas import OtpType as FactorOtpType
 from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
@@ -20,12 +26,20 @@ from app.users.services.update_my_profile import (
     sanitize_user_profile_data,
 )
 from app.auth.services.auth_user_session import update_session_user_info
+from app.utils.access_token import get_admin_token
 from app.utils.helpers import verify_otp_before_operation
 
 logger = logging.getLogger(__name__)
 
 MAX_EMAIL_LENGTH = 128
 NON_ASCII_CHARACTER_REGEX = re.compile(r"[^\x00-\x7F]")
+
+
+@dataclass
+class EmailMfaSyncContext:
+    normalized_new_email: str
+    old_email_factor_ids: list[str]
+    has_new_email_factor: bool
 
 
 def _validate_new_email_address(new_email_address: str | None) -> None:
@@ -86,7 +100,7 @@ async def update_profile_with_otp_verification(
         user_access_token=user_access_token,
     )
 
-    logger.info("OTP verification successful, proceeding with profile update")
+    logger.info("OTP verification successful, preparing profile update workflow")
 
     # Step 2: Get current user profile to validate user context and prepare updates
     # retrieve the unmasked profile
@@ -102,6 +116,26 @@ async def update_profile_with_otp_verification(
         )
 
     logger.info(f"Current user: {current_profile_response.id}")
+
+    email_mfa_sync_context: EmailMfaSyncContext | None = None
+    email_mfa_theme = _get_email_mfa_theme()
+
+    if profile_update_data.newEmailAddress:
+        email_mfa_sync_context = await _build_email_mfa_sync_context(
+            request=request,
+            user_access_token=user_access_token,
+            old_email=current_profile_response.userName,
+            new_email=profile_update_data.newEmailAddress,
+        )
+
+        if email_mfa_sync_context is not None:
+            await _delete_old_email_mfa_factors(
+                request=request,
+                user_access_token=user_access_token,
+                factor_ids=email_mfa_sync_context.old_email_factor_ids,
+                preferred_language=current_profile_response.preferredLanguage,
+                theme_id=email_mfa_theme,
+            )
 
     # Step 3: Build the profile update request based on provided fields
     profile_update_request = _build_profile_update_request(
@@ -124,14 +158,15 @@ async def update_profile_with_otp_verification(
             detail="Profile update failed after OTP verification",
         )
 
-    if profile_update_data.newEmailAddress:
-        await _sync_email_mfa_factors(
+    if email_mfa_sync_context is not None:
+        await _enroll_and_validate_new_email_mfa_factor(
             request=request,
             user_access_token=user_access_token,
             user_id=current_profile_response.id,
-            old_email=current_profile_response.userName,
-            new_email=profile_update_data.newEmailAddress,
+            new_email=email_mfa_sync_context.normalized_new_email,
+            has_new_email_factor=email_mfa_sync_context.has_new_email_factor,
             preferred_language=current_profile_response.preferredLanguage,
+            theme_id=email_mfa_theme,
         )
 
     # Step 5: Update session if email/username was changed
@@ -156,25 +191,37 @@ async def update_profile_with_otp_verification(
     )
 
 
-async def _sync_email_mfa_factors(
+def _get_email_mfa_theme() -> str | None:
+    """Read and normalize optional EMAIL_MFA_THEME config."""
+    theme_id = get_configuration().ibm_verify_config.EMAIL_MFA_THEME
+    if not theme_id:
+        return None
+
+    normalized_theme_id = theme_id.strip()
+    return normalized_theme_id or None
+
+
+def _normalize_email(value: str | None) -> str:
+    return (value or "").strip().lower()
+
+
+async def _build_email_mfa_sync_context(
     request: Request,
     user_access_token: str,
-    user_id: str,
     old_email: str,
     new_email: str,
-    preferred_language: str | None,
-) -> None:
-    """Ensure MFA email factors are rotated from old email to new email."""
-    normalized_old_email = (old_email or "").strip().lower()
-    normalized_new_email = (new_email or "").strip().lower()
+) -> EmailMfaSyncContext | None:
+    """Prepare email MFA sync metadata for pre/post profile update steps."""
+    normalized_old_email = _normalize_email(old_email)
+    normalized_new_email = _normalize_email(new_email)
 
     if not normalized_old_email or not normalized_new_email:
         logger.warning("Skipping email MFA sync due to missing old/new email value")
-        return
+        return None
 
     if normalized_old_email == normalized_new_email:
         logger.info("Email MFA sync skipped because email address is unchanged")
-        return
+        return None
 
     factors_response = await get_user_otp_factors(
         request.app.state.request_client,
@@ -204,29 +251,82 @@ async def _sync_email_mfa_factors(
         if factor_destination == normalized_old_email:
             old_email_factor_ids.append(factor.id)
 
+    return EmailMfaSyncContext(
+        normalized_new_email=normalized_new_email,
+        old_email_factor_ids=old_email_factor_ids,
+        has_new_email_factor=has_new_email_factor,
+    )
+
+
+async def _delete_old_email_mfa_factors(
+    request: Request,
+    user_access_token: str,
+    factor_ids: list[str],
+    preferred_language: str | None,
+    theme_id: str | None,
+) -> None:
     language = preferred_language or "en"
 
-    if not has_new_email_factor:
-        logger.info("Enrolling new email MFA factor for updated email address")
-        await dispatch_otp_enrollment(
-            global_http_client=request.app.state.request_client,
-            enrollment_request=OtpEnrollmentRequest(
-                destination=normalized_new_email,
-                otpType=OtpType.EMAIL,
-            ),
-            user_id=user_id,
-            user_access_token=user_access_token,
-            language=language,
-        )
-
-    for factor_id in old_email_factor_ids:
-        logger.info(f"Deleting old email MFA factor: {factor_id}")
+    for factor_id in factor_ids:
+        logger.info(f"Deleting old email MFA factor before profile update: {factor_id}")
         await dispatch_otp_deletion(
             global_http_client=request.app.state.request_client,
             deletion_request=OtpDeletionRequest(id=factor_id, otpType=OtpType.EMAIL),
             user_access_token=user_access_token,
             language=language,
+            theme_id=theme_id,
         )
+
+
+async def _enroll_and_validate_new_email_mfa_factor(
+    request: Request,
+    user_access_token: str,
+    user_id: str,
+    new_email: str,
+    has_new_email_factor: bool,
+    preferred_language: str | None,
+    theme_id: str | None,
+) -> None:
+    language = preferred_language or "en"
+
+    if has_new_email_factor:
+        logger.info("Email MFA enrollment skipped because new factor already exists")
+        return
+
+    logger.info("Enrolling new email MFA factor after profile update")
+    enrollment_response = await dispatch_otp_enrollment(
+        global_http_client=request.app.state.request_client,
+        enrollment_request=OtpEnrollmentRequest(
+            destination=new_email,
+            otpType=OtpType.EMAIL,
+        ),
+        user_id=user_id,
+        user_access_token=user_access_token,
+        language=language,
+        theme_id=theme_id,
+    )
+
+    enrolled_factor_payload = enrollment_response.json()
+    enrolled_factor_id = enrolled_factor_payload["id"]
+
+    # Follow IBM Verify flow: take enrollment response body, then set validated=true.
+    validation_payload = dict(enrolled_factor_payload)
+    validation_payload["validated"] = True
+
+    # Temporary debug output to copy the exact payload into Bruno.
+    print(json.dumps(validation_payload))
+
+    admin_access_token = await get_admin_token(request.app.state.request_client)
+
+    logger.info(f"Validating newly enrolled email MFA factor: {enrolled_factor_id}")
+    await dispatch_otp_factor_validation(
+        global_http_client=request.app.state.request_client,
+        factor_id=enrolled_factor_id,
+        otp_type=OtpType.EMAIL,
+        factor_payload=validation_payload,
+        user_access_token=admin_access_token,
+        language=language,
+    )
 
 
 def _build_profile_update_request(
