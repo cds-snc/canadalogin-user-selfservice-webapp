@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock, Mock, patch
 from fastapi import HTTPException
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError, Request, Response
 
 from app.otp.schemas import OtpType
 from app.users.schemas import (
@@ -13,7 +13,10 @@ from app.users.schemas import (
 )
 from app.users.services.update_profile_with_otp import (
     update_profile_with_otp_verification,
-    _sync_email_mfa_factors,
+    EmailMfaSyncContext,
+    _build_email_mfa_sync_context,
+    _delete_old_email_mfa_factors,
+    _enroll_and_validate_new_email_mfa_factor,
     _build_profile_update_request,
     _get_update_field_names,
     _build_session_updates,
@@ -224,9 +227,13 @@ UPDATE_PROFILE_IMPORT_PATH = (
 UPDATE_SESSION_IMPORT_PATH = (
     "app.users.services.update_profile_with_otp.update_session_user_info"
 )
-SYNC_EMAIL_MFA_IMPORT_PATH = (
-    "app.users.services.update_profile_with_otp._sync_email_mfa_factors"
+BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH = (
+    "app.users.services.update_profile_with_otp._build_email_mfa_sync_context"
 )
+DELETE_OLD_EMAIL_MFA_IMPORT_PATH = (
+    "app.users.services.update_profile_with_otp._delete_old_email_mfa_factors"
+)
+ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH = "app.users.services.update_profile_with_otp._enroll_and_validate_new_email_mfa_factor"
 
 
 class TestUpdateProfileWithOtpVerification:
@@ -311,7 +318,9 @@ class TestUpdateProfileWithOtpVerification:
         mock_get_profile.assert_not_called()
 
     @pytest.mark.asyncio
-    @patch(SYNC_EMAIL_MFA_IMPORT_PATH)
+    @patch(ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH)
+    @patch(DELETE_OLD_EMAIL_MFA_IMPORT_PATH)
+    @patch(BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH)
     @patch(UPDATE_SESSION_IMPORT_PATH)
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
@@ -322,7 +331,9 @@ class TestUpdateProfileWithOtpVerification:
         mock_get_profile,
         mock_update_profile,
         mock_update_session,
-        mock_sync_email_mfa,
+        mock_build_email_sync_context,
+        mock_delete_old_email_mfa,
+        mock_enroll_validate_email_mfa,
     ):
         """Test successful profile update with email address change and session update"""
         # Arrange
@@ -356,6 +367,27 @@ class TestUpdateProfileWithOtpVerification:
         )
         mock_update_response = Mock(success=True, data=updated_profile)
         mock_update_profile.return_value = mock_update_response
+        mock_build_email_sync_context.return_value = EmailMfaSyncContext(
+            normalized_new_email="new@example.com",
+            old_email_factor_ids=["old-factor-1"],
+            has_new_email_factor=False,
+        )
+
+        call_sequence = []
+
+        async def track_delete_old(*args, **kwargs):
+            call_sequence.append("delete_old_email_mfa")
+
+        async def track_profile_update(*args, **kwargs):
+            call_sequence.append("update_profile")
+            return mock_update_response
+
+        async def track_enroll_validate(*args, **kwargs):
+            call_sequence.append("enroll_and_validate_new_email_mfa")
+
+        mock_delete_old_email_mfa.side_effect = track_delete_old
+        mock_update_profile.side_effect = track_profile_update
+        mock_enroll_validate_email_mfa.side_effect = track_enroll_validate
 
         mock_request = Mock()
         mock_request.app = Mock()
@@ -388,7 +420,14 @@ class TestUpdateProfileWithOtpVerification:
         )
         mock_get_profile.assert_called_once()
         mock_update_profile.assert_called_once()
-        mock_sync_email_mfa.assert_called_once()
+        mock_build_email_sync_context.assert_called_once()
+        mock_delete_old_email_mfa.assert_called_once()
+        mock_enroll_validate_email_mfa.assert_called_once()
+        assert call_sequence == [
+            "delete_old_email_mfa",
+            "update_profile",
+            "enroll_and_validate_new_email_mfa",
+        ]
 
         # Verify session was updated with new email
         mock_update_session.assert_called_once()
@@ -397,7 +436,9 @@ class TestUpdateProfileWithOtpVerification:
         assert session_updates["email"] == "new@example.com"
 
     @pytest.mark.asyncio
-    @patch(SYNC_EMAIL_MFA_IMPORT_PATH)
+    @patch(ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH)
+    @patch(DELETE_OLD_EMAIL_MFA_IMPORT_PATH)
+    @patch(BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH)
     @patch(UPDATE_SESSION_IMPORT_PATH)
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
@@ -408,7 +449,9 @@ class TestUpdateProfileWithOtpVerification:
         mock_get_profile,
         mock_update_profile,
         mock_update_session,
-        mock_sync_email_mfa,
+        mock_build_email_sync_context,
+        mock_delete_old_email_mfa,
+        mock_enroll_validate_email_mfa,
     ):
         """Test successful profile update with phone number change (no session update)"""
         # Arrange
@@ -468,7 +511,9 @@ class TestUpdateProfileWithOtpVerification:
 
         # Session should not be updated for phone changes
         mock_update_session.assert_not_called()
-        mock_sync_email_mfa.assert_not_called()
+        mock_build_email_sync_context.assert_not_called()
+        mock_delete_old_email_mfa.assert_not_called()
+        mock_enroll_validate_email_mfa.assert_not_called()
 
     @pytest.mark.asyncio
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
@@ -543,11 +588,18 @@ class TestUpdateProfileWithOtpVerification:
         assert "Unable to retrieve current user profile" in exc.value.detail
 
     @pytest.mark.asyncio
+    @patch(DELETE_OLD_EMAIL_MFA_IMPORT_PATH)
+    @patch(BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH)
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
     @patch(VERIFY_OTP_IMPORT_PATH)
     async def test_profile_update_failure_raises_error(
-        self, mock_verify_otp, mock_get_profile, mock_update_profile
+        self,
+        mock_verify_otp,
+        mock_get_profile,
+        mock_update_profile,
+        mock_build_email_sync_context,
+        mock_delete_old_email_mfa,
     ):
         """Test handling of profile update failure after successful OTP verification"""
         # Arrange
@@ -570,6 +622,11 @@ class TestUpdateProfileWithOtpVerification:
         # Mock failed update
         mock_update_response = Mock(success=False)
         mock_update_profile.return_value = mock_update_response
+        mock_build_email_sync_context.return_value = EmailMfaSyncContext(
+            normalized_new_email="new@example.com",
+            old_email_factor_ids=["old-factor-1"],
+            has_new_email_factor=False,
+        )
 
         mock_request = Mock()
         mock_request.app = Mock()
@@ -591,9 +648,12 @@ class TestUpdateProfileWithOtpVerification:
 
         assert exc.value.status_code == 500
         assert "Profile update failed after OTP verification" in exc.value.detail
+        mock_delete_old_email_mfa.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch(SYNC_EMAIL_MFA_IMPORT_PATH)
+    @patch(ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH)
+    @patch(DELETE_OLD_EMAIL_MFA_IMPORT_PATH)
+    @patch(BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH)
     @patch(UPDATE_SESSION_IMPORT_PATH)
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
@@ -604,7 +664,9 @@ class TestUpdateProfileWithOtpVerification:
         mock_get_profile,
         mock_update_profile,
         mock_update_session,
-        mock_sync_email_mfa,
+        mock_build_email_sync_context,
+        mock_delete_old_email_mfa,
+        mock_enroll_validate_email_mfa,
     ):
         """Test that session update failure doesn't fail the entire operation"""
         # Arrange
@@ -638,6 +700,11 @@ class TestUpdateProfileWithOtpVerification:
         )
         mock_update_response = Mock(success=True, data=updated_profile)
         mock_update_profile.return_value = mock_update_response
+        mock_build_email_sync_context.return_value = EmailMfaSyncContext(
+            normalized_new_email="new@example.com",
+            old_email_factor_ids=["old-factor-1"],
+            has_new_email_factor=False,
+        )
 
         # Session update fails
         mock_update_session.side_effect = Exception("Session update failed")
@@ -662,7 +729,8 @@ class TestUpdateProfileWithOtpVerification:
         # Assert - operation still succeeds
         assert response.success is True
         assert response.data == updated_profile
-        mock_sync_email_mfa.assert_called_once()
+        mock_delete_old_email_mfa.assert_called_once()
+        mock_enroll_validate_email_mfa.assert_called_once()
 
 
 class TestGetUpdateFieldNames:
@@ -746,137 +814,63 @@ class TestBuildSessionUpdates:
         assert result == {}
 
 
-class TestSyncEmailMfaFactors:
+class TestBuildEmailMfaSyncContext:
     @pytest.mark.asyncio
-    @patch("app.users.services.update_profile_with_otp.dispatch_otp_deletion")
-    @patch("app.users.services.update_profile_with_otp.dispatch_otp_enrollment")
     @patch("app.users.services.update_profile_with_otp.get_user_otp_factors")
-    async def test_enrolls_new_and_deletes_old_email_factors(
+    async def test_builds_context_with_old_factor_ids_and_new_factor_flag(
         self,
         mock_get_user_otp_factors,
-        mock_dispatch_otp_enrollment,
-        mock_dispatch_otp_deletion,
-    ):
-        request_client = Mock(spec=AsyncClient)
-        request = Mock()
-        request.app = Mock()
-        request.app.state = Mock()
-        request.app.state.request_client = request_client
-
-        mock_get_user_otp_factors.return_value = Mock(
-            success=True,
-            data=[
-                Mock(id="old-factor-1", type="emailotp", destination="old@example.com"),
-                Mock(id="old-factor-2", type="emailotp", destination="OLD@example.com"),
-                Mock(id="sms-factor", type="smsotp", destination="+15145550199"),
-            ],
-        )
-        mock_dispatch_otp_enrollment.return_value = AsyncMock()
-        mock_dispatch_otp_deletion.return_value = AsyncMock()
-
-        await _sync_email_mfa_factors(
-            request=request,
-            user_access_token="user-token",
-            user_id="user-123",
-            old_email="old@example.com",
-            new_email="new@example.com",
-            preferred_language="fr",
-        )
-
-        mock_dispatch_otp_enrollment.assert_awaited_once()
-        enrollment_call = mock_dispatch_otp_enrollment.await_args.kwargs
-        assert enrollment_call["user_id"] == "user-123"
-        assert enrollment_call["user_access_token"] == "user-token"
-        assert enrollment_call["language"] == "fr"
-        assert enrollment_call["enrollment_request"].destination == "new@example.com"
-        assert enrollment_call["enrollment_request"].otpType == OtpType.EMAIL
-
-        assert mock_dispatch_otp_deletion.await_count == 2
-        deleted_ids = {
-            call.kwargs["deletion_request"].id
-            for call in mock_dispatch_otp_deletion.await_args_list
-        }
-        assert deleted_ids == {"old-factor-1", "old-factor-2"}
-        for call in mock_dispatch_otp_deletion.await_args_list:
-            assert call.kwargs["deletion_request"].otpType == OtpType.EMAIL
-
-    @pytest.mark.asyncio
-    @patch("app.users.services.update_profile_with_otp.dispatch_otp_deletion")
-    @patch("app.users.services.update_profile_with_otp.dispatch_otp_enrollment")
-    @patch("app.users.services.update_profile_with_otp.get_user_otp_factors")
-    async def test_skips_enrollment_when_new_email_factor_already_exists(
-        self,
-        mock_get_user_otp_factors,
-        mock_dispatch_otp_enrollment,
-        mock_dispatch_otp_deletion,
-    ):
-        request_client = Mock(spec=AsyncClient)
-        request = Mock()
-        request.app = Mock()
-        request.app.state = Mock()
-        request.app.state.request_client = request_client
-
-        mock_get_user_otp_factors.return_value = Mock(
-            success=True,
-            data=[
-                Mock(id="new-factor", type="emailotp", destination="new@example.com"),
-                Mock(id="old-factor", type="emailotp", destination="old@example.com"),
-            ],
-        )
-
-        await _sync_email_mfa_factors(
-            request=request,
-            user_access_token="user-token",
-            user_id="user-123",
-            old_email="old@example.com",
-            new_email="new@example.com",
-            preferred_language="en",
-        )
-
-        mock_dispatch_otp_enrollment.assert_not_awaited()
-        mock_dispatch_otp_deletion.assert_awaited_once()
-        delete_call = mock_dispatch_otp_deletion.await_args.kwargs
-        assert delete_call["deletion_request"].id == "old-factor"
-        assert delete_call["deletion_request"].otpType == OtpType.EMAIL
-
-    @pytest.mark.asyncio
-    @patch("app.users.services.update_profile_with_otp.dispatch_otp_deletion")
-    @patch("app.users.services.update_profile_with_otp.dispatch_otp_enrollment")
-    @patch("app.users.services.update_profile_with_otp.get_user_otp_factors")
-    async def test_skips_when_email_is_unchanged(
-        self,
-        mock_get_user_otp_factors,
-        mock_dispatch_otp_enrollment,
-        mock_dispatch_otp_deletion,
     ):
         request = Mock()
         request.app = Mock()
         request.app.state = Mock()
         request.app.state.request_client = Mock(spec=AsyncClient)
 
-        await _sync_email_mfa_factors(
-            request=request,
-            user_access_token="user-token",
-            user_id="user-123",
-            old_email="Old@Example.com",
-            new_email="old@example.com",
-            preferred_language="en",
+        mock_get_user_otp_factors.return_value = Mock(
+            success=True,
+            data=[
+                Mock(id="old-factor-1", type="emailotp", destination="old@example.com"),
+                Mock(id="old-factor-2", type="emailotp", destination="OLD@example.com"),
+                Mock(id="new-factor", type="emailotp", destination="new@example.com"),
+                Mock(id="sms-factor", type="smsotp", destination="+15145550199"),
+            ],
         )
 
-        mock_get_user_otp_factors.assert_not_called()
-        mock_dispatch_otp_enrollment.assert_not_awaited()
-        mock_dispatch_otp_deletion.assert_not_awaited()
+        result = await _build_email_mfa_sync_context(
+            request=request,
+            user_access_token="user-token",
+            old_email="old@example.com",
+            new_email="new@example.com",
+        )
+
+        assert result is not None
+        assert result.normalized_new_email == "new@example.com"
+        assert result.has_new_email_factor is True
+        assert set(result.old_email_factor_ids) == {"old-factor-1", "old-factor-2"}
 
     @pytest.mark.asyncio
-    @patch("app.users.services.update_profile_with_otp.dispatch_otp_deletion")
-    @patch("app.users.services.update_profile_with_otp.dispatch_otp_enrollment")
     @patch("app.users.services.update_profile_with_otp.get_user_otp_factors")
-    async def test_raises_when_factor_lookup_fails(
-        self,
-        mock_get_user_otp_factors,
-        mock_dispatch_otp_enrollment,
-        mock_dispatch_otp_deletion,
+    async def test_returns_none_when_email_is_unchanged(
+        self, mock_get_user_otp_factors
     ):
+        request = Mock()
+        request.app = Mock()
+        request.app.state = Mock()
+        request.app.state.request_client = Mock(spec=AsyncClient)
+
+        result = await _build_email_mfa_sync_context(
+            request=request,
+            user_access_token="user-token",
+            old_email="Old@Example.com",
+            new_email="old@example.com",
+        )
+
+        assert result is None
+        mock_get_user_otp_factors.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch("app.users.services.update_profile_with_otp.get_user_otp_factors")
+    async def test_raises_when_factor_lookup_fails(self, mock_get_user_otp_factors):
         request = Mock()
         request.app = Mock()
         request.app.state = Mock()
@@ -885,16 +879,310 @@ class TestSyncEmailMfaFactors:
         mock_get_user_otp_factors.return_value = Mock(success=False, data=[])
 
         with pytest.raises(HTTPException) as exc:
-            await _sync_email_mfa_factors(
+            await _build_email_mfa_sync_context(
                 request=request,
                 user_access_token="user-token",
-                user_id="user-123",
                 old_email="old@example.com",
                 new_email="new@example.com",
-                preferred_language=None,
             )
 
         assert exc.value.status_code == 502
         assert exc.value.detail == "Unable to retrieve user MFA factors"
+
+
+class TestDeleteOldEmailMfaFactors:
+    @pytest.mark.asyncio
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_deletion")
+    async def test_dispatches_deletions_with_theme_and_language(
+        self,
+        mock_dispatch_otp_deletion,
+    ):
+        request = Mock()
+        request.app = Mock()
+        request.app.state = Mock()
+        request.app.state.request_client = Mock(spec=AsyncClient)
+
+        await _delete_old_email_mfa_factors(
+            request=request,
+            user_access_token="user-token",
+            factor_ids=["old-factor-1", "old-factor-2"],
+            preferred_language="fr",
+            theme_id="57eee205-04f6-463b-b9a6-32ae84aa8943",
+        )
+
+        assert mock_dispatch_otp_deletion.await_count == 2
+        for call in mock_dispatch_otp_deletion.await_args_list:
+            assert call.kwargs["deletion_request"].otpType == OtpType.EMAIL
+            assert call.kwargs["user_access_token"] == "user-token"
+            assert call.kwargs["language"] == "fr"
+            assert call.kwargs["theme_id"] == "57eee205-04f6-463b-b9a6-32ae84aa8943"
+
+
+class TestEnrollAndValidateNewEmailMfaFactor:
+    @pytest.mark.asyncio
+    @patch(
+        "app.users.services.update_profile_with_otp.get_admin_token",
+        new_callable=AsyncMock,
+    )
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_factor_validation")
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_enrollment")
+    async def test_enrolls_and_validates_new_email_mfa_factor(
+        self,
+        mock_dispatch_otp_enrollment,
+        mock_dispatch_otp_factor_validation,
+        mock_get_admin_token,
+    ):
+        request = Mock()
+        request.app = Mock()
+        request.app.state = Mock()
+        request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_get_admin_token.return_value = "admin-token"
+
+        mock_enrollment_response = Mock()
+        mock_enrollment_response.json.return_value = {
+            "id": "new-factor-123",
+            "userId": "user-123",
+            "type": "emailotp",
+            "emailAddress": "new@example.com",
+            "enabled": True,
+            "validated": False,
+        }
+        mock_dispatch_otp_enrollment.return_value = mock_enrollment_response
+
+        await _enroll_and_validate_new_email_mfa_factor(
+            request=request,
+            user_access_token="user-token",
+            user_id="user-123",
+            new_email="new@example.com",
+            has_new_email_factor=False,
+            preferred_language="en",
+            theme_id="57eee205-04f6-463b-b9a6-32ae84aa8943",
+        )
+
+        mock_dispatch_otp_enrollment.assert_awaited_once()
+        mock_dispatch_otp_factor_validation.assert_awaited_once()
+        validation_call = mock_dispatch_otp_factor_validation.await_args.kwargs
+        assert validation_call["factor_id"] == "new-factor-123"
+        assert validation_call["otp_type"] == OtpType.EMAIL
+        assert validation_call["factor_payload"] == {
+            "id": "new-factor-123",
+            "userId": "user-123",
+            "type": "emailotp",
+            "emailAddress": "new@example.com",
+            "enabled": True,
+            "validated": True,
+        }
+        assert validation_call["user_access_token"] == "admin-token"
+        assert "theme_id" not in validation_call
+
+    @pytest.mark.asyncio
+    @patch(
+        "app.users.services.update_profile_with_otp.get_admin_token",
+        new_callable=AsyncMock,
+    )
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_factor_validation")
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_enrollment")
+    async def test_validation_request_reuses_enrollment_payload(
+        self,
+        mock_dispatch_otp_enrollment,
+        mock_dispatch_otp_factor_validation,
+        mock_get_admin_token,
+    ):
+        request = Mock()
+        request.app = Mock()
+        request.app.state = Mock()
+        request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_get_admin_token.return_value = "admin-token"
+
+        mock_enrollment_response = Mock()
+        mock_enrollment_response.json.return_value = {
+            "id": "new-factor-123",
+            "validated": False,
+        }
+        mock_dispatch_otp_enrollment.return_value = mock_enrollment_response
+
+        await _enroll_and_validate_new_email_mfa_factor(
+            request=request,
+            user_access_token="user-token",
+            user_id="user-123",
+            new_email="new@example.com",
+            has_new_email_factor=False,
+            preferred_language="en",
+            theme_id=None,
+        )
+
+        validation_call = mock_dispatch_otp_factor_validation.await_args.kwargs
+        assert validation_call["factor_payload"] == {
+            "id": "new-factor-123",
+            "validated": True,
+        }
+        assert validation_call["user_access_token"] == "admin-token"
+
+    @pytest.mark.asyncio
+    @patch(
+        "app.users.services.update_profile_with_otp.get_admin_token",
+        new_callable=AsyncMock,
+    )
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_factor_validation")
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_enrollment")
+    async def test_409_from_validation_is_propagated_for_global_handler(
+        self,
+        mock_dispatch_otp_enrollment,
+        mock_dispatch_otp_factor_validation,
+        mock_get_admin_token,
+    ):
+        request = Mock()
+        request.app = Mock()
+        request.app.state = Mock()
+        request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_get_admin_token.return_value = "admin-token"
+
+        mock_enrollment_response = Mock()
+        mock_enrollment_response.json.return_value = {
+            "id": "new-factor-123",
+            "userId": "user-123",
+            "type": "emailotp",
+            "emailAddress": "new@example.com",
+            "enabled": True,
+            "validated": False,
+        }
+        mock_dispatch_otp_enrollment.return_value = mock_enrollment_response
+
+        conflict_response = Response(
+            status_code=409,
+            request=Request(
+                "PUT", "https://example.com/v2.0/factors/emailotp/new-factor-123"
+            ),
+            json={"messageId": "SOME_CONFLICT"},
+        )
+        mock_dispatch_otp_factor_validation.side_effect = HTTPStatusError(
+            "Conflict",
+            request=conflict_response.request,
+            response=conflict_response,
+        )
+
+        with pytest.raises(HTTPStatusError) as exc:
+            await _enroll_and_validate_new_email_mfa_factor(
+                request=request,
+                user_access_token="user-token",
+                user_id="user-123",
+                new_email="new@example.com",
+                has_new_email_factor=False,
+                preferred_language="en",
+                theme_id=None,
+            )
+
+        assert exc.value.response.status_code == 409
+
+    @pytest.mark.asyncio
+    @patch(
+        "app.users.services.update_profile_with_otp.get_admin_token",
+        new_callable=AsyncMock,
+    )
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_factor_validation")
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_enrollment")
+    async def test_400_from_validation_is_propagated_for_global_handler(
+        self,
+        mock_dispatch_otp_enrollment,
+        mock_dispatch_otp_factor_validation,
+        mock_get_admin_token,
+    ):
+        request = Mock()
+        request.app = Mock()
+        request.app.state = Mock()
+        request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_get_admin_token.return_value = "admin-token"
+
+        mock_enrollment_response = Mock()
+        mock_enrollment_response.json.return_value = {
+            "id": "new-factor-123",
+            "userId": "user-123",
+            "type": "emailotp",
+            "emailAddress": "new@example.com",
+            "enabled": True,
+            "validated": False,
+        }
+        mock_dispatch_otp_enrollment.return_value = mock_enrollment_response
+
+        bad_request_response = Response(
+            status_code=400,
+            request=Request(
+                "PUT", "https://example.com/v2.0/factors/emailotp/new-factor-123"
+            ),
+            json={"messageId": "CSIBN0005E"},
+        )
+        mock_dispatch_otp_factor_validation.side_effect = HTTPStatusError(
+            "Bad Request",
+            request=bad_request_response.request,
+            response=bad_request_response,
+        )
+
+        with pytest.raises(HTTPStatusError) as exc:
+            await _enroll_and_validate_new_email_mfa_factor(
+                request=request,
+                user_access_token="user-token",
+                user_id="user-123",
+                new_email="new@example.com",
+                has_new_email_factor=False,
+                preferred_language="en",
+                theme_id=None,
+            )
+
+        assert exc.value.response.status_code == 400
+
+    @pytest.mark.asyncio
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_factor_validation")
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_enrollment")
+    async def test_skips_when_new_email_factor_exists(
+        self,
+        mock_dispatch_otp_enrollment,
+        mock_dispatch_otp_factor_validation,
+    ):
+        request = Mock()
+        request.app = Mock()
+        request.app.state = Mock()
+        request.app.state.request_client = Mock(spec=AsyncClient)
+
+        await _enroll_and_validate_new_email_mfa_factor(
+            request=request,
+            user_access_token="user-token",
+            user_id="user-123",
+            new_email="new@example.com",
+            has_new_email_factor=True,
+            preferred_language="en",
+            theme_id=None,
+        )
+
         mock_dispatch_otp_enrollment.assert_not_awaited()
-        mock_dispatch_otp_deletion.assert_not_awaited()
+        mock_dispatch_otp_factor_validation.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_factor_validation")
+    @patch("app.users.services.update_profile_with_otp.dispatch_otp_enrollment")
+    async def test_propagates_when_enrollment_response_has_no_factor_id(
+        self,
+        mock_dispatch_otp_enrollment,
+        mock_dispatch_otp_factor_validation,
+    ):
+        request = Mock()
+        request.app = Mock()
+        request.app.state = Mock()
+        request.app.state.request_client = Mock(spec=AsyncClient)
+
+        mock_enrollment_response = Mock()
+        mock_enrollment_response.json.return_value = {"validated": False}
+        mock_dispatch_otp_enrollment.return_value = mock_enrollment_response
+
+        with pytest.raises(KeyError) as exc:
+            await _enroll_and_validate_new_email_mfa_factor(
+                request=request,
+                user_access_token="user-token",
+                user_id="user-123",
+                new_email="new@example.com",
+                has_new_email_factor=False,
+                preferred_language="en",
+                theme_id=None,
+            )
+
+        assert str(exc.value) == "'id'"
+        mock_dispatch_otp_factor_validation.assert_not_awaited()

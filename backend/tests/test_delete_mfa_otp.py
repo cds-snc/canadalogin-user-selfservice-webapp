@@ -526,6 +526,54 @@ async def test_dispatch_otp_deletion_email_success(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_dispatch_otp_deletion_email_adds_theme_query(monkeypatch):
+    """Test email OTP deletion appends optional themeId query when provided."""
+
+    def mock_get_auth_request_headers(token, content_type, language=None):
+        return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+    def mock_get_configuration():
+        config = Mock()
+        config.ibm_verify_config.IBM_VERIFY_TENANT_URL = "https://test.verify.ibm.com"
+        return config
+
+    mock_client = AsyncMock(spec=AsyncClient)
+    mock_response = Mock(spec=Response)
+    mock_response.status_code = 204
+    mock_response.raise_for_status = Mock()
+    mock_client.delete.return_value = mock_response
+
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_auth_request_headers",
+        mock_get_auth_request_headers,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_configuration", mock_get_configuration
+    )
+
+    deletion_request = create_deletion_request(
+        factor_id="factor789", otp_type=OtpType.EMAIL
+    )
+
+    result = await dispatch_otp_deletion(
+        mock_client,
+        deletion_request,
+        "user-token",
+        theme_id="57eee205-04f6-463b-b9a6-32ae84aa8943",
+    )
+
+    assert result.status_code == 204
+    mock_client.delete.assert_called_once_with(
+        "https://test.verify.ibm.com/v2.0/factors/emailotp/factor789"
+        "?themeId=57eee205-04f6-463b-b9a6-32ae84aa8943",
+        headers={
+            "Authorization": "Bearer user-token",
+            "Content-Type": "application/json",
+        },
+    )
+
+
+@pytest.mark.asyncio
 async def test_handle_otp_deletion_unvalidated_factor_success(monkeypatch):
     """Test successful deletion of an unvalidated OTP factor without OTP verification"""
 
