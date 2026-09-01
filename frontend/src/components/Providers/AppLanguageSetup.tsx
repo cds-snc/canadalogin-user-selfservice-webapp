@@ -52,11 +52,6 @@ export const AppLanguageSetup = () => {
       AVAILABLE_LANGUAGES.en;
 
     const languageToDisplay = validateSelectedLanguage(possibleLanguages);
-    console.log("pathname", pathname);
-    console.log("normalized", normalizedUrlLanguage);
-    console.log("language", language);
-    console.log("profilePreferredLanguage", profilePreferredLanguage);
-    console.log(languageToDisplay);
 
     if (languageToDisplay !== language) {
       setAppLanguage(languageToDisplay);
