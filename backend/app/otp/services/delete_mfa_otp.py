@@ -254,7 +254,7 @@ async def dispatch_otp_deletion(
     if endpoint == "emailotp":
         deletion_url = _append_theme_id_query(deletion_url, theme_id)
 
-    logger.info(f"Calling IBM Verify DELETE {deletion_url}")
+    logger.info("Calling IBM Verify DELETE")
 
     response = await global_http_client.delete(deletion_url, headers=headers)
     response.raise_for_status()
