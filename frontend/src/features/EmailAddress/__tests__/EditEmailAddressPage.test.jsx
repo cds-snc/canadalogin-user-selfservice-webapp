@@ -639,6 +639,67 @@ describe("EditEmailAddressPage Integration Tests", () => {
       });
     });
 
+    it("allows passkey-only users to continue without phone MFA factors", async () => {
+      vi.mocked(useOtpOperations).mockImplementation(() => ({
+        userPhoneFactors: [],
+        userSelectedMfaFactor: null,
+        userOtpValue: "123456",
+        otpSentResponse: { trxnId: "mock-transaction-id" },
+        otpLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+        validateOtpCode: vi.fn((otpValue, callback) => {
+          if (callback) {
+            callback({ success: true });
+          }
+        }),
+        setOtpLoading: vi.fn(),
+      }));
+
+      vi.mocked(usePasskeyOperations).mockImplementation(() => ({
+        fido2Data: [
+          {
+            id: "passkey-only-1",
+            attributes: {
+              nickname: "Only passkey",
+              credentialId: "cred-only-1",
+            },
+          },
+        ],
+        loading: false,
+        refetch: vi.fn(),
+      }));
+
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("select-passkey-btn"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("fido2-success-btn"));
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument();
+      });
+    });
+
     it("executes complete wizard flow to success", async () => {
       renderComponent();
 
