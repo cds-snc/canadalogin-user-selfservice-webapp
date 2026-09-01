@@ -184,7 +184,7 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByRole("heading", {
-          name: "Prove your identity",
+          name: "Prove your identity when you’re ready",
         }),
       ).toBeInTheDocument();
 

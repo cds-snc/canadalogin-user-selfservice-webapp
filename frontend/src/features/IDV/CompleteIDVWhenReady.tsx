@@ -91,6 +91,7 @@ export default function CompleteIdentityProofingPage() {
                 rpServicePortal: relyingPartyLinkName,
               })}
             </GcdsLink>
+            {t("CompleteIdentityProofing.noDocumentsNoticeTextContd")}
           </GcdsText>
           <GcdsText>
             <GcdsDetails
