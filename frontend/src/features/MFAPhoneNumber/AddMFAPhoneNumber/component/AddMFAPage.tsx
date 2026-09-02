@@ -2,7 +2,12 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
-import { FLOW_TYPES, PAGES, serverMapping } from "../../../../utils/constants";
+import {
+  FLOW_TYPES,
+  INVALID_OTP_ERROR_CODES,
+  PAGES,
+  serverMapping,
+} from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
@@ -30,6 +35,10 @@ import { usePasskeyOperations } from "../../../../hooks/usePasskeyOperations";
 import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 import { Fido2Credential } from "../../../../types/hooks";
 import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
+import {
+  extractOtpServerMetadata,
+  mergeOtpSentResponseWithMetadata,
+} from "../../../../utils/otpMetadata";
 
 interface PhoneFormData {
   phoneNumber: string;
@@ -161,6 +170,7 @@ export default function AddMFAPage() {
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,
+    setOtpSentResponse,
   } = useOtpOperations({
     userId: id,
     userName,
@@ -181,6 +191,33 @@ export default function AddMFAPage() {
     customErrorMessage || getErrorMessage(language, errorCode);
   const { resetAttempts, isMaxAttemptsReached } =
     useOtpAttemptTracking(errorCode);
+
+  const getOtpAttemptsErrorMessage = (errorData?: {
+    retries?: number;
+    attempts?: number;
+  }) => {
+    const retries = errorData?.retries;
+    const attempts = errorData?.attempts;
+
+    if (
+      retries === undefined ||
+      retries === null ||
+      attempts === undefined ||
+      attempts === null
+    ) {
+      return "";
+    }
+
+    const remaining = retries - attempts;
+    if (remaining <= 0) {
+      return t("Error.otp_max_attempts", { ns: "common" });
+    }
+
+    return t("Error.otp_invalid_attempts", {
+      ns: "common",
+      count: remaining,
+    });
+  };
 
   const handlePhoneForm = (field: string, value: unknown) => {
     setPhoneFormData((prev) => ({
@@ -244,6 +281,7 @@ export default function AddMFAPage() {
     otpType?: string;
   } = {}): Promise<boolean> => {
     setErrorCode("");
+    setCustomErrorMessage("");
 
     try {
       const payload = {
@@ -295,6 +333,8 @@ export default function AddMFAPage() {
   };
 
   const verifyMFAOtp = async () => {
+    setCustomErrorMessage("");
+
     try {
       const payload = {
         id: phoneFormData.mfaId,
@@ -341,16 +381,28 @@ export default function AddMFAPage() {
           });
         }
         setErrorCode("");
+        setCustomErrorMessage("");
       }
     } catch (error) {
-      const err = error as { data?: { message?: string } };
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+      const err = error as {
+        data?: { message?: string; retries?: number; attempts?: number };
+      };
+      const message = err?.data?.message ?? "";
+      const attemptsMessage = getOtpAttemptsErrorMessage(err?.data);
+
+      if (message) {
+        setErrorCode(message);
+        if (
+          (INVALID_OTP_ERROR_CODES as readonly string[]).includes(message) &&
+          attemptsMessage
+        ) {
+          setCustomErrorMessage(attemptsMessage);
+        }
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: ADD_MFA_ANALYTICS.STEPS.SUCCESS,
           type: phoneFormData.otpType,
-          error: err.data.message,
+          error: message,
         });
       }
     }
@@ -422,6 +474,9 @@ export default function AddMFAPage() {
         error?.response?.data?.retries !== undefined &&
         error?.response?.data?.retries !== null;
       if (hasRetries) {
+        setOtpSentResponse((prev) =>
+          mergeOtpSentResponseWithMetadata(prev, extractOtpServerMetadata(err)),
+        );
         // Re-throw so OtpVerification can display "X retries remaining"
         throw error.response;
       }

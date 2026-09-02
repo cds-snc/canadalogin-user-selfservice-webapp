@@ -28,6 +28,10 @@ import {
   GA_FORM_EVENTS,
   DELETE_PASSKEY_ANALYTICS,
 } from "../../../../utils/analyticsConstants";
+import {
+  extractOtpServerMetadata,
+  mergeOtpSentResponseWithMetadata,
+} from "../../../../utils/otpMetadata";
 
 interface DeleteFIDO2PasskeyPageProps {
   step?: string;
@@ -92,6 +96,7 @@ export default function DeleteFIDO2PasskeyPage({
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,
+    setOtpSentResponse,
   } = useOtpOperations({
     userId: userProfile!.id,
     userName: userProfile!.userName,
@@ -252,6 +257,9 @@ export default function DeleteFIDO2PasskeyPage({
       const errData = err as {
         data?: { message?: string; retries?: number; attempts?: number };
       };
+      setOtpSentResponse((prev) =>
+        mergeOtpSentResponseWithMetadata(prev, extractOtpServerMetadata(err)),
+      );
       const message = errData?.data?.message ?? "error_delete_credential";
       const attemptsMessage = getOtpAttemptsErrorMessage(errData?.data);
       setErrorCode(message);

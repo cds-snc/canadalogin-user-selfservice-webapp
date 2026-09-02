@@ -196,6 +196,8 @@ async def test_verify_otp_wrong_code_raises_400_with_attempts(otp_type):
             json={
                 "attempts": 2,
                 "retries": 2,
+                "created": "2026-01-01T00:00:00Z",
+                "expiry": "2026-01-01T00:10:00Z",
             },
         )
 
@@ -212,6 +214,9 @@ async def test_verify_otp_wrong_code_raises_400_with_attempts(otp_type):
     assert exc.detail["message"] == "CSIAM0011E"
     assert exc.detail["attempts"] == 2
     assert exc.detail["retries"] == 2
+    assert exc.detail["created"] == "2026-01-01T00:00:00Z"
+    assert exc.detail["expiry"] == "2026-01-01T00:10:00Z"
+    assert exc.detail["trxnId"] == "tx-wrong-1"
 
 
 @pytest.mark.asyncio
@@ -250,6 +255,9 @@ async def test_verify_otp_wrong_code_zero_retries_raises_400():
     exc = excinfo.value
     assert exc.status_code == 400
     assert exc.detail["retries"] == 0
+    assert exc.detail["created"] is None
+    assert exc.detail["expiry"] is None
+    assert exc.detail["trxnId"] == "tx-no-retries"
 
 
 @pytest.mark.asyncio
@@ -280,6 +288,9 @@ async def test_verify_otp_non_json_error_body_uses_default_message_id():
     assert exc.detail["message"] == "UNKNOWN"
     assert exc.detail["attempts"] is None
     assert exc.detail["retries"] is None
+    assert exc.detail["created"] is None
+    assert exc.detail["expiry"] is None
+    assert exc.detail["trxnId"] == "tx-non-json"
 
 
 @pytest.mark.asyncio

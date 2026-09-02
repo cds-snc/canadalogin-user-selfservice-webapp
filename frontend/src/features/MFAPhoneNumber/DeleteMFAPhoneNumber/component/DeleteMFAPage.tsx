@@ -25,6 +25,10 @@ import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { DELETE_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
 import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
+import {
+  extractOtpServerMetadata,
+  mergeOtpSentResponseWithMetadata,
+} from "../../../../utils/otpMetadata";
 
 interface DeletePhoneFormData {
   phoneNumber: string;
@@ -144,6 +148,7 @@ export default function DeleteMFAPage() {
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,
+    setOtpSentResponse,
   } = useOtpOperations({
     userId: id,
     userName,
@@ -260,6 +265,9 @@ export default function DeleteMFAPage() {
       const err = error as {
         data?: { message?: string; retries?: number; attempts?: number };
       };
+      setOtpSentResponse((prev) =>
+        mergeOtpSentResponseWithMetadata(prev, extractOtpServerMetadata(error)),
+      );
       const message = err?.data?.message ?? "";
       const attemptsMessage = getOtpAttemptsErrorMessage(err?.data);
       setErrorCode(message);

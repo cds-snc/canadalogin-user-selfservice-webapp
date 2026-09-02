@@ -33,6 +33,10 @@ import type {
   AuthServiceResponse,
 } from "../../../types/services";
 import type { UserProfile } from "../../../types/user";
+import {
+  extractOtpServerMetadata,
+  hasOtpServerMetadata,
+} from "../../../utils/otpMetadata";
 
 type UpdatePhoneTransport = "sms" | "voice";
 
@@ -143,6 +147,16 @@ export default function EditContactPhoneNumberPage() {
         }
       }
     } catch (error) {
+      const metadata = extractOtpServerMetadata(error);
+      if (hasOtpServerMetadata(metadata)) {
+        setPhoneFormData((prev) => ({
+          ...prev,
+          trxnId: metadata.trxnId ?? prev.trxnId,
+          created: metadata.created ?? prev.created,
+          expiry: metadata.expiry ?? prev.expiry,
+        }));
+      }
+
       const message = getApiErrorMessage(error);
       if (message) {
         setErrorCode(message);

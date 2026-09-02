@@ -11,6 +11,12 @@ type CountdownAnchor =
       startedAtMs: number;
     };
 
+const DURATION_ANCHOR_CACHE_LIMIT = 50;
+const durationAnchorCache = new Map<
+  string,
+  { durationSeconds: number; startedAtMs: number; expiryMs: number }
+>();
+
 function parseTimestampMs(value?: string | null): number | null {
   if (!value) {
     return null;
@@ -31,6 +37,62 @@ function getMonotonicNowMs(): number {
   return Date.now();
 }
 
+function getDurationAnchorCacheKey(
+  createdMs: number,
+  expiryMs: number,
+): string {
+  return `${createdMs}:${expiryMs}`;
+}
+
+function cacheDurationAnchor(
+  key: string,
+  durationSeconds: number,
+  expiryMs: number,
+  createdMs: number,
+): { durationSeconds: number; startedAtMs: number; expiryMs: number } {
+  const cached = durationAnchorCache.get(key);
+  if (cached && cached.durationSeconds === durationSeconds) {
+    return cached;
+  }
+
+  const nowMs = Date.now();
+  const nowMonotonicMs = getMonotonicNowMs();
+  const observedAgeMs = nowMs - createdMs;
+  const maxDurationMs = durationSeconds * 1000;
+  const isObservedAgePlausible =
+    observedAgeMs >= 0 && observedAgeMs <= maxDurationMs;
+
+  // Reconstruct elapsed time when plausible so remounts without cache
+  // continue from the original issuance timeline.
+  const elapsedSeconds = isObservedAgePlausible
+    ? Math.floor(observedAgeMs / 1000)
+    : 0;
+
+  const next = {
+    durationSeconds,
+    startedAtMs: nowMonotonicMs - elapsedSeconds * 1000,
+    expiryMs,
+  };
+
+  durationAnchorCache.set(key, next);
+
+  // Prefer removing expired entries before enforcing size cap.
+  for (const [entryKey, entryValue] of durationAnchorCache.entries()) {
+    if (entryValue.expiryMs <= nowMs) {
+      durationAnchorCache.delete(entryKey);
+    }
+  }
+
+  if (durationAnchorCache.size > DURATION_ANCHOR_CACHE_LIMIT) {
+    const oldestKey = durationAnchorCache.keys().next().value;
+    if (oldestKey) {
+      durationAnchorCache.delete(oldestKey);
+    }
+  }
+
+  return next;
+}
+
 function buildCountdownAnchor(
   expiry?: string | null,
   otpCreatedAt?: string | null,
@@ -46,11 +108,18 @@ function buildCountdownAnchor(
       0,
       Math.ceil((expiryMs - createdMs) / 1000),
     );
+    const cacheKey = getDurationAnchorCacheKey(createdMs, expiryMs);
+    const cachedAnchor = cacheDurationAnchor(
+      cacheKey,
+      durationSeconds,
+      expiryMs,
+      createdMs,
+    );
 
     return {
       mode: "duration",
-      durationSeconds,
-      startedAtMs: getMonotonicNowMs(),
+      durationSeconds: cachedAnchor.durationSeconds,
+      startedAtMs: cachedAnchor.startedAtMs,
     };
   }
 

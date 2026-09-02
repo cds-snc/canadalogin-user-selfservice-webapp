@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
   trackEvent: vi.fn(),
   handleSetUserOtpValue: vi.fn(),
+  setOtpSentResponse: vi.fn(),
   requestOtpCode: vi.fn(async () => true),
   validateOtpCode: vi.fn(async (_otp: string, onSuccess?: () => void) => {
     onSuccess?.();
@@ -92,6 +93,7 @@ vi.mock("../../hooks/useOtpOperations", () => ({
     handleSetUserOtpValue: mocks.handleSetUserOtpValue,
     requestOtpCode: mocks.requestOtpCode,
     validateOtpCode: mocks.validateOtpCode,
+    setOtpSentResponse: mocks.setOtpSentResponse,
     setOtpLoading: vi.fn(),
   }),
 }));
