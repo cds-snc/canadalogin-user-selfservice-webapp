@@ -210,6 +210,7 @@ export default function EditEmailAddressPage() {
   };
 
   const handleBackToEnterEmail = async () => {
+    handleSetUserOtpValue("");
     setErrorCode("");
     setCustomErrorMessage("");
     resetAttempts();
@@ -481,6 +482,7 @@ export default function EditEmailAddressPage() {
           );
         }}
         onBack={() => {
+          handleSetUserOtpValue("");
           const prevStep =
             userPhoneFactors &&
             userPhoneFactors.length === 1 &&

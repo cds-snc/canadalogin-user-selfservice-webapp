@@ -8,6 +8,7 @@ import EditEmailAddressPage from "./EditEmailAddressPage";
 const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
   trackEvent: vi.fn(),
+  handleSetUserOtpValue: vi.fn(),
   requestOtpCode: vi.fn(async () => true),
   validateOtpCode: vi.fn(async (_otp: string, onSuccess?: () => void) => {
     onSuccess?.();
@@ -88,7 +89,7 @@ vi.mock("../../hooks/useOtpOperations", () => ({
     },
     otpLoading: false,
     handleChangeUserMfaSelection: vi.fn(),
-    handleSetUserOtpValue: vi.fn(),
+    handleSetUserOtpValue: mocks.handleSetUserOtpValue,
     requestOtpCode: mocks.requestOtpCode,
     validateOtpCode: mocks.validateOtpCode,
     setOtpLoading: vi.fn(),
@@ -159,12 +160,19 @@ vi.mock("../TransientOtp/components/OtpSelection", () => ({
 vi.mock("../TransientOtp/components/OtpVerification", () => ({
   default: ({
     validateOtpCode,
+    onBack,
   }: {
     validateOtpCode: () => Promise<void | boolean>;
+    onBack: () => void;
   }) => (
-    <button type="button" onClick={() => void validateOtpCode()}>
-      verify account otp
-    </button>
+    <>
+      <button type="button" onClick={() => void validateOtpCode()}>
+        verify account otp
+      </button>
+      <button type="button" onClick={() => onBack()}>
+        choose different method
+      </button>
+    </>
   ),
 }));
 
@@ -246,6 +254,50 @@ describe("EditEmailAddressPage", () => {
     );
 
     expect(mocks.resetAttempts).toHaveBeenCalledTimes(1);
+    expect(
+      await screen.findByRole("button", { name: "submit new email" }),
+    ).toBeInTheDocument();
+  });
+
+  it("clears OTP input when backing out of otp verification", async () => {
+    render(<EditEmailAddressPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "verify password" }));
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "choose different method" }),
+    );
+
+    expect(mocks.handleSetUserOtpValue).toHaveBeenCalledWith("");
+    expect(
+      await screen.findByRole("button", { name: "verify password" }),
+    ).toBeInTheDocument();
+  });
+
+  it("clears OTP input when choosing a different email", async () => {
+    render(<EditEmailAddressPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "verify password" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "verify account otp" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "fill new email" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "submit new email" }),
+    );
+
+    const callsBeforeBack = mocks.handleSetUserOtpValue.mock.calls.length;
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "use a different email" }),
+    );
+
+    expect(mocks.handleSetUserOtpValue.mock.calls.length).toBe(
+      callsBeforeBack + 1,
+    );
+    expect(mocks.handleSetUserOtpValue).toHaveBeenLastCalledWith("");
     expect(
       await screen.findByRole("button", { name: "submit new email" }),
     ).toBeInTheDocument();
