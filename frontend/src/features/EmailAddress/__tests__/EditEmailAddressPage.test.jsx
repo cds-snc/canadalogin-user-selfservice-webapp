@@ -898,6 +898,67 @@ describe("EditEmailAddressPage Integration Tests", () => {
       expect(screen.getByTestId("email-confirm-update")).toBeInTheDocument();
     });
 
+    it("maps upstream 409 conflict responses to email_already_associated", async () => {
+      const { authService } = await import("../../../services/authService");
+      authService.update_email_with_otp.mockRejectedValue({
+        status: 502,
+        data: {
+          message:
+            "Upstream service returned the following HTTP status code: 409.",
+        },
+      });
+
+      renderComponent();
+
+      // Navigate to confirm step
+      await act(async () => {
+        const validateBtn = screen.getByTestId("validate-password-btn");
+        fireEvent.click(validateBtn);
+      });
+
+      await act(async () => {
+        const nextBtn = screen.getByTestId("otp-next-btn");
+        fireEvent.click(nextBtn);
+      });
+
+      await act(async () => {
+        const verifyBtn = screen.getByTestId("verify-otp-btn");
+        fireEvent.click(verifyBtn);
+      });
+
+      const emailInput = screen.getByTestId("email-input");
+      await act(async () => {
+        fireEvent.change(emailInput, {
+          target: { value: "duplicate@example.com" },
+        });
+      });
+
+      await act(async () => {
+        const submitBtn = screen.getByTestId("submit-email-btn");
+        fireEvent.click(submitBtn);
+      });
+
+      await act(async () => {
+        const submitOtpBtn = screen.getByTestId("submit-email-otp-btn");
+        fireEvent.click(submitOtpBtn);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("email-confirm-update")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        const confirmBtn = screen.getByTestId("confirm-update-btn");
+        fireEvent.click(confirmBtn);
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({ error: "email_already_associated" }),
+        );
+      });
+    });
+
     it("handles logout errors in handleSignOut", async () => {
       const { authService } = await import("../../../services/authService");
       authService.logout.mockRejectedValue(new Error("Logout failed"));

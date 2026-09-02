@@ -86,12 +86,54 @@ const getEmailValidationErrorCode = (email: string): string | null => {
 };
 
 type CaughtError = {
+  status?: number;
   data?: {
     message?: string;
     created?: string;
     expiry?: string;
     trxnId?: string;
   };
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+      created?: string;
+      expiry?: string;
+      trxnId?: string;
+    };
+  };
+};
+
+const EXISTING_EMAIL_CONFLICT_ERROR_CODE = "email_already_associated";
+const UPSTREAM_HTTP_STATUS_CODE_REGEX = /status code:\s*(\d{3})/i;
+
+const getUpstreamStatusCodeFromMessage = (
+  message: string | undefined,
+): number | null => {
+  if (!message) {
+    return null;
+  }
+
+  const match = message.match(UPSTREAM_HTTP_STATUS_CODE_REGEX);
+  if (!match?.[1]) {
+    return null;
+  }
+
+  const parsedStatusCode = Number.parseInt(match[1], 10);
+  return Number.isNaN(parsedStatusCode) ? null : parsedStatusCode;
+};
+
+const resolveEmailUpdateErrorCode = (error: CaughtError): string => {
+  const payload = error?.data ?? error?.response?.data;
+  const message = payload?.message ?? "";
+  const directStatusCode = error?.status ?? error?.response?.status;
+  const upstreamStatusCode = getUpstreamStatusCodeFromMessage(message);
+
+  if (directStatusCode === 409 || upstreamStatusCode === 409) {
+    return EXISTING_EMAIL_CONFLICT_ERROR_CODE;
+  }
+
+  return message || "FAILED_TO_UPDATE_EMAIL";
 };
 
 export default function EditEmailAddressPage() {
@@ -363,15 +405,16 @@ export default function EditEmailAddressPage() {
     } catch (error) {
       console.error("Error updating email address with OTP:", error);
       const apiError = error as CaughtError;
+      const apiErrorPayload = apiError?.data ?? apiError?.response?.data;
       setOtpSentResponse((prev) =>
         mergeOtpSentResponseWithMetadata(prev, {
-          created: apiError?.data?.created,
-          expiry: apiError?.data?.expiry,
-          trxnId: apiError?.data?.trxnId,
+          created: apiErrorPayload?.created,
+          expiry: apiErrorPayload?.expiry,
+          trxnId: apiErrorPayload?.trxnId,
         }),
       );
 
-      const message = apiError?.data?.message ?? "FAILED_TO_UPDATE_EMAIL";
+      const message = resolveEmailUpdateErrorCode(apiError);
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
