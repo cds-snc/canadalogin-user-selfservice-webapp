@@ -11,7 +11,10 @@ import {
 
 import { useTranslation } from "react-i18next";
 import parsePhoneNumberFromString from "libphonenumber-js";
-import { getGcAccountDirectoryLink } from "../../../utils/externalLinks";
+import {
+  getGcAccountDirectoryLink,
+  getParticipatingServicesLink,
+} from "../../../utils/externalLinks";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import type { ContactPhoneSuccessProps } from "../../../types/contactPhoneNumber";
 
@@ -23,6 +26,7 @@ export default function SuccessfullyUpdated({
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
   const gcAccountDirectoryLink = getGcAccountDirectoryLink(routeLanguage);
+  const participatingServicesLink = getParticipatingServicesLink(routeLanguage);
   const { t } = useTranslation("phone");
 
   const displayPhoneNumber = (() => {
@@ -102,7 +106,7 @@ export default function SuccessfullyUpdated({
           </GcdsText>
           <GcdsText>
             {t("SuccessfullyUpdatedContactPhoneNumber.servicesLinkLead")}{" "}
-            <GcdsLink href={gcAccountDirectoryLink} target="_blank">
+            <GcdsLink href={participatingServicesLink} target="_blank">
               {t("SuccessfullyUpdatedContactPhoneNumber.servicesLinkText")}
             </GcdsLink>{" "}
             {t("SuccessfullyUpdatedContactPhoneNumber.servicesLinkSuffix")}

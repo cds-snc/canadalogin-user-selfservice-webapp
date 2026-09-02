@@ -56,7 +56,9 @@
     "gcAccountDirectory": "répertoire des comptes du gouvernement du Canada",
     "syncNoticeTitle": "Vous pourriez avoir à synchroniser cette mise à jour",
     "syncNoticeDescription": "Pour synchroniser la mise à jour de votre adresse courriel pour votre identifiant ConnexionCanada et les services qui y sont liés, connectez-vous à chaque service individuellement.",
-    "servicesLinkText": "Vous trouverez ici les liens vers tous les services auxquels vous pouvez accéder à l'aide de votre identifiant ConnexionCanada",
+    "servicesLinkLead": "Vous trouverez ici les liens de tous",
+    "servicesLinkText": "les services auxquels vous pouvez accéder à l'aide de votre identifiant ConnexionCanada",
+    "servicesLinkSuffix": ".",
     "period": ".",
     "backToProfile": "Retour au profil",
     "signOut": "Se déconnecter"
