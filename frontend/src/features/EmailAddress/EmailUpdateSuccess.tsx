@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { EXTERNAL_NAVIGATION_LINKS } from "../../utils/constants";
+import { getGcAccountDirectoryLink } from "../../utils/externalLinks";
 import {
   GcdsContainer,
   GcdsHeading,
@@ -24,6 +24,8 @@ export default function EmailUpdateSuccess({
   onSignOut,
 }: EmailUpdateSuccessProps) {
   const { language = "en" } = useParams<{ language?: string }>();
+  const routeLanguage = language === "fr" ? "fr" : "en";
+  const gcAccountDirectoryLink = getGcAccountDirectoryLink(routeLanguage);
   const { t } = useTranslation("email");
 
   return (
@@ -60,10 +62,7 @@ export default function EmailUpdateSuccess({
 
         <GcdsText marginBottom="300" lang={language}>
           {t("EmailUpdateSuccess.searchOtherAccounts")}{" "}
-          <GcdsLink
-            href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
-            target="_blank"
-          >
+          <GcdsLink href={gcAccountDirectoryLink} target="_blank">
             {t("EmailUpdateSuccess.gcAccountDirectory")}
           </GcdsLink>
           {t("EmailUpdateSuccess.period")}
@@ -77,10 +76,7 @@ export default function EmailUpdateSuccess({
         >
           <GcdsText>{t("EmailUpdateSuccess.syncNoticeDescription")}</GcdsText>
           <GcdsText>
-            <GcdsLink
-              href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
-              target="_blank"
-            >
+            <GcdsLink href={gcAccountDirectoryLink} target="_blank">
               {t("EmailUpdateSuccess.servicesLinkText")}
             </GcdsLink>
           </GcdsText>

@@ -10,7 +10,7 @@ import {
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
-import { EXTERNAL_NAVIGATION_LINKS } from "../../../utils/constants";
+import { getGcAccountDirectoryLink } from "../../../utils/externalLinks";
 import { useUser } from "../../../components/Providers/useUser";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
@@ -27,6 +27,7 @@ export default function SuccessfullyUpdated({
 }: ProfileNameSuccessProps) {
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
+  const gcAccountDirectoryLink = getGcAccountDirectoryLink(routeLanguage);
 
   const { dispatch } = useUser();
   const { t } = useTranslation("profile");
@@ -87,10 +88,7 @@ export default function SuccessfullyUpdated({
         <GcdsText>{t("ProfileUpdateNameSuccess.notConnectedNotice")}</GcdsText>
         <GcdsText>
           {t("ProfileUpdateNameSuccess.searchOtherAccounts")}{" "}
-          <GcdsLink
-            href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
-            target="_blank"
-          >
+          <GcdsLink href={gcAccountDirectoryLink} target="_blank">
             {t("ProfileUpdateNameSuccess.gcAccountDirectory")}
           </GcdsLink>
           .
@@ -106,10 +104,7 @@ export default function SuccessfullyUpdated({
           </GcdsText>
           <GcdsText>
             {t("ProfileUpdateNameSuccess.servicesLinkLead")}{" "}
-            <GcdsLink
-              href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
-              target="_blank"
-            >
+            <GcdsLink href={gcAccountDirectoryLink} target="_blank">
               {t("ProfileUpdateNameSuccess.servicesLinkText")}
             </GcdsLink>{" "}
             {t("ProfileUpdateNameSuccess.servicesLinkSuffix")}
