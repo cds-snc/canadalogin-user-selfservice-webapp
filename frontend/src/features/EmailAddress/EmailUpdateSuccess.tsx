@@ -1,6 +1,9 @@
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { getGcAccountDirectoryLink } from "../../utils/externalLinks";
+import {
+  getGcAccountDirectoryLink,
+  getParticipatingServicesLink,
+} from "../../utils/externalLinks";
 import {
   GcdsContainer,
   GcdsHeading,
@@ -26,6 +29,7 @@ export default function EmailUpdateSuccess({
   const { language = "en" } = useParams<{ language?: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
   const gcAccountDirectoryLink = getGcAccountDirectoryLink(routeLanguage);
+  const participatingServicesLink = getParticipatingServicesLink(routeLanguage);
   const { t } = useTranslation("email");
 
   return (
@@ -76,9 +80,11 @@ export default function EmailUpdateSuccess({
         >
           <GcdsText>{t("EmailUpdateSuccess.syncNoticeDescription")}</GcdsText>
           <GcdsText>
-            <GcdsLink href={gcAccountDirectoryLink} target="_blank">
+            {t("EmailUpdateSuccess.servicesLinkLead")}{" "}
+            <GcdsLink href={participatingServicesLink} target="_blank">
               {t("EmailUpdateSuccess.servicesLinkText")}
             </GcdsLink>
+            {t("EmailUpdateSuccess.servicesLinkSuffix")}
           </GcdsText>
         </GcdsNotice>
 

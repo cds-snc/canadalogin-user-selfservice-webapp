@@ -128,6 +128,10 @@ vi.mock("../../../utils/constants", () => ({
   EXTERNAL_NAVIGATION_LINKS: {
     gcAccountDirectory:
       "https://www.canada.ca/en/government/sign-in-online-account.html",
+    participatingServices:
+      "https://login.canada.ca/en/users/what-is-canadalogin/participating-services/",
+    participatingServicesFR:
+      "https://connexion.canada.ca/fr/utilisateurs/a-propos/services-participants/",
   },
 }));
 

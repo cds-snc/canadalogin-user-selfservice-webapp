@@ -27,6 +27,10 @@ vi.mock("../../../utils/constants", () => ({
   },
   EXTERNAL_NAVIGATION_LINKS: {
     gcAccountDirectory: "https://account.gc.ca",
+    participatingServices:
+      "https://login.canada.ca/en/users/what-is-canadalogin/participating-services/",
+    participatingServicesFR:
+      "https://connexion.canada.ca/fr/utilisateurs/a-propos/services-participants/",
   },
 }));
 
@@ -298,29 +302,25 @@ describe("EmailUpdateSuccess", () => {
       const links = screen.getAllByTestId("gcds-link");
       expect(links.length).toBeGreaterThanOrEqual(2);
       expect(links[0]).toHaveAttribute("href", "https://account.gc.ca");
-      expect(links[1]).toHaveAttribute("href", "https://account.gc.ca");
+      expect(links[1]).toHaveAttribute(
+        "href",
+        "https://login.canada.ca/en/users/what-is-canadalogin/participating-services/",
+      );
       expect(
         screen.getByText("Government of Canada account directory"),
       ).toBeInTheDocument();
     });
 
-    it("handles link with different href", () => {
-      // Test with a mock to change the constants
-      vi.doMock("../../../utils/constants", () => ({
-        PAGES: {
-          emailUpdateSuccess: "EmailUpdateSuccess",
-        },
-        EXTERNAL_NAVIGATION_LINKS: {
-          gcAccountDirectory: "https://test-account.gc.ca",
-        },
-      }));
-
+    it("uses French participating services URL when language is fr", () => {
+      mockUseParams.mockReturnValue({ language: "fr" });
       renderComponent();
 
       const links = screen.getAllByTestId("gcds-link");
-      links.forEach((link) => {
-        expect(link).toHaveAttribute("href", "https://account.gc.ca");
-      });
+      expect(links[0]).toHaveAttribute("href", "https://account.gc.ca");
+      expect(links[1]).toHaveAttribute(
+        "href",
+        "https://connexion.canada.ca/fr/utilisateurs/a-propos/services-participants/",
+      );
     });
   });
 

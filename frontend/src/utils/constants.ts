@@ -45,6 +45,10 @@ export const EXTERNAL_NAVIGATION_LINKS = {
     "https://www.canada.ca/en/government/sign-in-online-account.html",
   gcAccountDirectoryFR:
     "https://www.canada.ca/fr/gouvernement/ouvrir-session-dossier-compte-en-ligne.html",
+  participatingServices:
+    "https://login.canada.ca/en/users/what-is-canadalogin/participating-services/",
+  participatingServicesFR:
+    "https://connexion.canada.ca/fr/utilisateurs/a-propos/services-participants/",
   CanadaLoginWebsiteProdDomainEN: "https://login.canada.ca/en",
   CanadaLoginWebsiteProdDomainFR: "https://connexion.canada.ca/fr",
 } as const;
