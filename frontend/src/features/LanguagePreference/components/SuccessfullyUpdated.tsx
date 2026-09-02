@@ -10,10 +10,8 @@ import {
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
-import {
-  EXTERNAL_NAVIGATION_LINKS,
-  LANGUAGE_DISPLAY_NAMES,
-} from "../../../utils/constants";
+import { LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
+import { getGcAccountDirectoryLink } from "../../../utils/externalLinks";
 import { useUser } from "../../../components/Providers/useUser";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { authService } from "../../../services/authService";
@@ -30,6 +28,7 @@ export default function SuccessfullyUpdated({
 }: LanguagePreferenceSuccessProps) {
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
+  const gcAccountDirectoryLink = getGcAccountDirectoryLink(routeLanguage);
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
   const { t } = useTranslation("language");
@@ -102,10 +101,7 @@ export default function SuccessfullyUpdated({
         </GcdsText>
         <GcdsText>
           {t("SuccessfullyUpdatedLanguage.searchOtherAccounts")}{" "}
-          <GcdsLink
-            href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
-            target="_blank"
-          >
+          <GcdsLink href={gcAccountDirectoryLink} target="_blank">
             {t("SuccessfullyUpdatedLanguage.gcAccountDirectory")}
           </GcdsLink>
           .
@@ -121,10 +117,7 @@ export default function SuccessfullyUpdated({
           </GcdsText>
           <GcdsText>
             {t("SuccessfullyUpdatedLanguage.servicesLinkLead")}{" "}
-            <GcdsLink
-              href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
-              target="_blank"
-            >
+            <GcdsLink href={gcAccountDirectoryLink} target="_blank">
               {t("SuccessfullyUpdatedLanguage.servicesLinkText")}
             </GcdsLink>{" "}
             {t("SuccessfullyUpdatedLanguage.servicesLinkSuffix")}

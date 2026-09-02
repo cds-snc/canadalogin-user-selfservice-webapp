@@ -43,6 +43,8 @@ export const LANGUAGE_DISPLAY_NAMES = {
 export const EXTERNAL_NAVIGATION_LINKS = {
   gcAccountDirectory:
     "https://www.canada.ca/en/government/sign-in-online-account.html",
+  gcAccountDirectoryFR:
+    "https://www.canada.ca/fr/gouvernement/ouvrir-session-dossier-compte-en-ligne.html",
   CanadaLoginWebsiteProdDomainEN: "https://login.canada.ca/en",
   CanadaLoginWebsiteProdDomainFR: "https://connexion.canada.ca/fr",
 } as const;

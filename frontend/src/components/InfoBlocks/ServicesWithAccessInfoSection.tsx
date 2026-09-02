@@ -1,9 +1,7 @@
 import { GcdsDetails, GcdsText, GcdsLink } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
-import {
-  EXTERNAL_NAVIGATION_LINKS,
-  ServicesWithAccessInfoSectionInformation,
-} from "../../utils/constants";
+import { ServicesWithAccessInfoSectionInformation } from "../../utils/constants";
+import { getGcAccountDirectoryLink } from "../../utils/externalLinks";
 
 interface ServicesWithAccessInfoSectionProps {
   currentLang: string;
@@ -11,10 +9,11 @@ interface ServicesWithAccessInfoSectionProps {
 }
 
 export default function ServicesWithAccessInfoSection({
-  currentLang: _currentLang,
+  currentLang,
   information,
 }: ServicesWithAccessInfoSectionProps) {
   const { t } = useTranslation("layout");
+  const gcAccountDirectoryLink = getGcAccountDirectoryLink(currentLang);
   const informationMap: Record<string, string> = {
     [ServicesWithAccessInfoSectionInformation.NAME]: t(
       "ServicesWithAccessInfo.name",
@@ -48,10 +47,7 @@ export default function ServicesWithAccessInfoSection({
       </GcdsText>
       <GcdsText>
         {t("ServicesWithAccessInfo.searchOtherAccounts")}&nbsp;
-        <GcdsLink
-          href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
-          target="_blank"
-        >
+        <GcdsLink href={gcAccountDirectoryLink} target="_blank">
           {t("ServicesWithAccessInfo.gcAccountDirectory")}
         </GcdsLink>
         .
