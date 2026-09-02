@@ -462,6 +462,8 @@ export default function EditEmailAddressPage() {
           return validateOtpCode(
             userOtpValue,
             () => {
+              setCustomErrorMessage("");
+              resetAttempts();
               setWizardStep("enterEmail");
               trackEvent({
                 event: GA_FORM_EVENTS.FORM_STEP_CHANGE,

@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import EditEmailAddressPage from "./EditEmailAddressPage";
 
@@ -233,6 +233,24 @@ vi.mock("./EmailUpdateSuccess", () => ({
 }));
 
 describe("EditEmailAddressPage", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("resets OTP attempts after account OTP verification succeeds", async () => {
+    render(<EditEmailAddressPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "verify password" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "verify account otp" }),
+    );
+
+    expect(mocks.resetAttempts).toHaveBeenCalledTimes(1);
+    expect(
+      await screen.findByRole("button", { name: "submit new email" }),
+    ).toBeInTheDocument();
+  });
+
   it("clears OTP error summary after choosing a different email", async () => {
     render(<EditEmailAddressPage />);
 
