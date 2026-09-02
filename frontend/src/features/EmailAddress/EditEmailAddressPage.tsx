@@ -210,6 +210,9 @@ export default function EditEmailAddressPage() {
   };
 
   const handleBackToEnterEmail = async () => {
+    setErrorCode("");
+    setCustomErrorMessage("");
+    resetAttempts();
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
