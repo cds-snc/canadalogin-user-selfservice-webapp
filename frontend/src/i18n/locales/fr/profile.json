@@ -43,7 +43,7 @@
     "title": "Voulez-vous vraiment modifier votre nom?",
     "requestedUpdate": "Vous avez demandé à remplacer votre nom par le nom suivant :",
     "exampleName": "Exemple: Nouveau nom",
-    "allServicesNotice": "Cette action mettra à jour votre nom pour <bold>tous</bold> les services que vous avez connectés à votre identifiant <bold>ConnexionCanada</bold>.",
+    "allServicesNotice": "Votre nom sera mis à jour auprès de <bold>tous</bold> les services que vous avez liés à <bold>votre identifiant ConnexionCanada</bold>.",
     "headsUp": "Attention",
     "thisText": "Cette action",
     "confirmButton": "Oui, mettre à jour",
