@@ -22,7 +22,7 @@ import {
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
+import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 import {
   getVisitCanadaPostValidation,
@@ -65,7 +65,11 @@ export default function VisitCanadaPost() {
     dateOfBirth: "",
     address: "",
     province: "",
+    cityTown: "",
+    postalCode: "",
   });
+
+  const { relyingPartyName: rpName } = useRelyingPartyInfo();
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isDateOfBirthTouched, setIsDateOfBirthTouched] = useState(false);
   const [showErrorSummary, setShowErrorSummary] = useState(false);
@@ -235,11 +239,9 @@ export default function VisitCanadaPost() {
                 <li>{t("VisitCanadaPost.step1")}</li>
                 <li>{t("VisitCanadaPost.step2")}</li>
                 <li>{t("VisitCanadaPost.step3")}</li>
+                <li>{t("VisitCanadaPost.step4", { rpName })}</li>
               </ol>
             </GcdsText>
-            <AcceptableIdsDetails
-              detailsTitle={t("VisitCanadaPost.listOfIds")}
-            />
           </GcdsContainer>
 
           <GcdsContainer>
@@ -249,6 +251,7 @@ export default function VisitCanadaPost() {
             >
               <GcdsSelect
                 id="selectId"
+                style={{ marginTop: "24px" }}
                 label={t("VisitCanadaPost.selectIdLabel")}
                 hint={t("VisitCanadaPost.idHint")}
                 name="selectId"
@@ -330,6 +333,13 @@ export default function VisitCanadaPost() {
                       onGcdsChange={createChangeHandler("address")}
                     />
 
+                    <GcdsInput
+                      id="city-town-input"
+                      inputId="city-town-input"
+                      name="city-town-input"
+                      label={t("VisitCanadaPost.cityTownLabel")}
+                    />
+
                     <GcdsSelect
                       id="select-province"
                       name="select-province"
@@ -346,6 +356,13 @@ export default function VisitCanadaPost() {
                         </option>
                       ))}
                     </GcdsSelect>
+
+                    <GcdsInput
+                      id="postalcode-input"
+                      inputId="postalcode-input"
+                      name="postalcode-input"
+                      label={t("VisitCanadaPost.postalcodeLabel")}
+                    />
                   </>
                 )}
               </>

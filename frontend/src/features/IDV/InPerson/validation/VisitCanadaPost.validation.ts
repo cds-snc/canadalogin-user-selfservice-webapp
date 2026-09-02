@@ -22,6 +22,8 @@ export interface VisitCanadaPostFormData {
   dateOfBirth: string;
   address: string;
   province: string;
+  cityTown: string;
+  postalCode: string;
 }
 
 export interface VisitCanadaPostSummaryErrorCodes extends InPersonSharedSummaryErrorCodes {
