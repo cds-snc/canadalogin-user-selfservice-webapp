@@ -210,6 +210,10 @@ export default function EditEmailAddressPage() {
   };
 
   const handleBackToEnterEmail = async () => {
+    handleSetUserOtpValue("");
+    setErrorCode("");
+    setCustomErrorMessage("");
+    resetAttempts();
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
@@ -459,6 +463,8 @@ export default function EditEmailAddressPage() {
           return validateOtpCode(
             userOtpValue,
             () => {
+              setCustomErrorMessage("");
+              resetAttempts();
               setWizardStep("enterEmail");
               trackEvent({
                 event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -476,6 +482,7 @@ export default function EditEmailAddressPage() {
           );
         }}
         onBack={() => {
+          handleSetUserOtpValue("");
           const prevStep =
             userPhoneFactors &&
             userPhoneFactors.length === 1 &&
