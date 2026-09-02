@@ -96,6 +96,7 @@ export default function EditEmailEnterEmail({
               onGcdsInput={handleInputChange}
               required
               autoFocus
+              lang={language ?? "en"}
             />
 
             <GcdsGrid columns="max-content max-content" gap="200">
