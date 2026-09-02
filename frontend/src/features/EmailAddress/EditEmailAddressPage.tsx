@@ -24,6 +24,7 @@ import { useFormTracking } from "../../hooks/useFormTracking";
 import { useWizardPageTracking } from "../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../utils/analyticsConstants";
 import { EMAIL_ADDRESS_ANALYTICS } from "../../utils/analyticsConstants";
+import { mergeOtpSentResponseWithMetadata } from "../../utils/otpMetadata";
 import VerifyFIDO2Passkey from "../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 import EditEmailEnterEmail from "./EditEmailEnterEmail";
 import EmailOtpValidation from "./EmailOtpValidation";
@@ -84,7 +85,14 @@ const getEmailValidationErrorCode = (email: string): string | null => {
   return null;
 };
 
-type CaughtError = { data?: { message?: string } };
+type CaughtError = {
+  data?: {
+    message?: string;
+    created?: string;
+    expiry?: string;
+    trxnId?: string;
+  };
+};
 
 export default function EditEmailAddressPage() {
   const [wizardStep, setWizardStep] = useState<WizardStep>(
@@ -189,6 +197,7 @@ export default function EditEmailAddressPage() {
     requestOtpCode,
     validateOtpCode,
     setOtpLoading: setLocalLoading,
+    setOtpSentResponse,
   } = useOtpOperations({
     userId: id,
     userName,
@@ -354,6 +363,14 @@ export default function EditEmailAddressPage() {
     } catch (error) {
       console.error("Error updating email address with OTP:", error);
       const apiError = error as CaughtError;
+      setOtpSentResponse((prev) =>
+        mergeOtpSentResponseWithMetadata(prev, {
+          created: apiError?.data?.created,
+          expiry: apiError?.data?.expiry,
+          trxnId: apiError?.data?.trxnId,
+        }),
+      );
+
       const message = apiError?.data?.message ?? "FAILED_TO_UPDATE_EMAIL";
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,

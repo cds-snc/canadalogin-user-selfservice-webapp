@@ -4,6 +4,10 @@ import { useNavigate } from "react-router";
 import { otpFactors } from "../features/TransientOtp/api/otpFactors";
 import { authService } from "../services/authService";
 import { serverMapping } from "../utils/constants";
+import {
+  extractOtpServerMetadata,
+  mergeOtpSentResponseWithMetadata,
+} from "../utils/otpMetadata";
 import type { AuthServiceError } from "../types/services";
 import type {
   OtpFactor,
@@ -168,9 +172,22 @@ export const useOtpOperations = ({
       // If the error contains retries info, re-throw so OtpVerification
       // can display "X retries remaining" instead of a generic error
       const errObj = err as {
-        response?: { data?: { retries?: number; message?: string } };
+        response?: {
+          data?: {
+            retries?: number;
+            message?: string;
+          };
+        };
       };
-      if (errObj?.response?.data?.retries !== undefined) {
+      const hasRetries =
+        errObj?.response?.data?.retries !== undefined &&
+        errObj?.response?.data?.retries !== null;
+      if (hasRetries) {
+        const metadata = extractOtpServerMetadata(err);
+        setOtpSentResponse((prev) =>
+          mergeOtpSentResponseWithMetadata(prev, metadata),
+        );
+
         throw errObj.response;
       }
 

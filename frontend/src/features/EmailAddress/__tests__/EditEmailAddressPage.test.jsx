@@ -226,6 +226,7 @@ vi.mock("../../../hooks/useOtpOperations", () => ({
         callback({ success: true });
       }
     }),
+    setOtpSentResponse: vi.fn(),
     setOtpLoading: vi.fn(),
   })),
 }));
@@ -654,6 +655,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
             callback({ success: true });
           }
         }),
+        setOtpSentResponse: vi.fn(),
         setOtpLoading: vi.fn(),
       }));
 
@@ -982,6 +984,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
             callback({ success: true });
           }
         }),
+        setOtpSentResponse: vi.fn(),
         setOtpLoading: vi.fn(),
       }));
     });
@@ -1025,6 +1028,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
         validateOtpCode: vi.fn((_otp, _onSuccess, _override, onError) => {
           onError?.("INVALID_OTP_CODE");
         }),
+        setOtpSentResponse: vi.fn(),
         setOtpLoading: vi.fn(),
       }));
 
@@ -1206,6 +1210,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
             callback({ success: true });
           }
         }),
+        setOtpSentResponse: vi.fn(),
         setOtpLoading: vi.fn(),
       }));
     });

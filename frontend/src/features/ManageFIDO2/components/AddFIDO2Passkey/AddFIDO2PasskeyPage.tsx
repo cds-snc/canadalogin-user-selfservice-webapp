@@ -34,6 +34,10 @@ import {
   GA_FORM_EVENTS,
   ADD_PASSKEY_ANALYTICS,
 } from "../../../../utils/analyticsConstants";
+import {
+  extractOtpServerMetadata,
+  mergeOtpSentResponseWithMetadata,
+} from "../../../../utils/otpMetadata";
 
 interface AddFIDO2PasskeyPageProps {
   step?: string;
@@ -96,6 +100,7 @@ export default function AddFIDO2PasskeyPage({
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,
+    setOtpSentResponse,
   } = useOtpOperations({
     userId: id,
     userName,
@@ -334,6 +339,9 @@ export default function AddFIDO2PasskeyPage({
         error: errorMessage || "error_otp_validation_failed",
       });
       if (hasRetries) {
+        setOtpSentResponse((prev) =>
+          mergeOtpSentResponseWithMetadata(prev, extractOtpServerMetadata(err)),
+        );
         throw errData.response;
       }
     }
