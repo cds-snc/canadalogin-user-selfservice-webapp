@@ -3,12 +3,12 @@
   // Prevent the "Commit (No Verify)" shortcut from appearing in the Source Control panel,
   // ensuring black, flake8, and prettier always run via the .githooks/pre-commit hook.
   "git.allowNoVerifyCommit": false,
-  // Python interpreter — use the repo's virtual environment
+  // Python interpreter — use the repo virtual environment where backend deps are installed.
   "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
   // Test Explorer: use pytest, run from repo root so pytest.ini is picked up
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
+  "python.testing.pytestPath": "pytest",
   // Disable capture/cov in Test Explorer runs/debug sessions so prints and breakpoints are reliable.
   // Coverage is still available via explicit terminal commands (see backend/README.md).
   "python.testing.pytestArgs": ["-s", "--no-cov"],
