@@ -57,8 +57,10 @@ ensure-venv:
 	@current_version=$$($(VENV_PYTHON) -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || echo "missing"); \
 	if [ ! -x "$(VENV_PYTHON)" ] || [ "$$current_version" != "3.14" ]; then \
 		echo "Recreating .venv with $(PYTHON) (required Python 3.14)"; \
+		if [ -z "$(VENV)" ] || [ "$(VENV)" = "/" ]; then echo "Refusing to delete unsafe VENV path: $(VENV)" >&2; exit 1; fi; \
 		rm -rf "$(VENV)"; \
 		$(PYTHON) -m venv "$(VENV)"; \
+
 	fi
 
 install-python: ensure-venv
