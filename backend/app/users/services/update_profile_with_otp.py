@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from fastapi import HTTPException, status, Request
 
 from app.config import get_configuration
+from app.constants.verify_endpoints import VerifyAPIEndpoint
 from app.otp.schemas import OtpDeletionRequest, OtpEnrollmentRequest, OtpType
 from app.otp.services.delete_mfa_otp import dispatch_otp_deletion
 from app.otp.services.enroll_mfa_otp import (
@@ -26,7 +27,7 @@ from app.users.services.update_my_profile import (
     sanitize_user_profile_data,
 )
 from app.auth.services.auth_user_session import update_session_user_info
-from app.utils.access_token import get_admin_token
+from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import verify_otp_before_operation
 
 logger = logging.getLogger(__name__)
@@ -37,9 +38,39 @@ NON_ASCII_CHARACTER_REGEX = re.compile(r"[^\x00-\x7F]")
 
 @dataclass
 class EmailMfaSyncContext:
+    normalized_old_email: str
     normalized_new_email: str
     old_email_factor_ids: list[str]
     has_new_email_factor: bool
+
+
+async def _is_email_already_associated(
+    request: Request,
+    normalized_email: str,
+) -> bool:
+    """Check whether the email is already used by any account in IBM Verify."""
+    admin_access_token = await get_admin_token(request.app.state.request_client)
+    headers = get_auth_request_headers(admin_access_token)
+    tenant_url = get_configuration().ibm_verify_config.IBM_VERIFY_TENANT_URL.rstrip("/")
+    users_endpoint = f"{tenant_url}{VerifyAPIEndpoint.USERS.value}"
+
+    response = await request.app.state.request_client.get(
+        users_endpoint,
+        params={"filter": f'userName eq "{normalized_email}"', "count": 1},
+        headers=headers,
+    )
+    response.raise_for_status()
+
+    response_data = response.json()
+    total_results = response_data.get("totalResults")
+    if isinstance(total_results, int):
+        return total_results > 0
+
+    resources = response_data.get("Resources")
+    if isinstance(resources, list):
+        return len(resources) > 0
+
+    return False
 
 
 def _validate_new_email_address(new_email_address: str | None) -> None:
@@ -119,6 +150,7 @@ async def update_profile_with_otp_verification(
 
     email_mfa_sync_context: EmailMfaSyncContext | None = None
     email_mfa_theme = _get_email_mfa_theme()
+    deleted_old_email_mfa_factors = False
 
     if profile_update_data.newEmailAddress:
         email_mfa_sync_context = await _build_email_mfa_sync_context(
@@ -129,12 +161,25 @@ async def update_profile_with_otp_verification(
         )
 
         if email_mfa_sync_context is not None:
+            is_email_already_associated = await _is_email_already_associated(
+                request,
+                email_mfa_sync_context.normalized_new_email,
+            )
+            if is_email_already_associated:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="email_already_associated",
+                )
+
             await _delete_old_email_mfa_factors(
                 request=request,
                 user_access_token=user_access_token,
                 factor_ids=email_mfa_sync_context.old_email_factor_ids,
                 preferred_language=current_profile_response.preferredLanguage,
                 theme_id=email_mfa_theme,
+            )
+            deleted_old_email_mfa_factors = (
+                len(email_mfa_sync_context.old_email_factor_ids) > 0
             )
 
     # Step 3: Build the profile update request based on provided fields
@@ -147,12 +192,33 @@ async def update_profile_with_otp_verification(
     )
 
     # Step 4: Update the profile using the secure update function
-    profile_update_response = await update_profile_for_verified_changes(
-        request, profile_update_request, user_access_token
-    )
+    try:
+        profile_update_response = await update_profile_for_verified_changes(
+            request, profile_update_request, user_access_token
+        )
+    except Exception:
+        if email_mfa_sync_context is not None and deleted_old_email_mfa_factors:
+            await _restore_old_email_mfa_factor_after_failed_update(
+                request=request,
+                user_access_token=user_access_token,
+                user_id=current_profile_response.id,
+                old_email=email_mfa_sync_context.normalized_old_email,
+                preferred_language=current_profile_response.preferredLanguage,
+                theme_id=email_mfa_theme,
+            )
+        raise
 
     if not profile_update_response.success:
         logger.error("Profile update failed after successful OTP verification")
+        if email_mfa_sync_context is not None and deleted_old_email_mfa_factors:
+            await _restore_old_email_mfa_factor_after_failed_update(
+                request=request,
+                user_access_token=user_access_token,
+                user_id=current_profile_response.id,
+                old_email=email_mfa_sync_context.normalized_old_email,
+                preferred_language=current_profile_response.preferredLanguage,
+                theme_id=email_mfa_theme,
+            )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Profile update failed after OTP verification",
@@ -252,6 +318,7 @@ async def _build_email_mfa_sync_context(
             old_email_factor_ids.append(factor.id)
 
     return EmailMfaSyncContext(
+        normalized_old_email=normalized_old_email,
         normalized_new_email=normalized_new_email,
         old_email_factor_ids=old_email_factor_ids,
         has_new_email_factor=has_new_email_factor,
@@ -275,6 +342,35 @@ async def _delete_old_email_mfa_factors(
             user_access_token=user_access_token,
             language=language,
             theme_id=theme_id,
+        )
+
+
+async def _restore_old_email_mfa_factor_after_failed_update(
+    request: Request,
+    user_access_token: str,
+    user_id: str,
+    old_email: str,
+    preferred_language: str | None,
+    theme_id: str | None,
+) -> None:
+    logger.warning(
+        "Profile update failed after old email MFA deletion; attempting to restore old email MFA factor"
+    )
+
+    try:
+        await _enroll_and_validate_new_email_mfa_factor(
+            request=request,
+            user_access_token=user_access_token,
+            user_id=user_id,
+            new_email=old_email,
+            has_new_email_factor=False,
+            preferred_language=preferred_language,
+            theme_id=theme_id,
+        )
+    except Exception as restore_error:
+        logger.exception(
+            "Failed to restore old email MFA factor after profile update failure: %s",
+            str(restore_error),
         )
 
 
