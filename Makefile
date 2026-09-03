@@ -76,9 +76,14 @@ install-dev-python: ensure-venv
 	@$(MAKE) check-runtime-deps
 
 fix-cryptography:
+	@arch=$$(uname -m); \
+	if [ "$$arch" != "arm64" ] && [ "$$arch" != "aarch64" ]; then \
+		echo "Skipping cryptography source rebuild (arch=$$arch)."; \
+		exit 0; \
+	fi
 	@echo "Ensuring cryptography is rebuilt from source for this ARM/Python environment..."
 	@$(VENV_PYTHON) -m pip uninstall -y cryptography >/dev/null 2>&1 || true
-	@PIP_NO_BINARY=cryptography $(VENV_PYTHON) -m pip install --no-cache-dir --no-binary cryptography cryptography==48.0.1
+	@$(VENV_PYTHON) -m pip install --no-cache-dir --no-binary cryptography cryptography==48.0.1
 	@echo "cryptography rebuilt from source successfully."
 
 check-runtime-deps:
