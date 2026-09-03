@@ -184,8 +184,8 @@ class VerificationCreateResponseData(BaseModel):
     state: Optional[str] = None
     correlation: Optional[str] = None
     phoneNumber: Optional[str] = None
-    attempts: Optional[int] = 0
-    retries: Optional[int] = 0
+    attempts: Optional[int] = None
+    retries: Optional[int] = None
 
 
 class OtpVerificationAttemptRequest(BaseModel):

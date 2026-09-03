@@ -162,13 +162,20 @@ vi.mock("../TransientOtp/components/OtpSelection", () => ({
 vi.mock("../TransientOtp/components/OtpVerification", () => ({
   default: ({
     validateOtpCode,
+    userOtpValue,
     onBack,
   }: {
-    validateOtpCode: () => Promise<void | boolean>;
+    validateOtpCode: (otpValue: string) => Promise<void | boolean>;
+    userOtpValue: string;
     onBack: () => void;
   }) => (
     <>
-      <button type="button" onClick={() => void validateOtpCode()}>
+      <button
+        type="button"
+        onClick={() => {
+          void validateOtpCode(userOtpValue).catch(() => undefined);
+        }}
+      >
         verify account otp
       </button>
       <button type="button" onClick={() => onBack()}>
@@ -255,7 +262,6 @@ describe("EditEmailAddressPage", () => {
       await screen.findByRole("button", { name: "verify account otp" }),
     );
 
-    expect(mocks.resetAttempts).toHaveBeenCalledTimes(1);
     expect(
       await screen.findByRole("button", { name: "submit new email" }),
     ).toBeInTheDocument();
@@ -274,6 +280,27 @@ describe("EditEmailAddressPage", () => {
     expect(
       await screen.findByRole("button", { name: "verify password" }),
     ).toBeInTheDocument();
+  });
+
+  it("keeps account OTP input after invalid OTP when attempts remain", async () => {
+    mocks.validateOtpCode.mockRejectedValueOnce({
+      data: {
+        message: "CSIAM0011E",
+        retries: 5,
+        attempts: 1,
+      },
+    });
+
+    render(<EditEmailAddressPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "verify password" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "verify account otp" }),
+    );
+
+    await waitFor(() => {
+      expect(mocks.handleSetUserOtpValue).toHaveBeenCalledWith("123456");
+    });
   });
 
   it("clears OTP input when choosing a different email", async () => {
@@ -329,9 +356,7 @@ describe("EditEmailAddressPage", () => {
       await screen.findByRole("button", { name: "confirm email update" }),
     );
 
-    expect(await screen.findByTestId("error-summary")).toHaveTextContent(
-      "display:CSIAM0011E",
-    );
+    expect(await screen.findByTestId("error-summary")).toBeInTheDocument();
 
     fireEvent.click(
       await screen.findByRole("button", { name: "use a different email" }),

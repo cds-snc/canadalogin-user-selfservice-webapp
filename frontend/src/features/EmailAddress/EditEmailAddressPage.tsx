@@ -10,7 +10,6 @@ import {
 } from "../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../utils/errorUtils";
-import { useOtpAttemptTracking } from "../../hooks/useOtpAttemptTracking";
 import PasswordVerification from "../TransientOtp/components/PasswordVerification";
 import OtpSelection from "../TransientOtp/components/OtpSelection";
 import OtpVerification from "../TransientOtp/components/OtpVerification";
@@ -92,6 +91,8 @@ type CaughtError = {
     created?: string;
     expiry?: string;
     trxnId?: string;
+    attempts?: number;
+    retries?: number;
   };
   response?: {
     status?: number;
@@ -100,8 +101,29 @@ type CaughtError = {
       created?: string;
       expiry?: string;
       trxnId?: string;
+      attempts?: number;
+      retries?: number;
     };
   };
+};
+
+const hasRemainingOtpAttempts = (payload?: {
+  retries?: number;
+  attempts?: number;
+}): boolean => {
+  const retries = payload?.retries;
+  const attempts = payload?.attempts;
+
+  if (
+    retries === undefined ||
+    retries === null ||
+    attempts === undefined ||
+    attempts === null
+  ) {
+    return false;
+  }
+
+  return retries - attempts > 0;
 };
 
 const EXISTING_EMAIL_CONFLICT_ERROR_CODE = "email_already_associated";
@@ -144,6 +166,8 @@ export default function EditEmailAddressPage() {
   const [userPasswordValue, setUserPasswordValue] = useState("");
   const [selected2FAPasskey, setSelected2FAPasskey] =
     useState<Fido2Credential | null>(null);
+  const [isEmailOtpMaxAttemptsReached, setIsEmailOtpMaxAttemptsReached] =
+    useState(false);
   const [formData, setFormData] = useState<EmailFormData>({
     emailAddress: "",
   });
@@ -264,7 +288,7 @@ export default function EditEmailAddressPage() {
     handleSetUserOtpValue("");
     setErrorCode("");
     setCustomErrorMessage("");
-    resetAttempts();
+    setIsEmailOtpMaxAttemptsReached(false);
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
@@ -370,6 +394,7 @@ export default function EditEmailAddressPage() {
 
       if (!userOtpValue || !otpSentResponse?.trxnId) {
         setErrorCode("OTP_VERIFICATION_REQUIRED");
+        setIsEmailOtpMaxAttemptsReached(false);
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
@@ -389,6 +414,8 @@ export default function EditEmailAddressPage() {
         updateProfileSuccess(
           response.data as Parameters<typeof updateProfileSuccess>[0],
         );
+        setIsEmailOtpMaxAttemptsReached(false);
+        setCustomErrorMessage("");
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
           step: EMAIL_ADDRESS_ANALYTICS.STEPS.SUCCESS,
@@ -415,6 +442,31 @@ export default function EditEmailAddressPage() {
       );
 
       const message = resolveEmailUpdateErrorCode(apiError);
+      const retries = apiErrorPayload?.retries;
+      const attempts = apiErrorPayload?.attempts;
+
+      setIsEmailOtpMaxAttemptsReached(false);
+      setCustomErrorMessage("");
+
+      if (
+        retries !== undefined &&
+        retries !== null &&
+        attempts !== undefined &&
+        attempts !== null
+      ) {
+        const remaining = retries - attempts;
+        const isMaxAttemptsReached = remaining <= 0;
+        setIsEmailOtpMaxAttemptsReached(isMaxAttemptsReached);
+        setCustomErrorMessage(
+          isMaxAttemptsReached
+            ? t("Error.otp_max_attempts", { ns: "common" })
+            : t("Error.otp_invalid_attempts", {
+                ns: "common",
+                count: remaining,
+              }),
+        );
+      }
+
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
@@ -435,11 +487,13 @@ export default function EditEmailAddressPage() {
   };
 
   const [customErrorMessage, setCustomErrorMessage] = useState("");
-  const errorMessage =
+  const otpDisplayError =
     customErrorMessage || getErrorMessage(language, errorCode);
-  const { getDisplayError, resetAttempts, isMaxAttemptsReached } =
-    useOtpAttemptTracking(errorCode);
-  const otpDisplayError = getDisplayError(errorMessage);
+  const errorMessage = otpDisplayError;
+
+  const resetOtpAttemptState = () => {
+    setIsEmailOtpMaxAttemptsReached(false);
+  };
 
   const steps: Record<WizardStep, React.ReactElement> = {
     passwordVerification: (
@@ -516,7 +570,7 @@ export default function EditEmailAddressPage() {
           });
           return requestOtpCode();
         }}
-        validateOtpCode={() => {
+        validateOtpCode={(otpValue) => {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
@@ -524,10 +578,10 @@ export default function EditEmailAddressPage() {
             type: userSelectedMfaFactor?.type,
           });
           return validateOtpCode(
-            userOtpValue,
+            otpValue,
             () => {
               setCustomErrorMessage("");
-              resetAttempts();
+              resetOtpAttemptState();
               setWizardStep("enterEmail");
               trackEvent({
                 event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -542,7 +596,16 @@ export default function EditEmailAddressPage() {
                 error: message,
               });
             },
-          );
+          ).catch((error: unknown) => {
+            const apiError = error as CaughtError;
+            const payload = apiError?.data ?? apiError?.response?.data;
+
+            if (hasRemainingOtpAttempts(payload)) {
+              handleSetUserOtpValue(otpValue);
+            }
+
+            throw error;
+          });
         }}
         onBack={() => {
           handleSetUserOtpValue("");
@@ -614,6 +677,8 @@ export default function EditEmailAddressPage() {
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
             flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
           });
+          setIsEmailOtpMaxAttemptsReached(false);
+          setCustomErrorMessage("");
           return requestOtpCode({
             otpType: FLOW_TYPES.email,
             destination: formData.emailAddress,
@@ -622,8 +687,8 @@ export default function EditEmailAddressPage() {
         otpExpiry={otpSentResponse?.expiry}
         otpCreatedAt={otpSentResponse?.created}
         onBack={handleBackToEnterEmail}
-        isMaxAttemptsReached={isMaxAttemptsReached}
-        resetAttempts={resetAttempts}
+        isMaxAttemptsReached={isEmailOtpMaxAttemptsReached}
+        resetAttempts={resetOtpAttemptState}
       />
     ),
     emailConfirmUpdate: (
