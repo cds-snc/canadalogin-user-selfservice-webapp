@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.32.0...v1.32.1) (2026-09-03)
+
+
+### Bug Fixes
+
+* manage app changeemail server error displayed when user enters an existing email address ([#2080](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2080)) ([f8053ae](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f8053ae66e03f4c9d35ce16c2f6d782f2a53b42f))
+
 ## [1.32.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.31.0...v1.32.0) (2026-09-02)
 
 
