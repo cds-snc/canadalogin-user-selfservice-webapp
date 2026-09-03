@@ -577,26 +577,7 @@ export default function EditEmailAddressPage() {
             flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
             type: userSelectedMfaFactor?.type,
           });
-          return validateOtpCode(
-            otpValue,
-            () => {
-              setCustomErrorMessage("");
-              resetOtpAttemptState();
-              setWizardStep("enterEmail");
-              trackEvent({
-                event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-                step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
-              });
-            },
-            undefined,
-            (message) => {
-              trackEvent({
-                event: GA_FORM_EVENTS.FORM_STEP_END,
-                step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
-                error: message,
-              });
-            },
-          ).catch((error: unknown) => {
+          const handleOtpValidationError = (error: unknown) => {
             const apiError = error as CaughtError;
             const payload = apiError?.data ?? apiError?.response?.data;
 
@@ -604,8 +585,37 @@ export default function EditEmailAddressPage() {
               handleSetUserOtpValue(otpValue);
             }
 
-            throw error;
-          });
+            return Promise.reject(error);
+          };
+
+          try {
+            const validationResult = validateOtpCode(
+              otpValue,
+              () => {
+                setCustomErrorMessage("");
+                resetOtpAttemptState();
+                setWizardStep("enterEmail");
+                trackEvent({
+                  event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+                  step: EMAIL_ADDRESS_ANALYTICS.STEPS.ENTER_EMAIL,
+                });
+              },
+              undefined,
+              (message) => {
+                trackEvent({
+                  event: GA_FORM_EVENTS.FORM_STEP_END,
+                  step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
+                  error: message,
+                });
+              },
+            );
+
+            return Promise.resolve(validationResult).catch(
+              handleOtpValidationError,
+            );
+          } catch (error) {
+            return handleOtpValidationError(error);
+          }
         }}
         onBack={() => {
           handleSetUserOtpValue("");
