@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.32.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.31.0...v1.32.0) (2026-09-02)
+
+
+### Features
+
+* Add participating services link to various components and update translations ([#2072](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2072)) ([1e31e6e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1e31e6e7095e16626badef0e1f2cc2f8c0e76a5f))
+* Enhance email MFA handling with theme ID support ([#2047](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2047)) ([274265d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/274265d3d0e50d7488cdeefa37147096e1563733))
+* Implement OTP metadata handling for better error responses and countdown management ([#2062](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2062)) ([f5bdfa5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f5bdfa5f0a4f671f30cb71c649c616d3fe57340b))
+* Update external links to use dynamic GC account directory URLs based on language preference ([#2061](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2061)) ([2c22686](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2c22686a4e999eb454b61d1c54494b4c220048ec))
+
+
+### Bug Fixes
+
+* **EditEmailAddressPage:** clear error messages and reset attempts on navigating back to email entry ([#2059](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2059)) ([6e01859](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6e01859ec43ecc05dea51fb3b15d59dd8e0f1c01))
+* **EditEmailEnterEmail:** add language attribute to input for accessibility ([#2067](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2067)) ([7a3955d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7a3955dbd27710294dbff5eef30faafe5f8642be))
+* **email:** allow passkey-only users to continue without phone MFA factors ([#2033](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2033)) ([6dbe97b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6dbe97bad09ce4b91c60722000488a84cb5777a2))
+* **ErrorSummaryWithFocus:** enhance error link functionality to focus and scroll to linked elements on click or custom event ([#2039](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2039)) ([5765bcd](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5765bcd7ff6db7a82e970160a05034c936096d23))
+* Fix Phone Number Validation and Accessible Label Issues ([#2064](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2064)) ([ec97559](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ec97559427e2ed1a6d0d0a5cc2197f14a9158574))
+* Handle existing email conflict error and update error messages for clarity ([#2065](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2065)) ([f8a8685](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f8a8685a2465d7126cc33686f81a8b7fb676b9ba))
+* **ProfileUpdateNameConfirmUpdate:** update wording for clarity in name change notice ([#2060](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2060)) ([3999c74](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3999c748c9ffa75152d6536cb2402ab87193d34b))
+
+
+### Code Refactoring
+
+* **identity-verification:** Content changes to "Get ready to visit a Canad Post Location" page ([519bb6e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/519bb6ebc47858f88261ae7cd6be00cea7e48fd0))
+* **identity-verification:** Content changes to "Get ready to visit a Canada Post Location" page ([#2041](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2041)) ([519bb6e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/519bb6ebc47858f88261ae7cd6be00cea7e48fd0))
+* **identity-verification:** Content changes to "Prove your identity when you're ready" page EN + FR ([#2020](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2020)) ([b820055](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b820055726196f87149e9c7c5f37585ec99cd342))
+
 ## [1.31.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.30.0...v1.31.0) (2026-08-31)
 
 
