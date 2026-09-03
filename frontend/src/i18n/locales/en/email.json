@@ -56,7 +56,9 @@
     "gcAccountDirectory": "Government of Canada account directory",
     "syncNoticeTitle": "You may need to sync this update",
     "syncNoticeDescription": "To sync your updated email address from your CanadaLogin profile to your connected services, sign in to each service individually.",
-    "servicesLinkText": "You can find links to all services that can be accessed using your CanadaLogin",
+    "servicesLinkLead": "You can find links to all",
+    "servicesLinkText": "services that can be accessed using your CanadaLogin",
+    "servicesLinkSuffix": " here.",
     "period": ".",
     "backToProfile": "Back to profile",
     "signOut": "Sign out"

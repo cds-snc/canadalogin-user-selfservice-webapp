@@ -11,7 +11,10 @@ import {
 
 import { useTranslation } from "react-i18next";
 import { LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
-import { getGcAccountDirectoryLink } from "../../../utils/externalLinks";
+import {
+  getGcAccountDirectoryLink,
+  getParticipatingServicesLink,
+} from "../../../utils/externalLinks";
 import { useUser } from "../../../components/Providers/useUser";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
 import { authService } from "../../../services/authService";
@@ -29,6 +32,7 @@ export default function SuccessfullyUpdated({
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
   const gcAccountDirectoryLink = getGcAccountDirectoryLink(routeLanguage);
+  const participatingServicesLink = getParticipatingServicesLink(routeLanguage);
   const { state, dispatch } = useUser();
   const { setLoading } = userProfileDispatch(dispatch);
   const { t } = useTranslation("language");
@@ -117,7 +121,7 @@ export default function SuccessfullyUpdated({
           </GcdsText>
           <GcdsText>
             {t("SuccessfullyUpdatedLanguage.servicesLinkLead")}{" "}
-            <GcdsLink href={gcAccountDirectoryLink} target="_blank">
+            <GcdsLink href={participatingServicesLink} target="_blank">
               {t("SuccessfullyUpdatedLanguage.servicesLinkText")}
             </GcdsLink>{" "}
             {t("SuccessfullyUpdatedLanguage.servicesLinkSuffix")}
