@@ -421,11 +421,14 @@ export default function EditEmailAddressPage() {
         error: message,
       });
       setErrorCode(message);
-      if (
+
+      const shouldNavigateBackToEmailOtpValidation =
+        message === EXISTING_EMAIL_CONFLICT_ERROR_CODE ||
         (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
-          apiError?.data?.message ?? "",
-        )
-      ) {
+          apiErrorPayload?.message ?? "",
+        );
+
+      if (shouldNavigateBackToEmailOtpValidation) {
         setWizardStep("emailOtpValidation");
       }
     }

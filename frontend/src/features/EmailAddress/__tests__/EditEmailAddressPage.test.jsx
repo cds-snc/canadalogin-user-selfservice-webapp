@@ -957,6 +957,10 @@ describe("EditEmailAddressPage Integration Tests", () => {
           expect.objectContaining({ error: "email_already_associated" }),
         );
       });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("email-otp-validation")).toBeInTheDocument();
+      });
     });
 
     it("handles logout errors in handleSignOut", async () => {
