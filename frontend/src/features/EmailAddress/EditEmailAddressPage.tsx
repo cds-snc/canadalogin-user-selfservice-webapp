@@ -188,9 +188,20 @@ export default function EditEmailAddressPage() {
       ) {
         const success = await requestOtpCode();
         if (success) {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+            type: userSelectedMfaFactor?.type,
+          });
           setWizardStep("otpValidation");
         }
       } else {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_START,
+          step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_SELECTION,
+          flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+        });
         setWizardStep("otpSelection");
       }
     },
@@ -393,6 +404,11 @@ export default function EditEmailAddressPage() {
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
           step: EMAIL_ADDRESS_ANALYTICS.STEPS.SUCCESS,
         });
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_START,
+          step: EMAIL_ADDRESS_ANALYTICS.STEPS.SUCCESS,
+          flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+        });
         setWizardStep("emailUpdateSuccess");
       } else {
         setErrorCode("FAILED_TO_UPDATE_EMAIL");
@@ -459,6 +475,12 @@ export default function EditEmailAddressPage() {
           void (async () => {
             const success = await requestOtpCode();
             if (success) {
+              trackEvent({
+                event: GA_FORM_EVENTS.FORM_STEP_START,
+                step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
+                flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+                type: userSelectedMfaFactor?.type,
+              });
               setWizardStep("otpValidation");
               trackEvent({
                 event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -505,21 +527,9 @@ export default function EditEmailAddressPage() {
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={() => {
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_STEP_START,
-            step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
-            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
-            type: userSelectedMfaFactor?.type,
-          });
           return requestOtpCode();
         }}
         validateOtpCode={() => {
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_STEP_START,
-            step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
-            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
-            type: userSelectedMfaFactor?.type,
-          });
           return validateOtpCode(
             userOtpValue,
             () => {
@@ -585,6 +595,11 @@ export default function EditEmailAddressPage() {
           });
 
           if (userOtpValue && userOtpValue.trim()) {
+            trackEvent({
+              event: GA_FORM_EVENTS.FORM_STEP_START,
+              step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
+              flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+            });
             setWizardStep("emailConfirmUpdate");
             trackEvent({
               event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -629,11 +644,6 @@ export default function EditEmailAddressPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-          });
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_STEP_START,
-            step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
           });
           return handleEmailChangeWithOtp();
         }}
