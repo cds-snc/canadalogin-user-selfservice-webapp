@@ -3,7 +3,7 @@ VENV ?= .venv
 PYTHON ?= python3.14
 VENV_PYTHON := $(VENV)/bin/python
 PIP := $(VENV_PYTHON) -m pip
-
+export PATH := $(abspath $(VENV))/bin:$(PATH)
 .PHONY: ensure-venv install-python install-dev-python fix-cryptography check-runtime-deps dev-backend-debug-check devcontainer-post-create install-frontend-deps fmt-ci-python fmt-python lint-python run-tests setup-hooks uninstall-hooks check-local-state redis-start redis-stop
 
 # Redis helpers for local debugger startup and teardown.
