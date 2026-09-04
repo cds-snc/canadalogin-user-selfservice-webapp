@@ -1,0 +1,20 @@
+{
+  "successNotice": {
+    "title": "Vos renseignements ont été enregistrés dans ConnexionCanada",
+    "body": "Vos renseignements vérifiés ont été mis à jour."
+  },
+  "heading": "Ouvrez une session dans les services pour appliquer cette mise à jour",
+  "description": "Les services connectés à ConnexionCanada reçoivent vos renseignements mis à jour seulement lorsque vous ouvrez une nouvelle session. Jusqu'à ce que vous fermiez votre session et que vous en ouvriez une nouvelle, les services ci-dessous afficheront vos anciens renseignements.",
+  "servicesHeading": "Services nécessitant une nouvelle ouverture de session",
+  "servicesDescription": "Assurez-vous d'enregistrer tout travail en cours. Si vous choisissez de le faire plus tard, ces services continueront d'afficher vos anciens renseignements jusqu'à votre prochaine fermeture et ouverture de session dans chacun d'eux.",
+  "sessions": {
+    "activeSession": "Session active",
+    "inactiveSession": "Session inactive"
+  },
+  "signOutEverywhere": "Fermer toutes les sessions",
+  "doThisLater": "Je le ferai plus tard",
+  "informationHeading": "Cette mise à jour s'applique seulement aux services connectés par ConnexionCanada.",
+  "informationBody": "Si vous essayez de mettre à jour vos renseignements auprès d'un service qui n'est pas connecté à votre ConnexionCanada, vous devrez accéder à ce compte.",
+  "directoryPrefix": "Pour rechercher un autre compte du gouvernement du Canada, consultez le",
+  "directoryLink": "répertoire des comptes du gouvernement du Canada"
+}
