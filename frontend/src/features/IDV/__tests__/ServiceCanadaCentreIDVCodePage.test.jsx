@@ -4,6 +4,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import ServiceCanadaCentreIDVCodePage from "../InPerson/ServiceCanadaCentreIDVCodePage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
+import Header from "../../../components/Layout/Header";
 
 const mockRouteParams = vi.hoisted(() => ({
   language: "en",
@@ -89,6 +90,25 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </a>
   ),
+  GcdsHeader: ({ children }) => <header>{children}</header>,
+  GcdsLangToggle: ({ onGcdsClick }) => (
+    <button
+      onClick={() =>
+        onGcdsClick({
+          detail:
+            "/fr/identity-verification/update/in-person/service-canada-centre/code",
+          preventDefault: vi.fn(),
+        })
+      }
+    >
+      Change language
+    </button>
+  ),
+}));
+
+vi.mock("../../../components/Layout/TopNav", () => ({ default: () => null }));
+vi.mock("../../../components/Layout/Breadcrumbs", () => ({
+  default: () => null,
 }));
 
 const mockUserState = {
@@ -269,6 +289,24 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/update/in-person/service-canada-centre",
+    );
+  });
+
+  it("preserves verification details when changing the page language", () => {
+    render(
+      <BrowserRouter>
+        <Header
+          langHref="/fr/identity-verification/update/in-person/service-canada-centre/code"
+          currentLang="en"
+        />
+      </BrowserRouter>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Change language" }));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/fr/identity-verification/update/in-person/service-canada-centre/code",
+      { state: mockLocationState },
     );
   });
 

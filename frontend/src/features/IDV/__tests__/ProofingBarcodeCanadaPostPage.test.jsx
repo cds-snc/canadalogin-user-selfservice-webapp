@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, it, expect, vi } from "vitest";
 import ProofingBarcodeCanadaPostPage from "../InPerson/ProofingBarcodeCanadaPostPage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
+import Header from "../../../components/Layout/Header";
 import { PAGES } from "../../../utils/constants";
 
 const mockNavigate = vi.fn();
@@ -84,6 +85,24 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </details>
   ),
+  GcdsHeader: ({ children }) => <header>{children}</header>,
+  GcdsLangToggle: ({ onGcdsClick }) => (
+    <button
+      onClick={() =>
+        onGcdsClick({
+          detail: "/fr/idv/in-person/canada-post/idv-code",
+          preventDefault: vi.fn(),
+        })
+      }
+    >
+      Change language
+    </button>
+  ),
+}));
+
+vi.mock("../../../components/Layout/TopNav", () => ({ default: () => null }));
+vi.mock("../../../components/Layout/Breadcrumbs", () => ({
+  default: () => null,
 }));
 
 const mockUserState = {
@@ -208,6 +227,39 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
     expect(screen.getByText("Email statement")).toBeInTheDocument();
     expect(screen.getByText("Passport")).toBeInTheDocument();
+  });
+
+  it("preserves verification details when changing the page language", () => {
+    const verificationDetails = {
+      idvCode: "CP12345678",
+      givenName: "Name",
+      lastName: "Lastname",
+      dateOfBirth: "January 1, 1990",
+      idSelected: "passport",
+    };
+
+    render(
+      <MemoryRouter
+        initialEntries={[
+          {
+            pathname: "/en/idv/in-person/canada-post/idv-code",
+            state: verificationDetails,
+          },
+        ]}
+      >
+        <Header
+          langHref="/fr/idv/in-person/canada-post/idv-code"
+          currentLang="en"
+        />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Change language" }));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/fr/idv/in-person/canada-post/idv-code",
+      { state: verificationDetails },
+    );
   });
 
   it("renders update information button and nearest Canada Post notice", () => {
