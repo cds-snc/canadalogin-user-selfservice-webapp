@@ -21,7 +21,7 @@ function validateSelectedLanguage(selectedLanguage: any) {
 }
 
 export const AppLanguageSetup = () => {
-  const { pathname } = useLocation();
+  const { pathname, state: locationState } = useLocation();
   const { state } = useUser();
   const { state: languageState, setAppLanguage } = useLanguage();
   const { userProfile, isLoading } = state;
@@ -65,9 +65,9 @@ export const AppLanguageSetup = () => {
       if (urlPath.length > 1) {
         urlPath[0] = languageToDisplay;
         const newPath = urlPath.join("/");
-        navigateHelper(newPath, true);
+        navigateHelper(newPath, true, locationState);
       } else {
-        navigateHelper(languageToDisplay, true);
+        navigateHelper(languageToDisplay, true, locationState);
       }
     }
   }, [pathname, isLoading, userProfile?.preferredLanguage, language]);
