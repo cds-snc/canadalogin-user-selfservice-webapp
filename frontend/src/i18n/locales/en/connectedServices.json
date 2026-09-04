@@ -1,0 +1,20 @@
+{
+  "successNotice": {
+    "title": "Your information was successfully saved in CanadaLogin",
+    "body": "Your verified information has been updated."
+  },
+  "heading": "Sign in to services to apply this update",
+  "description": "Services connected with CanadaLogin only receive your updated information when you sign in again. Until you sign out and sign back in, the services below will keep showing your previous information.",
+  "servicesHeading": "Services needing you to sign in again",
+  "servicesDescription": "Be sure to save any active progress. If you choose to do this later, these services will keep showing your old information until you next sign out and sign back in to each one.",
+  "sessions": {
+    "activeSession": "Active session",
+    "inactiveSession": "Inactive session"
+  },
+  "signOutEverywhere": "Sign out everywhere",
+  "doThisLater": "I'll do this later",
+  "informationHeading": "This update only applies to services connected through CanadaLogin.",
+  "informationBody": "If you are trying to update your information with a service that is not connected to your CanadaLogin, you will need to go to that account.",
+  "directoryPrefix": "To search for another Government of Canada account, visit the",
+  "directoryLink": "Government of Canada account directory"
+}
