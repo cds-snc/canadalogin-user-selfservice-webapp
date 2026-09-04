@@ -377,6 +377,11 @@ export default function EditEmailAddressPage() {
       destination: normalizedNewEmail,
     });
     if (success) {
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_START,
+        step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+        flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+      });
       setWizardStep("emailOtpValidation");
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_CHANGE,

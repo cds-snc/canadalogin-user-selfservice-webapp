@@ -1480,6 +1480,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
           event: "form_step_change",
           step: "email_otp_validation",
         });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "email_otp_validation",
+          flow: "email_address_update",
+        });
       });
     });
 
