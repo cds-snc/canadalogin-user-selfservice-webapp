@@ -195,16 +195,6 @@ export default function EditEmailAddressPage() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     async () => {
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-        step:
-          userPhoneFactors &&
-          userPhoneFactors.length === 1 &&
-          fido2Data.length === 0
-            ? EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION
-            : EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_SELECTION,
-      });
-
       if (
         userPhoneFactors &&
         userPhoneFactors.length === 1 &&
@@ -219,6 +209,10 @@ export default function EditEmailAddressPage() {
             type: userSelectedMfaFactor?.type,
           });
           setWizardStep("otpValidation");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
+          });
         }
       } else {
         trackEvent({
@@ -227,6 +221,10 @@ export default function EditEmailAddressPage() {
           flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
         });
         setWizardStep("otpSelection");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_SELECTION,
+        });
       }
     },
     false,
