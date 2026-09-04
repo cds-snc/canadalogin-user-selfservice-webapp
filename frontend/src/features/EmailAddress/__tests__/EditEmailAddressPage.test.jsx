@@ -1367,6 +1367,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
           event: "form_step_change",
           step: "otp_selection",
         });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "otp_selection",
+          flow: "email_address_update",
+        });
       });
     });
 
@@ -1389,6 +1394,12 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",
           step: "otp_validation",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "otp_validation",
+          flow: "email_address_update",
+          type: "sms",
         });
       });
     });
@@ -1469,6 +1480,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
           event: "form_step_change",
           step: "email_otp_validation",
         });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "email_otp_validation",
+          flow: "email_address_update",
+        });
       });
     });
 
@@ -1521,6 +1537,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",
           step: "confirm_update",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "confirm_update",
+          flow: "email_address_update",
         });
       });
     });
@@ -1591,6 +1612,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_submit_complete",
           step: "email_update_success",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "email_update_success",
+          flow: "email_address_update",
         });
       });
     });
