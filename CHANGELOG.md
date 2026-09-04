@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.33.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.32.1...v1.33.0) (2026-09-04)
+
+
+### Features
+
+* **identity-verification:** Connected Services Details: Sign in to s… ([#2083](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2083)) ([aee4415](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/aee441550191e3858d7235875b22ccb0704bc01f))
+
+
+### Bug Fixes
+
+* Added GA Parameters for Change Email Flow ([#2077](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2077)) ([57134d9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/57134d9a7e2d75860a067fab0ede8a0262fd399f))
+* implement URL sanitization for logging sensitive query parameters ([#2086](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2086)) ([7ab9d1c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7ab9d1c957362d4c955f50c622d17e8212339c20))
+
 ## [1.32.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.32.0...v1.32.1) (2026-09-03)
 
 
