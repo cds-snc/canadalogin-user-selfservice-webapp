@@ -10,7 +10,10 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import { DEV_ONLY_FEATURE, EXTERNAL_NAVIGATION_LINKS } from "../../../utils/constants";
+import {
+  DEV_ONLY_FEATURE,
+  EXTERNAL_NAVIGATION_LINKS,
+} from "../../../utils/constants";
 import "./ConnectedServicesPage.css";
 
 const services = [
@@ -85,7 +88,7 @@ export default function ConnectedServicesPage() {
             </GcdsText>
             <GcdsText>{t("informationBody")}</GcdsText>
             <GcdsText>
-              {t("directoryPrefix")} {" "}
+              {t("directoryPrefix")}{" "}
               <GcdsLink
                 href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
                 lang={language}
