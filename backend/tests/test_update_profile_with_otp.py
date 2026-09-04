@@ -234,6 +234,10 @@ DELETE_OLD_EMAIL_MFA_IMPORT_PATH = (
     "app.users.services.update_profile_with_otp._delete_old_email_mfa_factors"
 )
 ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH = "app.users.services.update_profile_with_otp._enroll_and_validate_new_email_mfa_factor"
+RESTORE_OLD_EMAIL_MFA_IMPORT_PATH = "app.users.services.update_profile_with_otp._restore_old_email_mfa_factor_after_failed_update"
+PREFLIGHT_EMAIL_CHECK_IMPORT_PATH = (
+    "app.users.services.update_profile_with_otp._is_email_already_associated"
+)
 
 
 class TestUpdateProfileWithOtpVerification:
@@ -318,6 +322,7 @@ class TestUpdateProfileWithOtpVerification:
         mock_get_profile.assert_not_called()
 
     @pytest.mark.asyncio
+    @patch(PREFLIGHT_EMAIL_CHECK_IMPORT_PATH)
     @patch(ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH)
     @patch(DELETE_OLD_EMAIL_MFA_IMPORT_PATH)
     @patch(BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH)
@@ -334,10 +339,12 @@ class TestUpdateProfileWithOtpVerification:
         mock_build_email_sync_context,
         mock_delete_old_email_mfa,
         mock_enroll_validate_email_mfa,
+        mock_preflight_email_check,
     ):
         """Test successful profile update with email address change and session update"""
         # Arrange
         mock_verify_otp.return_value = None
+        mock_preflight_email_check.return_value = False
 
         current_profile = IBMVerifyUserProfileSchema(
             id="user-123",
@@ -368,6 +375,7 @@ class TestUpdateProfileWithOtpVerification:
         mock_update_response = Mock(success=True, data=updated_profile)
         mock_update_profile.return_value = mock_update_response
         mock_build_email_sync_context.return_value = EmailMfaSyncContext(
+            normalized_old_email="old@example.com",
             normalized_new_email="new@example.com",
             old_email_factor_ids=["old-factor-1"],
             has_new_email_factor=False,
@@ -434,6 +442,71 @@ class TestUpdateProfileWithOtpVerification:
         session_updates = mock_update_session.call_args[0][1]
         assert session_updates["preferred_username"] == "new@example.com"
         assert session_updates["email"] == "new@example.com"
+
+    @pytest.mark.asyncio
+    @patch(PREFLIGHT_EMAIL_CHECK_IMPORT_PATH)
+    @patch(ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH)
+    @patch(DELETE_OLD_EMAIL_MFA_IMPORT_PATH)
+    @patch(BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH)
+    @patch(UPDATE_PROFILE_IMPORT_PATH)
+    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_duplicate_email_preflight_prevents_delete_and_update(
+        self,
+        mock_verify_otp,
+        mock_get_profile,
+        mock_update_profile,
+        mock_build_email_sync_context,
+        mock_delete_old_email_mfa,
+        mock_enroll_validate_email_mfa,
+        mock_preflight_email_check,
+    ):
+        """Duplicate email preflight should fail before deletion/update operations."""
+        mock_verify_otp.return_value = None
+        mock_preflight_email_check.return_value = True
+
+        current_profile = IBMVerifyUserProfileSchema(
+            id="user-123",
+            userName="old@example.com",
+            emails=[EmailItem(value="old@example.com", type="work")],
+            active=True,
+            meta={
+                "location": "https://example.com/users/user-123",
+                "created": "2023-01-01T00:00:00Z",
+                "lastModified": "2023-09-22T12:30:00Z",
+                "resourceType": "User",
+            },
+        )
+        mock_get_profile.return_value = current_profile
+        mock_build_email_sync_context.return_value = EmailMfaSyncContext(
+            normalized_old_email="old@example.com",
+            normalized_new_email="new@example.com",
+            old_email_factor_ids=["old-factor-1"],
+            has_new_email_factor=False,
+        )
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            otp="123456",
+            trxnId="test-trxn-id",
+            otpType=OtpType.SMS,
+            newEmailAddress="new@example.com",
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request, profile_update_data, "user-token"
+            )
+
+        assert exc.value.status_code == 400
+        assert exc.value.detail == "email_already_associated"
+        mock_delete_old_email_mfa.assert_not_called()
+        mock_update_profile.assert_not_called()
+        mock_enroll_validate_email_mfa.assert_not_called()
 
     @pytest.mark.asyncio
     @patch(ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH)
@@ -588,6 +661,8 @@ class TestUpdateProfileWithOtpVerification:
         assert "Unable to retrieve current user profile" in exc.value.detail
 
     @pytest.mark.asyncio
+    @patch(PREFLIGHT_EMAIL_CHECK_IMPORT_PATH)
+    @patch(RESTORE_OLD_EMAIL_MFA_IMPORT_PATH)
     @patch(DELETE_OLD_EMAIL_MFA_IMPORT_PATH)
     @patch(BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH)
     @patch(UPDATE_PROFILE_IMPORT_PATH)
@@ -600,10 +675,13 @@ class TestUpdateProfileWithOtpVerification:
         mock_update_profile,
         mock_build_email_sync_context,
         mock_delete_old_email_mfa,
+        mock_restore_old_email_mfa,
+        mock_preflight_email_check,
     ):
         """Test handling of profile update failure after successful OTP verification"""
         # Arrange
         mock_verify_otp.return_value = None
+        mock_preflight_email_check.return_value = False
 
         current_profile = IBMVerifyUserProfileSchema(
             id="user-123",
@@ -623,6 +701,7 @@ class TestUpdateProfileWithOtpVerification:
         mock_update_response = Mock(success=False)
         mock_update_profile.return_value = mock_update_response
         mock_build_email_sync_context.return_value = EmailMfaSyncContext(
+            normalized_old_email="user@example.com",
             normalized_new_email="new@example.com",
             old_email_factor_ids=["old-factor-1"],
             has_new_email_factor=False,
@@ -649,8 +728,88 @@ class TestUpdateProfileWithOtpVerification:
         assert exc.value.status_code == 500
         assert "Profile update failed after OTP verification" in exc.value.detail
         mock_delete_old_email_mfa.assert_called_once()
+        mock_restore_old_email_mfa.assert_called_once()
 
     @pytest.mark.asyncio
+    @patch(PREFLIGHT_EMAIL_CHECK_IMPORT_PATH)
+    @patch(RESTORE_OLD_EMAIL_MFA_IMPORT_PATH)
+    @patch(ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH)
+    @patch(DELETE_OLD_EMAIL_MFA_IMPORT_PATH)
+    @patch(BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH)
+    @patch(UPDATE_PROFILE_IMPORT_PATH)
+    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_profile_update_http_409_conflict_preserves_old_email_factor(
+        self,
+        mock_verify_otp,
+        mock_get_profile,
+        mock_update_profile,
+        mock_build_email_sync_context,
+        mock_delete_old_email_mfa,
+        mock_enroll_validate_email_mfa,
+        mock_restore_old_email_mfa,
+        mock_preflight_email_check,
+    ):
+        """A profile update conflict should trigger old email MFA restoration."""
+        mock_verify_otp.return_value = None
+        mock_preflight_email_check.return_value = False
+
+        current_profile = IBMVerifyUserProfileSchema(
+            id="user-123",
+            userName="user@example.com",
+            emails=[EmailItem(value="user@example.com", type="work")],
+            active=True,
+            meta={
+                "location": "https://example.com/users/user-123",
+                "created": "2023-01-01T00:00:00Z",
+                "lastModified": "2023-09-22T12:30:00Z",
+                "resourceType": "User",
+            },
+        )
+        mock_get_profile.return_value = current_profile
+
+        mock_build_email_sync_context.return_value = EmailMfaSyncContext(
+            normalized_old_email="user@example.com",
+            normalized_new_email="new@example.com",
+            old_email_factor_ids=["old-factor-1"],
+            has_new_email_factor=False,
+        )
+
+        conflict_response = Response(
+            status_code=409,
+            request=Request("PUT", "https://example.com/v2.0/Me"),
+            json={"messageId": "SOME_CONFLICT"},
+        )
+        mock_update_profile.side_effect = HTTPStatusError(
+            "Conflict",
+            request=conflict_response.request,
+            response=conflict_response,
+        )
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            otp="123456",
+            trxnId="test-trxn-id",
+            otpType=OtpType.VOICE,
+            newEmailAddress="new@example.com",
+        )
+
+        with pytest.raises(HTTPStatusError) as exc:
+            await update_profile_with_otp_verification(
+                mock_request, profile_update_data, "user-token"
+            )
+
+        assert exc.value.response.status_code == 409
+        mock_delete_old_email_mfa.assert_called_once()
+        mock_restore_old_email_mfa.assert_called_once()
+        mock_enroll_validate_email_mfa.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch(PREFLIGHT_EMAIL_CHECK_IMPORT_PATH)
     @patch(ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH)
     @patch(DELETE_OLD_EMAIL_MFA_IMPORT_PATH)
     @patch(BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH)
@@ -667,10 +826,12 @@ class TestUpdateProfileWithOtpVerification:
         mock_build_email_sync_context,
         mock_delete_old_email_mfa,
         mock_enroll_validate_email_mfa,
+        mock_preflight_email_check,
     ):
         """Test that session update failure doesn't fail the entire operation"""
         # Arrange
         mock_verify_otp.return_value = None
+        mock_preflight_email_check.return_value = False
 
         current_profile = IBMVerifyUserProfileSchema(
             id="user-123",
@@ -701,6 +862,7 @@ class TestUpdateProfileWithOtpVerification:
         mock_update_response = Mock(success=True, data=updated_profile)
         mock_update_profile.return_value = mock_update_response
         mock_build_email_sync_context.return_value = EmailMfaSyncContext(
+            normalized_old_email="old@example.com",
             normalized_new_email="new@example.com",
             old_email_factor_ids=["old-factor-1"],
             has_new_email_factor=False,

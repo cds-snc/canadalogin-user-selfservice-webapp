@@ -34,7 +34,6 @@ import { ADD_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
 import { usePasskeyOperations } from "../../../../hooks/usePasskeyOperations";
 import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 import { Fido2Credential } from "../../../../types/hooks";
-import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
 import {
   extractOtpServerMetadata,
   mergeOtpSentResponseWithMetadata,
@@ -187,10 +186,14 @@ export default function AddMFAPage() {
   });
 
   const [customErrorMessage, setCustomErrorMessage] = useState("");
+  const [isMfaOtpMaxAttemptsReached, setIsMfaOtpMaxAttemptsReached] =
+    useState(false);
   const errorMessage =
     customErrorMessage || getErrorMessage(language, errorCode);
-  const { resetAttempts, isMaxAttemptsReached } =
-    useOtpAttemptTracking(errorCode);
+
+  const resetAttempts = () => {
+    setIsMfaOtpMaxAttemptsReached(false);
+  };
 
   const getOtpAttemptsErrorMessage = (errorData?: {
     retries?: number;
@@ -282,6 +285,7 @@ export default function AddMFAPage() {
   } = {}): Promise<boolean> => {
     setErrorCode("");
     setCustomErrorMessage("");
+    setIsMfaOtpMaxAttemptsReached(false);
 
     try {
       const payload = {
@@ -334,6 +338,7 @@ export default function AddMFAPage() {
 
   const verifyMFAOtp = async () => {
     setCustomErrorMessage("");
+    setIsMfaOtpMaxAttemptsReached(false);
 
     try {
       const payload = {
@@ -382,16 +387,29 @@ export default function AddMFAPage() {
         }
         setErrorCode("");
         setCustomErrorMessage("");
+        setIsMfaOtpMaxAttemptsReached(false);
       }
     } catch (error) {
       const err = error as {
         data?: { message?: string; retries?: number; attempts?: number };
       };
       const message = err?.data?.message ?? "";
+      const retries = err?.data?.retries;
+      const attempts = err?.data?.attempts;
       const attemptsMessage = getOtpAttemptsErrorMessage(err?.data);
 
       if (message) {
         setErrorCode(message);
+
+        if (
+          retries !== undefined &&
+          retries !== null &&
+          attempts !== undefined &&
+          attempts !== null
+        ) {
+          setIsMfaOtpMaxAttemptsReached(retries - attempts <= 0);
+        }
+
         if (
           (INVALID_OTP_ERROR_CODES as readonly string[]).includes(message) &&
           attemptsMessage
@@ -738,7 +756,7 @@ export default function AddMFAPage() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
         errorMessage={errorMessage}
-        isMaxAttemptsReached={isMaxAttemptsReached}
+        isMaxAttemptsReached={isMfaOtpMaxAttemptsReached}
         resetAttempts={resetAttempts}
         onNext={async () => {
           trackEvent({
