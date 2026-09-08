@@ -114,12 +114,10 @@ export default function DeleteFIDO2PasskeyPage({
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     async () => {
-      // If there's only one MFA factor, skip OTP selection and go directly to validation
-      if (
-        userPhoneFactors &&
-        userPhoneFactors.length === 1 &&
-        (!fido2Data || fido2Data.length === 0)
-      ) {
+      const phoneFactorCount = userPhoneFactors?.length ?? 0;
+      const passkeyCount = fido2Data?.length ?? 0;
+
+      if (phoneFactorCount === 1 && passkeyCount === 0) {
         const success = await requestOtpCode();
         if (success) {
           trackEvent({
@@ -128,6 +126,13 @@ export default function DeleteFIDO2PasskeyPage({
           });
           setWizardStep("otpValidation");
         }
+      } else if (phoneFactorCount === 0 && passkeyCount === 1) {
+        setSelected2FAPasskey(fido2Data[0]);
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
+        });
+        setWizardStep("verifyFIDO2Passkey");
       } else {
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_CHANGE,

@@ -116,26 +116,26 @@ export default function AddMFAPage() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     async () => {
-      // If there's only one MFA factor, skip OTP selection and go directly to validation
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-        step:
-          userPhoneFactors &&
-          userPhoneFactors.length === 1 &&
-          fido2Data.length === 0
-            ? ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION
-            : ADD_MFA_ANALYTICS.STEPS.OTP_SELECTION,
-      });
-      if (
-        userPhoneFactors &&
-        userPhoneFactors.length === 1 &&
-        fido2Data.length === 0
-      ) {
+      const phoneFactorCount = userPhoneFactors?.length ?? 0;
+      const passkeyCount = fido2Data.length;
+
+      if (phoneFactorCount === 1 && passkeyCount === 0) {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+        });
         const success = await requestOtpCode();
         if (success) {
           setWizardStep("otpValidation");
         }
+      } else if (phoneFactorCount === 0 && passkeyCount === 1) {
+        setSelected2FAPasskey(fido2Data[0]);
+        setWizardStep("verifyFIDO2Passkey");
       } else {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: ADD_MFA_ANALYTICS.STEPS.OTP_SELECTION,
+        });
         setWizardStep("otpSelection");
       }
     },
