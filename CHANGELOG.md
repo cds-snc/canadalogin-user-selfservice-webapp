@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.33.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.32.1...v1.33.0) (2026-09-08)
+
+
+### Features
+
+* **identity-verification:** Connected Services Details: Sign in to s… ([#2083](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2083)) ([aee4415](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/aee441550191e3858d7235875b22ccb0704bc01f))
+
+
+### Bug Fixes
+
+* Added GA Parameters for Change Email Flow ([#2077](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2077)) ([57134d9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/57134d9a7e2d75860a067fab0ede8a0262fd399f))
+* implement URL sanitization for logging sensitive query parameters ([#2086](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2086)) ([7ab9d1c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7ab9d1c957362d4c955f50c622d17e8212339c20))
+* send user straight to verify mfa screen ([#2093](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2093)) ([d4c3f0c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d4c3f0cb64b6e2be382bb29d0f1d959e0c664b12))
+* streamline MFA flow by updating conditions for passkey verification and adjusting related tests ([#2092](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2092)) ([a69cf3a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a69cf3a7925eca3e4a7f4079b485931cf4b1df5e))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump cryptography from 48.0.1 to 50.0.0 in /backend ([#1946](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1946)) ([5c3d1b6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5c3d1b6c416f9f712f766bf2c63ca57f4b22edee))
+* **deps:** update all minor dependencies ([#2006](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2006)) ([6abb2bf](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6abb2bfb7994905c42ce57e0c788404071420bca))
+* **deps:** update all non-major github action dependencies ([#2005](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2005)) ([fbf69ae](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fbf69aee79daf4e289a4c68400dee017f8b86c69))
+
 ## [1.32.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.32.0...v1.32.1) (2026-09-03)
 
 
