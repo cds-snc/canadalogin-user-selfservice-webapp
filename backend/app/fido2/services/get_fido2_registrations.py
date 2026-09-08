@@ -33,7 +33,7 @@ async def get_user_fido2_registrations(
     _username, _display_name, user_id = await get_user_profile_info(
         http_client, user_access_token
     )
-    logger.info(f"Found user ID from userinfo: {user_id}")
+    logger.info("Retrieved user profile info for FIDO2 registration lookup")
 
     # Get RP UUID from RP ID
     admin_token = await get_admin_token(http_client)
@@ -49,7 +49,7 @@ async def get_user_fido2_registrations(
     params = {"search": search_filter}
 
     logger.info(f"Making request to: {url}")
-    logger.info(f"Search filter: {search_filter}")
+    logger.info("Constructed FIDO2 registration search filter")
 
     response = await http_client.get(url, headers=headers, params=params)
     response.raise_for_status()
