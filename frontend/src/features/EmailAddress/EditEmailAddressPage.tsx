@@ -195,11 +195,10 @@ export default function EditEmailAddressPage() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     async () => {
-      if (
-        userPhoneFactors &&
-        userPhoneFactors.length === 1 &&
-        fido2Data.length === 0
-      ) {
+      const phoneFactorCount = userPhoneFactors?.length ?? 0;
+      const passkeyCount = fido2Data.length;
+
+      if (phoneFactorCount === 1 && passkeyCount === 0) {
         const success = await requestOtpCode();
         if (success) {
           trackEvent({
@@ -214,6 +213,9 @@ export default function EditEmailAddressPage() {
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
           });
         }
+      } else if (phoneFactorCount === 0 && passkeyCount === 1) {
+        setSelected2FAPasskey(fido2Data[0]);
+        setWizardStep("verifyFIDO2Passkey");
       } else {
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_START,

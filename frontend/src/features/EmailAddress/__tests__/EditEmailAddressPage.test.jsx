@@ -680,15 +680,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
-      });
-
-      await act(async () => {
-        fireEvent.click(screen.getByTestId("select-passkey-btn"));
+        expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
+        expect(screen.queryByTestId("otp-selection")).not.toBeInTheDocument();
       });
 
       await act(async () => {
