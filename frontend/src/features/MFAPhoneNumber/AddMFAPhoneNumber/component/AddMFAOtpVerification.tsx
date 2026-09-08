@@ -143,10 +143,6 @@ export default function AddMFAOtpVerification({
   const userMfaType = phoneFormData.otpType;
 
   const doSubmit = async () => {
-    if (!/^\d{6}$/.test(phoneFormData.otp)) {
-      setLocalError(t("Error.invalidCode", { ns: "common" }));
-      return;
-    }
     setLocalError("");
     await onNext();
   };
@@ -226,8 +222,6 @@ export default function AddMFAOtpVerification({
                   onGcdsInput={handleChange}
                   lang={language}
                   size={18}
-                  maxlength={6}
-                  minlength={6}
                 ></GcdsInput>
               </form>
 
@@ -243,7 +237,7 @@ export default function AddMFAOtpVerification({
         {!isExpired ? (
           <GcdsGrid columns="max-content max-content" gap="200">
             <SubmitButton
-              disabled={phoneFormData.otp.length < 6 || isMaxAttemptsReached}
+              disabled={isMaxAttemptsReached}
               style={{ width: "fit-content" }}
               onGcdsClick={(ev) => {
                 ev.preventDefault();

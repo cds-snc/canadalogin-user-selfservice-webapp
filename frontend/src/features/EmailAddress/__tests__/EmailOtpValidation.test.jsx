@@ -243,8 +243,8 @@ describe("EmailOtpValidation", () => {
       expect(input).toHaveAttribute("id", "verificationCode");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
       expect(input).toHaveAttribute("size", "18");
-      expect(input).toHaveAttribute("maxLength", "6");
-      expect(input).toHaveAttribute("minLength", "6");
+      expect(input).not.toHaveAttribute("maxLength");
+      expect(input).not.toHaveAttribute("minLength");
     });
 
     it("renders submit and cancel buttons", () => {

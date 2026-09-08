@@ -370,4 +370,79 @@ describe("EditEmailAddressPage", () => {
       await screen.findByRole("button", { name: "submit new email" }),
     ).toBeInTheDocument();
   });
+
+  it("navigates back to email OTP validation when update returns OTP attempts metadata", async () => {
+    mocks.updateEmailWithOtp.mockRejectedValueOnce({
+      data: {
+        message: "CSIBN0018E",
+        retries: 4,
+        attempts: 0,
+      },
+    });
+
+    render(<EditEmailAddressPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "verify password" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "verify account otp" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "fill new email" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "submit new email" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "continue with email otp" }),
+    );
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "confirm email update" }),
+    );
+
+    expect(
+      await screen.findByRole("button", { name: "continue with email otp" }),
+    ).toBeInTheDocument();
+  });
+
+  it("clears OTP error summary when returning to confirm update", async () => {
+    mocks.updateEmailWithOtp.mockRejectedValueOnce({
+      data: {
+        message: "CSIBN0018E",
+        retries: 4,
+        attempts: 0,
+      },
+    });
+
+    render(<EditEmailAddressPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "verify password" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "verify account otp" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "fill new email" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "submit new email" }),
+    );
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "continue with email otp" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "confirm email update" }),
+    );
+
+    expect(await screen.findByTestId("error-summary")).toBeInTheDocument();
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "continue with email otp" }),
+    );
+
+    expect(
+      await screen.findByRole("button", { name: "confirm email update" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
+  });
 });

@@ -408,7 +408,7 @@ export default function EditEmailAddressPage() {
         return;
       }
 
-      if (!userOtpValue || !otpSentResponse?.trxnId) {
+      if (!otpSentResponse?.trxnId) {
         setErrorCode("OTP_VERIFICATION_REQUIRED");
         setIsEmailOtpMaxAttemptsReached(false);
         trackEvent({
@@ -499,7 +499,11 @@ export default function EditEmailAddressPage() {
         message === EXISTING_EMAIL_CONFLICT_ERROR_CODE ||
         (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
           apiErrorPayload?.message ?? "",
-        );
+        ) ||
+        (retries !== undefined &&
+          retries !== null &&
+          attempts !== undefined &&
+          attempts !== null);
 
       if (shouldNavigateBackToEmailOtpValidation) {
         setWizardStep("emailOtpValidation");
@@ -675,31 +679,26 @@ export default function EditEmailAddressPage() {
     emailOtpValidation: (
       <EmailOtpValidation
         onSubmit={() => {
+          setErrorCode("");
+          setCustomErrorMessage("");
+          setIsEmailOtpMaxAttemptsReached(false);
+
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
             flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
           });
 
-          if (userOtpValue && userOtpValue.trim()) {
-            trackEvent({
-              event: GA_FORM_EVENTS.FORM_STEP_START,
-              step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-              flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
-            });
-            setWizardStep("emailConfirmUpdate");
-            trackEvent({
-              event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-              step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-            });
-          } else {
-            setErrorCode("OTP_REQUIRED");
-            trackEvent({
-              event: GA_FORM_EVENTS.FORM_STEP_END,
-              step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
-              error: "OTP_REQUIRED",
-            });
-          }
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
+            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+          });
+          setWizardStep("emailConfirmUpdate");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          });
         }}
         onCancel={handleBackToProfile}
         formData={formData}
