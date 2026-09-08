@@ -1135,6 +1135,21 @@ describe("AddMFAPage Unit Tests", () => {
     });
 
     it("should navigate to passkey verification and then add phone number", async () => {
+      useOtpOperations.mockReturnValue({
+        userPhoneFactors: [],
+        userSelectedMfaFactor: null,
+        userOtpValue: "",
+        otpSentResponse: { trxnId: "mock-trxn-id" },
+        otpLoading: false,
+        phoneFactorsMap: {},
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        setUserPhoneFactors: vi.fn(),
+        setUserSelectedMfaFactor: vi.fn(),
+        setOtpLoading: vi.fn(),
+        setOtpSentResponse: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+      });
       usePasskeyOperations.mockReturnValue({
         fido2Data: [
           { id: "passkey-42", attributes: { nickname: "Work Laptop" } },
@@ -1153,12 +1168,6 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       fireEvent.click(screen.getByTestId("password-verification-next"));
-
-      await waitFor(() => {
-        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
-      });
-
-      fireEvent.click(screen.getByTestId("otp-selection-fido2"));
 
       await waitFor(() => {
         expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
