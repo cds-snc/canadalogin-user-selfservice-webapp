@@ -257,7 +257,7 @@ describe("OtpVerification Component", () => {
 
     const otpInput = screen.getByTestId("gcds-input");
     expect(otpInput).toBeInTheDocument();
-    expect(otpInput).toHaveAttribute("maxLength", "6");
+    expect(otpInput).not.toHaveAttribute("maxLength");
   });
 
   it("calls onChangePhoneForm when OTP input changes", () => {
@@ -305,7 +305,7 @@ describe("OtpVerification Component", () => {
     );
   });
 
-  it("disables continue button when OTP is empty", () => {
+  it("keeps continue button enabled when OTP is empty", () => {
     render(
       <TestWrapper>
         <OtpVerification {...defaultProps} />
@@ -317,7 +317,7 @@ describe("OtpVerification Component", () => {
       btn.textContent.includes("Continue"),
     );
 
-    expect(continueButton).toBeDisabled();
+    expect(continueButton).not.toBeDisabled();
   });
 
   it("enables continue button when OTP has 6 digits", () => {

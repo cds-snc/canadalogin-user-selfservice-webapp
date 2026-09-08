@@ -214,14 +214,12 @@ export default function OtpVerification({
                 onGcdsInput={handleChange}
                 lang={language}
                 size={18}
-                maxlength={6}
-                minlength={6}
               />
             </form>
 
             <GcdsGrid columns="max-content max-content" gap="200">
               <SubmitButton
-                disabled={phoneFormData.otp.length < 6 || isMaxAttemptsReached}
+                disabled={isMaxAttemptsReached}
                 style={{ width: "fit-content" }}
                 onGcdsClick={onSubmitClick}
                 currentLang={language}
