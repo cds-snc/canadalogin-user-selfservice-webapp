@@ -35,6 +35,7 @@ vi.mock("../../../services/authService", () => ({
     transientOtpVerify: vi.fn(),
     update_my_user_profile: vi.fn(),
     update_phone_with_otp: vi.fn(),
+    verify_phone_otp_for_update: vi.fn(),
     get_my_user_profile: vi.fn(),
     logout: vi.fn(),
     get_relying_party_info: vi.fn(),
@@ -103,9 +104,11 @@ vi.mock("../components/OtpVerification", () => ({
     requestNewOtpCode,
     phoneFormData,
     onChangePhoneForm,
+    errorMessage,
   }) => (
     <div data-testid="otp-verification">
       <h2>OTP Verification</h2>
+      {errorMessage && <div data-testid="otp-error">{errorMessage}</div>}
       <input
         data-testid="otp-input"
         value={phoneFormData?.otp || ""}
@@ -296,6 +299,10 @@ describe("EditContactPhoneNumberPage Component", () => {
     mockAuthService.transientOtpSend.mockResolvedValue({
       data: { trxnId: "test-trxn-id" },
     });
+    mockAuthService.verify_phone_otp_for_update.mockResolvedValue({
+      success: true,
+      data: { verificationProofId: "test-proof-id" },
+    });
 
     render(
       <TestWrapper>
@@ -317,9 +324,18 @@ describe("EditContactPhoneNumberPage Component", () => {
     const otpInput = screen.getByTestId("otp-input");
     fireEvent.change(otpInput, { target: { value: "123456" } });
 
-    // Click verify - moves to confirm step without API call
+    // Click verify - validates OTP then moves to confirm step
     const verifyBtn = screen.getByTestId("verify-btn");
     fireEvent.click(verifyBtn);
+
+    await waitFor(() => {
+      expect(mockAuthService.verify_phone_otp_for_update).toHaveBeenCalledWith(
+        "+15551234567",
+        "123456",
+        "test-trxn-id",
+        "sms",
+      );
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
@@ -329,6 +345,11 @@ describe("EditContactPhoneNumberPage Component", () => {
   it("completes profile update and shows success", async () => {
     mockAuthService.transientOtpSend.mockResolvedValue({
       data: { trxnId: "test-trxn-id" },
+    });
+
+    mockAuthService.verify_phone_otp_for_update.mockResolvedValue({
+      success: true,
+      data: { verificationProofId: "test-proof-id" },
     });
 
     mockAuthService.update_phone_with_otp.mockResolvedValue({
@@ -365,9 +386,7 @@ describe("EditContactPhoneNumberPage Component", () => {
     await waitFor(() => {
       expect(mockAuthService.update_phone_with_otp).toHaveBeenCalledWith(
         "+15551234567",
-        "123456",
-        "test-trxn-id",
-        "sms",
+        "test-proof-id",
       );
     });
 
@@ -488,6 +507,47 @@ describe("EditContactPhoneNumberPage Component", () => {
     // async work is left pending when the test environment is torn down.
     await act(async () => {
       resolveOtp({ data: { trxnId: "test" } });
+    });
+  });
+
+  it("shows remaining attempts message on OTP verification failure", async () => {
+    mockAuthService.transientOtpSend.mockResolvedValue({
+      data: { trxnId: "test-trxn-id" },
+    });
+    mockAuthService.verify_phone_otp_for_update.mockRejectedValue({
+      data: {
+        message: "invalidCode",
+        retries: 4,
+        attempts: 1,
+        trxnId: "new-trxn-id",
+      },
+    });
+
+    render(
+      <TestWrapper>
+        <EditContactPhoneNumberPage />
+      </TestWrapper>,
+    );
+
+    const phoneInput = screen.getByTestId("phone-input");
+    fireEvent.change(phoneInput, { target: { value: "+15551234567" } });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+    });
+
+    const otpInput = screen.getByTestId("otp-input");
+    fireEvent.change(otpInput, { target: { value: "999999" } });
+    fireEvent.click(screen.getByTestId("verify-btn"));
+
+    await waitFor(() => {
+      expect(mockAuthService.verify_phone_otp_for_update).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      const otpError = screen.getByTestId("otp-error");
+      expect(otpError.textContent).toContain("3");
     });
   });
 });
