@@ -26,6 +26,14 @@ vi.mock("react-router", async () => {
 
 vi.mock("../api/identityVerificationApi", () => ({
   identityVerificationApi: {
+    getClaims: vi.fn().mockResolvedValue({
+      status: "verified",
+      verified_claims: {
+        verification: {
+          time: "2026-01-27T00:00:00Z",
+        },
+      },
+    }),
     getPostIdvRedirectUrl: vi.fn().mockResolvedValue({
       data: { redirect_url: "https://rp.example.com/service/return" },
     }),
