@@ -168,6 +168,15 @@ vi.mock("../../../../components/InfoBlocks/NoticeFactory", () => ({
 }));
 
 vi.mock(
+  "../../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus",
+  () => ({
+    default: ({ errorCode }) => (
+      <div data-testid="error-summary-with-focus">{errorCode}</div>
+    ),
+  }),
+);
+
+vi.mock(
   "../../../../components/Manage/SecuritySettings/components/PasskeyInfoPanel",
   () => ({
     default: () => <div data-testid="passkey-info-panel" />,
@@ -471,6 +480,27 @@ describe("Manage2FAVerifications — additional coverage", () => {
     });
     const { getByTestId } = render(<Manage2FAVerifications />);
     expect(getByTestId("notice-factory")).toHaveTextContent("passkey-added");
+  });
+
+  it("hides error summary when notice is displayed", () => {
+    mockUseLocation.mockReturnValue({
+      pathname: "/security-settings",
+      state: { noticeType: "passkeyAdded", passkeyName: "Work Laptop" },
+    });
+
+    const { getByTestId, queryByTestId } = render(<Manage2FAVerifications />);
+
+    expect(getByTestId("notice-factory")).toHaveTextContent("passkeyAdded");
+    expect(queryByTestId("error-summary-with-focus")).not.toBeInTheDocument();
+  });
+
+  it("shows error summary area when no notice is displayed", () => {
+    mockUseLocation.mockReturnValue({ state: null });
+
+    const { getByTestId, queryByTestId } = render(<Manage2FAVerifications />);
+
+    expect(queryByTestId("notice-factory")).not.toBeInTheDocument();
+    expect(getByTestId("error-summary-with-focus")).toBeInTheDocument();
   });
 
   it("persists notice state after location.state becomes null on rerender", () => {

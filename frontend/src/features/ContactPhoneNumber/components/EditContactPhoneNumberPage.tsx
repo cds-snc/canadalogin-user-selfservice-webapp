@@ -343,6 +343,9 @@ export default function EditContactPhoneNumberPage() {
 
       if (response?.success && response.data) {
         setPhoneOtpVerificationProofId("");
+        setErrorCode("");
+        setCustomErrorMessage("");
+        setIsPhoneOtpMaxAttemptsReached(false);
         updateProfileSuccess(response.data);
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
@@ -505,8 +508,8 @@ export default function EditContactPhoneNumberPage() {
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}
-      errorCode={errorCode}
-      errorMessage={errorMessage}
+      errorCode={wizardStep === "success" ? "" : errorCode}
+      errorMessage={wizardStep === "success" ? "" : errorMessage}
       language={language}
     />
   );

@@ -764,6 +764,8 @@ export default function EditEmailAddressPage() {
         setErrorCode={setErrorCode}
         setErrorMessage={setCustomErrorMessage}
         errorMessage={errorMessage}
+        otpExpiry={otpSentResponse?.expiry}
+        otpCreatedAt={otpSentResponse?.created}
         onCancel={handleBackToProfile}
         showTryAnotherWay={
           (userPhoneFactors != null && userPhoneFactors.length > 1) ||

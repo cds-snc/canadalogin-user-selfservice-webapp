@@ -35,7 +35,14 @@ export default function NoticeFactory({
   > = {
     mfaDeleted: ({ phoneNumber: currentPhoneNumber }) => (
       <GcdsText>
-        <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle={" "}>
+        <GcdsNotice
+          noticeRole="success"
+          noticeTitleTag="h2"
+          noticeTitle={" "}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <GcdsText>
             {t("NoticeFactory.successfullyDeleted")}{" "}
             <strong>{currentPhoneNumber}</strong>{" "}
@@ -50,7 +57,14 @@ export default function NoticeFactory({
       otpType: currentOtpType,
     }) => (
       <GcdsText>
-        <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle={" "}>
+        <GcdsNotice
+          noticeRole="success"
+          noticeTitleTag="h2"
+          noticeTitle={" "}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <GcdsText>
             {t("NoticeFactory.successfullyAdded")} {currentOtpType}{" "}
             {t("NoticeFactory.verificationFor")}{" "}
@@ -66,6 +80,9 @@ export default function NoticeFactory({
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("NoticeFactory.notice_title_success")}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
         >
           <GcdsText>{t("NoticeFactory.passkeyCreated")}</GcdsText>
         </GcdsNotice>
@@ -78,6 +95,9 @@ export default function NoticeFactory({
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("NoticeFactory.notice_title_success")}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
         >
           <GcdsText>
             {t("NoticeFactory.yourPasskey")}{" "}
