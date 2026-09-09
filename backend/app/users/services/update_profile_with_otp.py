@@ -3,18 +3,25 @@ import logging
 import re
 import time
 import uuid
+from datetime import datetime, timezone
 from dataclasses import dataclass
 
 from fastapi import HTTPException, status, Request
 
 from app.config import get_configuration
 from app.constants.verify_endpoints import VerifyAPIEndpoint
-from app.otp.schemas import OtpDeletionRequest, OtpEnrollmentRequest, OtpType
+from app.otp.schemas import (
+    OtpDeletionRequest,
+    OtpEnrollmentRequest,
+    OtpType,
+    RetrievalData,
+)
 from app.otp.services.delete_mfa_otp import dispatch_otp_deletion
 from app.otp.services.enroll_mfa_otp import (
     dispatch_otp_enrollment,
     dispatch_otp_factor_validation,
 )
+from app.otp.services.retrieve_transient_otp import dispatch_otp_status_retrieval
 from app.password.schemas import OtpType as FactorOtpType
 from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
@@ -39,7 +46,6 @@ logger = logging.getLogger(__name__)
 MAX_EMAIL_LENGTH = 128
 NON_ASCII_CHARACTER_REGEX = re.compile(r"[^\x00-\x7F]")
 PROFILE_UPDATE_OTP_PROOFS_SESSION_KEY = "profile_update_otp_proofs"
-PROFILE_UPDATE_OTP_PROOF_TTL_SECONDS = 300
 
 
 @dataclass
@@ -270,38 +276,43 @@ async def _apply_profile_update_otp_action(
     profile_update_data: ProfileUpdateWithOtpRequest,
     user_access_token: str,
 ) -> ProfileUpdateWithOtpResponse | None:
-    if profile_update_data.action in {
-        ProfileUpdateWithOtpAction.VERIFY,
-        ProfileUpdateWithOtpAction.COMMIT_WITH_OTP,
-    }:
-        # Verify action and legacy commit_with_otp both validate OTP directly.
+    if profile_update_data.action == ProfileUpdateWithOtpAction.VERIFY:
+        otp_type = profile_update_data.otpType
+        trxn_id = profile_update_data.trxnId
+
+        if otp_type is None or trxn_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="otp_expired",
+            )
+
+        proof_ttl_seconds = await _get_profile_update_otp_proof_ttl_seconds(
+            request=request,
+            trxn_id=trxn_id,
+            otp_type=otp_type,
+            user_access_token=user_access_token,
+        )
+
         await verify_otp_before_operation(
             global_http_client=request.app.state.request_client,
             otp=profile_update_data.otp,
-            trxn_id=profile_update_data.trxnId,
-            otp_type=profile_update_data.otpType,
+            trxn_id=trxn_id,
+            otp_type=otp_type,
             user_access_token=user_access_token,
         )
         logger.info("OTP verification successful")
 
-    if profile_update_data.action == ProfileUpdateWithOtpAction.VERIFY:
         await _run_preflight_checks_for_verified_action(
             request=request,
             profile_update_data=profile_update_data,
             user_access_token=user_access_token,
         )
 
-        otp_type = profile_update_data.otpType
-        if otp_type is None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="otpType is required for verify action",
-            )
-
         verification_proof_id = _store_profile_update_otp_proof(
             request,
             profile_update_data,
             otp_type,
+            proof_ttl_seconds,
         )
         logger.info("Issued one-time profile update verification proof")
 
@@ -310,9 +321,20 @@ async def _apply_profile_update_otp_action(
             message="OTP verified for profile update",
             data=ProfileUpdateOtpVerificationData(
                 verificationProofId=verification_proof_id,
-                expiresIn=PROFILE_UPDATE_OTP_PROOF_TTL_SECONDS,
+                expiresIn=proof_ttl_seconds,
             ),
         )
+
+    if profile_update_data.action == ProfileUpdateWithOtpAction.COMMIT_WITH_OTP:
+        # Legacy mode: verify OTP and commit in a single request.
+        await verify_otp_before_operation(
+            global_http_client=request.app.state.request_client,
+            otp=profile_update_data.otp,
+            trxn_id=profile_update_data.trxnId,
+            otp_type=profile_update_data.otpType,
+            user_access_token=user_access_token,
+        )
+        logger.info("OTP verification successful")
 
     if profile_update_data.action == ProfileUpdateWithOtpAction.COMMIT:
         verification_proof_id = profile_update_data.verificationProofId
@@ -429,6 +451,7 @@ def _store_profile_update_otp_proof(
     request: Request,
     profile_update_data: ProfileUpdateWithOtpRequest,
     otp_type: OtpType,
+    ttl_seconds: int,
 ) -> str:
     now = int(time.time())
     verification_proof_id = str(uuid.uuid4())
@@ -436,7 +459,7 @@ def _store_profile_update_otp_proof(
     proof_store = _get_profile_update_otp_proof_store(request)
     proof_store = _prune_expired_profile_update_otp_proofs(proof_store)
     proof_store[verification_proof_id] = {
-        "expiresAt": now + PROFILE_UPDATE_OTP_PROOF_TTL_SECONDS,
+        "expiresAt": now + ttl_seconds,
         "otpType": otp_type.value,
         "fingerprint": _build_profile_update_fingerprint(profile_update_data),
     }
@@ -480,6 +503,81 @@ def _consume_profile_update_otp_proof_or_raise(
 
     proof_store.pop(verification_proof_id, None)
     request.session[PROFILE_UPDATE_OTP_PROOFS_SESSION_KEY] = proof_store
+
+
+def _parse_iso_datetime(value: str | None) -> datetime | None:
+    if not value:
+        return None
+
+    normalized_value = value.strip()
+    if normalized_value.endswith("Z"):
+        normalized_value = normalized_value[:-1] + "+00:00"
+
+    try:
+        parsed_datetime = datetime.fromisoformat(normalized_value)
+    except ValueError:
+        return None
+
+    if parsed_datetime.tzinfo is None:
+        return parsed_datetime.replace(tzinfo=timezone.utc)
+
+    return parsed_datetime.astimezone(timezone.utc)
+
+
+async def _get_profile_update_otp_proof_ttl_seconds(
+    request: Request,
+    trxn_id: str,
+    otp_type: OtpType,
+    user_access_token: str,
+) -> int:
+    """Derive proof TTL from the OTP transaction expiry.
+
+    Fail closed when expiry cannot be resolved.
+    """
+    try:
+        status_response = await dispatch_otp_status_retrieval(
+            request.app.state.request_client,
+            RetrievalData(trxnId=trxn_id, otpType=otp_type),
+            user_access_token,
+        )
+
+        if status_response.status_code != 200:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="otp_expired",
+            )
+
+        response_body = status_response.json()
+        otp_expiry_datetime = _parse_iso_datetime(response_body.get("expiry"))
+
+        if otp_expiry_datetime is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="otp_expired",
+            )
+
+        remaining_seconds = int(
+            (otp_expiry_datetime - datetime.now(timezone.utc)).total_seconds()
+        )
+
+        if remaining_seconds <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="otp_expired",
+            )
+
+        return remaining_seconds
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.warning(
+            "Failed to derive OTP-based proof TTL, failing closed: %s",
+            str(e),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="otp_expired",
+        )
 
 
 def _get_email_mfa_theme() -> str | None:

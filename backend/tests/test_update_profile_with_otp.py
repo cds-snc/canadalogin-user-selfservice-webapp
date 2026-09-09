@@ -240,6 +240,7 @@ PREFLIGHT_EMAIL_CHECK_IMPORT_PATH = (
     "app.users.services.update_profile_with_otp._is_email_already_associated"
 )
 VERIFY_ACTION_PREFLIGHT_IMPORT_PATH = "app.users.services.update_profile_with_otp._run_preflight_checks_for_verified_action"
+PROOF_TTL_IMPORT_PATH = "app.users.services.update_profile_with_otp._get_profile_update_otp_proof_ttl_seconds"
 
 
 class TestUpdateProfileWithOtpVerification:
@@ -324,15 +325,18 @@ class TestUpdateProfileWithOtpVerification:
         mock_get_profile.assert_not_called()
 
     @pytest.mark.asyncio
+    @patch(PROOF_TTL_IMPORT_PATH)
     @patch(VERIFY_ACTION_PREFLIGHT_IMPORT_PATH)
     @patch(VERIFY_OTP_IMPORT_PATH)
     async def test_verify_action_returns_one_time_proof(
         self,
         mock_verify_otp,
         mock_verify_action_preflight,
+        mock_proof_ttl,
     ):
         mock_verify_otp.return_value = None
         mock_verify_action_preflight.return_value = None
+        mock_proof_ttl.return_value = 123
 
         mock_request = Mock()
         mock_request.app = Mock()
@@ -356,7 +360,7 @@ class TestUpdateProfileWithOtpVerification:
         assert response.message == "OTP verified for profile update"
         assert response.data is not None
         assert response.data.verificationProofId
-        assert response.data.expiresIn == 300
+        assert response.data.expiresIn == 123
         assert "profile_update_otp_proofs" in mock_request.session
         assert (
             response.data.verificationProofId
