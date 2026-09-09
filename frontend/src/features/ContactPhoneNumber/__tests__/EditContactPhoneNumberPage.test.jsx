@@ -16,6 +16,7 @@ import "@testing-library/jest-dom/vitest";
 const mockNavigate = vi.fn();
 const mockLocation = { state: null };
 let mockParams = { language: "en", step: undefined };
+const mockStepContent = vi.fn(({ StepComponent }) => StepComponent);
 
 // Mock react-router hooks
 vi.mock("react-router", async () => {
@@ -161,7 +162,7 @@ vi.mock("../components/SuccessfullyUpdated", () => ({
 }));
 
 vi.mock("../../../components/Wizard/StepContent", () => ({
-  default: ({ StepComponent }) => StepComponent,
+  default: (props) => mockStepContent(props),
 }));
 
 vi.mock("../../../components/Layout/Loading", () => ({
@@ -549,5 +550,71 @@ describe("EditContactPhoneNumberPage Component", () => {
       const otpError = screen.getByTestId("otp-error");
       expect(otpError.textContent).toContain("3");
     });
+  });
+
+  it("clears stale OTP errors when the flow reaches success", async () => {
+    mockAuthService.transientOtpSend.mockResolvedValue({
+      data: { trxnId: "test-trxn-id" },
+    });
+    mockAuthService.verify_phone_otp_for_update
+      .mockRejectedValueOnce({
+        data: {
+          message: "invalidCode",
+          retries: 4,
+          attempts: 1,
+          trxnId: "new-trxn-id",
+        },
+      })
+      .mockResolvedValueOnce({
+        success: true,
+        data: { verificationProofId: "test-proof-id" },
+      });
+    mockAuthService.update_phone_with_otp.mockResolvedValue({
+      success: true,
+      data: { phoneNumbers: [{ value: "+15551234567" }] },
+    });
+
+    render(
+      <TestWrapper>
+        <EditContactPhoneNumberPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.change(screen.getByTestId("phone-input"), {
+      target: { value: "+15551234567" },
+    });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByTestId("otp-input"), {
+      target: { value: "111111" },
+    });
+    fireEvent.click(screen.getByTestId("verify-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("otp-error")).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByTestId("otp-input"), {
+      target: { value: "123456" },
+    });
+    fireEvent.click(screen.getByTestId("verify-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("confirm-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("successfully-updated")).toBeInTheDocument();
+    });
+
+    const lastStepContentCall = mockStepContent.mock.calls.at(-1)?.[0];
+    expect(lastStepContentCall?.errorCode).toBe("");
+    expect(lastStepContentCall?.errorMessage).toBe("");
   });
 });

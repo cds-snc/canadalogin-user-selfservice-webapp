@@ -1,4 +1,6 @@
-import { GcdsButton, GcdsNotice, GcdsText } from "@gcds-core/components-react";
+import { GcdsButton, GcdsText } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 
@@ -16,7 +18,7 @@ export default function CompleteIdentityProofingNotice() {
   });
 
   return (
-    <GcdsNotice
+    <AccessibleNotice
       noticeRole="info"
       noticeTitleTag="h2"
       noticeTitle={t("CompleteIdentityProofing.noticeTitle")}
@@ -31,6 +33,6 @@ export default function CompleteIdentityProofingNotice() {
       >
         {t("CompleteIdentityProofing.noticeCta")}
       </GcdsButton>
-    </GcdsNotice>
+    </AccessibleNotice>
   );
 }

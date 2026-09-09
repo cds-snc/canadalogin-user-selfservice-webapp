@@ -21,7 +21,7 @@
     "callMe": "Call me",
     "callMeEndingIn": "Call me at number ending in {{digits}}",
     "verify": "Verify",
-    "verifyWithPasskey": "Verify with {{name}} passkey",
+    "verifyWithPasskey": "Verify with {{name}}",
     "chooseVerifyMethod": "Choose how you want to verify",
     "toDeletePasskey": "To delete a passkey or security key,",
     "toAddPasskey": "To add a passkey or security key,",

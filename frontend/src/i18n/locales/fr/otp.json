@@ -22,7 +22,7 @@
     "callMe": "Appelez-moi",
     "callMeEndingIn": "Appelez-moi au numéro se terminant par {{digits}}",
     "verify": "Vérifier",
-    "verifyWithPasskey": "Vérifier avec la clé d'accès {{name}}",
+    "verifyWithPasskey": "Vérifier avec {{name}}",
     "chooseVerifyMethod": "Choisissez une méthode de vérification",
     "toDeletePasskey": "Pour supprimer cette clé d’accès ou clé de sécurité,",
     "toAddPasskey": "Pour ajouter une clé d’accès ou une clé de sécurité,",

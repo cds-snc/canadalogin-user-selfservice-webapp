@@ -8,9 +8,10 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 
 import { useTranslation } from "react-i18next";
 
@@ -18,6 +19,7 @@ import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../utils/constants";
 import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import { useBreakpoints } from "../../../hooks/useBreakpoints";
 import { useOtpExpiryCountdown } from "../../../hooks/useOtpExpiryCountdown";
 import type {
   ContactPhoneOtpType,
@@ -30,6 +32,8 @@ interface PageHeaderProps {
   formattedPhoneNumber: string;
   countdownDisplay: string;
 }
+
+const OTP_CODE_MAX_LENGTH = 6;
 
 function PageHeader({
   language,
@@ -72,6 +76,7 @@ export default function OtpVerification({
   errorMessage,
   requestNewOtpCode,
   setErrorCode,
+  setErrorMessage,
   isMaxAttemptsReached = false,
   resetAttempts,
 }: ContactPhoneOtpVerificationProps) {
@@ -79,6 +84,7 @@ export default function OtpVerification({
 
   const [codeRequested, setCodeRequested] = useState(false);
   const { t } = useTranslation(["verification", "common"]);
+  const { mobile } = useBreakpoints();
   const [localError, setLocalError] = useState("");
   const {
     fallbackSeconds,
@@ -89,6 +95,8 @@ export default function OtpVerification({
   } = useOtpExpiryCountdown(phoneFormData.expiry, 10, phoneFormData.created);
 
   const displayError = localError || errorMessage || "";
+  const shouldShowSuccessNotice = codeRequested && !displayError;
+  const otpInputSize = mobile ? 18 : 6;
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -99,29 +107,61 @@ export default function OtpVerification({
 
   const requestNewCode = async (otpType?: ContactPhoneOtpType) => {
     onChangePhoneForm("otp", "");
-    await requestNewOtpCode(otpType ?? phoneFormData.otpType);
+    const requestResult = await requestNewOtpCode(
+      otpType ?? phoneFormData.otpType,
+    );
+
+    if (requestResult === false) {
+      setCodeRequested(false);
+      return;
+    }
+
     setCodeRequested(true);
     setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
     restartFallbackCountdown();
     resetAttempts?.();
   };
 
   const handleChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
-    onChangePhoneForm("otp", target.value);
+    const sanitizedValue = target.value
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    onChangePhoneForm("otp", sanitizedValue);
     setCodeRequested(false);
     setErrorCode?.("");
+    setErrorMessage?.("");
     setLocalError("");
+  };
+
+  const doSubmit = async () => {
+    setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
+
+    const normalizedOtp = phoneFormData.otp
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    if (normalizedOtp.length < OTP_CODE_MAX_LENGTH) {
+      const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
+      setLocalError(invalidCodeMessage);
+      setErrorCode?.("invalidCode");
+      return;
+    }
+
+    await onNext();
   };
 
   const onSubmitHandler: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
-    await onNext();
+    await doSubmit();
   };
 
   const onSubmitClick = (event: CustomEvent<string | void>) => {
     event.preventDefault();
-    void onNext();
+    void doSubmit();
   };
 
   const userMfaType = phoneFormData.otpType;
@@ -144,15 +184,15 @@ export default function OtpVerification({
 
   return (
     <GcdsContainer role="main">
-      {codeRequested ? (
-        <GcdsNotice
+      {shouldShowSuccessNotice ? (
+        <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("Verification.newCodeSent")}
           data-testid="linkSuccess"
         >
           &nbsp;
-        </GcdsNotice>
+        </AccessibleNotice>
       ) : null}
 
       <GcdsContainer>
@@ -208,12 +248,15 @@ export default function OtpVerification({
                 autocomplete="one-time-code"
                 name="verificationCode"
                 type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength={OTP_CODE_MAX_LENGTH}
                 value={phoneFormData.otp}
                 validateOn="other"
                 errorMessage={displayError}
                 onGcdsInput={handleChange}
                 lang={language}
-                size={18}
+                size={otpInputSize}
               />
             </form>
 
@@ -244,6 +287,7 @@ export default function OtpVerification({
       <GcdsText>
         <GcdsLink
           role="button"
+          style={{ textDecoration: "underline" }}
           onGcdsClick={switchVerificationMethod}
           onKeyDown={(event) =>
             handleLinkButtonKeyDown(event, switchVerificationMethod)
@@ -267,6 +311,7 @@ export default function OtpVerification({
         ) : (
           <GcdsLink
             role="button"
+            style={{ textDecoration: "underline" }}
             onGcdsClick={requestNewCodeAction}
             onKeyDown={(event) =>
               handleLinkButtonKeyDown(event, requestNewCodeAction)
@@ -280,6 +325,7 @@ export default function OtpVerification({
       <GcdsText>
         <GcdsLink
           role="button"
+          style={{ textDecoration: "underline" }}
           onGcdsClick={tryAnotherWayAction}
           onKeyDown={(event) =>
             handleLinkButtonKeyDown(event, tryAnotherWayAction)

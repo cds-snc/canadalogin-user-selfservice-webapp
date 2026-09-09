@@ -411,6 +411,39 @@ describe("EditEmailAddressPage", () => {
     expect(mocks.updateEmailWithOtp).not.toHaveBeenCalled();
   });
 
+  it("maps expired email OTP verification errors to otp_max_attempts", async () => {
+    mocks.verifyEmailOtpForUpdate.mockRejectedValueOnce({
+      data: {
+        message: "CSIAM0010E",
+      },
+    });
+
+    render(<EditEmailAddressPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "verify password" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "verify account otp" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "fill new email" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "submit new email" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "continue with email otp" }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-summary")).toHaveTextContent(
+        "Error.otp_max_attempts",
+      );
+      expect(
+        screen.queryByRole("button", { name: "confirm email update" }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
   it("navigates back to email OTP validation when update returns OTP attempts metadata", async () => {
     mocks.updateEmailWithOtp.mockRejectedValueOnce({
       data: {
@@ -439,6 +472,46 @@ describe("EditEmailAddressPage", () => {
     fireEvent.click(
       await screen.findByRole("button", { name: "confirm email update" }),
     );
+
+    expect(
+      await screen.findByRole("button", { name: "continue with email otp" }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows otp_max_attempts when email update fails after OTP attempts are exhausted", async () => {
+    mocks.updateEmailWithOtp.mockRejectedValueOnce({
+      data: {
+        message: "CSIAM0011E",
+        retries: 5,
+        attempts: 5,
+      },
+    });
+
+    render(<EditEmailAddressPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "verify password" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "verify account otp" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "fill new email" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "submit new email" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "continue with email otp" }),
+    );
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "confirm email update" }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-summary")).toHaveTextContent(
+        "Error.otp_max_attempts",
+      );
+    });
 
     expect(
       await screen.findByRole("button", { name: "continue with email otp" }),

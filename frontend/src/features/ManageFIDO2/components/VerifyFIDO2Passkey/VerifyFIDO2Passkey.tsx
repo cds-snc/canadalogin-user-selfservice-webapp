@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useParams } from "react-router";
 import {
   GcdsButton,
@@ -48,22 +48,20 @@ export default function VerifyFIDO2Passkey({
   const { language: routeLanguage } = useParams<{ language?: string }>();
   const language: "en" | "fr" = routeLanguage === "fr" ? "fr" : "en";
   const { t } = useTranslation(["fido2", "common"]);
-  const hasTriggeredRef = useRef(false);
-  const [localLoading, setLocalLoading] = useState(true);
+  const isVerifyingRef = useRef(false);
+  const [localLoading, setLocalLoading] = useState(false);
 
   /**
    * Trigger FIDO2 authentication flow
    */
   const handleFIDO2Verification = async () => {
-    setLocalLoading(true);
-    setErrorCode("");
-    // Prevent multiple calls - persist across strict mode remounts
-    if (hasTriggeredRef.current) {
+    if (isVerifyingRef.current) {
       return;
     }
 
-    // Set flag immediately and permanently (don't reset even on error)
-    hasTriggeredRef.current = true;
+    isVerifyingRef.current = true;
+    setLocalLoading(true);
+    setErrorCode("");
 
     try {
       // Check WebAuthn browser support
@@ -129,16 +127,9 @@ export default function VerifyFIDO2Passkey({
       onError?.("error_fido2_verification");
     } finally {
       setLocalLoading(false);
-      hasTriggeredRef.current = false;
+      isVerifyingRef.current = false;
     }
   };
-
-  // Automatically trigger FIDO2 verification when component mounts
-  useEffect(() => {
-    void handleFIDO2Verification();
-    // No cleanup needed - flag persists across remounts
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return localLoading ? (
     <Loader text={t("VerifyFIDO2Passkey.loading")} />
@@ -196,6 +187,7 @@ export default function VerifyFIDO2Passkey({
           <GcdsLink
             target="_blank"
             href={gcHelpCentreLinks.helpSigningInWithPasskey[language]}
+            style={{ textDecoration: "underline" }}
           >
             {t("VerifyFIDO2Passkey.helpLink")}
           </GcdsLink>

@@ -5,9 +5,10 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 
 import { useTranslation } from "react-i18next";
 import {
@@ -71,7 +72,7 @@ export default function SuccessfullyUpdated({
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("ProfileUpdateNameSuccess.successTitle")}
@@ -80,7 +81,7 @@ export default function SuccessfullyUpdated({
             {t("ProfileUpdateNameSuccess.nameUpdatedTo")}{" "}
             <strong>{username}</strong>
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         <GcdsHeading tag="h1">
           {t("ProfileUpdateNameSuccess.updateOtherPlaces")}
@@ -92,13 +93,17 @@ export default function SuccessfullyUpdated({
         <GcdsText>{t("ProfileUpdateNameSuccess.notConnectedNotice")}</GcdsText>
         <GcdsText>
           {t("ProfileUpdateNameSuccess.searchOtherAccounts")}{" "}
-          <GcdsLink href={gcAccountDirectoryLink} target="_blank">
+          <GcdsLink
+            href={gcAccountDirectoryLink}
+            target="_blank"
+            style={{ textDecoration: "underline" }}
+          >
             {t("ProfileUpdateNameSuccess.gcAccountDirectory")}
           </GcdsLink>
           .
         </GcdsText>
 
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="warning"
           noticeTitleTag="h2"
           noticeTitle={t("ProfileUpdateNameSuccess.syncNoticeTitle")}
@@ -108,12 +113,16 @@ export default function SuccessfullyUpdated({
           </GcdsText>
           <GcdsText>
             {t("ProfileUpdateNameSuccess.servicesLinkLead")}{" "}
-            <GcdsLink href={participatingServicesLink} target="_blank">
+            <GcdsLink
+              href={participatingServicesLink}
+              target="_blank"
+              style={{ textDecoration: "underline" }}
+            >
               {t("ProfileUpdateNameSuccess.servicesLinkText")}
             </GcdsLink>{" "}
             {t("ProfileUpdateNameSuccess.servicesLinkSuffix")}
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton

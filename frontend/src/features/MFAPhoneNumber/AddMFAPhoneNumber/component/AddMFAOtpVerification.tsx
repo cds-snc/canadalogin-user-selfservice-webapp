@@ -7,13 +7,15 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../../components/InfoBlocks/AccessibleNotice";
 import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import SubmitButton from "../../../../components/Layout/SubmitButton";
+import { useBreakpoints } from "../../../../hooks/useBreakpoints";
 import { useOtpExpiryCountdown } from "../../../../hooks/useOtpExpiryCountdown";
 import EmailNotificationInfoNotice from "../../../../components/InfoBlocks/EmailNotificationInfoNotice";
 
@@ -69,6 +71,8 @@ interface PhoneFormData {
   formattedPhoneNumber: string;
 }
 
+const OTP_CODE_MAX_LENGTH = 6;
+
 interface AddMFAOtpVerificationProps {
   onNext: () => Promise<void>;
   onCancel: () => Promise<void>;
@@ -76,7 +80,9 @@ interface AddMFAOtpVerificationProps {
   onChangePhoneForm: (field: string, value: string) => void;
   phoneFormData: PhoneFormData;
   errorMessage: string;
-  requestNewOtpCode: () => Promise<void>;
+  setErrorCode?: (errorCode: string) => void;
+  setErrorMessage?: (errorMessage: string) => void;
+  requestNewOtpCode: () => Promise<void | boolean>;
   onUseDifferentPhoneNumber: () => Promise<void>;
   onSetupAlternateMFAMethod: () => Promise<void>;
   isMaxAttemptsReached?: boolean;
@@ -90,6 +96,8 @@ export default function AddMFAOtpVerification({
   onChangePhoneForm,
   phoneFormData,
   errorMessage,
+  setErrorCode,
+  setErrorMessage,
   requestNewOtpCode,
   onUseDifferentPhoneNumber,
   onSetupAlternateMFAMethod,
@@ -100,6 +108,7 @@ export default function AddMFAOtpVerification({
 
   const [codeRequested, setCodeRequested] = useState(false);
   const { t } = useTranslation(["verification", "common"]);
+  const { mobile } = useBreakpoints();
   const [localError, setLocalError] = useState("");
   const {
     fallbackSeconds,
@@ -110,6 +119,8 @@ export default function AddMFAOtpVerification({
   } = useOtpExpiryCountdown(phoneFormData.expiry, 10, phoneFormData.created);
 
   const displayError = localError || errorMessage || "";
+  const shouldShowSuccessNotice = codeRequested && !displayError;
+  const otpInputSize = mobile ? 18 : 6;
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -118,20 +129,33 @@ export default function AddMFAOtpVerification({
     setCodeRequested(false);
   };
 
-  const requestNewCode = () => {
+  const requestNewCode = async () => {
     onChangePhoneForm("otp", "");
-    requestNewOtpCode();
+    const requestResult = await requestNewOtpCode();
+
+    if (requestResult === false) {
+      setCodeRequested(false);
+      return;
+    }
+
     setCodeRequested(true);
     setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
     restartFallbackCountdown();
     resetAttempts?.();
   };
 
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
-    onChangePhoneForm("otp", value);
+    const sanitizedValue = value
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    onChangePhoneForm("otp", sanitizedValue);
     setCodeRequested(false);
     setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
   };
 
   // Clear OTP field on mount
@@ -144,6 +168,19 @@ export default function AddMFAOtpVerification({
 
   const doSubmit = async () => {
     setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
+
+    const normalizedOtp = phoneFormData.otp
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    if (normalizedOtp.length < OTP_CODE_MAX_LENGTH) {
+      const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
+      setLocalError(invalidCodeMessage);
+      setErrorCode?.("invalidCode");
+      return;
+    }
+
     await onNext();
   };
 
@@ -155,15 +192,15 @@ export default function AddMFAOtpVerification({
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
-        {codeRequested && (
-          <GcdsNotice
+        {shouldShowSuccessNotice && (
+          <AccessibleNotice
             noticeRole="success"
             noticeTitleTag="h2"
             noticeTitle={t("Verification.newCodeSent")}
             data-testid="linkSuccess"
           >
             &nbsp;
-          </GcdsNotice>
+          </AccessibleNotice>
         )}
 
         <GcdsContainer>
@@ -187,7 +224,7 @@ export default function AddMFAOtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    requestNewCode();
+                    void requestNewCode();
                   }}
                 >
                   {t("Verification.requestNewCode")}
@@ -216,12 +253,15 @@ export default function AddMFAOtpVerification({
                   autocomplete="one-time-code"
                   name="verificationCode"
                   type="text"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  maxlength={OTP_CODE_MAX_LENGTH}
                   value={phoneFormData.otp}
                   validateOn="other"
                   errorMessage={displayError}
                   onGcdsInput={handleChange}
                   lang={language}
-                  size={18}
+                  size={otpInputSize}
                 ></GcdsInput>
               </form>
 
@@ -266,6 +306,7 @@ export default function AddMFAOtpVerification({
 
           <GcdsText>
             <GcdsLink
+              style={{ textDecoration: "underline" }}
               onGcdsClick={async () => {
                 await onSetupAlternateMFAMethod();
               }}
@@ -287,8 +328,9 @@ export default function AddMFAOtpVerification({
               </span>
             ) : (
               <GcdsLink
+                style={{ textDecoration: "underline" }}
                 onGcdsClick={() => {
-                  requestNewCode();
+                  void requestNewCode();
                 }}
               >
                 {userMfaType !== FLOW_TYPES.email
@@ -300,6 +342,7 @@ export default function AddMFAOtpVerification({
 
           <GcdsText>
             <GcdsLink
+              style={{ textDecoration: "underline" }}
               onGcdsClick={async () => {
                 clearValues();
                 await onUseDifferentPhoneNumber();

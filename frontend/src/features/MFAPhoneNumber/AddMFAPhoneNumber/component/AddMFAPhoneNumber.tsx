@@ -162,14 +162,21 @@ export default function AddMFAPhoneNumber({
           <GcdsText>{t("AddMFANumber.description")}</GcdsText>
           <GcdsText>
             {t("AddMFANumber.onlyFor2Step")}{" "}
-            <GcdsLink href={backtoProfilePage}>
+            <GcdsLink
+              href={backtoProfilePage}
+              style={{ textDecoration: "underline" }}
+            >
               {t("AddMFANumber.personalInformation")}
             </GcdsLink>{" "}
             {t("AddMFANumber.period")}
           </GcdsText>
           <GcdsText>
             {t("AddMFANumber.privacyNoticeLead")}{" "}
-            <GcdsLink href={privacyNoticeHref} target="_blank">
+            <GcdsLink
+              href={privacyNoticeHref}
+              target="_blank"
+              style={{ textDecoration: "underline" }}
+            >
               {t("AddMFANumber.privacyNoticeLink")}
             </GcdsLink>{" "}
             {t("AddMFANumber.privacyNoticeSuffix")}

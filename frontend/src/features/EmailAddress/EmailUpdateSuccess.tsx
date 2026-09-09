@@ -11,8 +11,9 @@ import {
   GcdsButton,
   GcdsGrid,
   GcdsLink,
-  GcdsNotice,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
 interface EmailUpdateSuccessProps {
@@ -35,7 +36,7 @@ export default function EmailUpdateSuccess({
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("EmailUpdateSuccess.successTitle")}
@@ -45,7 +46,7 @@ export default function EmailUpdateSuccess({
             {t("EmailUpdateSuccess.emailUpdatedTo")}{" "}
             <strong>{newEmailAddress}</strong>.
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         <GcdsHeading
           tag="h1"
@@ -66,13 +67,17 @@ export default function EmailUpdateSuccess({
 
         <GcdsText marginBottom="300" lang={language}>
           {t("EmailUpdateSuccess.searchOtherAccounts")}{" "}
-          <GcdsLink href={gcAccountDirectoryLink} target="_blank">
+          <GcdsLink
+            href={gcAccountDirectoryLink}
+            target="_blank"
+            style={{ textDecoration: "underline" }}
+          >
             {t("EmailUpdateSuccess.gcAccountDirectory")}
           </GcdsLink>
           {t("EmailUpdateSuccess.period")}
         </GcdsText>
 
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="warning"
           noticeTitleTag="h2"
           noticeTitle={t("EmailUpdateSuccess.syncNoticeTitle")}
@@ -81,12 +86,16 @@ export default function EmailUpdateSuccess({
           <GcdsText>{t("EmailUpdateSuccess.syncNoticeDescription")}</GcdsText>
           <GcdsText>
             {t("EmailUpdateSuccess.servicesLinkLead")}{" "}
-            <GcdsLink href={participatingServicesLink} target="_blank">
+            <GcdsLink
+              href={participatingServicesLink}
+              target="_blank"
+              style={{ textDecoration: "underline" }}
+            >
               {t("EmailUpdateSuccess.servicesLinkText")}
             </GcdsLink>
             {t("EmailUpdateSuccess.servicesLinkSuffix")}
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton

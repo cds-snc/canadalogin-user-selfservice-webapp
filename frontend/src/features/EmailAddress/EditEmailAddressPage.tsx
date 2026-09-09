@@ -24,6 +24,7 @@ import { useWizardPageTracking } from "../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../utils/analyticsConstants";
 import { EMAIL_ADDRESS_ANALYTICS } from "../../utils/analyticsConstants";
 import { mergeOtpSentResponseWithMetadata } from "../../utils/otpMetadata";
+import { shouldDisplayOtpMaxAttempts } from "../../utils/otpErrorMapping";
 import VerifyFIDO2Passkey from "../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 import EditEmailEnterEmail from "./EditEmailEnterEmail";
 import EmailOtpValidation from "./EmailOtpValidation";
@@ -398,6 +399,7 @@ export default function EditEmailAddressPage() {
     const apiErrorPayload = error?.data ?? error?.response?.data;
     const retries = apiErrorPayload?.retries;
     const attempts = apiErrorPayload?.attempts;
+    const payloadMessage = apiErrorPayload?.message;
 
     setOtpSentResponse((prev) =>
       mergeOtpSentResponseWithMetadata(prev, {
@@ -409,6 +411,19 @@ export default function EditEmailAddressPage() {
 
     setIsEmailOtpMaxAttemptsReached(false);
     setCustomErrorMessage("");
+
+    if (
+      shouldDisplayOtpMaxAttempts({
+        errorCode: payloadMessage,
+        retries,
+        attempts,
+      })
+    ) {
+      setIsEmailOtpMaxAttemptsReached(true);
+      setCustomErrorMessage(t("Error.otp_max_attempts", { ns: "common" }));
+      setErrorCode("otp_max_attempts");
+      return "otp_max_attempts";
+    }
 
     if (
       retries !== undefined &&
@@ -531,12 +546,13 @@ export default function EditEmailAddressPage() {
       }
 
       if (!emailOtpVerificationProofId) {
-        setErrorCode("otp_expired");
-        setIsEmailOtpMaxAttemptsReached(false);
+        setErrorCode("otp_max_attempts");
+        setIsEmailOtpMaxAttemptsReached(true);
+        setCustomErrorMessage(t("Error.otp_max_attempts", { ns: "common" }));
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-          error: "otp_expired",
+          error: "otp_max_attempts",
         });
         return;
       }
@@ -586,6 +602,7 @@ export default function EditEmailAddressPage() {
       const shouldNavigateBackToEmailOtpValidation =
         message === EXISTING_EMAIL_CONFLICT_ERROR_CODE ||
         message === "otp_expired" ||
+        message === "otp_max_attempts" ||
         message === "invalidCode" ||
         (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
           apiErrorPayload?.message ?? "",
@@ -747,6 +764,8 @@ export default function EditEmailAddressPage() {
         setErrorCode={setErrorCode}
         setErrorMessage={setCustomErrorMessage}
         errorMessage={errorMessage}
+        otpExpiry={otpSentResponse?.expiry}
+        otpCreatedAt={otpSentResponse?.created}
         onCancel={handleBackToProfile}
         showTryAnotherWay={
           (userPhoneFactors != null && userPhoneFactors.length > 1) ||

@@ -5,9 +5,10 @@ import {
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 import SubmitButton from "../../components/Layout/SubmitButton";
 
 type EmailFormData = {
@@ -44,7 +45,7 @@ export default function EmailConfirmUpdate({
           <strong>{formData.emailAddress}</strong>
         </GcdsText>
 
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="warning"
           noticeTitleTag="h2"
           noticeTitle={t("EmailConfirmUpdate.warningTitle")}
@@ -63,7 +64,7 @@ export default function EmailConfirmUpdate({
             </li>
             <li>{t("EmailConfirmUpdate.warningBullet2")}</li>
           </ul>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton currentLang={language} onClick={() => void onSubmit()}>

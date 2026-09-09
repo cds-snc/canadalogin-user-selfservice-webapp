@@ -37,6 +37,7 @@ import {
   extractOtpServerMetadata,
   hasOtpServerMetadata,
 } from "../../../utils/otpMetadata";
+import { shouldDisplayOtpMaxAttempts } from "../../../utils/otpErrorMapping";
 
 type UpdatePhoneTransport = "sms" | "voice";
 
@@ -117,7 +118,7 @@ export default function EditContactPhoneNumberPage() {
   }: {
     reSendOtpCode?: boolean;
     otpType?: ContactPhoneOtpType;
-  } = {}) => {
+  } = {}): Promise<boolean> => {
     try {
       if (!reSendOtpCode) {
         setLocalLoading(true);
@@ -153,7 +154,11 @@ export default function EditContactPhoneNumberPage() {
             type: otpType ?? phoneFormData.otpType,
           });
         }
+
+        return true;
       }
+
+      return false;
     } catch (error) {
       const metadata = extractOtpServerMetadata(error);
       if (hasOtpServerMetadata(metadata)) {
@@ -175,6 +180,8 @@ export default function EditContactPhoneNumberPage() {
           error: message,
         });
       }
+
+      return false;
     } finally {
       setLocalLoading(false);
     }
@@ -219,6 +226,21 @@ export default function EditContactPhoneNumberPage() {
 
     const retries = payload?.retries;
     const attempts = payload?.attempts;
+    const payloadMessage = payload?.message;
+
+    if (
+      shouldDisplayOtpMaxAttempts({
+        errorCode: payloadMessage,
+        retries,
+        attempts,
+      })
+    ) {
+      setIsPhoneOtpMaxAttemptsReached(true);
+      setCustomErrorMessage(t("Error.otp_max_attempts", { ns: "common" }));
+      setErrorCode("otp_max_attempts");
+      return "otp_max_attempts";
+    }
+
     if (
       retries !== undefined &&
       retries !== null &&
@@ -327,6 +349,9 @@ export default function EditContactPhoneNumberPage() {
 
       if (response?.success && response.data) {
         setPhoneOtpVerificationProofId("");
+        setErrorCode("");
+        setCustomErrorMessage("");
+        setIsPhoneOtpMaxAttemptsReached(false);
         updateProfileSuccess(response.data);
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
@@ -354,6 +379,7 @@ export default function EditContactPhoneNumberPage() {
 
       if (
         message === "otp_expired" ||
+        message === "otp_max_attempts" ||
         message === "invalidCode" ||
         (payloadMessage != null &&
           INVALID_OTP_ERROR_CODES.includes(
@@ -409,7 +435,7 @@ export default function EditContactPhoneNumberPage() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneFormChange}
         errorMessage={errorMessage}
-        onNext={() => {
+        onNext={async () => {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
@@ -418,7 +444,7 @@ export default function EditContactPhoneNumberPage() {
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
           });
-          return sendOtp({ reSendOtpCode: false });
+          await sendOtp({ reSendOtpCode: false });
         }}
         onCancel={handleBackToProfile}
         setErrorCode={setErrorCode}
@@ -450,6 +476,7 @@ export default function EditContactPhoneNumberPage() {
         isMaxAttemptsReached={isPhoneOtpMaxAttemptsReached}
         resetAttempts={resetOtpAttemptState}
         setErrorCode={setErrorCode}
+        setErrorMessage={setCustomErrorMessage}
       />
     ),
     confirmUpdate: (
@@ -488,8 +515,8 @@ export default function EditContactPhoneNumberPage() {
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}
-      errorCode={errorCode}
-      errorMessage={errorMessage}
+      errorCode={wizardStep === "success" ? "" : errorCode}
+      errorMessage={wizardStep === "success" ? "" : errorMessage}
       language={language}
     />
   );

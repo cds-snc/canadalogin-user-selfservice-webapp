@@ -6,9 +6,10 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 
 import {
   DEV_ONLY_FEATURE,
@@ -37,13 +38,13 @@ export default function ConnectedServicesPage() {
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("successNotice.title")}
         >
           <GcdsText>{t("successNotice.body")}</GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         <GcdsGrid columns="1" gap="150">
           <GcdsHeading tag="h1">{t("heading")}</GcdsHeading>
@@ -92,6 +93,7 @@ export default function ConnectedServicesPage() {
               <GcdsLink
                 href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
                 lang={language}
+                style={{ textDecoration: "underline" }}
               >
                 {t("directoryLink")}
               </GcdsLink>

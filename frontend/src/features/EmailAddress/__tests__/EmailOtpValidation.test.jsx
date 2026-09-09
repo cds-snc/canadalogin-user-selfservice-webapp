@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  act,
+  fireEvent,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router";
 import React from "react";
@@ -242,8 +248,8 @@ describe("EmailOtpValidation", () => {
       expect(input).toHaveAttribute("name", "verificationCode");
       expect(input).toHaveAttribute("id", "verificationCode");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
-      expect(input).toHaveAttribute("size", "18");
-      expect(input).not.toHaveAttribute("maxLength");
+      expect(input).toHaveAttribute("size", "6");
+      expect(input).toHaveAttribute("maxLength", "6");
       expect(input).not.toHaveAttribute("minLength");
     });
 
@@ -354,6 +360,16 @@ describe("EmailOtpValidation", () => {
       expect(mockHandleChange).toHaveBeenCalled();
     });
 
+    it("clamps OTP input to six numeric digits", async () => {
+      const user = userEvent.setup();
+      renderComponent();
+
+      const input = screen.getByTestId("gcds-input");
+      await user.type(input, "123456789");
+
+      expect(mockHandleChange).toHaveBeenLastCalledWith("123456");
+    });
+
     it("back link is clickable", async () => {
       const user = userEvent.setup();
       renderComponent();
@@ -433,6 +449,35 @@ describe("EmailOtpValidation", () => {
       expect(
         screen.queryByText("We have sent you a new code"),
       ).not.toBeInTheDocument();
+    });
+
+    it("increases resend delay by 10 seconds after each successful resend", async () => {
+      vi.useFakeTimers();
+      mockRequestOtpCode.mockResolvedValue(true);
+
+      renderComponent();
+
+      for (let second = 0; second < 10; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Request a new code"));
+      });
+      expect(screen.getByText(/20\s+seconds/)).toBeInTheDocument();
+
+      for (let second = 0; second < 20; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Request a new code"));
+      });
+      expect(screen.getByText(/30\s+seconds/)).toBeInTheDocument();
     });
   });
 

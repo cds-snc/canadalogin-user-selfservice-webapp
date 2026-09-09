@@ -46,11 +46,6 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </h3>
   ),
-  GcdsGrid: ({ children, className, ...props }) => (
-    <div data-testid="gcds-grid" className={className} {...props}>
-      {children}
-    </div>
-  ),
   GcdsText: ({ children, ...props }) => (
     <div data-testid="gcds-text" {...props}>
       {children}
@@ -112,6 +107,10 @@ describe("ViewLanguagePreferences Component", () => {
       const editLink = screen.getByTestId("gcds-link");
       expect(editLink).toBeInTheDocument();
       expect(editLink).toHaveTextContent("Edit");
+      expect(editLink).toHaveAttribute(
+        "aria-label",
+        "Edit Language preference",
+      );
     });
 
     it("renders all required components", () => {
@@ -127,7 +126,7 @@ describe("ViewLanguagePreferences Component", () => {
       render(<ViewLanguagePreferences />);
 
       expect(screen.getByTestId("gcds-heading")).toBeInTheDocument();
-      expect(screen.getByTestId("gcds-grid")).toBeInTheDocument();
+      expect(document.querySelector(".mobileOverflowWrap")).toBeInTheDocument();
       expect(screen.getByTestId("gcds-text")).toBeInTheDocument();
       expect(screen.getByTestId("gcds-link")).toBeInTheDocument();
     });

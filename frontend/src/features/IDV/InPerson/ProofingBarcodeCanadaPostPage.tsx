@@ -4,9 +4,10 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 import BarcodeDisplay from "../helpers/BarcodeDisplay";
@@ -225,19 +226,19 @@ export default function ProofingBarcodeCanadaPostPage() {
           </GcdsContainer>
         </GcdsContainer>
 
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="info"
           noticeTitleTag="h2"
           noticeTitle={t("ProofingBarcodeCanadaPost.findNearestTitle")}
         >
           <GcdsText marginBottom="0">
             {t("ProofingBarcodeCanadaPost.findNearestBody")}{" "}
-            <GcdsLink href="#" external>
+            <GcdsLink href="#" external style={{ textDecoration: "underline" }}>
               {t("ProofingBarcodeCanadaPost.findNearestLink")}
             </GcdsLink>
             .
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
       </GcdsGrid>
     </GcdsContainer>
   );

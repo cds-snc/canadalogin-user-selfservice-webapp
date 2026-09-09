@@ -8,6 +8,7 @@ import {
   extractOtpServerMetadata,
   mergeOtpSentResponseWithMetadata,
 } from "../utils/otpMetadata";
+import { isOtpMaxAttemptsErrorCode } from "../utils/otpErrorMapping";
 import type { AuthServiceError } from "../types/services";
 import type {
   OtpFactor,
@@ -147,6 +148,13 @@ export const useOtpOperations = ({
       return;
     }
 
+    const normalizedOtp = otpValue.trim();
+    if (normalizedOtp.length < 6) {
+      setErrorCode("invalidCode");
+      onError?.("invalidCode");
+      return;
+    }
+
     let otpType: string | undefined;
     if (overrideOtpType) {
       otpType = overrideOtpType;
@@ -157,7 +165,7 @@ export const useOtpOperations = ({
     }
 
     const userData = {
-      otp: otpValue,
+      otp: normalizedOtp,
       trxnId: otpSentResponse.trxnId,
       otpType,
     };
@@ -195,8 +203,11 @@ export const useOtpOperations = ({
         getErrorMessage(err) ||
         (err instanceof Error ? err.message : undefined);
       if (message) {
-        setErrorCode(message);
-        onError?.(message);
+        const normalizedMessage = isOtpMaxAttemptsErrorCode(message)
+          ? "otp_max_attempts"
+          : message;
+        setErrorCode(normalizedMessage);
+        onError?.(normalizedMessage);
       }
     } finally {
       setUserOtpValue("");

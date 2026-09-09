@@ -5,9 +5,10 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 
 import { useTranslation } from "react-i18next";
 import parsePhoneNumberFromString from "libphonenumber-js";
@@ -63,7 +64,7 @@ export default function SuccessfullyUpdated({
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("SuccessfullyUpdatedContactPhoneNumber.successTitle")}
@@ -72,7 +73,7 @@ export default function SuccessfullyUpdated({
             {t("SuccessfullyUpdatedContactPhoneNumber.phoneUpdatedTo")}{" "}
             <strong>{displayPhoneNumber}</strong>.
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         <GcdsHeading marginBottom="150" tag="h1">
           {t("SuccessfullyUpdatedContactPhoneNumber.updateOtherPlaces")}
@@ -89,12 +90,16 @@ export default function SuccessfullyUpdated({
         </GcdsText>
         <GcdsText>
           {t("SuccessfullyUpdatedContactPhoneNumber.searchOtherAccounts")}{" "}
-          <GcdsLink href={gcAccountDirectoryLink} target="_blank">
+          <GcdsLink
+            href={gcAccountDirectoryLink}
+            target="_blank"
+            style={{ textDecoration: "underline" }}
+          >
             {t("SuccessfullyUpdatedContactPhoneNumber.gcAccountDirectory")}
           </GcdsLink>
         </GcdsText>
 
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="warning"
           noticeTitleTag="h2"
           noticeTitle={t(
@@ -106,12 +111,16 @@ export default function SuccessfullyUpdated({
           </GcdsText>
           <GcdsText>
             {t("SuccessfullyUpdatedContactPhoneNumber.servicesLinkLead")}{" "}
-            <GcdsLink href={participatingServicesLink} target="_blank">
+            <GcdsLink
+              href={participatingServicesLink}
+              target="_blank"
+              style={{ textDecoration: "underline" }}
+            >
               {t("SuccessfullyUpdatedContactPhoneNumber.servicesLinkText")}
             </GcdsLink>{" "}
             {t("SuccessfullyUpdatedContactPhoneNumber.servicesLinkSuffix")}
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton

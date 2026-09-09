@@ -373,6 +373,7 @@ export default function OtpSelection({
           <GcdsLink
             href={gcHelpCentreLinks.twoStepVerification[language ?? "en"]}
             target="_blank"
+            style={{ textDecoration: "underline" }}
           >
             {t("TransientOtpSelection.helpLink")}
           </GcdsLink>
