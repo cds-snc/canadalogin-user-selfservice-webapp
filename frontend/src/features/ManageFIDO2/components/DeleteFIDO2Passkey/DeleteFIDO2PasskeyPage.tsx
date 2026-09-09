@@ -74,6 +74,11 @@ export default function DeleteFIDO2PasskeyPage({
   const [passkeyAssertionResult, setPasskeyAssertionResult] = useState<
     unknown | null
   >(null);
+  const [deletionVerificationProofId, setDeletionVerificationProofId] =
+    useState("");
+  const [verificationMethod, setVerificationMethod] = useState<
+    "otp" | "passkey" | null
+  >(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const backToManage2FAVerificationsPage = path(PAGES.manage2FAVerifications, {
     language: language,
@@ -188,15 +193,174 @@ export default function DeleteFIDO2PasskeyPage({
     });
   };
 
-  const validateOtpCode = async (_otpValue: string): Promise<void> => {
+  const getDeleteErrorData = (error: unknown) => {
+    const errData = error as {
+      data?: {
+        message?: string;
+        retries?: number;
+        attempts?: number;
+        trxnId?: string;
+        created?: string;
+        expiry?: string;
+      };
+      response?: {
+        data?: {
+          message?: string;
+          retries?: number;
+          attempts?: number;
+          trxnId?: string;
+          created?: string;
+          expiry?: string;
+        };
+      };
+    };
+
+    return errData.data ?? errData.response?.data;
+  };
+
+  const navigateBackToVerificationStep = () => {
+    if (verificationMethod === "passkey") {
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
+      });
+      setWizardStep("verifyFIDO2Passkey");
+      return;
+    }
+
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-      step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+      step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
     });
+    setWizardStep("otpValidation");
+  };
+
+  const verifyDeletionWithPasskey = async (
+    verifiedAssertionResult?: unknown,
+  ) => {
+    const assertionPayload = verifiedAssertionResult ?? passkeyAssertionResult;
+
+    if (!passkeyToDeleteId || assertionPayload == null) {
+      const message = "error_delete_credential";
+      setErrorCode(message);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
+        error: message,
+      });
+      return;
+    }
+
+    try {
+      setErrorCode("");
+      setCustomErrorMessage("");
+      setDeletionVerificationProofId("");
+
+      const response = await fido2Api.verifyDeleteRegistration(
+        passkeyToDeleteId,
+        assertionPayload,
+      );
+
+      const verificationProofId = response?.data?.verificationProofId ?? "";
+      if (!response?.success || !verificationProofId) {
+        throw { data: { message: "invalidCode" } };
+      }
+
+      setPasskeyAssertionResult(assertionPayload);
+      setVerificationMethod("passkey");
+      setDeletionVerificationProofId(verificationProofId);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
+      });
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+      });
+      setWizardStep("deleteFIDO2PasskeyConfirmation");
+    } catch (err) {
+      const errorData = getDeleteErrorData(err);
+      const message = errorData?.message ?? "error_fido2_verification";
+      setErrorCode(message);
+      setCustomErrorMessage("");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
+        error: message,
+      });
+    }
+  };
+
+  const validateOtpCode = async (otpValue: string): Promise<void> => {
+    const otpVerificationType =
+      userSelectedMfaFactor != null
+        ? serverMapping[
+            userSelectedMfaFactor.type as keyof typeof serverMapping
+          ]
+        : undefined;
+
+    const trxnId = otpSentResponse?.trxnId;
+
+    if (!passkeyToDeleteId || !otpVerificationType || !trxnId) {
+      setErrorCode("otp_expired");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
+        error: "otp_expired",
+      });
+      throw { data: { message: "otp_expired" } };
+    }
+
     setPasskeyAssertionResult(null);
     setErrorCode("");
     setCustomErrorMessage("");
-    setWizardStep("deleteFIDO2PasskeyConfirmation");
+    setDeletionVerificationProofId("");
+
+    try {
+      const response = await fido2Api.verifyDeleteRegistration(
+        passkeyToDeleteId,
+        undefined,
+        {
+          otp: otpValue,
+          trxnId,
+          otpVerificationType,
+        },
+      );
+
+      const verificationProofId = response?.data?.verificationProofId ?? "";
+      if (!response?.success || !verificationProofId) {
+        throw { data: { message: "invalidCode" } };
+      }
+
+      setVerificationMethod("otp");
+      setDeletionVerificationProofId(verificationProofId);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+      });
+      setWizardStep("deleteFIDO2PasskeyConfirmation");
+    } catch (err) {
+      setOtpSentResponse((prev) =>
+        mergeOtpSentResponseWithMetadata(prev, extractOtpServerMetadata(err)),
+      );
+      const errorData = getDeleteErrorData(err);
+      const message = errorData?.message ?? "invalidCode";
+      const attemptsMessage = getOtpAttemptsErrorMessage(errorData);
+
+      setErrorCode(message);
+      setCustomErrorMessage("");
+      if (attemptsMessage) {
+        setCustomErrorMessage(attemptsMessage);
+      }
+
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
+        error: message,
+      });
+
+      throw err;
+    }
   };
 
   const handleDeleteFIDO2 = async () => {
@@ -226,22 +390,26 @@ export default function DeleteFIDO2PasskeyPage({
     setDeleteLoading(true);
 
     try {
-      const otpPayload =
-        otpSentResponse?.trxnId && userOtpValue && userSelectedMfaFactor
-          ? {
-              otp: userOtpValue,
-              trxnId: otpSentResponse.trxnId,
-              otpVerificationType:
-                serverMapping[
-                  userSelectedMfaFactor.type as keyof typeof serverMapping
-                ],
-            }
-          : undefined;
+      if (!deletionVerificationProofId) {
+        setErrorCode("otp_expired");
+        setCustomErrorMessage("");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
+          error: "otp_expired",
+        });
+        navigateBackToVerificationStep();
+        return;
+      }
 
       const response = (await fido2Api.deleteRegistration(
         passkeyId,
-        passkeyAssertionResult ?? undefined,
-        otpPayload,
+        undefined,
+        undefined,
+        {
+          action: "commit",
+          verificationProofId: deletionVerificationProofId,
+        },
       )) as { success?: boolean } | undefined;
 
       if (response && response.success) {
@@ -253,20 +421,20 @@ export default function DeleteFIDO2PasskeyPage({
           event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
           step: DELETE_PASSKEY_ANALYTICS.STEPS.SUCCESS,
         });
+        setDeletionVerificationProofId("");
+        setVerificationMethod(null);
         setCustomErrorMessage("");
         setWizardStep("deleteFIDO2PasskeySuccess");
       } else {
         throw new Error("error_delete_credential");
       }
     } catch (err) {
-      const errData = err as {
-        data?: { message?: string; retries?: number; attempts?: number };
-      };
       setOtpSentResponse((prev) =>
         mergeOtpSentResponseWithMetadata(prev, extractOtpServerMetadata(err)),
       );
-      const message = errData?.data?.message ?? "error_delete_credential";
-      const attemptsMessage = getOtpAttemptsErrorMessage(errData?.data);
+      const errorData = getDeleteErrorData(err);
+      const message = errorData?.message ?? "error_delete_credential";
+      const attemptsMessage = getOtpAttemptsErrorMessage(errorData);
       setErrorCode(message);
       setCustomErrorMessage("");
       trackEvent({
@@ -275,14 +443,17 @@ export default function DeleteFIDO2PasskeyPage({
         error: message,
       });
       if (
+        message === "otp_expired" ||
+        message === "invalidCode" ||
         (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
-          errData?.data?.message ?? "",
+          errorData?.message ?? "",
         )
       ) {
         if (attemptsMessage) {
           setCustomErrorMessage(attemptsMessage);
         }
-        setWizardStep("otpValidation");
+        setDeletionVerificationProofId("");
+        navigateBackToVerificationStep();
       }
     } finally {
       setDeleteLoading(false);
@@ -325,6 +496,10 @@ export default function DeleteFIDO2PasskeyPage({
             event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
             step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
           });
+          setVerificationMethod(null);
+          setDeletionVerificationProofId("");
+          setErrorCode("");
+          setCustomErrorMessage("");
           setPasskeyAssertionResult(null);
           setSelected2FAPasskey(passkey);
           setWizardStep("verifyFIDO2Passkey");
@@ -347,6 +522,10 @@ export default function DeleteFIDO2PasskeyPage({
           return validateOtpCode(otpValue);
         }}
         onBack={() => {
+          setVerificationMethod(null);
+          setDeletionVerificationProofId("");
+          setErrorCode("");
+          setCustomErrorMessage("");
           // If there's only one MFA factor, go back to password verification
           // Otherwise, go back to OTP selection
           if (userPhoneFactors && userPhoneFactors.length === 1) {
@@ -371,18 +550,12 @@ export default function DeleteFIDO2PasskeyPage({
         assertionOptionsRequest={{ userVerification: "required" }}
         setAssertionResult={setPasskeyAssertionResult}
         selectedPasskey={selected2FAPasskey}
-        onCallback={() => {
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
-            step: DELETE_PASSKEY_ANALYTICS.STEPS.VERIFY_FIDO2,
-          });
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-            step: DELETE_PASSKEY_ANALYTICS.STEPS.CONFIRM_DELETE,
-          });
-          setWizardStep("deleteFIDO2PasskeyConfirmation");
+        onCallback={(assertionResult) => {
+          void verifyDeletionWithPasskey(assertionResult);
         }}
         onTryAnotherWayHandler={() => {
+          setVerificationMethod(null);
+          setDeletionVerificationProofId("");
           setPasskeyAssertionResult(null);
           setSelected2FAPasskey(null);
           setWizardStep("otpSelection");

@@ -257,6 +257,10 @@ vi.mock("../../../services/authService", () => ({
     logout: vi.fn().mockResolvedValue({
       data: { redirect_url: "https://logout.example.com" },
     }),
+    verify_email_otp_for_update: vi.fn().mockResolvedValue({
+      success: true,
+      data: { verificationProofId: "proof-123", expiresIn: 300 },
+    }),
     update_email_with_otp: vi.fn().mockResolvedValue({
       success: true,
       data: { userName: "updated@example.com" },

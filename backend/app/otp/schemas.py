@@ -197,6 +197,12 @@ class OtpVerificationAttemptRequest(BaseModel):
     otpType: OtpType
 
 
+class OtpDeletionAction(str, Enum):
+    VERIFY = "verify"
+    COMMIT = "commit"
+    COMMIT_WITH_VERIFICATION = "commit_with_verification"
+
+
 class OtpDeletionRequest(BaseModel):
     """Request schema for deleting OTP enrollment with verification.
 
@@ -206,22 +212,62 @@ class OtpDeletionRequest(BaseModel):
 
     id: str
     otpType: OtpType  # Type of the factor being deleted (SMS/Voice)
+    action: OtpDeletionAction = OtpDeletionAction.COMMIT_WITH_VERIFICATION
     otp: Optional[str] = None
     trxnId: Optional[str] = None
     otpVerificationType: Optional[OtpType] = (
         None  # Type of OTP used for verification (can differ from otpType)
     )
     assertionResult: Optional[FIDO2AssertionResultRequest] = None
+    verificationProofId: Optional[str] = None
 
     @model_validator(mode="after")
     def validate_verification_payload(self):
         otp_fields = (self.otp, self.trxnId, self.otpVerificationType)
         has_any_otp_field = any(field is not None for field in otp_fields)
         has_all_otp_fields = all(field is not None for field in otp_fields)
+        has_assertion_result = self.assertionResult is not None
+
+        if self.action == OtpDeletionAction.VERIFY:
+            if has_assertion_result and has_any_otp_field:
+                raise ValueError(
+                    "Provide either assertionResult or otp, trxnId, and otpVerificationType"
+                )
+
+            if not has_assertion_result and not has_all_otp_fields:
+                raise ValueError(
+                    "either assertionResult or otp, trxnId, and otpVerificationType must be provided"
+                )
+
+            if self.verificationProofId is not None:
+                raise ValueError("verificationProofId is not allowed for verify action")
+
+            return self
+
+        if self.action == OtpDeletionAction.COMMIT:
+            if not self.verificationProofId:
+                raise ValueError("verificationProofId is required for commit action")
+
+            if has_assertion_result or has_any_otp_field:
+                raise ValueError(
+                    "otp, trxnId, otpVerificationType, and assertionResult are not allowed for commit action"
+                )
+
+            return self
+
+        if has_assertion_result and has_any_otp_field:
+            raise ValueError(
+                "Provide either assertionResult or otp, trxnId, and otpVerificationType"
+            )
 
         if has_any_otp_field and not has_all_otp_fields:
             raise ValueError(
                 "otp, trxnId, and otpVerificationType must be provided together"
+            )
+
+        if self.verificationProofId is not None:
+            raise ValueError(
+                "verificationProofId is only supported when action is commit"
             )
 
         return self
@@ -238,16 +284,51 @@ class OtpBatchDeletionRequest(BaseModel):
     """Request schema for batch-deleting multiple OTP factors with a single OTP verification."""
 
     factors: list[OtpFactorItem]
+    action: OtpDeletionAction = OtpDeletionAction.COMMIT_WITH_VERIFICATION
     otp: Optional[str] = None
     trxnId: Optional[str] = None
     otpVerificationType: Optional[OtpType] = None
     assertionResult: Optional[FIDO2AssertionResultRequest] = None
+    verificationProofId: Optional[str] = None
 
     @model_validator(mode="after")
     def validate_verification_payload(self):
         otp_fields = (self.otp, self.trxnId, self.otpVerificationType)
         has_any_otp_field = any(field is not None for field in otp_fields)
         has_all_otp_fields = all(field is not None for field in otp_fields)
+        has_assertion_result = self.assertionResult is not None
+
+        if self.action == OtpDeletionAction.VERIFY:
+            if has_assertion_result and has_any_otp_field:
+                raise ValueError(
+                    "Provide either assertionResult or otp, trxnId, and otpVerificationType"
+                )
+
+            if not has_assertion_result and not has_all_otp_fields:
+                raise ValueError(
+                    "either assertionResult or otp, trxnId, and otpVerificationType must be provided"
+                )
+
+            if self.verificationProofId is not None:
+                raise ValueError("verificationProofId is not allowed for verify action")
+
+            return self
+
+        if self.action == OtpDeletionAction.COMMIT:
+            if not self.verificationProofId:
+                raise ValueError("verificationProofId is required for commit action")
+
+            if has_assertion_result or has_any_otp_field:
+                raise ValueError(
+                    "otp, trxnId, otpVerificationType, and assertionResult are not allowed for commit action"
+                )
+
+            return self
+
+        if has_assertion_result and has_any_otp_field:
+            raise ValueError(
+                "Provide either assertionResult or otp, trxnId, and otpVerificationType"
+            )
 
         if self.assertionResult is None and not has_all_otp_fields:
             raise ValueError(
@@ -257,6 +338,11 @@ class OtpBatchDeletionRequest(BaseModel):
         if has_any_otp_field and not has_all_otp_fields:
             raise ValueError(
                 "otp, trxnId, and otpVerificationType must be provided together"
+            )
+
+        if self.verificationProofId is not None:
+            raise ValueError(
+                "verificationProofId is only supported when action is commit"
             )
 
         return self
