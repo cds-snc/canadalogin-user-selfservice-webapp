@@ -589,7 +589,8 @@ export default function EditEmailAddressPage() {
         message === "invalidCode" ||
         (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
           apiErrorPayload?.message ?? "",
-        );
+        ) ||
+        hasRemainingOtpAttempts(apiErrorPayload);
 
       if (shouldNavigateBackToEmailOtpValidation) {
         setEmailOtpVerificationProofId("");

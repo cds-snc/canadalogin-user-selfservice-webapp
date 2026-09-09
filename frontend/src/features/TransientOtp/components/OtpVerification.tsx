@@ -79,10 +79,6 @@ export default function OtpVerification({
   };
 
   const doSubmit = async () => {
-    if (!/^\d{6}$/.test(userOtpValue)) {
-      setLocalError(t("Error.invalidCode", { ns: "common" }));
-      return;
-    }
     setLocalError("");
     setErrorCode("");
     setErrorMessage?.("");
@@ -278,8 +274,6 @@ export default function OtpVerification({
                 onGcdsInput={handleChange}
                 lang={language}
                 size={18}
-                maxlength={6}
-                minlength={6}
                 autocomplete="one-time-code"
                 autoFocus
               ></GcdsInput>
@@ -292,7 +286,7 @@ export default function OtpVerification({
               gap="200"
             >
               <SubmitButton
-                disabled={userOtpValue.length < 6 || isMaxAttemptsReached}
+                disabled={isMaxAttemptsReached}
                 onGcdsClick={(ev) => {
                   ev.preventDefault();
                   void doSubmit();

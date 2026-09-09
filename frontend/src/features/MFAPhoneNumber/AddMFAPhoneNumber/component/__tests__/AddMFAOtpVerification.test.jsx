@@ -218,8 +218,8 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       expect(input).toHaveAttribute("id", "verificationCode");
       expect(input).toHaveAttribute("name", "verificationCode");
       expect(input).toHaveAttribute("type", "text");
-      expect(input).toHaveAttribute("maxLength", "6");
-      expect(input).toHaveAttribute("minLength", "6");
+      expect(input).not.toHaveAttribute("maxLength");
+      expect(input).not.toHaveAttribute("minLength");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
     });
 
@@ -404,7 +404,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
   });
 
   describe("Button States and Actions", () => {
-    it("should disable Continue button when OTP is less than 6 digits", () => {
+    it("should keep Continue button enabled when OTP is less than 6 digits", () => {
       const phoneFormDataShortOtp = {
         ...defaultPhoneFormData,
         otp: "123",
@@ -426,7 +426,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       );
 
       const continueButton = screen.getByTestId("continue-button");
-      expect(continueButton).toBeDisabled();
+      expect(continueButton).not.toBeDisabled();
     });
 
     it("should enable Continue button when OTP is 6 digits", () => {
@@ -664,8 +664,8 @@ describe("AddMFAOtpVerification Unit Tests", () => {
         </TestWrapper>,
       );
 
-      // Initially, continue button should be disabled
-      expect(screen.getByTestId("continue-button")).toBeDisabled();
+      // Continue button should be enabled even with empty OTP
+      expect(screen.getByTestId("continue-button")).not.toBeDisabled();
 
       // Simulate user entering OTP
       const updatedPhoneFormData = { ...defaultPhoneFormData, otp: "123456" };

@@ -89,7 +89,7 @@ export default function EditEmailEnterEmail({
               label={t("EditEmailEnterEmail.emailLabel")}
               inputId="emailAddress"
               name="emailAddress"
-              type="email"
+              type="text"
               value={formData?.emailAddress || ""}
               errorMessage={errorMessage}
               validateOn="other"
