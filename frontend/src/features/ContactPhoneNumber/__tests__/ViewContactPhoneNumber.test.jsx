@@ -188,6 +188,10 @@ describe("ViewContactPhoneNumber Component", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByText("Edit")).toBeInTheDocument();
+    expect(screen.getByTestId("gcds-link")).toHaveAttribute(
+      "aria-label",
+      "Edit Phone number",
+    );
     expect(screen.getByTestId("verified-badge")).toHaveTextContent("Verified");
   });
 

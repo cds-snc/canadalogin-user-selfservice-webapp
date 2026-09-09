@@ -86,16 +86,21 @@ function ContactPhoneNumber({
     language,
   });
   const navigateHelper = useNavigateHelper();
+  const editPhoneAriaLabel = `${t("ProfileHome.edit")} ${t("ProfileHome.contactPhone")}`;
 
   return (
     <>
       <GcdsText>{t("ProfileHome.phoneDescription")}</GcdsText>
 
-      <GcdsGrid columns="1fr auto">
-        <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
+      <div className="mobileOverflowWrap">
+        <div className="mobileOverflowWrapMain">
+          <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
+        </div>
         <GcdsLink
           href={newContactPhoneNumber}
+          className="mobileOverflowWrapAction"
           size="regular"
+          aria-label={editPhoneAriaLabel}
           style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {
             event.preventDefault();
@@ -104,7 +109,7 @@ function ContactPhoneNumber({
         >
           {t("ProfileHome.edit")}
         </GcdsLink>
-      </GcdsGrid>
+      </div>
       <VerifiedBadge text={t("ProfileHome.verified")} />
     </>
   );

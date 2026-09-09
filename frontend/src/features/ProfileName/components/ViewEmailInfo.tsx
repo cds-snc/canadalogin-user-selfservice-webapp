@@ -1,10 +1,5 @@
 import { useNavigate, useParams } from "react-router";
-import {
-  GcdsGrid,
-  GcdsHeading,
-  GcdsLink,
-  GcdsText,
-} from "@gcds-core/components-react";
+import { GcdsHeading, GcdsLink, GcdsText } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
 import { PAGES } from "../../../utils/constants";
@@ -25,6 +20,7 @@ export default function DisplayEmailInfo() {
   const email = state?.userProfile?.userName || "";
   const emailActionLabel =
     routeLanguage === "en" ? t("ProfileHome.change") : t("ProfileHome.edit");
+  const emailActionAriaLabel = `${emailActionLabel} ${t("ProfileHome.email")}`;
   const editEmail = path(PAGES.editEmailPage, {
     language: routeLanguage,
   });
@@ -35,11 +31,15 @@ export default function DisplayEmailInfo() {
         {t("ProfileHome.email")}
       </GcdsHeading>
       <GcdsText>{t("ProfileHome.emailDescription")}</GcdsText>
-      <GcdsGrid columns="1fr auto" className="gridInline">
-        <GcdsText>{email}</GcdsText>
+      <div className="mobileOverflowWrap">
+        <div className="mobileOverflowWrapMain">
+          <GcdsText>{email}</GcdsText>
+        </div>
         <GcdsLink
           href={editEmail}
+          className="mobileOverflowWrapAction"
           size="regular"
+          aria-label={emailActionAriaLabel}
           style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {
             event.preventDefault();
@@ -48,7 +48,7 @@ export default function DisplayEmailInfo() {
         >
           {emailActionLabel}
         </GcdsLink>
-      </GcdsGrid>
+      </div>
       <VerifiedBadge text={t("ProfileHome.verified")} />
     </>
   );

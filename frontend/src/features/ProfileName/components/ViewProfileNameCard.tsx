@@ -1,7 +1,6 @@
 import { useParams } from "react-router";
 import {
   GcdsContainer,
-  GcdsGrid,
   GcdsHeading,
   GcdsLink,
   GcdsText,
@@ -30,6 +29,7 @@ export default function ViewProfileNameCard({
   const editProfile = path(PAGES.editProfileNamePage, {
     language: routeLanguage,
   });
+  const editPreferredNameAriaLabel = `${t("ProfileHome.edit")} ${t("ProfileHome.preferredName")}`;
 
   return (
     <GcdsContainer
@@ -41,11 +41,15 @@ export default function ViewProfileNameCard({
       {isConfirmIdentityDetails && (
         <GcdsText>{t("ProfileHome.preferredNameDescription")}</GcdsText>
       )}
-      <GcdsGrid columns="1fr auto" className="gridInline">
-        <GcdsText>{name}</GcdsText>
+      <div className="mobileOverflowWrap">
+        <div className="mobileOverflowWrapMain">
+          <GcdsText>{name}</GcdsText>
+        </div>
         <GcdsLink
           href={editProfile}
+          className="mobileOverflowWrapAction"
           size="regular"
+          aria-label={editPreferredNameAriaLabel}
           style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {
             event.preventDefault();
@@ -54,7 +58,7 @@ export default function ViewProfileNameCard({
         >
           {t("ProfileHome.edit")}
         </GcdsLink>
-      </GcdsGrid>
+      </div>
     </GcdsContainer>
   );
 }

@@ -1,10 +1,5 @@
 import { useNavigate, useParams } from "react-router";
-import {
-  GcdsGrid,
-  GcdsHeading,
-  GcdsLink,
-  GcdsText,
-} from "@gcds-core/components-react";
+import { GcdsHeading, GcdsLink, GcdsText } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
 import { PAGES, LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
@@ -28,17 +23,22 @@ export default function ViewLanguagePreferences() {
     LANGUAGE_DISPLAY_NAMES[routeLanguage]?.[
       preferredLanguage as keyof (typeof LANGUAGE_DISPLAY_NAMES)["en"]
     ] || preferredLanguage;
+  const editLanguageAriaLabel = `${t("ProfileHome.edit")} ${t("ProfileHome.languagePreference")}`;
 
   return (
     <>
       <GcdsHeading tag="h3" marginTop="300">
         {t("ProfileHome.languagePreference")}
       </GcdsHeading>
-      <GcdsGrid columns="1fr auto" className="gridInline">
-        <GcdsText>{displayLanguageName}</GcdsText>
+      <div className="mobileOverflowWrap">
+        <div className="mobileOverflowWrapMain">
+          <GcdsText>{displayLanguageName}</GcdsText>
+        </div>
         <GcdsLink
           href={editLanguagePreferences}
+          className="mobileOverflowWrapAction"
           size="regular"
+          aria-label={editLanguageAriaLabel}
           style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {
             event.preventDefault();
@@ -47,7 +47,7 @@ export default function ViewLanguagePreferences() {
         >
           {t("ProfileHome.edit")}
         </GcdsLink>
-      </GcdsGrid>
+      </div>
     </>
   );
 }
