@@ -13,11 +13,14 @@ import type {
   AuthServiceResponse,
   LogoutResponseData,
   OtpRequestPayload,
+  OtpVerificationProofData,
   PasswordPolicyData,
   RelyingPartyData,
   SessionKeepAliveData,
   UpdateEmailPayload,
   UpdatePhonePayload,
+  VerifyEmailOtpForUpdatePayload,
+  VerifyPhoneOtpForUpdatePayload,
   UserPayload,
 } from "../types/services";
 
@@ -144,18 +147,12 @@ export const authService: AuthServiceContract = {
       handleApiError(error as AuthServiceError);
     }
   },
-  update_email_with_otp: async (
-    newEmailAddress,
-    otp,
-    trxnId,
-    otpType = "email",
-  ) => {
+  update_email_with_otp: async (newEmailAddress, verificationProofId) => {
     try {
       const updatePayload: UpdateEmailPayload = {
+        action: "commit",
         newEmailAddress,
-        otp,
-        trxnId,
-        otpType,
+        verificationProofId,
       };
 
       const response = await axios.post<AuthServiceResponse>(
@@ -167,9 +164,58 @@ export const authService: AuthServiceContract = {
       handleApiError(error as AuthServiceError);
     }
   },
-  update_phone_with_otp: async (phoneNumber, otp, trxnId, otpType = "sms") => {
+  verify_email_otp_for_update: async (
+    newEmailAddress,
+    otp,
+    trxnId,
+    otpType = "email",
+  ) => {
+    try {
+      const updatePayload: VerifyEmailOtpForUpdatePayload = {
+        action: "verify",
+        newEmailAddress,
+        otp,
+        trxnId,
+        otpType,
+      };
+
+      const response = await axios.post<
+        AuthServiceResponse<OtpVerificationProofData>
+      >(
+        `${config.apiUrl}${SUBMIT_END_POINTS.profileUpdateWithOtp}`,
+        updatePayload,
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error as AuthServiceError);
+    }
+  },
+  update_phone_with_otp: async (phoneNumber, verificationProofId) => {
     try {
       const updatePayload: UpdatePhonePayload = {
+        action: "commit",
+        phoneNumbers: [{ value: phoneNumber, type: "mobile" }],
+        verificationProofId,
+      };
+
+      const response = await axios.post<AuthServiceResponse>(
+        `${config.apiUrl}${SUBMIT_END_POINTS.profileUpdateWithOtp}`,
+        updatePayload,
+      );
+      return response.data;
+    } catch (error) {
+      handleApiError(error as AuthServiceError);
+    }
+  },
+  verify_phone_otp_for_update: async (
+    phoneNumber,
+    otp,
+    trxnId,
+    otpType = "sms",
+  ) => {
+    try {
+      const updatePayload: VerifyPhoneOtpForUpdatePayload = {
+        action: "verify",
         phoneNumbers: [{ value: phoneNumber, type: "mobile" }],
         otp,
         trxnId,

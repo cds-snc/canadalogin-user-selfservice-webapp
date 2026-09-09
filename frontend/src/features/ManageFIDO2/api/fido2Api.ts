@@ -7,6 +7,28 @@ interface AssertionOptionsRequest {
   userVerification?: "required" | "preferred" | "discouraged";
 }
 
+type DeleteRegistrationAction =
+  | "verify"
+  | "commit"
+  | "commit_with_verification";
+
+type OtpVerificationPayload = {
+  otp: string;
+  trxnId: string;
+  otpVerificationType: string;
+};
+
+type DeleteRegistrationVerificationData = {
+  verificationProofId?: string;
+  expiresIn?: number;
+};
+
+type DeleteRegistrationResponse = {
+  success?: boolean;
+  message?: string;
+  data?: DeleteRegistrationVerificationData;
+};
+
 axios.defaults.withCredentials = true;
 
 export const fido2Api = {
@@ -42,7 +64,11 @@ export const fido2Api = {
   deleteRegistration: async (
     registrationId: string,
     assertionResult?: unknown,
-    otpPayload?: { otp: string; trxnId: string; otpVerificationType: string },
+    otpPayload?: OtpVerificationPayload,
+    options?: {
+      action?: DeleteRegistrationAction;
+      verificationProofId?: string;
+    },
   ) => {
     try {
       const response = await axios.delete(
@@ -52,6 +78,10 @@ export const fido2Api = {
             id: registrationId,
             assertionResult: assertionResult,
             ...otpPayload,
+            ...(options?.action ? { action: options.action } : {}),
+            ...(options?.verificationProofId
+              ? { verificationProofId: options.verificationProofId }
+              : {}),
           },
         },
       );
@@ -59,6 +89,19 @@ export const fido2Api = {
     } catch (error) {
       handleApiError(error as ApiErrorLike);
     }
+  },
+
+  verifyDeleteRegistration: async (
+    registrationId: string,
+    assertionResult?: unknown,
+    otpPayload?: OtpVerificationPayload,
+  ) => {
+    return (await fido2Api.deleteRegistration(
+      registrationId,
+      assertionResult,
+      otpPayload,
+      { action: "verify" },
+    )) as DeleteRegistrationResponse | undefined;
   },
 
   /**
