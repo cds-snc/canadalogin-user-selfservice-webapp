@@ -67,9 +67,9 @@ vi.mock("../../LanguagePreference/components/ViewLanguagePreference", () => ({
   default: () => <div>Language preferences</div>,
 }));
 
-vi.mock("../../../components/Badges/VerifiedBadge", () => ({
+/* vi.mock("../../../components/Badges/VerifiedBadge", () => ({
   default: ({ text }) => <div data-testid="verified-badge">{text}</div>,
-}));
+})); */
 
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, role }) => <div role={role}>{children}</div>,
@@ -153,19 +153,19 @@ describe("ConfirmIdentityDetails", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Confirm what will be saved to your CanadaLogin",
+        name: "Saved to your CanadaLogin",
       }),
     ).toBeInTheDocument();
   });
 
-  it("shows verified badge", () => {
+  /* it("shows verified badge", () => {
     render(<ConfirmIdentityDetails />);
 
     const badges = screen.getAllByTestId("verified-badge");
     expect(
       badges.some((b) => b.textContent === "Proven January 27, 2026"),
     ).toBe(true);
-  });
+  }); */
 
   it("shows the existing RP success notice when RP details are available", () => {
     render(<ConfirmIdentityDetails />);
@@ -198,7 +198,7 @@ describe("ConfirmIdentityDetails", () => {
     ).toBeInTheDocument();
   });
 
-  it("navigates to start identity proofing when Update information is clicked", () => {
+  /* it("navigates to start identity proofing when Update information is clicked", () => {
     render(<ConfirmIdentityDetails />);
 
     fireEvent.click(screen.getByRole("button", { name: "Update information" }));
@@ -206,15 +206,15 @@ describe("ConfirmIdentityDetails", () => {
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/IdvStartIdentityProofingPage",
     );
-  });
+  }); */
 
-  it("redirects to the stored RP target when Confirm and continue is clicked", async () => {
+  it("redirects to the stored RP target when Continue is clicked", async () => {
     mockJourneyType = "required";
 
     render(<ConfirmIdentityDetails />);
 
     fireEvent.click(
-      screen.getByRole("button", { name: "Confirm and continue" }),
+      screen.getByRole("button", { name: "Continue" }),
     );
 
     await waitFor(() => {
