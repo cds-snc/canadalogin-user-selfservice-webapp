@@ -276,7 +276,7 @@ export default {
 // ─── Story 1: Complete delete via FIDO2 passkey ────────────────────────────
 //
 // Flow: password → OTP selection (shows passkey) → click passkey →
-//       FIDO2 verification auto-completes (mocked) →
+//       click Continue on passkey verification (mocked WebAuthn) →
 //       confirmation screen → "Yes, delete" → success page
 
 export const CompleteDeleteViaFIDO2Passkey = (() => {
@@ -304,7 +304,7 @@ export const CompleteDeleteViaFIDO2Passkey = (() => {
 
   return {
     // Install the navigator.credentials mock BEFORE the component renders
-    // so VerifyFIDO2Passkey's auto-triggered WebAuthn call resolves immediately.
+    // so VerifyFIDO2Passkey's WebAuthn call resolves immediately after Continue.
     // We use Object.defineProperty to ensure the mock takes effect even though
     // CredentialsContainer.get is non-writable by default in Chromium.
     decorators: [
@@ -382,11 +382,21 @@ export const CompleteDeleteViaFIDO2Passkey = (() => {
         });
       });
 
+      await step("Start FIDO2 verification by clicking Continue", async () => {
+        await waitFor(() => {
+          const continueButton = Array.from(
+            canvasElement.querySelectorAll("gcds-button"),
+          ).find((button) => /Continue/i.test(button.textContent || ""));
+          expect(continueButton).toBeInTheDocument();
+          dispatchGcdsClick(continueButton);
+        });
+      });
+
       await step(
-        "FIDO2 verification auto-completes (mocked) and advances to confirmation",
+        "FIDO2 verification completes (mocked) and advances to confirmation",
         async () => {
-          await waitFor(async () => {
-            await expect(
+          await waitFor(() => {
+            expect(
               canvas.getByText(
                 /Are you sure you want to delete this passkey\?/i,
               ),
