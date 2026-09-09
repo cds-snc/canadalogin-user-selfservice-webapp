@@ -119,7 +119,7 @@ export default function OtpVerification({
     if (normalizedOtp.length < 6) {
       const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
       setLocalError(invalidCodeMessage);
-      setErrorCode("invalidCode");
+      setErrorCode?.("invalidCode");
       return;
     }
 
