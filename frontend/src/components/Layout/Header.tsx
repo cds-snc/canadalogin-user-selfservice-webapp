@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import {
   GcdsContainer,
   GcdsHeader,
@@ -19,6 +19,7 @@ type LanguageToggleEvent = CustomEvent<string> & {
 
 export default function Header({ langHref, currentLang }: HeaderProps) {
   const navigate = useNavigate();
+  const { state: locationState } = useLocation();
 
   return (
     <GcdsContainer className="gcds-header">
@@ -34,7 +35,7 @@ export default function Header({ langHref, currentLang }: HeaderProps) {
           lang={currentLang}
           onGcdsClick={(ev: LanguageToggleEvent) => {
             ev.preventDefault();
-            navigate(ev.detail);
+            navigate(ev.detail, { state: locationState });
           }}
         />
         <Breadcrumbs />
