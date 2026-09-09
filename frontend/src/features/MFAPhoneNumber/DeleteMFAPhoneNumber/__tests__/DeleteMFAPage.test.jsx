@@ -58,6 +58,8 @@ vi.mock("../../../../hooks/usePasswordValidation");
 const mockGetUserOtpPhoneFactors = vi.fn();
 const mockDeleteMFA = vi.fn();
 const mockDeleteMFABatch = vi.fn();
+const mockVerifyDeleteMFA = vi.fn();
+const mockVerifyDeleteMFABatch = vi.fn();
 
 vi.mock("../../../TransientOtp/api/otpFactors", () => ({
   otpFactors: {
@@ -69,6 +71,8 @@ vi.mock("../api/DeleteMFAPhoneNumberAPI", () => ({
   deleteMFAPhoneNumberApi: {
     deleteMFA: (...args) => mockDeleteMFA(...args),
     deleteMFABatch: (...args) => mockDeleteMFABatch(...args),
+    verifyDeleteMFA: (...args) => mockVerifyDeleteMFA(...args),
+    verifyDeleteMFABatch: (...args) => mockVerifyDeleteMFABatch(...args),
   },
 }));
 
@@ -191,12 +195,15 @@ vi.mock(
         <button
           data-testid="verify-fido2-success"
           onClick={() => {
-            setAssertionResult?.({
+            const assertionPayload = {
               id: "assertion-id",
               rawId: "raw-assertion-id",
               type: "public-key",
+            };
+            setAssertionResult?.({
+              ...assertionPayload,
             });
-            onCallback?.();
+            onCallback?.(assertionPayload);
           }}
         >
           Success
@@ -363,6 +370,14 @@ describe("DeleteMFAPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocation.state = { factorIds: ["factor-1"] };
+    mockVerifyDeleteMFA.mockResolvedValue({
+      success: true,
+      data: { verificationProofId: "proof-id" },
+    });
+    mockVerifyDeleteMFABatch.mockResolvedValue({
+      success: true,
+      data: { verificationProofId: "proof-id" },
+    });
 
     // Mock the useOtpOperations hook - default to loading false
     useOtpOperations.mockReturnValue({
@@ -1367,7 +1382,7 @@ describe("DeleteMFAPage", () => {
       });
 
       await waitFor(() => {
-        expect(mockDeleteMFA).toHaveBeenCalledWith({
+        expect(mockVerifyDeleteMFA).toHaveBeenCalledWith({
           id: "factor-1",
           otpType: "sms",
           assertionResult: {
@@ -1375,6 +1390,12 @@ describe("DeleteMFAPage", () => {
             rawId: "raw-assertion-id",
             type: "public-key",
           },
+        });
+        expect(mockDeleteMFA).toHaveBeenCalledWith({
+          action: "commit",
+          id: "factor-1",
+          otpType: "sms",
+          verificationProofId: "proof-id",
         });
       });
     });

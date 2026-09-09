@@ -1,26 +1,34 @@
 import logging
-from datetime import datetime
+import time
+import uuid
+from datetime import datetime, timezone
 from urllib.parse import quote
 
 from app.config import get_configuration
 from app.fido2.services.authenticate_fido2_registration import submit_assertion_result
 from app.otp.schemas import (
+    OtpDeletionAction,
     OtpBatchDeletionRequest,
     OtpDeletionRequest,
     OtpType,
+    RetrievalData,
 )
+from app.otp.services.retrieve_transient_otp import dispatch_otp_status_retrieval
 from app.users.services.get_my_profile import get_my_profile
 from app.users.services.mfa_delete_guard import (
     assert_remaining_mfa_factor_after_deletion,
 )
 from app.users.services.otp_factors import get_user_otp_factors
 from app.utils.access_token import get_auth_request_headers
+from app.utils.global_error_handlers import extract_response_body
 from app.utils.schemas import ResponseModel
 from app.utils.helpers import verify_otp_before_operation
 from fastapi import HTTPException, Request, status
 from httpx import AsyncClient, HTTPStatusError
 
 logger = logging.getLogger(__name__)
+
+MFA_DELETE_VERIFICATION_PROOFS_SESSION_KEY = "mfa_delete_verification_proofs"
 
 
 def _append_theme_id_query(url: str, theme_id: str | None) -> str:
@@ -46,6 +54,219 @@ def _get_endpoint_for_otp_type(otp_type: OtpType) -> str:
         return "unknown"
 
 
+def _build_single_delete_fingerprint(
+    deletion_request: OtpDeletionRequest,
+) -> dict[str, str | list[str]]:
+    return {
+        "mode": "single",
+        "factorIds": [deletion_request.id],
+        "otpTypes": [deletion_request.otpType.value],
+    }
+
+
+def _build_batch_delete_fingerprint(
+    deletion_request: OtpBatchDeletionRequest,
+) -> dict[str, str | list[dict[str, str]]]:
+    normalized_factors = [
+        {"id": factor.id, "otpType": factor.otpType.value}
+        for factor in deletion_request.factors
+    ]
+    normalized_factors.sort(key=lambda item: (item["id"], item["otpType"]))
+
+    return {
+        "mode": "batch",
+        "factors": normalized_factors,
+    }
+
+
+def _get_mfa_delete_proof_store(request: Request) -> dict[str, dict]:
+    proof_store = request.session.get(MFA_DELETE_VERIFICATION_PROOFS_SESSION_KEY, {})
+    if isinstance(proof_store, dict):
+        return proof_store
+    return {}
+
+
+def _prune_expired_mfa_delete_proofs(proof_store: dict[str, dict]) -> dict[str, dict]:
+    now = int(time.time())
+    pruned_store: dict[str, dict] = {}
+
+    for proof_id, proof_data in proof_store.items():
+        if not isinstance(proof_data, dict):
+            continue
+
+        expires_at = proof_data.get("expiresAt")
+        if isinstance(expires_at, int) and expires_at > now:
+            pruned_store[proof_id] = proof_data
+
+    return pruned_store
+
+
+def _store_mfa_delete_verification_proof(
+    request: Request,
+    fingerprint: dict,
+    ttl_seconds: int,
+) -> str:
+    now = int(time.time())
+    verification_proof_id = str(uuid.uuid4())
+
+    proof_store = _get_mfa_delete_proof_store(request)
+    proof_store = _prune_expired_mfa_delete_proofs(proof_store)
+    proof_store[verification_proof_id] = {
+        "expiresAt": now + ttl_seconds,
+        "fingerprint": fingerprint,
+    }
+
+    request.session[MFA_DELETE_VERIFICATION_PROOFS_SESSION_KEY] = proof_store
+    return verification_proof_id
+
+
+def _consume_mfa_delete_verification_proof_or_raise(
+    request: Request,
+    verification_proof_id: str,
+    expected_fingerprint: dict,
+) -> None:
+    proof_store = _get_mfa_delete_proof_store(request)
+    proof_store = _prune_expired_mfa_delete_proofs(proof_store)
+    proof_data = proof_store.get(verification_proof_id)
+
+    if proof_data is None:
+        request.session[MFA_DELETE_VERIFICATION_PROOFS_SESSION_KEY] = proof_store
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="otp_expired",
+        )
+
+    expires_at = proof_data.get("expiresAt")
+    if not isinstance(expires_at, int) or expires_at <= int(time.time()):
+        proof_store.pop(verification_proof_id, None)
+        request.session[MFA_DELETE_VERIFICATION_PROOFS_SESSION_KEY] = proof_store
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="otp_expired",
+        )
+
+    actual_fingerprint = proof_data.get("fingerprint")
+    if actual_fingerprint != expected_fingerprint:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="invalidCode",
+        )
+
+    proof_store.pop(verification_proof_id, None)
+    request.session[MFA_DELETE_VERIFICATION_PROOFS_SESSION_KEY] = proof_store
+
+
+def _parse_iso_datetime(value: str | None) -> datetime | None:
+    if not value:
+        return None
+
+    normalized_value = value.strip()
+    if normalized_value.endswith("Z"):
+        normalized_value = normalized_value[:-1] + "+00:00"
+
+    try:
+        parsed_datetime = datetime.fromisoformat(normalized_value)
+    except ValueError:
+        return None
+
+    if parsed_datetime.tzinfo is None:
+        return parsed_datetime.replace(tzinfo=timezone.utc)
+
+    return parsed_datetime.astimezone(timezone.utc)
+
+
+async def _get_mfa_delete_otp_proof_ttl_seconds(
+    request: Request,
+    trxn_id: str,
+    otp_type: OtpType,
+    user_access_token: str,
+) -> int:
+    try:
+        status_response = await dispatch_otp_status_retrieval(
+            request.app.state.request_client,
+            RetrievalData(trxnId=trxn_id, otpType=otp_type),
+            user_access_token,
+        )
+    except Exception as e:
+        logger.warning("Unable to resolve OTP status for delete proof TTL: %s", str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="otp_expired",
+        )
+
+    if status_response.status_code != 200:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="otp_expired",
+        )
+
+    otp_expiry_datetime = _parse_iso_datetime(status_response.json().get("expiry"))
+    if otp_expiry_datetime is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="otp_expired",
+        )
+
+    remaining_seconds = int(
+        (otp_expiry_datetime - datetime.now(timezone.utc)).total_seconds()
+    )
+    if remaining_seconds <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="otp_expired",
+        )
+
+    return remaining_seconds
+
+
+def _get_mfa_delete_passkey_proof_ttl_seconds() -> int:
+    session_lifetime = get_configuration().session_config.SESSION_LIFETIME
+    try:
+        ttl_seconds = int(session_lifetime)
+    except (TypeError, ValueError):
+        ttl_seconds = 0
+
+    if ttl_seconds <= 0:
+        ttl_seconds = 60
+
+    return ttl_seconds
+
+
+async def _verify_passkey_assertion_or_raise(
+    request: Request,
+    global_http_client: AsyncClient,
+    user_access_token: str,
+    assertion_result,
+) -> None:
+    try:
+        assertion_response = await submit_assertion_result(
+            request=request,
+            http_client=global_http_client,
+            user_access_token=user_access_token,
+            request_body=assertion_result,
+            return_jwt=False,
+        )
+    except HTTPStatusError as e:
+        if e.response is not None and e.response.status_code in [
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_401_UNAUTHORIZED,
+        ]:
+            body = extract_response_body(e.response)
+            message_id = body.get("messageId")
+            if message_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=message_id,
+                )
+        raise
+
+    if not assertion_response.success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="invalidCode",
+        )
+
+
 async def handle_otp_deletion(
     global_http_client: AsyncClient,
     deletion_request: OtpDeletionRequest,
@@ -69,7 +290,76 @@ async def handle_otp_deletion(
     user_language = my_profile_response.data.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
 
-    if deletion_request.otp is None and deletion_request.assertionResult is None:
+    if deletion_request.action == OtpDeletionAction.VERIFY:
+        if request is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Request context required for verification",
+            )
+
+        proof_ttl_seconds = _get_mfa_delete_passkey_proof_ttl_seconds()
+        if deletion_request.assertionResult is not None:
+            await _verify_passkey_assertion_or_raise(
+                request=request,
+                global_http_client=global_http_client,
+                user_access_token=user_access_token,
+                assertion_result=deletion_request.assertionResult,
+            )
+        else:
+            proof_ttl_seconds = await _get_mfa_delete_otp_proof_ttl_seconds(
+                request=request,
+                trxn_id=deletion_request.trxnId,
+                otp_type=deletion_request.otpVerificationType,
+                user_access_token=user_access_token,
+            )
+            await verify_otp_before_operation(
+                global_http_client=global_http_client,
+                user_access_token=user_access_token,
+                otp=deletion_request.otp,
+                trxn_id=deletion_request.trxnId,
+                otp_type=deletion_request.otpVerificationType,
+            )
+
+        await assert_remaining_mfa_factor_after_deletion(
+            http_client=global_http_client,
+            user_access_token=user_access_token,
+            otp_factor_ids_to_delete={deletion_request.id},
+        )
+
+        verification_proof_id = _store_mfa_delete_verification_proof(
+            request=request,
+            fingerprint=_build_single_delete_fingerprint(deletion_request),
+            ttl_seconds=proof_ttl_seconds,
+        )
+        return ResponseModel(
+            success=True,
+            data={
+                "verificationProofId": verification_proof_id,
+                "expiresIn": proof_ttl_seconds,
+            },
+            message="MFA deletion verification successful",
+        )
+
+    if deletion_request.action == OtpDeletionAction.COMMIT:
+        if request is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Request context required for verification proof",
+            )
+
+        _consume_mfa_delete_verification_proof_or_raise(
+            request=request,
+            verification_proof_id=deletion_request.verificationProofId,
+            expected_fingerprint=_build_single_delete_fingerprint(deletion_request),
+        )
+
+        await assert_remaining_mfa_factor_after_deletion(
+            http_client=global_http_client,
+            user_access_token=user_access_token,
+            otp_factor_ids_to_delete={deletion_request.id},
+        )
+
+    elif deletion_request.otp is None and deletion_request.assertionResult is None:
         # No OTP provided — only permitted for genuinely unvalidated factors.
         # Fetch the unvalidated factors and confirm this factor is among them.
         unvalidated_factors_response = await get_user_otp_factors(
@@ -96,20 +386,12 @@ async def handle_otp_deletion(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Request context required for passkey verification",
                 )
-
-            assertion_response = await submit_assertion_result(
+            await _verify_passkey_assertion_or_raise(
                 request=request,
-                http_client=global_http_client,
+                global_http_client=global_http_client,
                 user_access_token=user_access_token,
-                request_body=deletion_request.assertionResult,
-                return_jwt=False,
+                assertion_result=deletion_request.assertionResult,
             )
-
-            if not assertion_response.success:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="FIDO2 authentication required to delete MFA factor",
-                )
         else:
             # Validated factor deletion path — OTP verification required.
             # Use the verification OTP type (may differ from the factor being deleted)
@@ -168,26 +450,82 @@ async def handle_otp_batch_deletion(
     )
     start_time = datetime.now()
 
-    if deletion_request.assertionResult is not None:
+    if deletion_request.action == OtpDeletionAction.VERIFY:
+        if request is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Request context required for verification",
+            )
+
+        proof_ttl_seconds = _get_mfa_delete_passkey_proof_ttl_seconds()
+        if deletion_request.assertionResult is not None:
+            await _verify_passkey_assertion_or_raise(
+                request=request,
+                global_http_client=global_http_client,
+                user_access_token=user_access_token,
+                assertion_result=deletion_request.assertionResult,
+            )
+        else:
+            proof_ttl_seconds = await _get_mfa_delete_otp_proof_ttl_seconds(
+                request=request,
+                trxn_id=deletion_request.trxnId,
+                otp_type=deletion_request.otpVerificationType,
+                user_access_token=user_access_token,
+            )
+            await verify_otp_before_operation(
+                global_http_client=global_http_client,
+                user_access_token=user_access_token,
+                otp=deletion_request.otp,
+                trxn_id=deletion_request.trxnId,
+                otp_type=deletion_request.otpVerificationType,
+            )
+
+        await assert_remaining_mfa_factor_after_deletion(
+            http_client=global_http_client,
+            user_access_token=user_access_token,
+            otp_factor_ids_to_delete={factor.id for factor in deletion_request.factors},
+        )
+
+        verification_proof_id = _store_mfa_delete_verification_proof(
+            request=request,
+            fingerprint=_build_batch_delete_fingerprint(deletion_request),
+            ttl_seconds=proof_ttl_seconds,
+        )
+        return ResponseModel(
+            success=True,
+            data={
+                "verificationProofId": verification_proof_id,
+                "expiresIn": proof_ttl_seconds,
+            },
+            message="MFA deletion verification successful",
+        )
+
+    if deletion_request.action == OtpDeletionAction.COMMIT:
+        if request is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Request context required for verification proof",
+            )
+
+        _consume_mfa_delete_verification_proof_or_raise(
+            request=request,
+            verification_proof_id=deletion_request.verificationProofId,
+            expected_fingerprint=_build_batch_delete_fingerprint(deletion_request),
+        )
+
+    elif deletion_request.assertionResult is not None:
         if request is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Request context required for passkey verification",
             )
 
-        assertion_response = await submit_assertion_result(
+        await _verify_passkey_assertion_or_raise(
             request=request,
-            http_client=global_http_client,
+            global_http_client=global_http_client,
             user_access_token=user_access_token,
-            request_body=deletion_request.assertionResult,
-            return_jwt=False,
+            assertion_result=deletion_request.assertionResult,
         )
-
-        if not assertion_response.success:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="FIDO2 authentication required to delete MFA factor",
-            )
     else:
         # Verify OTP once for the entire batch
         await verify_otp_before_operation(

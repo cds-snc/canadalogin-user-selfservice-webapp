@@ -23,7 +23,7 @@ import { gcHelpCentreLinks } from "../../../../utils/constants";
 interface VerifyFIDO2PasskeyProps {
   setErrorCode: (code: string) => void;
   setAssertionResult?: (assertionResult: unknown) => void;
-  onCallback?: () => Promise<void> | void;
+  onCallback?: (assertionResult?: unknown) => Promise<void> | void;
   submitAttestationResult?: boolean;
   errorMessage: string;
   selectedPasskey?: Fido2Credential | null;
@@ -121,7 +121,7 @@ export default function VerifyFIDO2Passkey({
       if (submitAttestationResult) {
         await fido2Api.submitAssertionResult(assertionResult);
       }
-      await onCallback?.();
+      await onCallback?.(assertionResult);
     } catch (err) {
       console.error("error_fido2_verification", err);
       // Failed auth response: cancelled or timed out by the user or the browser
