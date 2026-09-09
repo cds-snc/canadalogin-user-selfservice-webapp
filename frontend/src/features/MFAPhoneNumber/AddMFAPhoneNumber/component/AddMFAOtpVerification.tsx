@@ -78,7 +78,8 @@ interface AddMFAOtpVerificationProps {
   phoneFormData: PhoneFormData;
   errorMessage: string;
   setErrorCode?: (errorCode: string) => void;
-  requestNewOtpCode: () => Promise<void>;
+  setErrorMessage?: (errorMessage: string) => void;
+  requestNewOtpCode: () => Promise<void | boolean>;
   onUseDifferentPhoneNumber: () => Promise<void>;
   onSetupAlternateMFAMethod: () => Promise<void>;
   isMaxAttemptsReached?: boolean;
@@ -93,6 +94,7 @@ export default function AddMFAOtpVerification({
   phoneFormData,
   errorMessage,
   setErrorCode,
+  setErrorMessage,
   requestNewOtpCode,
   onUseDifferentPhoneNumber,
   onSetupAlternateMFAMethod,
@@ -113,6 +115,7 @@ export default function AddMFAOtpVerification({
   } = useOtpExpiryCountdown(phoneFormData.expiry, 10, phoneFormData.created);
 
   const displayError = localError || errorMessage || "";
+  const shouldShowSuccessNotice = codeRequested && !displayError;
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -121,11 +124,19 @@ export default function AddMFAOtpVerification({
     setCodeRequested(false);
   };
 
-  const requestNewCode = () => {
+  const requestNewCode = async () => {
     onChangePhoneForm("otp", "");
-    requestNewOtpCode();
+    const requestResult = await requestNewOtpCode();
+
+    if (requestResult === false) {
+      setCodeRequested(false);
+      return;
+    }
+
     setCodeRequested(true);
     setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
     restartFallbackCountdown();
     resetAttempts?.();
   };
@@ -136,6 +147,7 @@ export default function AddMFAOtpVerification({
     setCodeRequested(false);
     setLocalError("");
     setErrorCode?.("");
+    setErrorMessage?.("");
   };
 
   // Clear OTP field on mount
@@ -147,6 +159,10 @@ export default function AddMFAOtpVerification({
   const userMfaType = phoneFormData.otpType;
 
   const doSubmit = async () => {
+    setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
+
     const normalizedOtp = phoneFormData.otp.trim();
     if (normalizedOtp.length < 6) {
       const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
@@ -155,7 +171,6 @@ export default function AddMFAOtpVerification({
       return;
     }
 
-    setLocalError("");
     await onNext();
   };
 
@@ -167,7 +182,7 @@ export default function AddMFAOtpVerification({
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
-        {codeRequested && (
+        {shouldShowSuccessNotice && (
           <AccessibleNotice
             noticeRole="success"
             noticeTitleTag="h2"
@@ -199,7 +214,7 @@ export default function AddMFAOtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    requestNewCode();
+                    void requestNewCode();
                   }}
                 >
                   {t("Verification.requestNewCode")}
@@ -302,7 +317,7 @@ export default function AddMFAOtpVerification({
               <GcdsLink
                 style={{ textDecoration: "underline" }}
                 onGcdsClick={() => {
-                  requestNewCode();
+                  void requestNewCode();
                 }}
               >
                 {userMfaType !== FLOW_TYPES.email

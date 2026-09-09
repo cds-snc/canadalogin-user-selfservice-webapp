@@ -199,6 +199,7 @@ const mockSetUserOtpValue = vi.fn();
 const mockRequestOtpCode = vi.fn();
 const mockValidateOtpCode = vi.fn();
 const mockSetErrorCode = vi.fn();
+const mockSetErrorMessage = vi.fn();
 const mockOnCancel = vi.fn(() => mockNavigateHelper("/en/security-settings"));
 
 const defaultProps = {
@@ -207,6 +208,7 @@ const defaultProps = {
   requestOtpCode: mockRequestOtpCode,
   validateOtpCode: mockValidateOtpCode,
   setErrorCode: mockSetErrorCode,
+  setErrorMessage: mockSetErrorMessage,
   onCancel: mockOnCancel,
   errorMessage: "",
   userSelectedMfaFactor: {
@@ -678,6 +680,26 @@ describe("OtpVerification Component", () => {
       expect(screen.getByTestId("notice")).toHaveTextContent(
         "We have sent you a new code",
       );
+    });
+
+    it("clears parent error message after requesting a new code", async () => {
+      vi.useFakeTimers();
+      mockRequestOtpCode.mockResolvedValue(true);
+
+      renderComponent();
+
+      for (let second = 0; second < 10; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      const requestNewCodeLink = screen.getByText("Request a new code");
+      await act(async () => {
+        fireEvent.click(requestNewCodeLink);
+      });
+
+      expect(mockSetErrorMessage).toHaveBeenCalledWith("");
     });
   });
 

@@ -118,7 +118,7 @@ export default function EditContactPhoneNumberPage() {
   }: {
     reSendOtpCode?: boolean;
     otpType?: ContactPhoneOtpType;
-  } = {}) => {
+  } = {}): Promise<boolean> => {
     try {
       if (!reSendOtpCode) {
         setLocalLoading(true);
@@ -154,7 +154,11 @@ export default function EditContactPhoneNumberPage() {
             type: otpType ?? phoneFormData.otpType,
           });
         }
+
+        return true;
       }
+
+      return false;
     } catch (error) {
       const metadata = extractOtpServerMetadata(error);
       if (hasOtpServerMetadata(metadata)) {
@@ -176,6 +180,8 @@ export default function EditContactPhoneNumberPage() {
           error: message,
         });
       }
+
+      return false;
     } finally {
       setLocalLoading(false);
     }
@@ -429,7 +435,7 @@ export default function EditContactPhoneNumberPage() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneFormChange}
         errorMessage={errorMessage}
-        onNext={() => {
+        onNext={async () => {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
@@ -438,7 +444,7 @@ export default function EditContactPhoneNumberPage() {
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
           });
-          return sendOtp({ reSendOtpCode: false });
+          await sendOtp({ reSendOtpCode: false });
         }}
         onCancel={handleBackToProfile}
         setErrorCode={setErrorCode}
@@ -470,6 +476,7 @@ export default function EditContactPhoneNumberPage() {
         isMaxAttemptsReached={isPhoneOtpMaxAttemptsReached}
         resetAttempts={resetOtpAttemptState}
         setErrorCode={setErrorCode}
+        setErrorMessage={setCustomErrorMessage}
       />
     ),
     confirmUpdate: (

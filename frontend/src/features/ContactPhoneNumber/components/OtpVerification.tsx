@@ -73,6 +73,7 @@ export default function OtpVerification({
   errorMessage,
   requestNewOtpCode,
   setErrorCode,
+  setErrorMessage,
   isMaxAttemptsReached = false,
   resetAttempts,
 }: ContactPhoneOtpVerificationProps) {
@@ -90,6 +91,7 @@ export default function OtpVerification({
   } = useOtpExpiryCountdown(phoneFormData.expiry, 10, phoneFormData.created);
 
   const displayError = localError || errorMessage || "";
+  const shouldShowSuccessNotice = codeRequested && !displayError;
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -100,9 +102,19 @@ export default function OtpVerification({
 
   const requestNewCode = async (otpType?: ContactPhoneOtpType) => {
     onChangePhoneForm("otp", "");
-    await requestNewOtpCode(otpType ?? phoneFormData.otpType);
+    const requestResult = await requestNewOtpCode(
+      otpType ?? phoneFormData.otpType,
+    );
+
+    if (requestResult === false) {
+      setCodeRequested(false);
+      return;
+    }
+
     setCodeRequested(true);
     setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
     restartFallbackCountdown();
     resetAttempts?.();
   };
@@ -112,10 +124,15 @@ export default function OtpVerification({
     onChangePhoneForm("otp", target.value);
     setCodeRequested(false);
     setErrorCode?.("");
+    setErrorMessage?.("");
     setLocalError("");
   };
 
   const doSubmit = async () => {
+    setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
+
     const normalizedOtp = phoneFormData.otp.trim();
     if (normalizedOtp.length < 6) {
       const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
@@ -124,7 +141,6 @@ export default function OtpVerification({
       return;
     }
 
-    setLocalError("");
     await onNext();
   };
 
@@ -158,7 +174,7 @@ export default function OtpVerification({
 
   return (
     <GcdsContainer role="main">
-      {codeRequested ? (
+      {shouldShowSuccessNotice ? (
         <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"

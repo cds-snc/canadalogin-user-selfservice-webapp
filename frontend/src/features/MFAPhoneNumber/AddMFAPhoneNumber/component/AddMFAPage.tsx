@@ -778,6 +778,7 @@ export default function AddMFAPage() {
         onChangePhoneForm={handlePhoneForm}
         errorMessage={errorMessage}
         setErrorCode={setErrorCode}
+        setErrorMessage={setCustomErrorMessage}
         isMaxAttemptsReached={isMfaOtpMaxAttemptsReached}
         resetAttempts={resetAttempts}
         onNext={async () => {
@@ -804,7 +805,7 @@ export default function AddMFAPage() {
             flow: ADD_MFA_ANALYTICS.FLOW_ID,
             type: phoneFormData.otpType,
           });
-          await sendMFAOtp({ reSendOtpCode: true });
+          return sendMFAOtp({ reSendOtpCode: true });
         }}
         onBack={async () => {
           setErrorCode("");

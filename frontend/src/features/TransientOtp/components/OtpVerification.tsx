@@ -73,6 +73,7 @@ export default function OtpVerification({
   } = useOtpExpiryCountdown(otpExpiry, initialTime, otpCreatedAt);
 
   const displayError = localError || errorMessage || "";
+  const shouldShowSuccessNotice = codeRequested && !displayError;
   const countdownDisplay = hasServerExpiry ? formattedCountdown : null;
 
   const handleChange = (e: CustomEvent<string>) => {
@@ -173,12 +174,13 @@ export default function OtpVerification({
       return;
     }
 
-    setCodeRequested(true);
-    setTime(initialTime);
     setErrorCode("");
+    setErrorMessage?.("");
     setUserOtpValue("");
     setLocalError("");
     resetAttempts?.();
+    setTime(initialTime);
+    setCodeRequested(true);
   };
 
   const requestNewCodeAction = () => {
@@ -187,7 +189,7 @@ export default function OtpVerification({
 
   return (
     <GcdsContainer role="main">
-      {codeRequested ? (
+      {shouldShowSuccessNotice ? (
         <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"
