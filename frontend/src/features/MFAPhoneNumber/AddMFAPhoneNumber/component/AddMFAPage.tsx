@@ -38,6 +38,10 @@ import {
   extractOtpServerMetadata,
   mergeOtpSentResponseWithMetadata,
 } from "../../../../utils/otpMetadata";
+import {
+  isOtpMaxAttemptsErrorCode,
+  shouldDisplayOtpMaxAttempts,
+} from "../../../../utils/otpErrorMapping";
 
 interface PhoneFormData {
   phoneNumber: string;
@@ -399,22 +403,34 @@ export default function AddMFAPage() {
       const attemptsMessage = getOtpAttemptsErrorMessage(err?.data);
 
       if (message) {
-        setErrorCode(message);
-
         if (
-          retries !== undefined &&
-          retries !== null &&
-          attempts !== undefined &&
-          attempts !== null
+          shouldDisplayOtpMaxAttempts({
+            errorCode: message,
+            retries,
+            attempts,
+          })
         ) {
-          setIsMfaOtpMaxAttemptsReached(retries - attempts <= 0);
-        }
+          setErrorCode("otp_max_attempts");
+          setCustomErrorMessage(t("Error.otp_max_attempts", { ns: "common" }));
+          setIsMfaOtpMaxAttemptsReached(true);
+        } else {
+          setErrorCode(message);
 
-        if (
-          (INVALID_OTP_ERROR_CODES as readonly string[]).includes(message) &&
-          attemptsMessage
-        ) {
-          setCustomErrorMessage(attemptsMessage);
+          if (
+            retries !== undefined &&
+            retries !== null &&
+            attempts !== undefined &&
+            attempts !== null
+          ) {
+            setIsMfaOtpMaxAttemptsReached(retries - attempts <= 0);
+          }
+
+          if (
+            (INVALID_OTP_ERROR_CODES as readonly string[]).includes(message) &&
+            attemptsMessage
+          ) {
+            setCustomErrorMessage(attemptsMessage);
+          }
         }
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
@@ -504,11 +520,16 @@ export default function AddMFAPage() {
         error.response.data &&
         error.response.data.message
       ) {
-        setErrorCode(error.response.data.message);
+        const normalizedMessage = isOtpMaxAttemptsErrorCode(
+          error.response.data.message,
+        )
+          ? "otp_max_attempts"
+          : error.response.data.message;
+        setErrorCode(normalizedMessage);
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
-          error: error.response.data.message,
+          error: normalizedMessage,
         });
       }
     }

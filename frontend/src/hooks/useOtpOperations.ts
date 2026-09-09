@@ -8,6 +8,7 @@ import {
   extractOtpServerMetadata,
   mergeOtpSentResponseWithMetadata,
 } from "../utils/otpMetadata";
+import { isOtpMaxAttemptsErrorCode } from "../utils/otpErrorMapping";
 import type { AuthServiceError } from "../types/services";
 import type {
   OtpFactor,
@@ -202,8 +203,11 @@ export const useOtpOperations = ({
         getErrorMessage(err) ||
         (err instanceof Error ? err.message : undefined);
       if (message) {
-        setErrorCode(message);
-        onError?.(message);
+        const normalizedMessage = isOtpMaxAttemptsErrorCode(message)
+          ? "otp_max_attempts"
+          : message;
+        setErrorCode(normalizedMessage);
+        onError?.(normalizedMessage);
       }
     } finally {
       setUserOtpValue("");

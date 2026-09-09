@@ -37,6 +37,7 @@ import {
   extractOtpServerMetadata,
   hasOtpServerMetadata,
 } from "../../../utils/otpMetadata";
+import { shouldDisplayOtpMaxAttempts } from "../../../utils/otpErrorMapping";
 
 type UpdatePhoneTransport = "sms" | "voice";
 
@@ -219,6 +220,21 @@ export default function EditContactPhoneNumberPage() {
 
     const retries = payload?.retries;
     const attempts = payload?.attempts;
+    const payloadMessage = payload?.message;
+
+    if (
+      shouldDisplayOtpMaxAttempts({
+        errorCode: payloadMessage,
+        retries,
+        attempts,
+      })
+    ) {
+      setIsPhoneOtpMaxAttemptsReached(true);
+      setCustomErrorMessage(t("Error.otp_max_attempts", { ns: "common" }));
+      setErrorCode("otp_max_attempts");
+      return "otp_max_attempts";
+    }
+
     if (
       retries !== undefined &&
       retries !== null &&
@@ -354,6 +370,7 @@ export default function EditContactPhoneNumberPage() {
 
       if (
         message === "otp_expired" ||
+        message === "otp_max_attempts" ||
         message === "invalidCode" ||
         (payloadMessage != null &&
           INVALID_OTP_ERROR_CODES.includes(

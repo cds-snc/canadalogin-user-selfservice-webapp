@@ -631,6 +631,50 @@ describe("useOtpOperations", () => {
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
+    it("should normalize expired OTP backend code to otp_max_attempts", async () => {
+      mockAuthService.transientOtpVerify.mockRejectedValue({
+        response: {
+          data: { message: "CSIAM0010E" },
+        },
+      });
+
+      const mockOnError = vi.fn();
+
+      const { result } = renderHook(
+        () =>
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+          }),
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(result.current.userSelectedMfaFactor).toBeTruthy();
+      });
+
+      act(() => {
+        result.current.setOtpSentResponse({ trxnId: "test-transaction-id" });
+      });
+
+      await act(async () => {
+        await result.current.validateOtpCode(
+          "123456",
+          mockOnSuccess,
+          undefined,
+          mockOnError,
+        );
+      });
+
+      expect(defaultProps.setErrorCode).toHaveBeenCalledWith(
+        "otp_max_attempts",
+      );
+      expect(mockOnError).toHaveBeenCalledWith("otp_max_attempts");
+      expect(mockOnSuccess).not.toHaveBeenCalled();
+    });
+
     it("should validate without calling onSuccess when onSuccess is not provided", async () => {
       const { result } = renderHook(
         () =>

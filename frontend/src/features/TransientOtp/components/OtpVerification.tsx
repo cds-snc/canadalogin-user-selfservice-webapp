@@ -17,6 +17,7 @@ import { FLOW_TYPES } from "../../../utils/constants";
 import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import SubmitButton from "../../../components/Layout/SubmitButton";
 import { useOtpExpiryCountdown } from "../../../hooks/useOtpExpiryCountdown";
+import { shouldDisplayOtpMaxAttempts } from "../../../utils/otpErrorMapping";
 import type { OtpFactor } from "../../../types/hooks";
 
 type CaughtApiError = {
@@ -101,6 +102,21 @@ export default function OtpVerification({
       const attempts = apiError?.data?.attempts;
 
       if (
+        shouldDisplayOtpMaxAttempts({
+          errorCode: messageId,
+          retries,
+          attempts,
+        })
+      ) {
+        const maxAttemptsMsg = t("Error.otp_max_attempts", { ns: "common" });
+        setIsMaxAttemptsReached(true);
+        setLocalError(maxAttemptsMsg);
+        setErrorMessage?.(maxAttemptsMsg);
+        setErrorCode("otp_max_attempts");
+        return;
+      }
+
+      if (
         retries !== undefined &&
         retries !== null &&
         attempts !== undefined &&
@@ -109,20 +125,12 @@ export default function OtpVerification({
         // The backend enriches the error with retries (max allowed) and
         // attempts (used so far) from the IBM Verify retrieve endpoint.
         const remaining = retries - attempts;
-
-        if (remaining <= 0) {
-          const maxAttemptsMsg = t("Error.otp_max_attempts", { ns: "common" });
-          setIsMaxAttemptsReached(true);
-          setLocalError(maxAttemptsMsg);
-          setErrorMessage?.(maxAttemptsMsg);
-        } else {
-          const invalidAttemptsMsg = t("Error.otp_invalid_attempts", {
-            ns: "common",
-            count: remaining,
-          });
-          setLocalError(invalidAttemptsMsg);
-          setErrorMessage?.(invalidAttemptsMsg);
-        }
+        const invalidAttemptsMsg = t("Error.otp_invalid_attempts", {
+          ns: "common",
+          count: remaining,
+        });
+        setLocalError(invalidAttemptsMsg);
+        setErrorMessage?.(invalidAttemptsMsg);
         // Also set errorCode so the parent's StepContent shows
         // the error summary at the top of the page
         if (messageId) {

@@ -536,6 +536,38 @@ describe("OtpVerification Component", () => {
       });
     });
 
+    it("maps expired OTP errors to otp_max_attempts", async () => {
+      const user = userEvent.setup({ delay: null });
+      mockValidateOtpCode.mockRejectedValue({
+        data: { message: "CSIAM0010E" },
+      });
+
+      renderComponent({ userOtpValue: "123456" });
+
+      const submitButton = screen.getByTestId("submit-button");
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockSetErrorCode).toHaveBeenCalledWith("otp_max_attempts");
+      });
+    });
+
+    it("maps exhausted OTP retries to otp_max_attempts", async () => {
+      const user = userEvent.setup({ delay: null });
+      mockValidateOtpCode.mockRejectedValue({
+        data: { message: "CSIAM0011E", retries: 5, attempts: 5 },
+      });
+
+      renderComponent({ userOtpValue: "123456" });
+
+      const submitButton = screen.getByTestId("submit-button");
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockSetErrorCode).toHaveBeenCalledWith("otp_max_attempts");
+      });
+    });
+
     it("clears error code when submitting again", async () => {
       const user = userEvent.setup({ delay: null });
       mockValidateOtpCode.mockRejectedValueOnce({

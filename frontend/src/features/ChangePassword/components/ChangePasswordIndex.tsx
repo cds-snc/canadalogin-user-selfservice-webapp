@@ -14,6 +14,7 @@ import { authService } from "../../../services/authService";
 
 import { useTranslation } from "react-i18next";
 import { path } from "../../../utils/routeHelpers";
+import { isOtpMaxAttemptsErrorCode } from "../../../utils/otpErrorMapping";
 import OtpSelection from "../../TransientOtp/components/OtpSelection";
 import OtpVerification from "../../TransientOtp/components/OtpVerification";
 import { passwordUpdate } from "../api/passwordUpdate";
@@ -179,11 +180,14 @@ export default function ChangePasswordIndex() {
     } catch (err) {
       const message = getApiErrorMessage(err);
       if (message) {
-        setErrorCode(message);
+        const normalizedMessage = isOtpMaxAttemptsErrorCode(message)
+          ? "otp_max_attempts"
+          : message;
+        setErrorCode(normalizedMessage);
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: CHANGE_PASSWORD_ANALYTICS.STEPS.OTP_VALIDATION,
-          error: message,
+          error: normalizedMessage,
         });
       }
       return false;
