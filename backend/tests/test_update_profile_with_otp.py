@@ -6,6 +6,7 @@ from httpx import AsyncClient, HTTPStatusError, Request, Response
 from app.otp.schemas import OtpType
 from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
+    ProfileUpdateWithOtpAction,
     UserProfileName,
     EmailItem,
     MetaDataTypeValue,
@@ -238,6 +239,7 @@ RESTORE_OLD_EMAIL_MFA_IMPORT_PATH = "app.users.services.update_profile_with_otp.
 PREFLIGHT_EMAIL_CHECK_IMPORT_PATH = (
     "app.users.services.update_profile_with_otp._is_email_already_associated"
 )
+VERIFY_ACTION_PREFLIGHT_IMPORT_PATH = "app.users.services.update_profile_with_otp._run_preflight_checks_for_verified_action"
 
 
 class TestUpdateProfileWithOtpVerification:
@@ -319,6 +321,135 @@ class TestUpdateProfileWithOtpVerification:
         assert exc.value.status_code == 400
         assert exc.value.detail == "email_accented_characters"
         mock_verify_otp.assert_not_called()
+        mock_get_profile.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch(VERIFY_ACTION_PREFLIGHT_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_verify_action_returns_one_time_proof(
+        self,
+        mock_verify_otp,
+        mock_verify_action_preflight,
+    ):
+        mock_verify_otp.return_value = None
+        mock_verify_action_preflight.return_value = None
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {}
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp="123456",
+            trxnId="verify-trxn-id",
+            otpType=OtpType.EMAIL,
+            newEmailAddress="new@example.com",
+        )
+
+        response = await update_profile_with_otp_verification(
+            mock_request, profile_update_data, "user-token"
+        )
+
+        assert response.success is True
+        assert response.message == "OTP verified for profile update"
+        assert response.data is not None
+        assert response.data.verificationProofId
+        assert response.data.expiresIn == 300
+        assert "profile_update_otp_proofs" in mock_request.session
+        assert (
+            response.data.verificationProofId
+            in mock_request.session["profile_update_otp_proofs"]
+        )
+        mock_verify_otp.assert_called_once()
+        mock_verify_action_preflight.assert_called_once()
+
+    @pytest.mark.asyncio
+    @patch(PREFLIGHT_EMAIL_CHECK_IMPORT_PATH)
+    @patch(UPDATE_PROFILE_IMPORT_PATH)
+    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_commit_action_uses_proof_and_skips_otp_verification(
+        self,
+        mock_verify_otp,
+        mock_get_profile,
+        mock_update_profile,
+        mock_preflight_email_check,
+    ):
+        mock_preflight_email_check.return_value = False
+
+        current_profile = IBMVerifyUserProfileSchema(
+            id="user-123",
+            userName="same@example.com",
+            emails=[EmailItem(value="same@example.com", type="work")],
+            active=True,
+            meta={
+                "location": "https://example.com/users/user-123",
+                "created": "2023-01-01T00:00:00Z",
+                "lastModified": "2023-09-22T12:30:00Z",
+                "resourceType": "User",
+            },
+        )
+        mock_get_profile.return_value = current_profile
+        mock_update_profile.return_value = Mock(success=True, data=current_profile)
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "profile_update_otp_proofs": {
+                "proof-123": {
+                    "expiresAt": 4102444800,
+                    "otpType": "email",
+                    "fingerprint": {
+                        "newEmailAddress": "same@example.com",
+                        "phoneNumbers": [],
+                    },
+                }
+            }
+        }
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
+            verificationProofId="proof-123",
+            newEmailAddress="same@example.com",
+        )
+
+        response = await update_profile_with_otp_verification(
+            mock_request, profile_update_data, "user-token"
+        )
+
+        assert response.success is True
+        assert "proof-123" not in mock_request.session["profile_update_otp_proofs"]
+        mock_verify_otp.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
+    async def test_commit_action_without_proof_fails_before_profile_update(
+        self,
+        mock_get_profile,
+    ):
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {}
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
+            verificationProofId="missing-proof",
+            newEmailAddress="new@example.com",
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request, profile_update_data, "user-token"
+            )
+
+        assert exc.value.status_code == 400
+        assert exc.value.detail == "otp_expired"
         mock_get_profile.assert_not_called()
 
     @pytest.mark.asyncio

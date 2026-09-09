@@ -231,6 +231,21 @@ class ProfileResponse(ResponseModel):
     data: Optional[IBMVerifyUserProfileSchema] = None
 
 
+class ProfileUpdateWithOtpAction(str, Enum):
+    VERIFY = "verify"
+    COMMIT = "commit"
+    COMMIT_WITH_OTP = "commit_with_otp"
+
+
+class ProfileUpdateOtpVerificationData(BaseModel):
+    verificationProofId: str
+    expiresIn: int
+
+
+class ProfileUpdateWithOtpResponse(ResponseModel):
+    data: Optional[IBMVerifyUserProfileSchema | ProfileUpdateOtpVerificationData] = None
+
+
 class LocalizedRelyingPartyDetail(BaseModel):
     name: str
     url: str
@@ -316,16 +331,20 @@ class ProfileUpdateWithOtpRequest(BaseModel):
     """
 
     # Sensitive profile fields that require OTP verification (all optional, at least one must be provided)
+    action: ProfileUpdateWithOtpAction = ProfileUpdateWithOtpAction.COMMIT_WITH_OTP
     newEmailAddress: Optional[EmailStr] = None
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None
 
-    # OTP verification fields (always required)
-    otp: str
-    trxnId: str
-    otpType: OtpType
+    # OTP verification fields (required for verify and commit_with_otp actions)
+    otp: Optional[str] = None
+    trxnId: Optional[str] = None
+    otpType: Optional[OtpType] = None
+
+    # One-time server-issued proof from the verify action (required for commit action)
+    verificationProofId: Optional[str] = None
 
     def model_post_init(self, __context: Any) -> None:
-        """Validate that at least one sensitive profile field is provided for update"""
+        """Validate profile update action payload shape."""
         update_fields = [
             self.newEmailAddress,
             self.phoneNumbers,
@@ -335,5 +354,32 @@ class ProfileUpdateWithOtpRequest(BaseModel):
             raise ValueError(
                 "At least one sensitive profile field must be provided for update"
             )
+
+        otp_fields = (self.otp, self.trxnId, self.otpType)
+        has_any_otp_field = any(field is not None for field in otp_fields)
+        has_all_otp_fields = all(field is not None for field in otp_fields)
+
+        if self.action in {
+            ProfileUpdateWithOtpAction.VERIFY,
+            ProfileUpdateWithOtpAction.COMMIT_WITH_OTP,
+        }:
+            if not has_all_otp_fields:
+                raise ValueError(
+                    "otp, trxnId, and otpType are required for verify and commit_with_otp actions"
+                )
+
+            if self.verificationProofId is not None:
+                raise ValueError(
+                    "verificationProofId is not allowed for verify and commit_with_otp actions"
+                )
+
+        if self.action == ProfileUpdateWithOtpAction.COMMIT:
+            if not self.verificationProofId:
+                raise ValueError("verificationProofId is required for commit action")
+
+            if has_any_otp_field:
+                raise ValueError(
+                    "otp, trxnId, and otpType are not allowed for commit action"
+                )
 
         return self

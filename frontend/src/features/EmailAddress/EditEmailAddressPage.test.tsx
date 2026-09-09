@@ -15,6 +15,10 @@ const mocks = vi.hoisted(() => ({
     onSuccess?.();
     return true;
   }),
+  verifyEmailOtpForUpdate: vi.fn(async () => ({
+    success: true,
+    data: { verificationProofId: "proof-123", expiresIn: 300 },
+  })),
   updateEmailWithOtp: vi.fn(async () => {
     throw { data: { message: "CSIAM0011E" } };
   }),
@@ -116,6 +120,7 @@ vi.mock("../../hooks/useOtpAttemptTracking", () => ({
 vi.mock("../../services/authService", () => ({
   authService: {
     logout: vi.fn(),
+    verify_email_otp_for_update: mocks.verifyEmailOtpForUpdate,
     update_email_with_otp: mocks.updateEmailWithOtp,
   },
 }));
@@ -369,5 +374,40 @@ describe("EditEmailAddressPage", () => {
     expect(
       await screen.findByRole("button", { name: "submit new email" }),
     ).toBeInTheDocument();
+  });
+
+  it("shows invalid email OTP error on email otp step without navigating to confirm", async () => {
+    mocks.verifyEmailOtpForUpdate.mockRejectedValueOnce({
+      data: {
+        message: "CSIAM0011E",
+        retries: 5,
+        attempts: 1,
+      },
+    });
+
+    render(<EditEmailAddressPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "verify password" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "verify account otp" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "fill new email" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "submit new email" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "continue with email otp" }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "confirm email update" }),
+      ).not.toBeInTheDocument();
+    });
+
+    expect(mocks.updateEmailWithOtp).not.toHaveBeenCalled();
   });
 });
