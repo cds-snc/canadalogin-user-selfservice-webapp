@@ -228,7 +228,10 @@ function coreEndpoints(fido2Data = [], numPhoneFactors = 2) {
     {
       type: "delete",
       endpoint: "/v1/fido2/registration",
-      response: { success: true },
+      response: {
+        success: true,
+        data: { verificationProofId: "proof-fido2-delete", expiresIn: 60 },
+      },
     },
   ];
 }
@@ -425,6 +428,7 @@ export const OTPPathToConfirmationScreen = (() => {
     "",
     { language: AVAILABLE_LANGUAGES.en, flow: FLOW_TYPES.profile },
     coreEndpoints(),
+    { passkeyId: "passkey-1", passkeyNickname: "Work Laptop" },
   );
 
   return {
