@@ -93,6 +93,17 @@ export const CompleteDeleteFactor = (() => {
         },
       },
       {
+        type: "delete",
+        endpoint: "/v1/otp/mfa/delete",
+        response: {
+          success: true,
+          data: {
+            verificationProofId: "proof-mfa-delete",
+            expiresIn: 60,
+          },
+        },
+      },
+      {
         type: "post",
         endpoint: `${SUBMIT_END_POINTS.passwordVerify}`,
         response: {
