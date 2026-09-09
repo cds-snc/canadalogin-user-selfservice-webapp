@@ -2,7 +2,7 @@
   "ManageDashboard": {
     "welcome": "Welcome,",
     "personalInfo": "Personal information",
-    "personalInfoDescription": "Modify your name, contact phone number and language preferences.",
+    "personalInfoDescription": "Modify your email, name, contact phone number and language preferences.",
     "securitySettings": "Security settings",
     "securitySettingsDescription": "Manage your password and 2-step verification:",
     "securitySettingsPhone": "Phone",

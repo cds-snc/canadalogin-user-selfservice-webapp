@@ -30,6 +30,8 @@ import frFido2 from "./locales/fr/fido2.json";
 import frOtp from "./locales/fr/otp.json";
 import enIdv from "./locales/en/idv.json";
 import frIdv from "./locales/fr/idv.json";
+import enConnectedServices from "./locales/en/connectedServices.json";
+import frConnectedServices from "./locales/fr/connectedServices.json";
 
 export const NAMESPACES = [
   "common",
@@ -46,6 +48,7 @@ export const NAMESPACES = [
   "fido2",
   "otp",
   "idv",
+  "connectedServices",
 ] as const;
 
 export type I18nNamespace = (typeof NAMESPACES)[number];
@@ -142,6 +145,7 @@ i18n.use(initReactI18next).init({
       fido2: enFido2,
       otp: enOtp,
       idv: enIdv,
+      connectedServices: enConnectedServices,
     },
     fr: {
       common: frCommon,
@@ -158,6 +162,7 @@ i18n.use(initReactI18next).init({
       fido2: frFido2,
       otp: frOtp,
       idv: frIdv,
+      connectedServices: frConnectedServices,
     },
   },
   lng: "en",

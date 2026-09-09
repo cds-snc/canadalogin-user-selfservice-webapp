@@ -151,15 +151,6 @@ export default function StartIdentityProofingPage() {
             </GcdsText>
           </GcdsNotice>
         )}
-        {journeyType === IDV_JOURNEY_TYPE.START && (
-          <GcdsNotice
-            noticeRole="success"
-            noticeTitle={t("StartIdentityProofing.signedInSuccessNotice")}
-            noticeTitleTag="h2"
-          >
-            <GcdsText hidden={true}>{""}</GcdsText>
-          </GcdsNotice>
-        )}
         <GcdsContainer>
           <GcdsHeading tag="h1">{pageTitle}</GcdsHeading>
           <GcdsText>

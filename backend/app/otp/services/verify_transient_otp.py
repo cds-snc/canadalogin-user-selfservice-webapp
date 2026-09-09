@@ -13,17 +13,24 @@ from app.utils.schemas import ResponseModel
 logger = logging.getLogger(__name__)
 
 
-async def _fetch_remaining_retries(
+async def _fetch_otp_status_snapshot(
     global_http_client: AsyncClient,
     trxn_id: str,
     otp_type: OtpType,
     user_access_token: str,
 ):
-    """Best-effort fetch of attempts/retries from the IBM Verify retrieve endpoint.
+    """Best-effort fetch of OTP status metadata from the IBM Verify retrieve endpoint.
 
-    Returns (attempts, retries) or (None, None) if the call fails or the
+    Returns attempts/retries plus created/expiry when available, or None fields if the call fails or the
     transient OTP no longer exists (e.g. it was deleted after max attempts).
     """
+    status_snapshot = {
+        "attempts": None,
+        "retries": None,
+        "created": None,
+        "expiry": None,
+    }
+
     try:
         response = await dispatch_otp_status_retrieval(
             global_http_client,
@@ -31,12 +38,16 @@ async def _fetch_remaining_retries(
             user_access_token,
         )
         if response.status_code != 200:
-            return None, None
+            return status_snapshot
         body = response.json()
-        return body.get("attempts"), body.get("retries")
+        status_snapshot["attempts"] = body.get("attempts")
+        status_snapshot["retries"] = body.get("retries")
+        status_snapshot["created"] = body.get("created")
+        status_snapshot["expiry"] = body.get("expiry")
+        return status_snapshot
     except Exception as e:  # noqa: BLE001 - best-effort enrichment
-        logger.warning(f"Failed to retrieve OTP attempts/retries: {e}")
-        return None, None
+        logger.warning(f"Failed to retrieve OTP status snapshot: {e}")
+        return status_snapshot
 
 
 async def handle_otp_verification(
@@ -110,16 +121,22 @@ async def verify_otp(
     # since IBM Verify may change those IDs without notice.
     attempts = None
     retries = None
+    created = None
+    expiry = None
     if response.status_code == 400:
-        attempts, retries = await _fetch_remaining_retries(
+        status_snapshot = await _fetch_otp_status_snapshot(
             global_http_client,
             trxnId,
             user_verification_data.otpType,
             user_access_token,
         )
+        attempts = status_snapshot.get("attempts")
+        retries = status_snapshot.get("retries")
+        created = status_snapshot.get("created")
+        expiry = status_snapshot.get("expiry")
 
     logger.warning(
-        f"OTP verification failed: status={response.status_code}, messageId={message_id}, attempts={attempts}, retries={retries}"
+        f"OTP verification failed: status={response.status_code}, messageId={message_id}, attempts={attempts}, retries={retries}, created={created}, expiry={expiry}"
     )
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
@@ -127,5 +144,8 @@ async def verify_otp(
             "message": message_id,
             "attempts": attempts,
             "retries": retries,
+            "created": created,
+            "expiry": expiry,
+            "trxnId": trxnId,
         },
     )

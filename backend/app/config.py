@@ -34,6 +34,7 @@ class IBMVerifyConfig(BaseSettings):
     IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: str
     IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: str
     IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID: Optional[str] = None
+    EMAIL_MFA_THEME: Optional[str] = None
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )

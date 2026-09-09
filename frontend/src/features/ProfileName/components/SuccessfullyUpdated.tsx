@@ -10,7 +10,10 @@ import {
 } from "@gcds-core/components-react";
 
 import { useTranslation } from "react-i18next";
-import { EXTERNAL_NAVIGATION_LINKS } from "../../../utils/constants";
+import {
+  getGcAccountDirectoryLink,
+  getParticipatingServicesLink,
+} from "../../../utils/externalLinks";
 import { useUser } from "../../../components/Providers/useUser";
 import { authService } from "../../../services/authService";
 import { userProfileDispatch } from "../../../utils/userProfileDispatch";
@@ -27,6 +30,8 @@ export default function SuccessfullyUpdated({
 }: ProfileNameSuccessProps) {
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
+  const gcAccountDirectoryLink = getGcAccountDirectoryLink(routeLanguage);
+  const participatingServicesLink = getParticipatingServicesLink(routeLanguage);
 
   const { dispatch } = useUser();
   const { t } = useTranslation("profile");
@@ -65,43 +70,67 @@ export default function SuccessfullyUpdated({
 
   return (
     <GcdsContainer role="main">
-      <GcdsText>
-        <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
+      <GcdsGrid columns="1" gap="300">
+        <GcdsNotice
+          noticeRole="success"
+          noticeTitleTag="h2"
+          noticeTitle={t("ProfileUpdateNameSuccess.successTitle")}
+        >
           <GcdsText>
-            <strong>
-              {t("ProfileUpdateNameSuccess.nameUpdatedTo")} {username}
-            </strong>
+            {t("ProfileUpdateNameSuccess.nameUpdatedTo")}{" "}
+            <strong>{username}</strong>
           </GcdsText>
         </GcdsNotice>
-      </GcdsText>
-      <GcdsHeading tag="h1">
-        {t("ProfileUpdateNameSuccess.updateOtherPlaces")}
-      </GcdsHeading>
-      <GcdsHeading tag="h4">
-        {t("ProfileUpdateNameSuccess.onlyConnectedServices")}
-      </GcdsHeading>
-      <GcdsText>{t("ProfileUpdateNameSuccess.notConnectedNotice")}</GcdsText>
-      <GcdsText>
-        {t("ProfileUpdateNameSuccess.searchOtherAccounts")}{" "}
-        <GcdsLink href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}>
-          {t("ProfileUpdateNameSuccess.gcAccountDirectory")}
-        </GcdsLink>
-      </GcdsText>
-      <GcdsGrid columns="max-content max-content" gap="200">
-        <SubmitButton
-          currentLang={routeLanguage}
-          style={{ width: "fit-content" }}
-          onGcdsClick={onSubmitHandler}
+
+        <GcdsHeading tag="h1">
+          {t("ProfileUpdateNameSuccess.updateOtherPlaces")}
+        </GcdsHeading>
+
+        <GcdsText>
+          <strong>{t("ProfileUpdateNameSuccess.onlyConnectedServices")}</strong>
+        </GcdsText>
+        <GcdsText>{t("ProfileUpdateNameSuccess.notConnectedNotice")}</GcdsText>
+        <GcdsText>
+          {t("ProfileUpdateNameSuccess.searchOtherAccounts")}{" "}
+          <GcdsLink href={gcAccountDirectoryLink} target="_blank">
+            {t("ProfileUpdateNameSuccess.gcAccountDirectory")}
+          </GcdsLink>
+          .
+        </GcdsText>
+
+        <GcdsNotice
+          noticeRole="warning"
+          noticeTitleTag="h2"
+          noticeTitle={t("ProfileUpdateNameSuccess.syncNoticeTitle")}
         >
-          {t("ProfileUpdateNameSuccess.backToProfile")}
-        </SubmitButton>
-        <GcdsButton
-          buttonRole="secondary"
-          style={{ width: "fit-content" }}
-          onGcdsClick={handleSignout}
-        >
-          {t("ProfileUpdateNameSuccess.signOut")}
-        </GcdsButton>
+          <GcdsText>
+            {t("ProfileUpdateNameSuccess.syncNoticeDescription")}
+          </GcdsText>
+          <GcdsText>
+            {t("ProfileUpdateNameSuccess.servicesLinkLead")}{" "}
+            <GcdsLink href={participatingServicesLink} target="_blank">
+              {t("ProfileUpdateNameSuccess.servicesLinkText")}
+            </GcdsLink>{" "}
+            {t("ProfileUpdateNameSuccess.servicesLinkSuffix")}
+          </GcdsText>
+        </GcdsNotice>
+
+        <GcdsGrid columns="max-content max-content" gap="200">
+          <SubmitButton
+            currentLang={routeLanguage}
+            style={{ width: "fit-content" }}
+            onGcdsClick={onSubmitHandler}
+          >
+            {t("ProfileUpdateNameSuccess.backToProfile")}
+          </SubmitButton>
+          <GcdsButton
+            buttonRole="secondary"
+            style={{ width: "fit-content" }}
+            onGcdsClick={handleSignout}
+          >
+            {t("ProfileUpdateNameSuccess.signOut")}
+          </GcdsButton>
+        </GcdsGrid>
       </GcdsGrid>
     </GcdsContainer>
   );

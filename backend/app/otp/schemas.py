@@ -111,8 +111,40 @@ class RetrievalData(BaseModel):
 
 
 class OtpEnrollmentRequest(BaseModel):
-    destination: PhoneNumber
+    destination: str
     otpType: OtpType
+
+    @model_validator(mode="after")
+    def validate_destination_for_type(self):
+        if self.otpType in {OtpType.SMS, OtpType.VOICE}:
+            try:
+
+                class TempPhoneModel(BaseModel):
+                    phone: PhoneNumber
+
+                temp_model = TempPhoneModel(phone=self.destination)
+                self.destination = str(temp_model.phone)
+            except Exception as e:
+                raise ValueError(
+                    f"Invalid phone number format: {self.destination}"
+                ) from e
+            return self
+
+        if self.otpType == OtpType.EMAIL:
+            try:
+
+                class TempEmailModel(BaseModel):
+                    email: EmailStr
+
+                temp_model = TempEmailModel(email=self.destination)
+                self.destination = str(temp_model.email).lower()
+            except Exception as e:
+                raise ValueError(
+                    f"Invalid email address format: {self.destination}"
+                ) from e
+            return self
+
+        raise ValueError(f"Unsupported OTP type: {self.otpType}")
 
 
 class EnrollmentResponseData(BaseModel):
@@ -152,8 +184,8 @@ class VerificationCreateResponseData(BaseModel):
     state: Optional[str] = None
     correlation: Optional[str] = None
     phoneNumber: Optional[str] = None
-    attempts: Optional[int] = 0
-    retries: Optional[int] = 0
+    attempts: Optional[int] = None
+    retries: Optional[int] = None
 
 
 class OtpVerificationAttemptRequest(BaseModel):

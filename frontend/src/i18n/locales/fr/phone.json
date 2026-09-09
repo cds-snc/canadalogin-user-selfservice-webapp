@@ -1,6 +1,7 @@
 {
   "EnterNewPhoneNumber": {
-    "title": "Entrez un nouveau numéro de téléphone",
+    "title": "Modifier votre numéro de téléphone de communication",
+    "enterNewNumberHeading": "Entrez un nouveau numéro",
     "description": "Cette action modifiera le numéro de téléphone que ConnexionCanada et les services liés à votre identifiant ConnexionCanada peuvent utiliser pour vous contacter.",
     "servicesAccessTitle": "Services ayant accès à votre numéro de téléphone de communication",
     "servicesAccessDescription": "Les services suivants ont accès à votre numéro de téléphone de communication par le biais de ConnexionCanada:",
@@ -43,12 +44,18 @@
     "cancelButton": "Annuler"
   },
   "SuccessfullyUpdatedContactPhoneNumber": {
-    "phoneUpdatedTo": "Votre numéro de téléphone de communication est maintenant le",
+    "successTitle": "Opération réussie",
+    "phoneUpdatedTo": "Votre numéro de téléphone de communication est maintenant le :",
     "updateOtherPlaces": "Vous devez peut-être mettre à jour votre numéro de téléphone ailleurs.",
     "onlyConnectedServices": "Cette action ne modifie votre numéro de téléphone de communication que pour les services liés à votre identifiant ConnexionCanada.",
     "notConnectedNotice": "Si vous cherchez à mettre à jour votre numéro de téléphone de communication pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
-    "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
-    "gcAccountDirectory": "répertoire des comptes du GC.",
+    "searchOtherAccounts": "Pour rechercher un autre compte du gouvernement du Canada, visitez le",
+    "gcAccountDirectory": "répertoire des comptes du gouvernement du Canada",
+    "syncNoticeTitle": "Vous pourriez avoir à synchroniser cette mise à jour.",
+    "syncNoticeDescription": "Pour synchroniser la mise à jour de votre numéro de téléphone de communication depuis votre profil ConnexionCanada vers les services qui y sont liés (services tiers), connectez-vous à chaque service individuellement.",
+    "servicesLinkLead": "Vous trouverez ici les liens vers",
+    "servicesLinkText": "les services auxquels vous pouvez accéder à l'aide de votre identifiant ConnexionCanada",
+    "servicesLinkSuffix": ".",
     "backToProfile": "Retour au profil",
     "signOut": "Se déconnecter"
   }

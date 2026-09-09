@@ -254,11 +254,12 @@ vi.mock("../../../../components/Layout/Loading", () => ({
 vi.mock(
   "../../../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus",
   () => ({
-    default: ({ errorCode, language }) =>
-      errorCode ? (
+    default: ({ errorCode, errorMessage, language }) =>
+      errorCode || errorMessage ? (
         <div
           data-testid="error-summary-with-focus"
           data-error-code={errorCode}
+          data-error-message={errorMessage}
           data-language={language}
         >
           Error Summary: {errorCode}
@@ -815,6 +816,78 @@ describe("AddMFAPage Unit Tests", () => {
         expect(addMFAPhoneNumberApi.verifyMFAOTP).toHaveBeenCalled();
       });
     });
+
+    it("should display remaining attempts message when verifyMFAOtp returns retries metadata", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+
+      addMFAPhoneNumberApi.sendMFAOTP.mockResolvedValue({
+        data: { id: "txn-456" },
+      });
+
+      addMFAPhoneNumberApi.verifyMFAOTP.mockRejectedValue({
+        data: {
+          message: "CSIBN0021E",
+          attempts: 1,
+          retries: 4,
+        },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("add-mfa-otp-verification"),
+        ).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("add-mfa-otp-verification-next"));
+
+      await waitFor(() => {
+        expect(addMFAPhoneNumberApi.verifyMFAOTP).toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+          "data-error-message",
+          "Invalid code. You have 3 attempts remaining.",
+        );
+      });
+    });
   });
 
   describe("deleteMFA Error Handling", () => {
@@ -1062,6 +1135,21 @@ describe("AddMFAPage Unit Tests", () => {
     });
 
     it("should navigate to passkey verification and then add phone number", async () => {
+      useOtpOperations.mockReturnValue({
+        userPhoneFactors: [],
+        userSelectedMfaFactor: null,
+        userOtpValue: "",
+        otpSentResponse: { trxnId: "mock-trxn-id" },
+        otpLoading: false,
+        phoneFactorsMap: {},
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        setUserPhoneFactors: vi.fn(),
+        setUserSelectedMfaFactor: vi.fn(),
+        setOtpLoading: vi.fn(),
+        setOtpSentResponse: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+      });
       usePasskeyOperations.mockReturnValue({
         fido2Data: [
           { id: "passkey-42", attributes: { nickname: "Work Laptop" } },
@@ -1080,12 +1168,6 @@ describe("AddMFAPage Unit Tests", () => {
       });
 
       fireEvent.click(screen.getByTestId("password-verification-next"));
-
-      await waitFor(() => {
-        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
-      });
-
-      fireEvent.click(screen.getByTestId("otp-selection-fido2"));
 
       await waitFor(() => {
         expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();

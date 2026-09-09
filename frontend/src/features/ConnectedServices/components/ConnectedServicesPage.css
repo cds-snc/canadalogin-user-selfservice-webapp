@@ -1,0 +1,28 @@
+.connected-services-information {
+  display: flex;
+  width: min(49rem, 100%);
+  box-sizing: border-box;
+  padding: var(--gcds-spacing-250, 1.25rem);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--gcds-spacing-200, 1rem);
+  border-radius: var(--gcds-border-radius-150, 0.75rem);
+  background: var(--gcds-color-yellow-100, #fcefcf);
+}
+
+.connected-services-table {
+  width: 100%;
+  max-width: 49rem;
+  border-collapse: collapse;
+}
+
+.connected-services-table th,
+.connected-services-table td {
+  padding: var(--gcds-spacing-150, 0.75rem);
+  border-bottom: 0.0625rem solid var(--gcds-color-grayscale-300, #afafaf);
+  text-align: left;
+}
+
+.connected-services-table th {
+  width: 50%;
+}

@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from urllib.parse import quote
 
 from app.config import get_configuration
 from app.otp.schemas import EnrollmentResponseData, OtpEnrollmentRequest, OtpType
@@ -15,12 +16,23 @@ from httpx import AsyncClient
 logger = logging.getLogger(__name__)
 
 
+def _append_theme_id_query(url: str, theme_id: str | None) -> str:
+    if not theme_id:
+        return url
+
+    normalized_theme_id = theme_id.strip()
+    if not normalized_theme_id:
+        return url
+
+    return f"{url}?themeId={quote(normalized_theme_id, safe='')}"
+
+
 async def handle_otp_enrollment(
     global_http_client: AsyncClient,
     enrollment_request: OtpEnrollmentRequest,
     user_access_token: str,
 ):
-    """Enroll a phone number for OTP authentication (SMS or Voice)"""
+    """Enroll a destination for OTP authentication (SMS, Voice, or Email)."""
     otp_type = enrollment_request.otpType
     logger.info(f"Attempting to enroll {otp_type} OTP factor")
     start_time = datetime.now()
@@ -63,7 +75,7 @@ async def handle_otp_enrollment(
     response_json = http_client_response.json()
 
     # Parse the enrollment response
-    # Add phoneNumber from request since it may not be in IBM response
+    # Add destination from request since it may not be in IBM response
     response_json["destination"] = enrollment_request.destination
     enrollment_data = EnrollmentResponseData(**response_json)
 
@@ -80,40 +92,96 @@ async def dispatch_otp_enrollment(
     user_id: str,
     user_access_token: str,
     language: str = None,
+    theme_id: str | None = None,
 ):
-    """Dispatch OTP enrollment to IBM Verify (SMS or Voice)"""
+    """Dispatch OTP enrollment to IBM Verify (SMS, Voice, or Email)."""
     headers = get_auth_request_headers(user_access_token, True, language)
     settings = get_configuration().ibm_verify_config
 
-    # Format phone number for IBM Verify
-    formatted_phone = prepare_pydantic_phone_number_for_verify(
-        enrollment_request.destination
-    )
-    if not formatted_phone.startswith("+"):
-        formatted_phone = f"+{formatted_phone}"
-
     enrollment_data = {
         "userId": user_id,
-        "phoneNumber": formatted_phone,
         "enabled": True,  # Enable the factor immediately upon enrollment
     }
 
     # Determine the endpoint based on OTP type
     if enrollment_request.otpType == OtpType.SMS:
         endpoint = "smsotp"
+        formatted_phone = prepare_pydantic_phone_number_for_verify(
+            enrollment_request.destination
+        )
+        if not formatted_phone.startswith("+"):
+            formatted_phone = f"+{formatted_phone}"
+        enrollment_data["phoneNumber"] = formatted_phone
     elif enrollment_request.otpType == OtpType.VOICE:
         endpoint = "voiceotp"
+        formatted_phone = prepare_pydantic_phone_number_for_verify(
+            enrollment_request.destination
+        )
+        if not formatted_phone.startswith("+"):
+            formatted_phone = f"+{formatted_phone}"
+        enrollment_data["phoneNumber"] = formatted_phone
+    elif enrollment_request.otpType == OtpType.EMAIL:
+        endpoint = "emailotp"
+        enrollment_data["emailAddress"] = enrollment_request.destination.lower()
     else:
-        raise ValueError(f"Unsupported OTP type: {enrollment_request.otpType}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported OTP type: {enrollment_request.otpType}",
+        )
 
     enrollment_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/{endpoint}"
+    if enrollment_request.otpType == OtpType.EMAIL:
+        enrollment_url = _append_theme_id_query(enrollment_url, theme_id)
+
     response = await global_http_client.post(
         enrollment_url, json=enrollment_data, headers=headers
     )
     if response.status_code == status.HTTP_409_CONFLICT:
+        duplicate_message = (
+            "mfa_email_duplicate"
+            if enrollment_request.otpType == OtpType.EMAIL
+            else "mfa_phone_duplicate"
+        )
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="mfa_phone_duplicate",
+            detail=duplicate_message,
         )
+    response.raise_for_status()
+    return response
+
+
+async def dispatch_otp_factor_validation(
+    global_http_client: AsyncClient,
+    factor_id: str,
+    otp_type: OtpType,
+    factor_payload: dict,
+    user_access_token: str,
+    language: str = None,
+):
+    """Update an OTP factor object in IBM Verify (used for post-enrollment validation)."""
+    headers = get_auth_request_headers(user_access_token, True, language)
+    settings = get_configuration().ibm_verify_config
+
+    if otp_type == OtpType.SMS:
+        endpoint = "smsotp"
+    elif otp_type == OtpType.VOICE:
+        endpoint = "voiceotp"
+    elif otp_type == OtpType.EMAIL:
+        endpoint = "emailotp"
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported OTP type: {otp_type}",
+        )
+
+    factor_update_url = (
+        f"{settings.IBM_VERIFY_TENANT_URL}/factors/v2.0/factors/{endpoint}/{factor_id}"
+    )
+
+    response = await global_http_client.put(
+        factor_update_url,
+        json=factor_payload,
+        headers=headers,
+    )
     response.raise_for_status()
     return response

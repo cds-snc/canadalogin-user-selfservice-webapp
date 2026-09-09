@@ -1,5 +1,84 @@
 # Changelog
 
+## [1.33.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.0...v1.33.1) (2026-09-08)
+
+
+### Bug Fixes
+
+* handle empty otp string ([#2100](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2100)) ([9457a9c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9457a9cff8e0fc1ef35c6016d810effe1fdcf6f8))
+* remove sensitive user ID logging and improve log messages for FIDO2 registration ([#2096](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2096)) ([2756dda](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2756dda012aa870626193fe2fcdb457d64fac111))
+
+## [1.33.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.32.1...v1.33.0) (2026-09-08)
+
+
+### Features
+
+* **identity-verification:** Connected Services Details: Sign in to s… ([#2083](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2083)) ([aee4415](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/aee441550191e3858d7235875b22ccb0704bc01f))
+
+
+### Bug Fixes
+
+* Added GA Parameters for Change Email Flow ([#2077](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2077)) ([57134d9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/57134d9a7e2d75860a067fab0ede8a0262fd399f))
+* implement URL sanitization for logging sensitive query parameters ([#2086](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2086)) ([7ab9d1c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7ab9d1c957362d4c955f50c622d17e8212339c20))
+* send user straight to verify mfa screen ([#2093](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2093)) ([d4c3f0c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d4c3f0cb64b6e2be382bb29d0f1d959e0c664b12))
+* streamline MFA flow by updating conditions for passkey verification and adjusting related tests ([#2092](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2092)) ([a69cf3a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a69cf3a7925eca3e4a7f4079b485931cf4b1df5e))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump cryptography from 48.0.1 to 50.0.0 in /backend ([#1946](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1946)) ([5c3d1b6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5c3d1b6c416f9f712f766bf2c63ca57f4b22edee))
+* **deps:** update all minor dependencies ([#2006](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2006)) ([6abb2bf](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6abb2bfb7994905c42ce57e0c788404071420bca))
+* **deps:** update all non-major github action dependencies ([#2005](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2005)) ([fbf69ae](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fbf69aee79daf4e289a4c68400dee017f8b86c69))
+
+## [1.32.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.32.0...v1.32.1) (2026-09-03)
+
+
+### Bug Fixes
+
+* manage app changeemail server error displayed when user enters an existing email address ([#2080](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2080)) ([f8053ae](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f8053ae66e03f4c9d35ce16c2f6d782f2a53b42f))
+
+## [1.32.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.31.0...v1.32.0) (2026-09-02)
+
+
+### Features
+
+* Add participating services link to various components and update translations ([#2072](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2072)) ([1e31e6e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1e31e6e7095e16626badef0e1f2cc2f8c0e76a5f))
+* Enhance email MFA handling with theme ID support ([#2047](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2047)) ([274265d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/274265d3d0e50d7488cdeefa37147096e1563733))
+* Implement OTP metadata handling for better error responses and countdown management ([#2062](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2062)) ([f5bdfa5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f5bdfa5f0a4f671f30cb71c649c616d3fe57340b))
+* Update external links to use dynamic GC account directory URLs based on language preference ([#2061](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2061)) ([2c22686](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2c22686a4e999eb454b61d1c54494b4c220048ec))
+
+
+### Bug Fixes
+
+* **EditEmailAddressPage:** clear error messages and reset attempts on navigating back to email entry ([#2059](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2059)) ([6e01859](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6e01859ec43ecc05dea51fb3b15d59dd8e0f1c01))
+* **EditEmailEnterEmail:** add language attribute to input for accessibility ([#2067](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2067)) ([7a3955d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7a3955dbd27710294dbff5eef30faafe5f8642be))
+* **email:** allow passkey-only users to continue without phone MFA factors ([#2033](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2033)) ([6dbe97b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6dbe97bad09ce4b91c60722000488a84cb5777a2))
+* **ErrorSummaryWithFocus:** enhance error link functionality to focus and scroll to linked elements on click or custom event ([#2039](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2039)) ([5765bcd](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5765bcd7ff6db7a82e970160a05034c936096d23))
+* Fix Phone Number Validation and Accessible Label Issues ([#2064](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2064)) ([ec97559](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ec97559427e2ed1a6d0d0a5cc2197f14a9158574))
+* Handle existing email conflict error and update error messages for clarity ([#2065](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2065)) ([f8a8685](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f8a8685a2465d7126cc33686f81a8b7fb676b9ba))
+* **ProfileUpdateNameConfirmUpdate:** update wording for clarity in name change notice ([#2060](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2060)) ([3999c74](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3999c748c9ffa75152d6536cb2402ab87193d34b))
+
+
+### Code Refactoring
+
+* **identity-verification:** Content changes to "Get ready to visit a Canad Post Location" page ([519bb6e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/519bb6ebc47858f88261ae7cd6be00cea7e48fd0))
+* **identity-verification:** Content changes to "Get ready to visit a Canada Post Location" page ([#2041](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2041)) ([519bb6e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/519bb6ebc47858f88261ae7cd6be00cea7e48fd0))
+* **identity-verification:** Content changes to "Prove your identity when you're ready" page EN + FR ([#2020](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2020)) ([b820055](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b820055726196f87149e9c7c5f37585ec99cd342))
+
+## [1.31.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.30.0...v1.31.0) (2026-08-31)
+
+
+### Features
+
+* handle changing MFA email to new email ([#2018](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2018)) ([3fa51db](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3fa51db3817b7122005c12d9749343acb1f2a741))
+* **identity-verification:** move styling to seperate css ([#2013](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2013)) ([86363c1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/86363c137c4119da812e049e1f844278863f3b8d))
+* **identity-verification:** send the verification method and user form data service canada canada post to idv data store ([#2009](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2009)) ([7fd58e4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7fd58e4c685512e3bd8fb75919b3201b10e348a9))
+
+
+### Code Refactoring
+
+* **identity-verification:** [FE] 'You are signed in with CanadaLogin' to appear only when journeyType is required ([#2021](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2021)) ([e37814b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e37814bb567216e6c63ee593c7e23e65c2538448))
+
 ## [1.30.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.29.0...v1.30.0) (2026-08-24)
 
 

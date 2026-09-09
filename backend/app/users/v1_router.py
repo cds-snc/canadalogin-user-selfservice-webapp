@@ -108,7 +108,7 @@ async def user_factors(
     response_model_by_alias=False,
     tags=["Users"],
     summary="Update any profile field with OTP verification",
-    description="Generalized endpoint to atomically validate OTP and update any profile field (email, name, phone, language). Ensures profile changes only occur after successful OTP verification.",
+    description="Generalized endpoint to atomically validate OTP and update any profile field (email, name, phone, language). Ensures profile changes only occur after successful OTP verification. When email is updated, email MFA factors are synchronized by adding the new email factor and deleting factors tied to the previous email.",
 )
 async def update_user_profile_with_otp_verification(
     request: Request,

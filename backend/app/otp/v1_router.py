@@ -102,7 +102,7 @@ async def check_otp(
     status_code=status.HTTP_201_CREATED,
     tags=["OTP"],
     summary="Enroll MFA OTP factor",
-    description="Enrolls a phone number for MFA OTP-based two-factor authentication (SMS or Voice based on otpType)",
+    description="Enrolls a destination for MFA OTP-based two-factor authentication (SMS, Voice, or Email based on otpType)",
 )
 async def enroll_otp(
     request: Request,
@@ -120,7 +120,7 @@ async def enroll_otp(
     status_code=status.HTTP_201_CREATED,
     tags=["OTP"],
     summary="Send MFA OTP",
-    description="Sends an MFA OTP via SMS or initiates a voice call based on otpType",
+    description="Sends an MFA OTP based on otpType (SMS, Voice, or Email)",
 )
 async def create_mfa_otp_verification(
     request: Request,
@@ -142,7 +142,7 @@ async def create_mfa_otp_verification(
     status_code=status.HTTP_200_OK,
     tags=["OTP"],
     summary="Verify MFA OTP",
-    description="Verifies the user-provided OTP for MFA authentication (SMS or Voice based on otpType)",
+    description="Verifies the user-provided OTP for MFA authentication (SMS, Voice, or Email based on otpType)",
 )
 async def attempt_mfa_otp_verification(
     request: Request,
@@ -162,7 +162,7 @@ async def attempt_mfa_otp_verification(
     response_model=ResponseModel,
     tags=["OTP"],
     summary="Delete MFA OTP factor",
-    description="Deletes an enrolled MFA OTP factor (SMS or Voice based on otpType). For unvalidated factors only when no OTP is provided.",
+    description="Deletes an enrolled MFA OTP factor (SMS, Voice, or Email based on otpType). For unvalidated factors only when no OTP is provided.",
 )
 async def delete_mfa_otp_factor(
     request: Request,

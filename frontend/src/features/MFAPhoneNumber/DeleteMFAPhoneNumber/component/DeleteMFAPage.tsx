@@ -25,6 +25,10 @@ import { useWizardPageTracking } from "../../../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../../../utils/analyticsConstants";
 import { DELETE_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
 import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
+import {
+  extractOtpServerMetadata,
+  mergeOtpSentResponseWithMetadata,
+} from "../../../../utils/otpMetadata";
 
 interface DeletePhoneFormData {
   phoneNumber: string;
@@ -91,26 +95,26 @@ export default function DeleteMFAPage() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     async () => {
-      // If there's only one MFA factor, skip OTP selection and go directly to validation
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-        step:
-          userPhoneFactors &&
-          userPhoneFactors.length === 1 &&
-          fido2Data.length === 0
-            ? DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION
-            : DELETE_MFA_ANALYTICS.STEPS.OTP_SELECTION,
-      });
-      if (
-        userPhoneFactors &&
-        userPhoneFactors.length === 1 &&
-        fido2Data.length === 0
-      ) {
+      const phoneFactorCount = userPhoneFactors?.length ?? 0;
+      const passkeyCount = fido2Data.length;
+
+      if (phoneFactorCount === 1 && passkeyCount === 0) {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+        });
         const success = await requestOtpCode();
         if (success) {
           setWizardStep("otpValidation");
         }
+      } else if (phoneFactorCount === 0 && passkeyCount === 1) {
+        setSelected2FAPasskey(fido2Data[0]);
+        setWizardStep("verifyFIDO2Passkey");
       } else {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: DELETE_MFA_ANALYTICS.STEPS.OTP_SELECTION,
+        });
         setWizardStep("otpSelection");
       }
     },
@@ -144,6 +148,7 @@ export default function DeleteMFAPage() {
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,
+    setOtpSentResponse,
   } = useOtpOperations({
     userId: id,
     userName,
@@ -260,6 +265,9 @@ export default function DeleteMFAPage() {
       const err = error as {
         data?: { message?: string; retries?: number; attempts?: number };
       };
+      setOtpSentResponse((prev) =>
+        mergeOtpSentResponseWithMetadata(prev, extractOtpServerMetadata(error)),
+      );
       const message = err?.data?.message ?? "";
       const attemptsMessage = getOtpAttemptsErrorMessage(err?.data);
       setErrorCode(message);
@@ -357,7 +365,7 @@ export default function DeleteMFAPage() {
         validatePassword={handleValidatePassword}
         setErrorCode={setErrorCode}
         errorMessage={errorMessage}
-        parentPage={PAGES.addMFAPage}
+        parentPage={PAGES.deleteMFAPage}
       />
     ),
     otpSelection: (

@@ -193,13 +193,11 @@ export const EditProfileName = (() => {
 
       await step("Verify success page is displayed", async () => {
         await waitFor(async () => {
-          const canvas = within(canvasElement);
+          const pageText = canvasElement.textContent || "";
 
-          // Check that the success message is present with the updated name
-          const successText = canvas.getByText(
-            /Your name has been updated to Test User/i,
-          );
-          await expect(successText).toBeInTheDocument();
+          // Keep this resilient to styled/split text nodes inside web components.
+          await expect(pageText).toContain("Your name has been updated to");
+          await expect(pageText).toContain("Test User");
         });
       });
     },

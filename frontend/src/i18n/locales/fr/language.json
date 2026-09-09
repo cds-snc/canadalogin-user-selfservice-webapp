@@ -24,18 +24,20 @@
     "legallyChangeName": "légalement votre nom."
   },
   "SuccessfullyUpdatedLanguage": {
-    "successTitle": "Réussite",
-    "languageUpdatedTo": "Votre langue de communication est maintenant le",
-    "updateOtherPlaces": "Vous devez peut-être mettre à jour votre langue de communication ailleurs.",
+    "successTitle": "Opération réussie",
+    "languageUpdatedTo": "Votre langue de communication est maintenant la suivante :",
+    "updateOtherPlaces": "Il se peut que vous deviez mettre à jour votre langue de communication ailleurs.",
     "onlyConnectedServices": "Cette action ne modifie votre langue de communication que pour les services liés à votre identifiant ConnexionCanada.",
     "notConnectedNotice": "Si vous cherchez à mettre à jour votre langue de communication pour un service qui n'est pas lié à votre identifiant ConnexionCanada, vous devez le faire depuis le compte que vous possédez pour le service en question.",
-    "searchOtherAccounts": "Pour rechercher un autre compte du GC, consultez le",
+    "searchOtherAccounts": "Pour rechercher un autre compte du gouvernement du Canada, visitez le",
     "backToProfile": "Retour au profil",
     "signOut": "Se déconnecter",
-    "gcAccountDirectory": "répertoire des comptes du GC.",
-    "viewConnectedServices": "Pour voir les services connectés à votre identifiant ConnexionCanada, accédez à ",
-    "connectedServices": "Services connectés",
-    "inYourDashboard": "dans votre tableau de bord ConnexionCanada.",
+    "gcAccountDirectory": "répertoire des comptes du gouvernement du Canada",
+    "syncNoticeTitle": "Vous pourriez avoir à synchroniser cette mise à jour",
+    "syncNoticeDescription": "Pour synchroniser la mise à jour de votre langue de communication entre votre profil ConnexionCanada et les services qui y sont liés, connectez-vous à chaque service individuellement.",
+    "servicesLinkLead": "Vous trouverez ici les liens vers tous les",
+    "servicesLinkText": "services auxquels vous pouvez accéder à l'aide de votre identifiant ConnexionCanada",
+    "servicesLinkSuffix": ".",
     "signingOut": "Déconnexion en cours...",
     "signOutFailed": "Échec de la déconnexion. Redirection..."
   }

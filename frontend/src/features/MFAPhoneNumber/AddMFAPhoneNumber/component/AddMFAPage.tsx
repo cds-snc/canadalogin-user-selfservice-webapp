@@ -2,7 +2,12 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import Loader from "../../../../components/Layout/Loading";
 import { useUser } from "../../../../components/Providers/useUser";
-import { FLOW_TYPES, PAGES, serverMapping } from "../../../../utils/constants";
+import {
+  FLOW_TYPES,
+  INVALID_OTP_ERROR_CODES,
+  PAGES,
+  serverMapping,
+} from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
 import { getErrorMessage } from "../../../../utils/errorUtils";
 import { path } from "../../../../utils/routeHelpers";
@@ -29,7 +34,10 @@ import { ADD_MFA_ANALYTICS } from "../../../../utils/analyticsConstants";
 import { usePasskeyOperations } from "../../../../hooks/usePasskeyOperations";
 import VerifyFIDO2Passkey from "../../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 import { Fido2Credential } from "../../../../types/hooks";
-import { useOtpAttemptTracking } from "../../../../hooks/useOtpAttemptTracking";
+import {
+  extractOtpServerMetadata,
+  mergeOtpSentResponseWithMetadata,
+} from "../../../../utils/otpMetadata";
 
 interface PhoneFormData {
   phoneNumber: string;
@@ -108,26 +116,26 @@ export default function AddMFAPage() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     async () => {
-      // If there's only one MFA factor, skip OTP selection and go directly to validation
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-        step:
-          userPhoneFactors &&
-          userPhoneFactors.length === 1 &&
-          fido2Data.length === 0
-            ? ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION
-            : ADD_MFA_ANALYTICS.STEPS.OTP_SELECTION,
-      });
-      if (
-        userPhoneFactors &&
-        userPhoneFactors.length === 1 &&
-        fido2Data.length === 0
-      ) {
+      const phoneFactorCount = userPhoneFactors?.length ?? 0;
+      const passkeyCount = fido2Data.length;
+
+      if (phoneFactorCount === 1 && passkeyCount === 0) {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: ADD_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+        });
         const success = await requestOtpCode();
         if (success) {
           setWizardStep("otpValidation");
         }
+      } else if (phoneFactorCount === 0 && passkeyCount === 1) {
+        setSelected2FAPasskey(fido2Data[0]);
+        setWizardStep("verifyFIDO2Passkey");
       } else {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: ADD_MFA_ANALYTICS.STEPS.OTP_SELECTION,
+        });
         setWizardStep("otpSelection");
       }
     },
@@ -161,6 +169,7 @@ export default function AddMFAPage() {
     handleChangeUserMfaSelection,
     handleSetUserOtpValue,
     requestOtpCode,
+    setOtpSentResponse,
   } = useOtpOperations({
     userId: id,
     userName,
@@ -177,10 +186,41 @@ export default function AddMFAPage() {
   });
 
   const [customErrorMessage, setCustomErrorMessage] = useState("");
+  const [isMfaOtpMaxAttemptsReached, setIsMfaOtpMaxAttemptsReached] =
+    useState(false);
   const errorMessage =
     customErrorMessage || getErrorMessage(language, errorCode);
-  const { resetAttempts, isMaxAttemptsReached } =
-    useOtpAttemptTracking(errorCode);
+
+  const resetAttempts = () => {
+    setIsMfaOtpMaxAttemptsReached(false);
+  };
+
+  const getOtpAttemptsErrorMessage = (errorData?: {
+    retries?: number;
+    attempts?: number;
+  }) => {
+    const retries = errorData?.retries;
+    const attempts = errorData?.attempts;
+
+    if (
+      retries === undefined ||
+      retries === null ||
+      attempts === undefined ||
+      attempts === null
+    ) {
+      return "";
+    }
+
+    const remaining = retries - attempts;
+    if (remaining <= 0) {
+      return t("Error.otp_max_attempts", { ns: "common" });
+    }
+
+    return t("Error.otp_invalid_attempts", {
+      ns: "common",
+      count: remaining,
+    });
+  };
 
   const handlePhoneForm = (field: string, value: unknown) => {
     setPhoneFormData((prev) => ({
@@ -244,6 +284,8 @@ export default function AddMFAPage() {
     otpType?: string;
   } = {}): Promise<boolean> => {
     setErrorCode("");
+    setCustomErrorMessage("");
+    setIsMfaOtpMaxAttemptsReached(false);
 
     try {
       const payload = {
@@ -295,6 +337,9 @@ export default function AddMFAPage() {
   };
 
   const verifyMFAOtp = async () => {
+    setCustomErrorMessage("");
+    setIsMfaOtpMaxAttemptsReached(false);
+
     try {
       const payload = {
         id: phoneFormData.mfaId,
@@ -341,16 +386,41 @@ export default function AddMFAPage() {
           });
         }
         setErrorCode("");
+        setCustomErrorMessage("");
+        setIsMfaOtpMaxAttemptsReached(false);
       }
     } catch (error) {
-      const err = error as { data?: { message?: string } };
-      if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+      const err = error as {
+        data?: { message?: string; retries?: number; attempts?: number };
+      };
+      const message = err?.data?.message ?? "";
+      const retries = err?.data?.retries;
+      const attempts = err?.data?.attempts;
+      const attemptsMessage = getOtpAttemptsErrorMessage(err?.data);
+
+      if (message) {
+        setErrorCode(message);
+
+        if (
+          retries !== undefined &&
+          retries !== null &&
+          attempts !== undefined &&
+          attempts !== null
+        ) {
+          setIsMfaOtpMaxAttemptsReached(retries - attempts <= 0);
+        }
+
+        if (
+          (INVALID_OTP_ERROR_CODES as readonly string[]).includes(message) &&
+          attemptsMessage
+        ) {
+          setCustomErrorMessage(attemptsMessage);
+        }
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: ADD_MFA_ANALYTICS.STEPS.SUCCESS,
           type: phoneFormData.otpType,
-          error: err.data.message,
+          error: message,
         });
       }
     }
@@ -422,6 +492,9 @@ export default function AddMFAPage() {
         error?.response?.data?.retries !== undefined &&
         error?.response?.data?.retries !== null;
       if (hasRetries) {
+        setOtpSentResponse((prev) =>
+          mergeOtpSentResponseWithMetadata(prev, extractOtpServerMetadata(err)),
+        );
         // Re-throw so OtpVerification can display "X retries remaining"
         throw error.response;
       }
@@ -683,7 +756,7 @@ export default function AddMFAPage() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
         errorMessage={errorMessage}
-        isMaxAttemptsReached={isMaxAttemptsReached}
+        isMaxAttemptsReached={isMfaOtpMaxAttemptsReached}
         resetAttempts={resetAttempts}
         onNext={async () => {
           trackEvent({

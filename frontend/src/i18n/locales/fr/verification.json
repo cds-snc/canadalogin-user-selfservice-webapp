@@ -20,6 +20,8 @@
     "tenMinutes": "10 minutes.",
     "enterCode": "Entrez le code",
     "sixDigitCode": "Code à 6 chiffres",
+    "addPhoneInfoTitle": "Information",
+    "addPhoneInfoDescription": "L'ajout d'un numéro de téléphone déclenchera l'envoi d'une notification à votre adresse courriel.",
     "problemsWithCode": "Des problèmes avec votre code?",
     "callMeInstead": "Recevoir le code par appel vocal",
     "textMeInstead": "Recevoir le code par message texte (SMS)",
@@ -39,6 +41,8 @@
     "cancel": "Annuler",
     "setupSmsInstead": "Configurer la vérification par message texte (SMS)",
     "setupVoiceInstead": "Configurez la vérification par appel vocal",
+    "verifySmsInstead": "Utiliser plutôt la vérification par message texte (SMS)",
+    "verifyVoiceInstead": "Utiliser plutôt la vérification par appel vocal",
     "cannotAccessPhone": "Je n'ai pas accès à mon téléphone"
   },
   "CheckYourEmail": {

@@ -35,6 +35,11 @@ def mock_voice_verification_create_request():
 
 
 @pytest.fixture
+def mock_email_verification_create_request():
+    return OtpVerificationCreateRequest(id="factor123", otpType=OtpType.EMAIL)
+
+
+@pytest.fixture
 def mock_sms_verification_attempt_request():
     return OtpVerificationAttemptRequest(
         id="factor123", trxnId="trxn456", otp="123456", otpType=OtpType.SMS
@@ -45,6 +50,13 @@ def mock_sms_verification_attempt_request():
 def mock_voice_verification_attempt_request():
     return OtpVerificationAttemptRequest(
         id="factor123", trxnId="trxn456", otp="123456", otpType=OtpType.VOICE
+    )
+
+
+@pytest.fixture
+def mock_email_verification_attempt_request():
+    return OtpVerificationAttemptRequest(
+        id="factor123", trxnId="trxn456", otp="123456", otpType=OtpType.EMAIL
     )
 
 
@@ -156,6 +168,41 @@ class TestUnifiedMFAOTPDispatchFunctions:
                 # Check the last call to verify it's the Voice API call
                 last_call_args = mock_http_client.post.call_args_list[-1]
                 assert "/v2.0/factors/voiceotp/" in last_call_args[0][0]
+
+    @pytest.mark.asyncio
+    async def test_dispatch_mfa_verification_create_email(
+        self, mock_email_verification_create_request
+    ):
+        """Test Email dispatch verification create."""
+        mock_http_client = AsyncMock()
+
+        with patch(
+            "app.otp.services.send_mfa_otp.get_auth_request_headers"
+        ) as mock_headers:
+            mock_headers.return_value = {"Authorization": "Bearer user_token"}
+
+            with patch(
+                "app.otp.services.send_mfa_otp.get_configuration"
+            ) as mock_config:
+                mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                    "https://test.ibm.com"
+                )
+
+                mock_response = MagicMock()
+                mock_response.raise_for_status = MagicMock()
+                mock_http_client.post.return_value = mock_response
+
+                result = await dispatch_send_mfa_otp(
+                    mock_http_client,
+                    mock_email_verification_create_request,
+                    OtpType.EMAIL,
+                    "user_token",
+                )
+
+                assert result == mock_response
+                assert mock_http_client.post.call_count >= 1
+                last_call_args = mock_http_client.post.call_args_list[-1]
+                assert "/v2.0/factors/emailotp/" in last_call_args[0][0]
 
 
 class TestIntegrationBasics:
@@ -378,7 +425,7 @@ class TestDispatchMFAVerificationAttempt:
                 )
 
                 mock_response = MagicMock()
-                mock_response.raise_for_status = MagicMock()
+                mock_response.status_code = 204
                 mock_http_client.post.return_value = mock_response
 
                 result = await dispatch_verify_mfa_otp(
@@ -416,7 +463,7 @@ class TestDispatchMFAVerificationAttempt:
                 )
 
                 mock_response = MagicMock()
-                mock_response.raise_for_status = MagicMock()
+                mock_response.status_code = 204
                 mock_http_client.post.return_value = mock_response
 
                 result = await dispatch_verify_mfa_otp(
@@ -431,3 +478,93 @@ class TestDispatchMFAVerificationAttempt:
                 last_call_args = mock_http_client.post.call_args_list[-1]
                 assert "/v2.0/factors/voiceotp/" in last_call_args[0][0]
                 assert "/verifications/" in last_call_args[0][0]
+
+    @pytest.mark.asyncio
+    async def test_dispatch_verification_attempt_success_email(
+        self, mock_email_verification_attempt_request
+    ):
+        """Test successful Email verification attempt dispatch."""
+        mock_http_client = AsyncMock()
+
+        with patch(
+            "app.otp.services.verify_mfa_otp.get_auth_request_headers"
+        ) as mock_headers:
+            mock_headers.return_value = {"Authorization": "Bearer user_token"}
+
+            with patch(
+                "app.otp.services.verify_mfa_otp.get_configuration"
+            ) as mock_config:
+                mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                    "https://test.ibm.com"
+                )
+
+                mock_response = MagicMock()
+                mock_response.status_code = 204
+                mock_http_client.post.return_value = mock_response
+
+                result = await dispatch_verify_mfa_otp(
+                    mock_http_client,
+                    mock_email_verification_attempt_request,
+                    OtpType.EMAIL,
+                    "user_token",
+                )
+
+                assert result == mock_response
+                last_call_args = mock_http_client.post.call_args_list[-1]
+                assert "/v2.0/factors/emailotp/" in last_call_args[0][0]
+                assert "/verifications/" in last_call_args[0][0]
+                assert last_call_args[1]["json"] == {"otp": "123456"}
+
+    @pytest.mark.asyncio
+    async def test_dispatch_verification_attempt_invalid_otp_includes_status_metadata(
+        self, mock_sms_verification_attempt_request
+    ):
+        """Invalid OTP responses include IBM status metadata for timer continuity."""
+        mock_http_client = AsyncMock()
+
+        with patch(
+            "app.otp.services.verify_mfa_otp.get_auth_request_headers"
+        ) as mock_headers:
+            mock_headers.return_value = {"Authorization": "Bearer user_token"}
+
+            with patch(
+                "app.otp.services.verify_mfa_otp.get_configuration"
+            ) as mock_config:
+                mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                    "https://test.ibm.com"
+                )
+
+                invalid_response = MagicMock()
+                invalid_response.status_code = 400
+                invalid_response.json.return_value = {"messageId": "CSIAM0011E"}
+
+                status_response = MagicMock()
+                status_response.status_code = 200
+                status_response.json.return_value = {
+                    "attempts": 2,
+                    "retries": 2,
+                    "created": "2026-01-01T00:00:00Z",
+                    "expiry": "2026-01-01T00:10:00Z",
+                }
+
+                mock_http_client.post.return_value = invalid_response
+                mock_http_client.get.return_value = status_response
+
+                from fastapi import HTTPException
+
+                with pytest.raises(HTTPException) as excinfo:
+                    await dispatch_verify_mfa_otp(
+                        mock_http_client,
+                        mock_sms_verification_attempt_request,
+                        OtpType.SMS,
+                        "user_token",
+                    )
+
+                exc = excinfo.value
+                assert exc.status_code == 400
+                assert exc.detail["message"] == "CSIAM0011E"
+                assert exc.detail["attempts"] == 2
+                assert exc.detail["retries"] == 2
+                assert exc.detail["created"] == "2026-01-01T00:00:00Z"
+                assert exc.detail["expiry"] == "2026-01-01T00:10:00Z"
+                assert exc.detail["trxnId"] == "trxn456"

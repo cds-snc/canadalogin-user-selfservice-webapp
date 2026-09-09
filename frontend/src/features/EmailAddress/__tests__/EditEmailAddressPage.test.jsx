@@ -6,6 +6,7 @@ import React from "react";
 import EditEmailAddressPage from "../EditEmailAddressPage";
 import { usePasswordValidation } from "../../../hooks/usePasswordValidation";
 import { useOtpOperations } from "../../../hooks/useOtpOperations";
+import { usePasskeyOperations } from "../../../hooks/usePasskeyOperations";
 
 const { mockTrackEvent } = vi.hoisted(() => ({
   mockTrackEvent: vi.fn(),
@@ -66,17 +67,52 @@ vi.mock("../../TransientOtp/components/PasswordVerification", () => ({
 }));
 
 vi.mock("../../TransientOtp/components/OtpSelection", () => ({
-  default: ({ onNext, onCancel }) => (
+  default: ({ onNext, onCancel, onSelectFIDO2, fido2Data }) => (
     <div data-testid="otp-selection">
       <button onClick={onNext} data-testid="otp-next-btn">
         Next
       </button>
+      {fido2Data?.length > 0 && (
+        <button
+          onClick={() =>
+            onSelectFIDO2?.({
+              id: "passkey-1",
+              attributes: {
+                nickname: "My passkey",
+                credentialId: "cred-1",
+              },
+            })
+          }
+          data-testid="select-passkey-btn"
+        >
+          Select Passkey
+        </button>
+      )}
       <button onClick={onCancel} data-testid="otp-cancel-btn">
         Cancel
       </button>
     </div>
   ),
 }));
+
+vi.mock(
+  "../../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey",
+  () => ({
+    default: ({ onCallback, onTryAnotherWayHandler }) => (
+      <div data-testid="verify-fido2-passkey">
+        <button onClick={onCallback} data-testid="fido2-success-btn">
+          Passkey Success
+        </button>
+        <button
+          onClick={onTryAnotherWayHandler}
+          data-testid="fido2-try-another-way-btn"
+        >
+          Try Another Way
+        </button>
+      </div>
+    ),
+  }),
+);
 
 vi.mock("../../TransientOtp/components/OtpVerification", () => ({
   default: ({ validateOtpCode, onBack, onCancel }) => (
@@ -190,7 +226,16 @@ vi.mock("../../../hooks/useOtpOperations", () => ({
         callback({ success: true });
       }
     }),
+    setOtpSentResponse: vi.fn(),
     setOtpLoading: vi.fn(),
+  })),
+}));
+
+vi.mock("../../../hooks/usePasskeyOperations", () => ({
+  usePasskeyOperations: vi.fn(() => ({
+    fido2Data: [],
+    loading: false,
+    refetch: vi.fn(),
   })),
 }));
 
@@ -240,6 +285,11 @@ vi.mock("../../../utils/routeHelpers", () => ({
 describe("EditEmailAddressPage Integration Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(usePasskeyOperations).mockImplementation(() => ({
+      fido2Data: [],
+      loading: false,
+      refetch: vi.fn(),
+    }));
     // Mock window.location for logout tests
     delete window.location;
     window.location = { href: "" };
@@ -372,6 +422,89 @@ describe("EditEmailAddressPage Integration Tests", () => {
       expect(screen.getByTestId("edit-email-enter-email")).toBeInTheDocument();
     });
 
+    it("executes handleEnterEmailSubmit with email longer than 128 characters", async () => {
+      renderComponent();
+
+      // Navigate to enter email step
+      await act(async () => {
+        const validateBtn = screen.getByTestId("validate-password-btn");
+        fireEvent.click(validateBtn);
+      });
+
+      await act(async () => {
+        const nextBtn = screen.getByTestId("otp-next-btn");
+        fireEvent.click(nextBtn);
+      });
+
+      await act(async () => {
+        const verifyBtn = screen.getByTestId("verify-otp-btn");
+        fireEvent.click(verifyBtn);
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument();
+      });
+
+      const localPart = "a".repeat(123);
+      const emailInput = screen.getByTestId("email-input");
+      await act(async () => {
+        fireEvent.change(emailInput, {
+          target: { value: `${localPart}@x.com` },
+        });
+      });
+
+      await act(async () => {
+        const submitBtn = screen.getByTestId("submit-email-btn");
+        fireEvent.click(submitBtn);
+      });
+
+      // Should still be on enter email step due to validation error
+      expect(screen.getByTestId("edit-email-enter-email")).toBeInTheDocument();
+    });
+
+    it("executes handleEnterEmailSubmit with accented characters in email", async () => {
+      renderComponent();
+
+      // Navigate to enter email step
+      await act(async () => {
+        const validateBtn = screen.getByTestId("validate-password-btn");
+        fireEvent.click(validateBtn);
+      });
+
+      await act(async () => {
+        const nextBtn = screen.getByTestId("otp-next-btn");
+        fireEvent.click(nextBtn);
+      });
+
+      await act(async () => {
+        const verifyBtn = screen.getByTestId("verify-otp-btn");
+        fireEvent.click(verifyBtn);
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument();
+      });
+
+      const emailInput = screen.getByTestId("email-input");
+      await act(async () => {
+        fireEvent.change(emailInput, {
+          target: { value: "usér@example.com" },
+        });
+      });
+
+      await act(async () => {
+        const submitBtn = screen.getByTestId("submit-email-btn");
+        fireEvent.click(submitBtn);
+      });
+
+      // Should still be on enter email step due to validation error
+      expect(screen.getByTestId("edit-email-enter-email")).toBeInTheDocument();
+    });
+
     it("executes handleEnterEmailSubmit with valid email", async () => {
       renderComponent();
 
@@ -438,7 +571,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
 
       const emailInput = screen.getByTestId("email-input");
       await act(async () => {
-        fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+        fireEvent.change(emailInput, { target: { value: "new@example.com" } });
       });
 
       await act(async () => {
@@ -454,6 +587,108 @@ describe("EditEmailAddressPage Integration Tests", () => {
       await act(async () => {
         const backBtn = screen.getByTestId("back-email-otp-btn");
         fireEvent.click(backBtn);
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("allows selecting a passkey from otpSelection and continues to enter email", async () => {
+      vi.mocked(usePasskeyOperations).mockImplementation(() => ({
+        fido2Data: [
+          {
+            id: "passkey-1",
+            attributes: {
+              nickname: "My passkey",
+              credentialId: "cred-1",
+            },
+          },
+        ],
+        loading: false,
+        refetch: vi.fn(),
+      }));
+
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("select-passkey-btn"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("fido2-success-btn"));
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("edit-email-enter-email"),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("allows passkey-only users to continue without phone MFA factors", async () => {
+      vi.mocked(useOtpOperations).mockImplementation(() => ({
+        userPhoneFactors: [],
+        userSelectedMfaFactor: null,
+        userOtpValue: "123456",
+        otpSentResponse: { trxnId: "mock-transaction-id" },
+        otpLoading: false,
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        requestOtpCode: vi.fn().mockResolvedValue(true),
+        validateOtpCode: vi.fn((otpValue, callback) => {
+          if (callback) {
+            callback({ success: true });
+          }
+        }),
+        setOtpSentResponse: vi.fn(),
+        setOtpLoading: vi.fn(),
+      }));
+
+      vi.mocked(usePasskeyOperations).mockImplementation(() => ({
+        fido2Data: [
+          {
+            id: "passkey-only-1",
+            attributes: {
+              nickname: "Only passkey",
+              credentialId: "cred-only-1",
+            },
+          },
+        ],
+        loading: false,
+        refetch: vi.fn(),
+      }));
+
+      renderComponent();
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("validate-password-btn"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("otp-selection")).not.toBeInTheDocument();
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("fido2-success-btn"));
       });
 
       await waitFor(() => {
@@ -659,6 +894,132 @@ describe("EditEmailAddressPage Integration Tests", () => {
       expect(screen.getByTestId("email-confirm-update")).toBeInTheDocument();
     });
 
+    it("maps upstream 409 conflict responses to email_already_associated", async () => {
+      const { authService } = await import("../../../services/authService");
+      authService.update_email_with_otp.mockRejectedValue({
+        status: 502,
+        data: {
+          message:
+            "Upstream service returned the following HTTP status code: 409.",
+        },
+      });
+
+      renderComponent();
+
+      // Navigate to confirm step
+      await act(async () => {
+        const validateBtn = screen.getByTestId("validate-password-btn");
+        fireEvent.click(validateBtn);
+      });
+
+      await act(async () => {
+        const nextBtn = screen.getByTestId("otp-next-btn");
+        fireEvent.click(nextBtn);
+      });
+
+      await act(async () => {
+        const verifyBtn = screen.getByTestId("verify-otp-btn");
+        fireEvent.click(verifyBtn);
+      });
+
+      const emailInput = screen.getByTestId("email-input");
+      await act(async () => {
+        fireEvent.change(emailInput, {
+          target: { value: "duplicate@example.com" },
+        });
+      });
+
+      await act(async () => {
+        const submitBtn = screen.getByTestId("submit-email-btn");
+        fireEvent.click(submitBtn);
+      });
+
+      await act(async () => {
+        const submitOtpBtn = screen.getByTestId("submit-email-otp-btn");
+        fireEvent.click(submitOtpBtn);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("email-confirm-update")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        const confirmBtn = screen.getByTestId("confirm-update-btn");
+        fireEvent.click(confirmBtn);
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({ error: "email_already_associated" }),
+        );
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("email-otp-validation")).toBeInTheDocument();
+      });
+    });
+
+    it("maps upstream 409 conflict responses to email_already_associated", async () => {
+      const { authService } = await import("../../../services/authService");
+      authService.update_email_with_otp.mockRejectedValue({
+        status: 502,
+        data: {
+          message:
+            "Upstream service returned the following HTTP status code: 409.",
+        },
+      });
+
+      renderComponent();
+
+      // Navigate to confirm step
+      await act(async () => {
+        const validateBtn = screen.getByTestId("validate-password-btn");
+        fireEvent.click(validateBtn);
+      });
+
+      await act(async () => {
+        const nextBtn = screen.getByTestId("otp-next-btn");
+        fireEvent.click(nextBtn);
+      });
+
+      await act(async () => {
+        const verifyBtn = screen.getByTestId("verify-otp-btn");
+        fireEvent.click(verifyBtn);
+      });
+
+      const emailInput = screen.getByTestId("email-input");
+      await act(async () => {
+        fireEvent.change(emailInput, {
+          target: { value: "duplicate@example.com" },
+        });
+      });
+
+      await act(async () => {
+        const submitBtn = screen.getByTestId("submit-email-btn");
+        fireEvent.click(submitBtn);
+      });
+
+      await act(async () => {
+        const submitOtpBtn = screen.getByTestId("submit-email-otp-btn");
+        fireEvent.click(submitOtpBtn);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("email-confirm-update")).toBeInTheDocument();
+      });
+
+      await act(async () => {
+        const confirmBtn = screen.getByTestId("confirm-update-btn");
+        fireEvent.click(confirmBtn);
+      });
+
+      await waitFor(() => {
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          expect.objectContaining({ error: "email_already_associated" }),
+        );
+      });
+    });
+
     it("handles logout errors in handleSignOut", async () => {
       const { authService } = await import("../../../services/authService");
       authService.logout.mockRejectedValue(new Error("Logout failed"));
@@ -745,6 +1106,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
             callback({ success: true });
           }
         }),
+        setOtpSentResponse: vi.fn(),
         setOtpLoading: vi.fn(),
       }));
     });
@@ -788,6 +1150,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
         validateOtpCode: vi.fn((_otp, _onSuccess, _override, onError) => {
           onError?.("INVALID_OTP_CODE");
         }),
+        setOtpSentResponse: vi.fn(),
         setOtpLoading: vi.fn(),
       }));
 
@@ -969,6 +1332,7 @@ describe("EditEmailAddressPage Integration Tests", () => {
             callback({ success: true });
           }
         }),
+        setOtpSentResponse: vi.fn(),
         setOtpLoading: vi.fn(),
       }));
     });
@@ -999,6 +1363,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
           event: "form_step_change",
           step: "otp_selection",
         });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "otp_selection",
+          flow: "email_address_update",
+        });
       });
     });
 
@@ -1021,6 +1390,12 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",
           step: "otp_validation",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "otp_validation",
+          flow: "email_address_update",
+          type: "sms",
         });
       });
     });
@@ -1101,6 +1476,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
           event: "form_step_change",
           step: "email_otp_validation",
         });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "email_otp_validation",
+          flow: "email_address_update",
+        });
       });
     });
 
@@ -1153,6 +1533,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",
           step: "confirm_update",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "confirm_update",
+          flow: "email_address_update",
         });
       });
     });
@@ -1223,6 +1608,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_submit_complete",
           step: "email_update_success",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "email_update_success",
+          flow: "email_address_update",
         });
       });
     });

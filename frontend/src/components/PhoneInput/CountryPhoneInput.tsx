@@ -1,12 +1,12 @@
 import { GcdsInput } from "@gcds-core/components-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import "flag-icons/css/flag-icons.min.css";
 import "./CountryPhoneInput.css";
 import { ALLOWED_PHONE_KEYS, MAX_PHONE_DIGITS } from "./constants";
 import type { CountryPhoneInputProps } from "./types";
 import {
   createCountryOptions,
-  getCountryFlagEmoji,
   getDialCodeForCountry,
   getDisplayedPhoneNumber,
   getFormattedLocalPhoneNumber,
@@ -16,6 +16,12 @@ import {
   getStoredPhoneNumber,
   isPhoneNumberValidForCountry,
 } from "./utils";
+
+function CountryFlag({ countryIso2 }: { countryIso2: string }) {
+  return (
+    <span aria-hidden="true" className={`fi fi-${countryIso2.toLowerCase()}`} />
+  );
+}
 
 function CountryPhoneInput({
   language,
@@ -361,9 +367,13 @@ function CountryPhoneInput({
         event.preventDefault();
         const beforeDigits = value.slice(0, start).replace(/\D/g, "");
         const afterDigits = value.slice(end).replace(/\D/g, "");
+        const maxDigits = getMaxPhoneDigitsForCountry(
+          selectedCountryIso2,
+          selectedDialCode,
+        );
         const newDigits = (beforeDigits + event.key + afterDigits).slice(
           0,
-          MAX_PHONE_DIGITS,
+          maxDigits || MAX_PHONE_DIGITS,
         );
 
         if (newDigits !== beforeDigits + afterDigits) {
@@ -375,7 +385,7 @@ function CountryPhoneInput({
 
       event.preventDefault();
     },
-    [applyPhoneEdit],
+    [applyPhoneEdit, selectedCountryIso2, selectedDialCode],
   );
 
   useEffect(() => {
@@ -495,11 +505,11 @@ function CountryPhoneInput({
               className="mfa-phone-input__country-trigger"
               aria-expanded={isCountryMenuOpen}
               aria-haspopup="listbox"
-              aria-controls={optionsId}
+              aria-controls={isCountryMenuOpen ? optionsId : undefined}
               aria-label={
                 selectedCountryOption
-                  ? `${selectedCountryOption.countryName} +${selectedCountryOption.dialCode}`
-                  : `+${selectedDialCode}`
+                  ? `${labels.country}, ${selectedCountryOption.iso2.toUpperCase()} +${selectedCountryOption.dialCode}`
+                  : `${labels.country}, +${selectedDialCode}`
               }
               onClick={() => {
                 if (isCountryMenuOpen) {
@@ -514,9 +524,14 @@ function CountryPhoneInput({
                 aria-hidden="true"
                 className="mfa-phone-input__country-trigger-label"
               >
-                {selectedCountryOption
-                  ? `${getCountryFlagEmoji(selectedCountryOption.iso2)} +${selectedCountryOption.dialCode}`
-                  : `+${selectedDialCode}`}
+                {selectedCountryOption ? (
+                  <>
+                    <CountryFlag countryIso2={selectedCountryOption.iso2} /> +
+                    {selectedCountryOption.dialCode}
+                  </>
+                ) : (
+                  `+${selectedDialCode}`
+                )}
               </span>
               <span
                 aria-hidden="true"
@@ -577,9 +592,7 @@ function CountryPhoneInput({
                           onCountryOptionKeyDown(event, countryOption.iso2)
                         }
                       >
-                        <span aria-hidden="true">
-                          {getCountryFlagEmoji(countryOption.iso2)}
-                        </span>
+                        <CountryFlag countryIso2={countryOption.iso2} />
                         {` ${countryOption.countryName} +${countryOption.dialCode}`}
                       </li>
                     ))

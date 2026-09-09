@@ -18,6 +18,12 @@ vi.mock("@gcds-core/components-react", () => ({
     return <Component lang={lang}>{children}</Component>;
   },
   GcdsLink: ({ children, href }) => <a href={href}>{children}</a>,
+  GcdsNotice: ({ children, noticeTitle }) => (
+    <div>
+      <div>{noticeTitle}</div>
+      {children}
+    </div>
+  ),
   GcdsText: ({ children }) => <div>{children}</div>,
 }));
 
@@ -53,6 +59,12 @@ describe("DeleteMFAPhoneNumberConfirm", () => {
     expect(
       screen.queryByTestId("delete-phone-confirm-accent"),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Deleting a phone number will send a notification to your email address",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("will not")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Yes, delete" })).toHaveAttribute(
       "data-button-role",
       "danger",

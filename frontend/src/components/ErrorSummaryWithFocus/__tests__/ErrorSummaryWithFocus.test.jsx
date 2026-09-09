@@ -1,4 +1,4 @@
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { BrowserRouter } from "react-router";
 import ErrorSummaryWithFocus from "../ErrorSummaryWithFocus";
@@ -227,8 +227,23 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
       );
 
       const link = screen.getByTestId("error-link-0");
-      expect(link).toHaveAttribute("href", "#error-href-1");
+      expect(link).toHaveAttribute("href", "#errorSummary");
       expect(link).toHaveTextContent("Invalid code. Try again.");
+    });
+
+    it("should use custom summary id in default error link target", () => {
+      render(
+        <TestWrapper>
+          <ErrorSummaryWithFocus
+            errorCode="CSIAM0011E"
+            language="en"
+            id="custom-summary-id"
+          />
+        </TestWrapper>,
+      );
+
+      const link = screen.getByTestId("error-link-0");
+      expect(link).toHaveAttribute("href", "#custom-summary-id");
     });
 
     it("should use custom error links when provided", () => {
@@ -255,6 +270,99 @@ describe("ErrorSummaryWithFocus Unit Tests", () => {
 
       expect(link1).toHaveAttribute("href", "#custom-error-1");
       expect(link2).toHaveAttribute("href", "#custom-error-2");
+    });
+
+    it("should scroll and focus linked element when error link is clicked", () => {
+      const customErrorLinks = {
+        "#custom-error-1": "Custom error message 1",
+      };
+
+      const targetInput = document.createElement("input");
+      targetInput.id = "custom-error-1";
+      document.body.appendChild(targetInput);
+
+      render(
+        <TestWrapper>
+          <ErrorSummaryWithFocus
+            errorCode="CSIAM0011E"
+            language="en"
+            errorLinks={customErrorLinks}
+            autoFocus={false}
+          />
+        </TestWrapper>,
+      );
+
+      fireEvent.click(screen.getByTestId("error-link-0"));
+
+      expect(mockScrollIntoView).toHaveBeenCalledTimes(1);
+      expect(mockScrollIntoView.mock.instances[0]).toBe(targetInput);
+      expect(mockFocus).toHaveBeenCalledTimes(1);
+      expect(mockFocus.mock.instances[0]).toBe(targetInput);
+
+      targetInput.remove();
+    });
+
+    it("should scroll and focus linked element on gcdsClick custom event", () => {
+      const customErrorLinks = {
+        "#custom-error-2": "Custom error message 2",
+      };
+
+      const targetInput = document.createElement("input");
+      targetInput.id = "custom-error-2";
+      document.body.appendChild(targetInput);
+
+      render(
+        <TestWrapper>
+          <ErrorSummaryWithFocus
+            errorCode="CSIAM0011E"
+            language="en"
+            errorLinks={customErrorLinks}
+            autoFocus={false}
+          />
+        </TestWrapper>,
+      );
+
+      const summary = screen.getByTestId("gcds-error-summary");
+      const gcdsClickEvent = new CustomEvent("gcdsClick", {
+        detail: "#custom-error-2",
+        bubbles: true,
+        cancelable: true,
+      });
+
+      fireEvent(summary, gcdsClickEvent);
+
+      expect(mockScrollIntoView).toHaveBeenCalledTimes(1);
+      expect(mockScrollIntoView.mock.instances[0]).toBe(targetInput);
+      expect(mockFocus).toHaveBeenCalledTimes(1);
+      expect(mockFocus.mock.instances[0]).toBe(targetInput);
+
+      targetInput.remove();
+    });
+
+    it("should fall back to focusing summary when link target is missing", () => {
+      const customErrorLinks = {
+        "#missing-target": "Missing target message",
+      };
+
+      render(
+        <TestWrapper>
+          <ErrorSummaryWithFocus
+            errorCode="CSIAM0011E"
+            language="en"
+            errorLinks={customErrorLinks}
+            autoFocus={false}
+          />
+        </TestWrapper>,
+      );
+
+      const summary = screen.getByTestId("gcds-error-summary");
+
+      fireEvent.click(screen.getByTestId("error-link-0"));
+
+      expect(mockScrollIntoView).toHaveBeenCalledTimes(1);
+      expect(mockScrollIntoView.mock.instances[0]).toBe(summary);
+      expect(mockFocus).toHaveBeenCalledTimes(1);
+      expect(mockFocus.mock.instances[0]).toBe(summary);
     });
 
     it("should handle empty error links object", () => {

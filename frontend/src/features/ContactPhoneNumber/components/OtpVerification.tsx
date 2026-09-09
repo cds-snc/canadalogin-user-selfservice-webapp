@@ -214,14 +214,12 @@ export default function OtpVerification({
                 onGcdsInput={handleChange}
                 lang={language}
                 size={18}
-                maxlength={6}
-                minlength={6}
               />
             </form>
 
             <GcdsGrid columns="max-content max-content" gap="200">
               <SubmitButton
-                disabled={phoneFormData.otp.length < 6 || isMaxAttemptsReached}
+                disabled={isMaxAttemptsReached}
                 style={{ width: "fit-content" }}
                 onGcdsClick={onSubmitClick}
                 currentLang={language}
@@ -252,8 +250,8 @@ export default function OtpVerification({
           }
         >
           {userMfaType === FLOW_TYPES.sms
-            ? t("Verification.setupVoiceInstead")
-            : t("Verification.setupSmsInstead")}
+            ? t("Verification.verifyVoiceInstead")
+            : t("Verification.verifySmsInstead")}
         </GcdsLink>
       </GcdsText>
 
@@ -287,7 +285,7 @@ export default function OtpVerification({
             handleLinkButtonKeyDown(event, tryAnotherWayAction)
           }
         >
-          {t("Verification.tryAnotherWay")}
+          {t("Verification.differentPhoneNumber")}
         </GcdsLink>
       </GcdsText>
     </GcdsContainer>

@@ -58,7 +58,7 @@ vi.mock("../../../../utils/functions", () => ({
         2: "We have sent a text message with a 6-digit verification code to:",
         3: "We have sent a 6-digit verification code via voice call to:",
         4: "Your text (SMS) might take a few minutes to arrive.",
-        5: "Your call might take a few minutes to arrive.",
+        5: "Your call may take a few minutes to arrive.",
         6: "Your code will expire in",
         7: "10 minutes.",
         8: "Enter the code",
@@ -320,8 +320,8 @@ describe("OtpVerification Component", () => {
       const input = screen.getByTestId("verificationCode");
       expect(input).toBeInTheDocument();
       expect(input).toHaveAttribute("type", "text");
-      expect(input).toHaveAttribute("maxLength", "6");
-      expect(input).toHaveAttribute("minLength", "6");
+      expect(input).not.toHaveAttribute("maxLength");
+      expect(input).not.toHaveAttribute("minLength");
     });
 
     it("renders submit, cancel, and choose different method buttons", () => {
@@ -356,7 +356,7 @@ describe("OtpVerification Component", () => {
         ),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(/Your call might take a few minutes to arrive\./),
+        screen.getByText(/Your call may take a few minutes to arrive\./),
       ).toBeInTheDocument();
     });
 
@@ -456,11 +456,11 @@ describe("OtpVerification Component", () => {
   });
 
   describe("Submit Button Behavior", () => {
-    it("disables submit button when code is less than 6 digits", () => {
+    it("keeps submit button enabled when code is less than 6 digits", () => {
       renderComponent({ userOtpValue: "12345" });
 
       const submitButton = screen.getByTestId("submit-button");
-      expect(submitButton).toBeDisabled();
+      expect(submitButton).not.toBeDisabled();
     });
 
     it("enables submit button when code is 6 digits", () => {
@@ -701,7 +701,7 @@ describe("OtpVerification Component", () => {
       expect(input).toHaveValue("");
 
       const submitButton = screen.getByTestId("submit-button");
-      expect(submitButton).toBeDisabled();
+      expect(submitButton).not.toBeDisabled();
     });
 
     it("handles OTP send error without message", async () => {
@@ -832,8 +832,8 @@ describe("OtpVerification Component", () => {
 
       const input = screen.getByTestId("verificationCode");
       expect(input).toHaveAttribute("type", "text");
-      expect(input).toHaveAttribute("maxLength", "6");
-      expect(input).toHaveAttribute("minLength", "6");
+      expect(input).not.toHaveAttribute("maxLength");
+      expect(input).not.toHaveAttribute("minLength");
       expect(input).toHaveAttribute("required");
     });
 
