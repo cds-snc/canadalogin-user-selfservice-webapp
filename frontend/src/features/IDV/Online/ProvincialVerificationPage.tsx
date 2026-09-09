@@ -4,10 +4,11 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
   GcdsContainer,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 import {
@@ -118,7 +119,7 @@ export default function ProvincialVerificationPage() {
           </GcdsButton>
         </GcdsGrid>
 
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="info"
           noticeTitleTag="h2"
           noticeTitle={t("ProvincialVerification.moreInfoTitle")}
@@ -133,7 +134,7 @@ export default function ProvincialVerificationPage() {
           >
             {t("ProvincialVerification.learnMoreLink")}
           </GcdsLink>
-        </GcdsNotice>
+        </AccessibleNotice>
       </GcdsGrid>
     </GcdsContainer>
   );

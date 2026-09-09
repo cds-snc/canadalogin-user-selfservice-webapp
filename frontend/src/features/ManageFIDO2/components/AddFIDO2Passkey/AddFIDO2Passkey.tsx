@@ -6,9 +6,10 @@ import {
   GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../../components/InfoBlocks/AccessibleNotice";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
 
 interface AddFIDO2PasskeyProps {
@@ -50,7 +51,7 @@ export default function AddFIDO2Passkey({
             </GcdsText>
           </li>
         </ol>
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="info"
           noticeTitleTag="h2"
           noticeTitle={t("AddFIDO2Passkey.infoTitle")}
@@ -72,7 +73,7 @@ export default function AddFIDO2Passkey({
               </GcdsText>
             </li>
           </ul>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         {errorMessage && (
           <GcdsErrorMessage messageId="message-props">

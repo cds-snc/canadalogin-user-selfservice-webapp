@@ -7,9 +7,10 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router";
@@ -187,14 +188,14 @@ export default function OtpVerification({
   return (
     <GcdsContainer role="main">
       {codeRequested ? (
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("Verification.successTitle")}
           data-testid="linkSuccess"
         >
           <GcdsText>{t("Verification.newCodeSent")}</GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
       ) : null}
 
       <GcdsContainer>

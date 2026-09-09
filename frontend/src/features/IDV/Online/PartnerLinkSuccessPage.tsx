@@ -3,9 +3,10 @@ import {
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -72,7 +73,7 @@ export default function PartnerLinkSuccessPage() {
         </GcdsContainer>
 
         <GcdsContainer>
-          <GcdsNotice
+          <AccessibleNotice
             noticeRole="info"
             noticeTitleTag="h2"
             noticeTitle={t("PartnerLinkSuccess.noticeTitle", {
@@ -84,7 +85,7 @@ export default function PartnerLinkSuccessPage() {
                 partnerName,
               })}
             </GcdsText>
-          </GcdsNotice>
+          </AccessibleNotice>
         </GcdsContainer>
 
         <GcdsGrid columns="max-content" gap="200">

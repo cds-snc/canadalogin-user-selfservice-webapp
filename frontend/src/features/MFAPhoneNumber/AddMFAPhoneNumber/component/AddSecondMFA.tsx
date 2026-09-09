@@ -3,9 +3,10 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../../components/InfoBlocks/AccessibleNotice";
 import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../../utils/constants";
 import { useTranslation } from "react-i18next";
@@ -46,7 +47,7 @@ export default function AddSecondMFA({
   return (
     <GcdsContainer role="main">
       <section>
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("NoticeFactory.notice_title_success", { ns: "otp" })}
@@ -56,7 +57,7 @@ export default function AddSecondMFA({
             <strong>{phoneFormData.formattedPhoneNumber} </strong>
             {t(`${pageName}.asVerificationNumber`)}
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
       </section>
 
       <section>

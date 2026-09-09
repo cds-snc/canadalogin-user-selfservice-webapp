@@ -6,9 +6,10 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import SubmitButton from "../../components/Layout/SubmitButton";
@@ -106,7 +107,7 @@ export default function EmailOtpValidation({
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
         {showResendSuccessNotice ? (
-          <GcdsNotice
+          <AccessibleNotice
             noticeRole="success"
             noticeTitle={t("Verification.successTitle", {
               ns: "verification",
@@ -119,7 +120,7 @@ export default function EmailOtpValidation({
                 ns: "verification",
               })}
             </GcdsText>
-          </GcdsNotice>
+          </AccessibleNotice>
         ) : null}
 
         <GcdsHeading tag="h1" lang={language}>

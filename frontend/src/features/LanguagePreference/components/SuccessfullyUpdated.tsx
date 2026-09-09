@@ -5,9 +5,10 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 
 import { useTranslation } from "react-i18next";
 import { LANGUAGE_DISPLAY_NAMES } from "../../../utils/constants";
@@ -79,7 +80,7 @@ export default function SuccessfullyUpdated({
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("SuccessfullyUpdatedLanguage.successTitle")}
@@ -88,7 +89,7 @@ export default function SuccessfullyUpdated({
             {t("SuccessfullyUpdatedLanguage.languageUpdatedTo")}{" "}
             <strong>{displayLanguageName}</strong>.
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         <GcdsHeading tag="h1">
           {t("SuccessfullyUpdatedLanguage.updateOtherPlaces")}
@@ -115,7 +116,7 @@ export default function SuccessfullyUpdated({
           .
         </GcdsText>
 
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="warning"
           noticeTitleTag="h2"
           noticeTitle={t("SuccessfullyUpdatedLanguage.syncNoticeTitle")}
@@ -134,7 +135,7 @@ export default function SuccessfullyUpdated({
             </GcdsLink>{" "}
             {t("SuccessfullyUpdatedLanguage.servicesLinkSuffix")}
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
 
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton

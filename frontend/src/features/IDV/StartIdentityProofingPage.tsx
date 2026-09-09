@@ -8,8 +8,9 @@ import {
   GcdsLink,
   GcdsText,
   GcdsContainer,
-  GcdsNotice,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 
 import {
   DEV_ONLY_FEATURE,
@@ -132,16 +133,16 @@ export default function StartIdentityProofingPage() {
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
         {resolvedJourneyType === IDV_JOURNEY_TYPE.REQUIRED && (
-          <GcdsNotice
+          <AccessibleNotice
             noticeRole="success"
             noticeTitle={t("StartIdentityProofing.signedInSuccessNotice")}
             noticeTitleTag="h2"
           >
             <GcdsText hidden={true}>{""}</GcdsText>
-          </GcdsNotice>
+          </AccessibleNotice>
         )}
         {journeyType === IDV_JOURNEY_TYPE.VERIFICATION_ERROR && (
-          <GcdsNotice
+          <AccessibleNotice
             noticeRole="danger"
             noticeTitle={t("StartIdentityProofing.errorNoticeTitle")}
             noticeTitleTag="h2"
@@ -149,7 +150,7 @@ export default function StartIdentityProofingPage() {
             <GcdsText>
               {t("StartIdentityProofing.errorNoticeDescription")}
             </GcdsText>
-          </GcdsNotice>
+          </AccessibleNotice>
         )}
         <GcdsContainer>
           <GcdsHeading tag="h1">{pageTitle}</GcdsHeading>
