@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.33.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.0...v1.33.1) (2026-09-08)
+
+
+### Bug Fixes
+
+* handle empty otp string ([#2100](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2100)) ([9457a9c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9457a9cff8e0fc1ef35c6016d810effe1fdcf6f8))
+* remove sensitive user ID logging and improve log messages for FIDO2 registration ([#2096](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2096)) ([2756dda](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2756dda012aa870626193fe2fcdb457d64fac111))
+
 ## [1.33.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.32.1...v1.33.0) (2026-09-08)
 
 
