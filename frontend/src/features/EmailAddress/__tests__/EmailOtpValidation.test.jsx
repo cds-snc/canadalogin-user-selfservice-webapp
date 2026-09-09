@@ -242,8 +242,8 @@ describe("EmailOtpValidation", () => {
       expect(input).toHaveAttribute("name", "verificationCode");
       expect(input).toHaveAttribute("id", "verificationCode");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
-      expect(input).toHaveAttribute("size", "18");
-      expect(input).not.toHaveAttribute("maxLength");
+      expect(input).toHaveAttribute("size", "6");
+      expect(input).toHaveAttribute("maxLength", "6");
       expect(input).not.toHaveAttribute("minLength");
     });
 
@@ -352,6 +352,16 @@ describe("EmailOtpValidation", () => {
       await user.type(input, "123456");
 
       expect(mockHandleChange).toHaveBeenCalled();
+    });
+
+    it("clamps OTP input to six numeric digits", async () => {
+      const user = userEvent.setup();
+      renderComponent();
+
+      const input = screen.getByTestId("gcds-input");
+      await user.type(input, "123456789");
+
+      expect(mockHandleChange).toHaveBeenLastCalledWith("123456");
     });
 
     it("back link is clickable", async () => {

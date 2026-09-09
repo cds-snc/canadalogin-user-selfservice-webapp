@@ -19,6 +19,7 @@ import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../utils/constants";
 import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import { useBreakpoints } from "../../../hooks/useBreakpoints";
 import { useOtpExpiryCountdown } from "../../../hooks/useOtpExpiryCountdown";
 import type {
   ContactPhoneOtpType,
@@ -31,6 +32,8 @@ interface PageHeaderProps {
   formattedPhoneNumber: string;
   countdownDisplay: string;
 }
+
+const OTP_CODE_MAX_LENGTH = 6;
 
 function PageHeader({
   language,
@@ -81,6 +84,7 @@ export default function OtpVerification({
 
   const [codeRequested, setCodeRequested] = useState(false);
   const { t } = useTranslation(["verification", "common"]);
+  const { mobile } = useBreakpoints();
   const [localError, setLocalError] = useState("");
   const {
     fallbackSeconds,
@@ -92,6 +96,7 @@ export default function OtpVerification({
 
   const displayError = localError || errorMessage || "";
   const shouldShowSuccessNotice = codeRequested && !displayError;
+  const otpInputSize = mobile ? 18 : 6;
 
   const clearValues = () => {
     onChangePhoneForm("phoneNumber", "");
@@ -121,7 +126,10 @@ export default function OtpVerification({
 
   const handleChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
-    onChangePhoneForm("otp", target.value);
+    const sanitizedValue = target.value
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    onChangePhoneForm("otp", sanitizedValue);
     setCodeRequested(false);
     setErrorCode?.("");
     setErrorMessage?.("");
@@ -133,8 +141,10 @@ export default function OtpVerification({
     setErrorCode?.("");
     setErrorMessage?.("");
 
-    const normalizedOtp = phoneFormData.otp.trim();
-    if (normalizedOtp.length < 6) {
+    const normalizedOtp = phoneFormData.otp
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    if (normalizedOtp.length < OTP_CODE_MAX_LENGTH) {
       const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
       setLocalError(invalidCodeMessage);
       setErrorCode?.("invalidCode");
@@ -238,12 +248,15 @@ export default function OtpVerification({
                 autocomplete="one-time-code"
                 name="verificationCode"
                 type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength={OTP_CODE_MAX_LENGTH}
                 value={phoneFormData.otp}
                 validateOn="other"
                 errorMessage={displayError}
                 onGcdsInput={handleChange}
                 lang={language}
-                size={18}
+                size={otpInputSize}
               />
             </form>
 

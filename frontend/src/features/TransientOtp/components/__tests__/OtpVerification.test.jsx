@@ -322,7 +322,8 @@ describe("OtpVerification Component", () => {
       const input = screen.getByTestId("verificationCode");
       expect(input).toBeInTheDocument();
       expect(input).toHaveAttribute("type", "text");
-      expect(input).not.toHaveAttribute("maxLength");
+      expect(input).toHaveAttribute("maxLength", "6");
+      expect(input).toHaveAttribute("size", "6");
       expect(input).not.toHaveAttribute("minLength");
     });
 
@@ -447,6 +448,15 @@ describe("OtpVerification Component", () => {
       await user.type(input, "123456");
 
       expect(mockSetUserOtpValue).toHaveBeenCalledTimes(6);
+    });
+
+    it("clamps input to six digits and strips non-numeric characters", () => {
+      renderComponent();
+
+      const input = screen.getByTestId("verificationCode");
+      fireEvent.change(input, { target: { value: "123456789" } });
+
+      expect(mockSetUserOtpValue).toHaveBeenLastCalledWith("123456");
     });
 
     it("displays the current userOtpValue", () => {
@@ -899,7 +909,7 @@ describe("OtpVerification Component", () => {
 
       const input = screen.getByTestId("verificationCode");
       expect(input).toHaveAttribute("type", "text");
-      expect(input).not.toHaveAttribute("maxLength");
+      expect(input).toHaveAttribute("maxLength", "6");
       expect(input).not.toHaveAttribute("minLength");
       expect(input).toHaveAttribute("required");
     });

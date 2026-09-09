@@ -48,6 +48,7 @@ vi.mock("@gcds-core/components-react", () => ({
     value,
     onGcdsInput,
     maxLength,
+    maxlength,
     validateOn: _va,
     errorMessage,
     hint: _hint,
@@ -61,7 +62,7 @@ vi.mock("@gcds-core/components-react", () => ({
         data-error-message={errorMessage}
         value={value}
         onChange={(e) => onGcdsInput?.(e)}
-        maxLength={maxLength}
+        maxLength={maxlength ?? maxLength}
         {...props}
       />
     </div>
@@ -257,7 +258,9 @@ describe("OtpVerification Component", () => {
 
     const otpInput = screen.getByTestId("gcds-input");
     expect(otpInput).toBeInTheDocument();
-    expect(otpInput).not.toHaveAttribute("maxLength");
+    expect(otpInput).toHaveAttribute("type", "text");
+    expect(otpInput).toHaveAttribute("maxLength", "6");
+    expect(otpInput).toHaveAttribute("size", "6");
   });
 
   it("calls onChangePhoneForm when OTP input changes", () => {
@@ -269,6 +272,19 @@ describe("OtpVerification Component", () => {
 
     const otpInput = screen.getByTestId("gcds-input");
     fireEvent.change(otpInput, { target: { value: "123456" } });
+
+    expect(mockOnChangePhoneForm).toHaveBeenCalledWith("otp", "123456");
+  });
+
+  it("clamps OTP input to six numeric digits", () => {
+    render(
+      <TestWrapper>
+        <OtpVerification {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    const otpInput = screen.getByTestId("gcds-input");
+    fireEvent.change(otpInput, { target: { value: "123456789" } });
 
     expect(mockOnChangePhoneForm).toHaveBeenCalledWith("otp", "123456");
   });

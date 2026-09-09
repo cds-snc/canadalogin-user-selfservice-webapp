@@ -17,6 +17,7 @@ import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../utils/constants";
 import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import { useBreakpoints } from "../../../hooks/useBreakpoints";
 import { useOtpExpiryCountdown } from "../../../hooks/useOtpExpiryCountdown";
 import { shouldDisplayOtpMaxAttempts } from "../../../utils/otpErrorMapping";
 import type { OtpFactor } from "../../../types/hooks";
@@ -26,6 +27,7 @@ type CaughtApiError = {
 };
 
 const initialTime = 10;
+const OTP_CODE_MAX_LENGTH = 6;
 
 interface OtpVerificationProps {
   userSelectedMfaFactor: OtpFactor;
@@ -64,6 +66,7 @@ export default function OtpVerification({
   const [time, setTime] = useState(initialTime);
   const [codeRequested, setCodeRequested] = useState(false);
   const { t } = useTranslation(["verification", "common"]);
+  const { mobile } = useBreakpoints();
   const [localError, setLocalError] = useState("");
   const [isMaxAttemptsReached, setIsMaxAttemptsReached] = useState(false);
   const {
@@ -75,10 +78,14 @@ export default function OtpVerification({
   const displayError = localError || errorMessage || "";
   const shouldShowSuccessNotice = codeRequested && !displayError;
   const countdownDisplay = hasServerExpiry ? formattedCountdown : null;
+  const otpInputSize = mobile ? 18 : 6;
 
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
-    setUserOtpValue(value);
+    const sanitizedValue = value
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    setUserOtpValue(sanitizedValue);
   };
 
   const doSubmit = async () => {
@@ -86,8 +93,10 @@ export default function OtpVerification({
     setErrorCode("");
     setErrorMessage?.("");
 
-    const normalizedOtp = userOtpValue.trim();
-    if (normalizedOtp.length < 6) {
+    const normalizedOtp = userOtpValue
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    if (normalizedOtp.length < OTP_CODE_MAX_LENGTH) {
       const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
       setLocalError(invalidCodeMessage);
       setErrorMessage?.(invalidCodeMessage);
@@ -96,7 +105,7 @@ export default function OtpVerification({
     }
 
     try {
-      await validateOtpCode(userOtpValue);
+      await validateOtpCode(normalizedOtp);
     } catch (error) {
       const apiError = error as CaughtApiError;
       const messageId = apiError?.data?.message;
@@ -289,12 +298,15 @@ export default function OtpVerification({
                 label={t("Verification.sixDigitCode")}
                 name="verificationCode"
                 type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength={OTP_CODE_MAX_LENGTH}
                 validateOn="other"
                 errorMessage={displayError}
                 value={userOtpValue}
                 onGcdsInput={handleChange}
                 lang={language}
-                size={18}
+                size={otpInputSize}
                 autocomplete="one-time-code"
                 autoFocus
               ></GcdsInput>

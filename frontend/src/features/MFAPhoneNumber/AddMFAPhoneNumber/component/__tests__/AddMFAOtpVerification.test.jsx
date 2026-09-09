@@ -218,7 +218,8 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       expect(input).toHaveAttribute("id", "verificationCode");
       expect(input).toHaveAttribute("name", "verificationCode");
       expect(input).toHaveAttribute("type", "text");
-      expect(input).not.toHaveAttribute("maxLength");
+      expect(input).toHaveAttribute("maxLength", "6");
+      expect(input).toHaveAttribute("size", "6");
       expect(input).not.toHaveAttribute("minLength");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
     });
@@ -355,6 +356,34 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       });
 
       // The handleChange function should be called
+      expect(mockOnChangePhoneForm).toHaveBeenCalledWith("otp", "123456");
+    });
+
+    it("should clamp OTP input to six numeric digits", () => {
+      render(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={defaultPhoneFormData}
+            errorMessage=""
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      const input = screen.getByTestId("gcds-input");
+      act(() => {
+        Object.defineProperty(input, "value", {
+          value: "123456789",
+          writable: true,
+        });
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+
       expect(mockOnChangePhoneForm).toHaveBeenCalledWith("otp", "123456");
     });
 
