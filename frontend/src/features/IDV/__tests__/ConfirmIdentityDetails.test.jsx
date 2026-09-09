@@ -97,6 +97,11 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </button>
   ),
+  GcdsIcon: ({ name, className, size }) => (
+    <span data-testid={`icon-${name}`} className={className} data-size={size}>
+      {name}
+    </span>
+  ),
   GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag }) => {
     const TitleTag = noticeTitleTag ?? "h2";
     return (
