@@ -133,7 +133,11 @@ export default function OnlineVerificationInfo() {
           {
             // TODO: populate with real URL once available
           }
-          <GcdsLink href={"#"} external={true}>
+          <GcdsLink
+            href={"#"}
+            external={true}
+            style={{ textDecoration: "underline" }}
+          >
             {t("OnlineVerificationInfo.learnMoreLink")}
           </GcdsLink>
         </GcdsNotice>

@@ -105,7 +105,11 @@ export default function SuccessfullyUpdated({
         </GcdsText>
         <GcdsText>
           {t("SuccessfullyUpdatedLanguage.searchOtherAccounts")}{" "}
-          <GcdsLink href={gcAccountDirectoryLink} target="_blank">
+          <GcdsLink
+            href={gcAccountDirectoryLink}
+            target="_blank"
+            style={{ textDecoration: "underline" }}
+          >
             {t("SuccessfullyUpdatedLanguage.gcAccountDirectory")}
           </GcdsLink>
           .
@@ -121,7 +125,11 @@ export default function SuccessfullyUpdated({
           </GcdsText>
           <GcdsText>
             {t("SuccessfullyUpdatedLanguage.servicesLinkLead")}{" "}
-            <GcdsLink href={participatingServicesLink} target="_blank">
+            <GcdsLink
+              href={participatingServicesLink}
+              target="_blank"
+              style={{ textDecoration: "underline" }}
+            >
               {t("SuccessfullyUpdatedLanguage.servicesLinkText")}
             </GcdsLink>{" "}
             {t("SuccessfullyUpdatedLanguage.servicesLinkSuffix")}

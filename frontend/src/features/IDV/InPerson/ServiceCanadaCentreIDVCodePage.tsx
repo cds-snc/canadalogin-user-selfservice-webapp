@@ -221,7 +221,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
             {
               //TODO: populate with real URL once available
             }
-            <GcdsLink href="#" external>
+            <GcdsLink href="#" external style={{ textDecoration: "underline" }}>
               {t("ServiceCanadaCentreCode.findNearestLink")}
             </GcdsLink>
             .

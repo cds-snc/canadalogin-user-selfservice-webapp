@@ -232,7 +232,7 @@ export default function ProofingBarcodeCanadaPostPage() {
         >
           <GcdsText marginBottom="0">
             {t("ProofingBarcodeCanadaPost.findNearestBody")}{" "}
-            <GcdsLink href="#" external>
+            <GcdsLink href="#" external style={{ textDecoration: "underline" }}>
               {t("ProofingBarcodeCanadaPost.findNearestLink")}
             </GcdsLink>
             .

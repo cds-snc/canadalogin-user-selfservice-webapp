@@ -40,6 +40,7 @@ export default function DisplayEmailInfo() {
         <GcdsLink
           href={editEmail}
           size="regular"
+          style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {
             event.preventDefault();
             navigate(event.detail);

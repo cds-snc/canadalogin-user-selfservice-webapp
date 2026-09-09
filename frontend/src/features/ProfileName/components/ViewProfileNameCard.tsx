@@ -46,6 +46,7 @@ export default function ViewProfileNameCard({
         <GcdsLink
           href={editProfile}
           size="regular"
+          style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {
             event.preventDefault();
             navigateHelper(event.detail);

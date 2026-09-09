@@ -96,6 +96,7 @@ function ContactPhoneNumber({
         <GcdsLink
           href={newContactPhoneNumber}
           size="regular"
+          style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {
             event.preventDefault();
             navigateHelper(event.detail);

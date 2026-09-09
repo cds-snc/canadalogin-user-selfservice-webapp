@@ -89,7 +89,11 @@ export default function SuccessfullyUpdated({
         </GcdsText>
         <GcdsText>
           {t("SuccessfullyUpdatedContactPhoneNumber.searchOtherAccounts")}{" "}
-          <GcdsLink href={gcAccountDirectoryLink} target="_blank">
+          <GcdsLink
+            href={gcAccountDirectoryLink}
+            target="_blank"
+            style={{ textDecoration: "underline" }}
+          >
             {t("SuccessfullyUpdatedContactPhoneNumber.gcAccountDirectory")}
           </GcdsLink>
         </GcdsText>
@@ -106,7 +110,11 @@ export default function SuccessfullyUpdated({
           </GcdsText>
           <GcdsText>
             {t("SuccessfullyUpdatedContactPhoneNumber.servicesLinkLead")}{" "}
-            <GcdsLink href={participatingServicesLink} target="_blank">
+            <GcdsLink
+              href={participatingServicesLink}
+              target="_blank"
+              style={{ textDecoration: "underline" }}
+            >
               {t("SuccessfullyUpdatedContactPhoneNumber.servicesLinkText")}
             </GcdsLink>{" "}
             {t("SuccessfullyUpdatedContactPhoneNumber.servicesLinkSuffix")}

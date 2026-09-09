@@ -39,6 +39,7 @@ export default function ViewLanguagePreferences() {
         <GcdsLink
           href={editLanguagePreferences}
           size="regular"
+          style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {
             event.preventDefault();
             navigate(event.detail);

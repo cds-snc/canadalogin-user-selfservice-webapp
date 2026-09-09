@@ -257,6 +257,7 @@ export default function OtpVerification({
       <GcdsText>
         <GcdsLink
           role="button"
+          style={{ textDecoration: "underline" }}
           onGcdsClick={switchVerificationMethod}
           onKeyDown={(event) =>
             handleLinkButtonKeyDown(event, switchVerificationMethod)
@@ -280,6 +281,7 @@ export default function OtpVerification({
         ) : (
           <GcdsLink
             role="button"
+            style={{ textDecoration: "underline" }}
             onGcdsClick={requestNewCodeAction}
             onKeyDown={(event) =>
               handleLinkButtonKeyDown(event, requestNewCodeAction)
@@ -293,6 +295,7 @@ export default function OtpVerification({
       <GcdsText>
         <GcdsLink
           role="button"
+          style={{ textDecoration: "underline" }}
           onGcdsClick={tryAnotherWayAction}
           onKeyDown={(event) =>
             handleLinkButtonKeyDown(event, tryAnotherWayAction)

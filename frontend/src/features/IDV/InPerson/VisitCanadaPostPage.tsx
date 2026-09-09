@@ -400,7 +400,11 @@ export default function VisitCanadaPost() {
             noticeTitleTag="h2"
             noticeTitle={t("VisitCanadaPost.moreInfoTitle")}
           >
-            <GcdsLink href="#" external={true}>
+            <GcdsLink
+              href="#"
+              external={true}
+              style={{ textDecoration: "underline" }}
+            >
               {t("VisitCanadaPost.learnMoreLink")}
             </GcdsLink>
           </GcdsNotice>

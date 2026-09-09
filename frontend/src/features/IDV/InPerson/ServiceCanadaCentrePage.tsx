@@ -395,7 +395,11 @@ export default function ServiceCanadaCentrePage() {
             {
               //TODO: populate with real URL once available
             }
-            <GcdsLink href={"#"} external={true}>
+            <GcdsLink
+              href={"#"}
+              external={true}
+              style={{ textDecoration: "underline" }}
+            >
               {t("ServiceCanadaCentre.learnMoreLink")}
             </GcdsLink>
           </GcdsNotice>

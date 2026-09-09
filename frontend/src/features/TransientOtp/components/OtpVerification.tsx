@@ -354,6 +354,7 @@ export default function OtpVerification({
         ) : (
           <GcdsLink
             role="button"
+            style={{ textDecoration: "underline" }}
             onGcdsClick={requestNewCodeAction}
             onKeyDown={(event) =>
               handleLinkButtonKeyDown(event, requestNewCodeAction)

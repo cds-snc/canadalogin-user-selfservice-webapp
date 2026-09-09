@@ -212,6 +212,7 @@ export default function EmailOtpValidation({
 
         <GcdsText>
           <GcdsLink
+            style={{ textDecoration: "underline" }}
             onGcdsClick={async () => {
               clearValues();
               await onBack();
@@ -231,7 +232,10 @@ export default function EmailOtpValidation({
               </strong>
             </span>
           ) : (
-            <GcdsLink onGcdsClick={handleResendCode}>
+            <GcdsLink
+              style={{ textDecoration: "underline" }}
+              onGcdsClick={handleResendCode}
+            >
               {t("EmailOtpValidation.requestNewCode")}
             </GcdsLink>
           )}

@@ -160,7 +160,12 @@ export default function StartIdentityProofingPage() {
           </GcdsText>
           <GcdsText>{t("StartIdentityProofing.bodyText")}</GcdsText>
 
-          <GcdsLink href="#" external size="regular">
+          <GcdsLink
+            href="#"
+            external
+            size="regular"
+            style={{ textDecoration: "underline" }}
+          >
             {t("StartIdentityProofing.learnMoreDescription")}
           </GcdsLink>
           <GcdsHeading tag="h2" marginTop="300" characterLimit={false}>

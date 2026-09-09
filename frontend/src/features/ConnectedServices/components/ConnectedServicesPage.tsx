@@ -92,6 +92,7 @@ export default function ConnectedServicesPage() {
               <GcdsLink
                 href={EXTERNAL_NAVIGATION_LINKS.gcAccountDirectory}
                 lang={language}
+                style={{ textDecoration: "underline" }}
               >
                 {t("directoryLink")}
               </GcdsLink>

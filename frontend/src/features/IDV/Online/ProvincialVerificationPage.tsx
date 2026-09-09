@@ -126,7 +126,11 @@ export default function ProvincialVerificationPage() {
           {
             // TODO: populate with real URL once available
           }
-          <GcdsLink href={"#"} external={true}>
+          <GcdsLink
+            href={"#"}
+            external={true}
+            style={{ textDecoration: "underline" }}
+          >
             {t("ProvincialVerification.learnMoreLink")}
           </GcdsLink>
         </GcdsNotice>

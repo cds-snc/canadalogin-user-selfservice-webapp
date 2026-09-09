@@ -40,7 +40,11 @@ export default function PasskeyInfoPanel() {
             {t("Manage2FAVerifications.howIsMyInfoUsedPt1")}
             <strong>{t("Manage2FAVerifications.howIsMyInfoUsedBold")}</strong>
             {t("Manage2FAVerifications.howIsMyInfoUsedPt2")}
-            <GcdsLink href={privacyNoticeHref} target="_blank">
+            <GcdsLink
+              href={privacyNoticeHref}
+              target="_blank"
+              style={{ textDecoration: "underline" }}
+            >
               {t("Manage2FAVerifications.privacyNoticeLink")}
             </GcdsLink>
             {"."}
@@ -52,6 +56,7 @@ export default function PasskeyInfoPanel() {
         <GcdsLink
           href={gcHelpCentreLinks.learnAboutPasskeys[language]}
           target="_blank"
+          style={{ textDecoration: "underline" }}
         >
           {t("Manage2FAVerifications.learnMorePasskeys")}
         </GcdsLink>

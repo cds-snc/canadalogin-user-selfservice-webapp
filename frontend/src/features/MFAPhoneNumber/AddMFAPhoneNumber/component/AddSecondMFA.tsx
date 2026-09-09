@@ -88,6 +88,7 @@ export default function AddSecondMFA({
           <GcdsText>
             {" "}
             <GcdsLink
+              style={{ textDecoration: "underline" }}
               onGcdsClick={async (ev) => {
                 ev.preventDefault();
                 await onSkipForNow();

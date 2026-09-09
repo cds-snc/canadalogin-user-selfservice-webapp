@@ -92,7 +92,11 @@ export default function SuccessfullyUpdated({
         <GcdsText>{t("ProfileUpdateNameSuccess.notConnectedNotice")}</GcdsText>
         <GcdsText>
           {t("ProfileUpdateNameSuccess.searchOtherAccounts")}{" "}
-          <GcdsLink href={gcAccountDirectoryLink} target="_blank">
+          <GcdsLink
+            href={gcAccountDirectoryLink}
+            target="_blank"
+            style={{ textDecoration: "underline" }}
+          >
             {t("ProfileUpdateNameSuccess.gcAccountDirectory")}
           </GcdsLink>
           .
@@ -108,7 +112,11 @@ export default function SuccessfullyUpdated({
           </GcdsText>
           <GcdsText>
             {t("ProfileUpdateNameSuccess.servicesLinkLead")}{" "}
-            <GcdsLink href={participatingServicesLink} target="_blank">
+            <GcdsLink
+              href={participatingServicesLink}
+              target="_blank"
+              style={{ textDecoration: "underline" }}
+            >
               {t("ProfileUpdateNameSuccess.servicesLinkText")}
             </GcdsLink>{" "}
             {t("ProfileUpdateNameSuccess.servicesLinkSuffix")}

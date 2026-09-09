@@ -277,6 +277,7 @@ export default function AddMFAOtpVerification({
 
           <GcdsText>
             <GcdsLink
+              style={{ textDecoration: "underline" }}
               onGcdsClick={async () => {
                 await onSetupAlternateMFAMethod();
               }}
@@ -298,6 +299,7 @@ export default function AddMFAOtpVerification({
               </span>
             ) : (
               <GcdsLink
+                style={{ textDecoration: "underline" }}
                 onGcdsClick={() => {
                   requestNewCode();
                 }}
@@ -311,6 +313,7 @@ export default function AddMFAOtpVerification({
 
           <GcdsText>
             <GcdsLink
+              style={{ textDecoration: "underline" }}
               onGcdsClick={async () => {
                 clearValues();
                 await onUseDifferentPhoneNumber();

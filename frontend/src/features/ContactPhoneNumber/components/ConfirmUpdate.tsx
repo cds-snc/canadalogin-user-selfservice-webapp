@@ -109,7 +109,10 @@ export default function ConfirmUpdate({
             </strong>
             <GcdsText>
               {t("ConfirmContactPhoneNumberUpdate.changeTwoStep")}{" "}
-              <GcdsLink href={manage2FAVerificationsPage}>
+              <GcdsLink
+                href={manage2FAVerificationsPage}
+                style={{ textDecoration: "underline" }}
+              >
                 {t("ConfirmContactPhoneNumberUpdate.securitySettings")}
               </GcdsLink>
             </GcdsText>

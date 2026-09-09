@@ -196,6 +196,7 @@ export default function VerifyFIDO2Passkey({
           <GcdsLink
             target="_blank"
             href={gcHelpCentreLinks.helpSigningInWithPasskey[language]}
+            style={{ textDecoration: "underline" }}
           >
             {t("VerifyFIDO2Passkey.helpLink")}
           </GcdsLink>
