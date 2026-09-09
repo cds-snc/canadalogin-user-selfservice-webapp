@@ -88,4 +88,22 @@ describe("useOtpExpiryCountdown", () => {
 
     expect(result.current.formattedCountdown).toBe("09:55");
   });
+
+  it("increases fallback resend countdown by the initial interval on each restart", () => {
+    const { result } = renderHook(() => useOtpExpiryCountdown(undefined, 10));
+
+    expect(result.current.fallbackSeconds).toBe(10);
+
+    act(() => {
+      result.current.restartFallbackCountdown();
+    });
+
+    expect(result.current.fallbackSeconds).toBe(20);
+
+    act(() => {
+      result.current.restartFallbackCountdown();
+    });
+
+    expect(result.current.fallbackSeconds).toBe(30);
+  });
 });

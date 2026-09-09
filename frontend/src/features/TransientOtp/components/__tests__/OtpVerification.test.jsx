@@ -692,6 +692,37 @@ describe("OtpVerification Component", () => {
       );
     });
 
+    it("increases the resend delay by 10 seconds after each successful resend", async () => {
+      vi.useFakeTimers();
+      mockRequestOtpCode.mockResolvedValue(true);
+
+      renderComponent();
+
+      for (let second = 0; second < 10; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Request a new code"));
+      });
+
+      expect(screen.getByText(/20\s+seconds/)).toBeInTheDocument();
+
+      for (let second = 0; second < 20; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Request a new code"));
+      });
+
+      expect(screen.getByText(/30\s+seconds/)).toBeInTheDocument();
+    });
+
     it("clears parent error message after requesting a new code", async () => {
       vi.useFakeTimers();
       mockRequestOtpCode.mockResolvedValue(true);

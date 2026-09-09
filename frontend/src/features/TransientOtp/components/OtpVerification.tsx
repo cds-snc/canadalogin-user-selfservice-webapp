@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   GcdsButton,
@@ -63,16 +63,17 @@ export default function OtpVerification({
   onCancel,
 }: OtpVerificationProps) {
   const { language } = useParams();
-  const [time, setTime] = useState(initialTime);
   const [codeRequested, setCodeRequested] = useState(false);
   const { t } = useTranslation(["verification", "common"]);
   const { mobile } = useBreakpoints();
   const [localError, setLocalError] = useState("");
   const [isMaxAttemptsReached, setIsMaxAttemptsReached] = useState(false);
   const {
+    fallbackSeconds,
     formattedCountdown,
     hasServerExpiry,
     isExpired: isOtpExpired,
+    restartFallbackCountdown,
   } = useOtpExpiryCountdown(otpExpiry, initialTime, otpCreatedAt);
 
   const displayError = localError || errorMessage || "";
@@ -159,18 +160,6 @@ export default function OtpVerification({
     void doSubmit();
   };
 
-  useEffect(() => {
-    if (time <= 0) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setTime((prevTime) => prevTime - 1);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [time]);
-
   const userMfaType = userSelectedMfaFactor?.type;
   const isEmailFactor =
     userMfaType === FLOW_TYPES.email || userMfaType === FLOW_TYPES.emailOtp;
@@ -188,7 +177,7 @@ export default function OtpVerification({
     setUserOtpValue("");
     setLocalError("");
     resetAttempts?.();
-    setTime(initialTime);
+    restartFallbackCountdown();
     setCodeRequested(true);
   };
 
@@ -358,12 +347,12 @@ export default function OtpVerification({
       <GcdsHeading tag="h2">{t("Verification.problemsWithCode")}</GcdsHeading>
 
       <GcdsText>
-        {!isOtpExpired && time > 0 ? (
+        {!isOtpExpired && fallbackSeconds > 0 ? (
           <span>
             {t("Verification.requestNewCodeIn")}
             <strong>
               {" "}
-              {time} {t("Verification.seconds")}
+              {fallbackSeconds} {t("Verification.seconds")}
             </strong>
           </span>
         ) : (
