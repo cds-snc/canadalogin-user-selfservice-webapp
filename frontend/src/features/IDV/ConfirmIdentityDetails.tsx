@@ -18,7 +18,8 @@ import { path } from "../../utils/routeHelpers";
 import {
   identityVerificationApi,
   type IdentityVerificationClaimsResponse,
-} from "../../features/IDV/api/identityVerificationApi";import VerifiedBadge from "../../components/Badges/VerifiedBadge";
+} from "../../features/IDV/api/identityVerificationApi";
+import VerifiedBadge from "../../components/Badges/VerifiedBadge";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function ConfirmIdentityDetails() {
     useRelyingPartyInfo();
 
   const [identityVerificationClaims, setIdentityVerificationClaims] =
-      useState<IdentityVerificationClaimsResponse>();
+    useState<IdentityVerificationClaimsResponse>();
 
   useEffect(() => {
     if (!DEV_ONLY_FEATURE) {
