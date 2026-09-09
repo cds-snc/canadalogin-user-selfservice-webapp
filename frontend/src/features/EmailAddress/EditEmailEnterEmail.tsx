@@ -94,7 +94,6 @@ export default function EditEmailEnterEmail({
               errorMessage={errorMessage}
               validateOn="other"
               onGcdsInput={handleInputChange}
-              required
               autoFocus
               lang={language ?? "en"}
             />
