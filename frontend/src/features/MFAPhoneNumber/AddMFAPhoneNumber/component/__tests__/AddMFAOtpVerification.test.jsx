@@ -481,6 +481,38 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       expect(mockOnNext).toHaveBeenCalled();
     });
 
+    it("should not call onNext and should show invalid code when OTP has fewer than 6 digits", () => {
+      const phoneFormDataShortOtp = {
+        ...defaultPhoneFormData,
+        otp: "12345",
+      };
+
+      render(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={phoneFormDataShortOtp}
+            errorMessage=""
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      const continueButton = screen.getByTestId("continue-button");
+      act(() => {
+        continueButton.click();
+      });
+
+      expect(mockOnNext).not.toHaveBeenCalled();
+      expect(screen.getByTestId("gcds-input-error")).toHaveTextContent(
+        "Codes must be six digits. Try again.",
+      );
+    });
+
     it("should call onCancel when Cancel button is clicked", () => {
       render(
         <TestWrapper>

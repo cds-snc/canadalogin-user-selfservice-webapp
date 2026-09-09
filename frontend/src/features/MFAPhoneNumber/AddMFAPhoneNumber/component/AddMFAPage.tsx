@@ -756,6 +756,7 @@ export default function AddMFAPage() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneForm}
         errorMessage={errorMessage}
+        setErrorCode={setErrorCode}
         isMaxAttemptsReached={isMfaOtpMaxAttemptsReached}
         resetAttempts={resetAttempts}
         onNext={async () => {

@@ -367,6 +367,35 @@ describe("OtpVerification Component", () => {
     expect(mockOnNext).toHaveBeenCalledTimes(1);
   });
 
+  it("shows invalidCode and does not call onNext when continue is clicked with fewer than 6 digits", () => {
+    const propsWithShortOtp = {
+      ...defaultProps,
+      phoneFormData: {
+        ...defaultProps.phoneFormData,
+        otp: "12345",
+      },
+    };
+
+    render(
+      <TestWrapper>
+        <OtpVerification {...propsWithShortOtp} />
+      </TestWrapper>,
+    );
+
+    const continueButtons = screen.getAllByTestId("gcds-button");
+    const continueButton = continueButtons.find((btn) =>
+      btn.textContent.includes("Continue"),
+    );
+    fireEvent.click(continueButton);
+
+    expect(mockOnNext).not.toHaveBeenCalled();
+    expect(mockSetErrorCode).toHaveBeenLastCalledWith("invalidCode");
+    expect(screen.getByTestId("gcds-input")).toHaveAttribute(
+      "data-error-message",
+      "Codes must be six digits. Try again.",
+    );
+  });
+
   it("calls onCancel when cancel button is clicked", () => {
     render(
       <TestWrapper>

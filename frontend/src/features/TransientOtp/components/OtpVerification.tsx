@@ -82,6 +82,16 @@ export default function OtpVerification({
     setLocalError("");
     setErrorCode("");
     setErrorMessage?.("");
+
+    const normalizedOtp = userOtpValue.trim();
+    if (normalizedOtp.length < 6) {
+      const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
+      setLocalError(invalidCodeMessage);
+      setErrorMessage?.(invalidCodeMessage);
+      setErrorCode("invalidCode");
+      return;
+    }
+
     try {
       await validateOtpCode(userOtpValue);
     } catch (error) {

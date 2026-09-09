@@ -482,6 +482,19 @@ describe("OtpVerification Component", () => {
       });
     });
 
+    it("shows invalidCode and does not call validateOtpCode when OTP is shorter than 6 digits", async () => {
+      const user = userEvent.setup({ delay: null });
+      renderComponent({ userOtpValue: "12345" });
+
+      const submitButton = screen.getByTestId("submit-button");
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockValidateOtpCode).not.toHaveBeenCalled();
+        expect(mockSetErrorCode).toHaveBeenLastCalledWith("invalidCode");
+      });
+    });
+
     it("calls onNext when verification is successful", async () => {
       const user = userEvent.setup({ delay: null });
       mockValidateOtpCode.mockImplementation(async () => {

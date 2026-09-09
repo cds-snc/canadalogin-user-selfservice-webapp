@@ -147,6 +147,13 @@ export const useOtpOperations = ({
       return;
     }
 
+    const normalizedOtp = otpValue.trim();
+    if (normalizedOtp.length < 6) {
+      setErrorCode("invalidCode");
+      onError?.("invalidCode");
+      return;
+    }
+
     let otpType: string | undefined;
     if (overrideOtpType) {
       otpType = overrideOtpType;
@@ -157,7 +164,7 @@ export const useOtpOperations = ({
     }
 
     const userData = {
-      otp: otpValue,
+      otp: normalizedOtp,
       trxnId: otpSentResponse.trxnId,
       otpType,
     };

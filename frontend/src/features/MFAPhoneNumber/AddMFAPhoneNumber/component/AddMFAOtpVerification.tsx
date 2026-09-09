@@ -76,6 +76,7 @@ interface AddMFAOtpVerificationProps {
   onChangePhoneForm: (field: string, value: string) => void;
   phoneFormData: PhoneFormData;
   errorMessage: string;
+  setErrorCode?: (errorCode: string) => void;
   requestNewOtpCode: () => Promise<void>;
   onUseDifferentPhoneNumber: () => Promise<void>;
   onSetupAlternateMFAMethod: () => Promise<void>;
@@ -90,6 +91,7 @@ export default function AddMFAOtpVerification({
   onChangePhoneForm,
   phoneFormData,
   errorMessage,
+  setErrorCode,
   requestNewOtpCode,
   onUseDifferentPhoneNumber,
   onSetupAlternateMFAMethod,
@@ -132,6 +134,7 @@ export default function AddMFAOtpVerification({
     onChangePhoneForm("otp", value);
     setCodeRequested(false);
     setLocalError("");
+    setErrorCode?.("");
   };
 
   // Clear OTP field on mount
@@ -143,6 +146,14 @@ export default function AddMFAOtpVerification({
   const userMfaType = phoneFormData.otpType;
 
   const doSubmit = async () => {
+    const normalizedOtp = phoneFormData.otp.trim();
+    if (normalizedOtp.length < 6) {
+      const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
+      setLocalError(invalidCodeMessage);
+      setErrorCode?.("invalidCode");
+      return;
+    }
+
     setLocalError("");
     await onNext();
   };

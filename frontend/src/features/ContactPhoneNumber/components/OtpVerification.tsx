@@ -114,14 +114,27 @@ export default function OtpVerification({
     setLocalError("");
   };
 
+  const doSubmit = async () => {
+    const normalizedOtp = phoneFormData.otp.trim();
+    if (normalizedOtp.length < 6) {
+      const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
+      setLocalError(invalidCodeMessage);
+      setErrorCode("invalidCode");
+      return;
+    }
+
+    setLocalError("");
+    await onNext();
+  };
+
   const onSubmitHandler: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
-    await onNext();
+    await doSubmit();
   };
 
   const onSubmitClick = (event: CustomEvent<string | void>) => {
     event.preventDefault();
-    void onNext();
+    void doSubmit();
   };
 
   const userMfaType = phoneFormData.otpType;
