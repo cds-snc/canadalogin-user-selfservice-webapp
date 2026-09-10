@@ -180,6 +180,8 @@ describe("EmailOtpValidation", () => {
   const mockSetFormData = vi.fn();
   const mockHandleChange = vi.fn();
   const mockRequestOtpCode = vi.fn();
+  const mockSetErrorCode = vi.fn();
+  const mockSetErrorMessage = vi.fn();
   const mockUseParams = vi.mocked(useParams);
 
   const defaultProps = {
@@ -189,6 +191,8 @@ describe("EmailOtpValidation", () => {
     formData: { emailAddress: "test@example.com" },
     setFormData: mockSetFormData,
     errorMessage: "",
+    setErrorCode: mockSetErrorCode,
+    setErrorMessage: mockSetErrorMessage,
     userOtpValue: "",
     handleChange: mockHandleChange,
     requestOtpCode: mockRequestOtpCode,
@@ -319,7 +323,7 @@ describe("EmailOtpValidation", () => {
   describe("Form Interactions", () => {
     it("submit button is clickable", async () => {
       const user = userEvent.setup();
-      renderComponent();
+      renderComponent({ userOtpValue: "123456" });
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);
@@ -340,7 +344,10 @@ describe("EmailOtpValidation", () => {
     it("handles form submission via onSubmitHandler", async () => {
       const user = userEvent.setup();
       const mockAsyncOnSubmit = vi.fn().mockResolvedValue();
-      renderComponent({ onSubmit: mockAsyncOnSubmit });
+      renderComponent({
+        onSubmit: mockAsyncOnSubmit,
+        userOtpValue: "123456",
+      });
 
       const form = screen.getByTestId("gcds-container").querySelector("form");
       if (form) {
@@ -348,6 +355,22 @@ describe("EmailOtpValidation", () => {
       }
 
       expect(mockAsyncOnSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not submit and shows invalid-code validation when OTP is shorter than 6 digits", async () => {
+      const user = userEvent.setup();
+      renderComponent({ userOtpValue: "12345" });
+
+      await user.click(screen.getByTestId("submit-button"));
+
+      expect(mockOnSubmit).not.toHaveBeenCalled();
+      expect(mockSetErrorCode).toHaveBeenCalledWith("invalidCode");
+      expect(mockSetErrorMessage).toHaveBeenCalledWith(
+        "Codes must be six digits. Try again.",
+      );
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Codes must be six digits. Try again.",
+      );
     });
 
     it("handles OTP input changes", async () => {
@@ -524,7 +547,7 @@ describe("EmailOtpValidation", () => {
 
     it("should handle multiple button clicks", async () => {
       const user = userEvent.setup();
-      renderComponent();
+      renderComponent({ userOtpValue: "123456" });
 
       const submitButton = screen.getByTestId("submit-button");
       const cancelButton = screen.getByTestId("gcds-button");
@@ -551,7 +574,10 @@ describe("EmailOtpValidation", () => {
       const user = userEvent.setup();
       const mockAsyncOnSubmit = vi.fn().mockResolvedValue();
 
-      renderComponent({ onSubmit: mockAsyncOnSubmit });
+      renderComponent({
+        onSubmit: mockAsyncOnSubmit,
+        userOtpValue: "123456",
+      });
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);
@@ -608,7 +634,7 @@ describe("EmailOtpValidation", () => {
       const user = userEvent.setup();
       const mockOnSubmit = vi.fn();
 
-      renderComponent({ onSubmit: mockOnSubmit });
+      renderComponent({ onSubmit: mockOnSubmit, userOtpValue: "123456" });
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);
@@ -714,7 +740,10 @@ describe("EmailOtpValidation", () => {
     it("tests async operations with await", async () => {
       const user = userEvent.setup();
       const mockAsyncOnSubmit = vi.fn().mockResolvedValue("success");
-      renderComponent({ onSubmit: mockAsyncOnSubmit });
+      renderComponent({
+        onSubmit: mockAsyncOnSubmit,
+        userOtpValue: "123456",
+      });
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);

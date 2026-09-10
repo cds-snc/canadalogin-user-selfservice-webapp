@@ -28,6 +28,8 @@ interface EmailOtpValidationProps {
   formData: EmailFormData;
   setFormData: (data: EmailFormData) => void;
   errorMessage?: string;
+  setErrorCode?: (errorCode: string) => void;
+  setErrorMessage?: (errorMessage: string) => void;
   userOtpValue: string;
   handleChange: (value: string) => void;
   requestOtpCode: () => Promise<void | boolean>;
@@ -44,6 +46,8 @@ export default function EmailOtpValidation({
   formData,
   setFormData,
   errorMessage,
+  setErrorCode,
+  setErrorMessage,
   userOtpValue,
   handleChange,
   requestOtpCode,
@@ -83,11 +87,30 @@ export default function EmailOtpValidation({
     setLocalError("");
   };
 
+  const doSubmit = async () => {
+    setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
+
+    const normalizedOtp = userOtpValue
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    if (normalizedOtp.length < OTP_CODE_MAX_LENGTH) {
+      const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
+      setLocalError(invalidCodeMessage);
+      setErrorMessage?.(invalidCodeMessage);
+      setErrorCode?.("invalidCode");
+      return;
+    }
+
+    await onSubmit();
+  };
+
   const onSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (
     ev,
   ) => {
     ev.preventDefault();
-    await onSubmit();
+    void doSubmit();
   };
 
   const handleResendCode = async (ev?: Event) => {
@@ -99,6 +122,9 @@ export default function EmailOtpValidation({
 
         if (resendSucceeded) {
           setShowResendSuccessNotice(true);
+          setErrorCode?.("");
+          setErrorMessage?.("");
+          handleChange("");
           setLocalError("");
           restartFallbackCountdown();
           resetAttempts?.();
