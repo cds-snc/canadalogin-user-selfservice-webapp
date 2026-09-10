@@ -61,35 +61,40 @@ vi.mock("@gcds-core/components-react", () => ({
     validateOn: _va,
     label: _label,
     hint: _hint,
-    errorMessage: _em,
+    errorMessage,
     lang: _lang,
     required,
     ...domProps
   }) => (
-    <input
-      id={inputId}
-      name={name}
-      type={type}
-      value={value ?? ""}
-      onInput={onInput}
-      required={required}
-      data-testid={domProps["data-testid"]}
-      {...domProps}
-    />
+    <div>
+      <input
+        id={inputId}
+        name={name}
+        type={type}
+        value={value ?? ""}
+        onInput={onInput}
+        required={required}
+        data-testid={domProps["data-testid"]}
+        {...domProps}
+      />
+      {errorMessage ? (
+        <div data-testid={`${inputId}-error`}>{errorMessage}</div>
+      ) : null}
+    </div>
   ),
   GcdsErrorMessage: ({ children, messageId, ...props }) => (
     <div data-testid="error-message" id={messageId} {...props}>
       {children}
     </div>
   ),
-  GcdsErrorSummary: ({
-    heading,
-    errorLinks: _errorLinks,
-    lang: _lang,
-    ...props
-  }) => (
+  GcdsErrorSummary: ({ heading, errorLinks, lang: _lang, ...props }) => (
     <div data-testid="error-summary" {...props}>
-      {heading}
+      <div>{heading}</div>
+      <ul>
+        {Object.entries(errorLinks || {}).map(([href, message]) => (
+          <li key={href}>{message}</li>
+        ))}
+      </ul>
     </div>
   ),
   GcdsDetails: ({ children, ...props }) => (
@@ -277,8 +282,11 @@ describe("EditProfileNamePage — form validation", () => {
     fireEvent.click(continueButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId("error-message")).toHaveTextContent(
+      expect(screen.getByTestId("familyName-error")).toHaveTextContent(
         "Enter a last name to continue. If you have a single name, enter it in the last name field.",
+      );
+      expect(screen.getByTestId("error-summary")).toHaveTextContent(
+        "There was a problem",
       );
     });
   });
@@ -299,8 +307,11 @@ describe("EditProfileNamePage — form validation", () => {
     fireEvent.click(continueButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId("error-message")).toHaveTextContent(
+      expect(screen.getByTestId("familyName-error")).toHaveTextContent(
         "Enter a last name to continue. If you have a single name, enter it in the last name field.",
+      );
+      expect(screen.getByTestId("error-summary")).toHaveTextContent(
+        "There was a problem",
       );
     });
   });
@@ -320,8 +331,11 @@ describe("EditProfileNamePage — form validation", () => {
     fireEvent.click(continueButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId("error-message")).toHaveTextContent(
+      expect(screen.getByTestId("givenName-error")).toHaveTextContent(
         "Your first name cannot be more than 80 characters. Try again.",
+      );
+      expect(screen.getByTestId("error-summary")).toHaveTextContent(
+        "There was a problem",
       );
     });
   });
@@ -356,7 +370,41 @@ describe("EditProfileNamePage — form validation", () => {
     fireEvent.click(continueButton);
 
     await waitFor(() => {
-      expect(screen.getByTestId("error-message")).toHaveTextContent(
+      expect(screen.getByTestId("familyName-error")).toHaveTextContent(
+        "Your last name cannot be more than 80 characters. Try again.",
+      );
+      expect(screen.getByTestId("error-summary")).toHaveTextContent(
+        "There was a problem",
+      );
+    });
+  });
+
+  it("shows first-name and last-name max length errors together in inputs and summary", async () => {
+    renderPage(
+      buildUserState({
+        givenName: "",
+        familyName: "",
+        formatted: "",
+      }),
+    );
+
+    setInputValue("givenName", "givenName", "A".repeat(81));
+    setInputValue("familyName", "familyName", "B".repeat(81));
+
+    const continueButton = screen.getByRole("button", { name: /continue/i });
+    fireEvent.click(continueButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("givenName-error")).toHaveTextContent(
+        "Your first name cannot be more than 80 characters. Try again.",
+      );
+      expect(screen.getByTestId("familyName-error")).toHaveTextContent(
+        "Your last name cannot be more than 80 characters. Try again.",
+      );
+      expect(screen.getByTestId("error-summary")).toHaveTextContent(
+        "Your first name cannot be more than 80 characters. Try again.",
+      );
+      expect(screen.getByTestId("error-summary")).toHaveTextContent(
         "Your last name cannot be more than 80 characters. Try again.",
       );
     });
@@ -417,14 +465,15 @@ describe("EditProfileNamePage — form validation", () => {
     // Trigger validation error first
     fireEvent.click(screen.getByRole("button", { name: /continue/i }));
     await waitFor(() => {
-      expect(screen.getByTestId("error-message")).toBeInTheDocument();
+      expect(screen.getByTestId("familyName-error")).toBeInTheDocument();
     });
 
     // Typing in an input should clear the error
     setInputValue("familyName", "familyName", "S");
 
     await waitFor(() => {
-      expect(screen.queryByTestId("error-message")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("familyName-error")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
     });
   });
 });
