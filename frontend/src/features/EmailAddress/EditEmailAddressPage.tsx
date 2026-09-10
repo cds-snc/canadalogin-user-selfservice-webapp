@@ -682,7 +682,7 @@ export default function EditEmailAddressPage() {
           setSelected2FAPasskey(passkey);
           setWizardStep("verifyFIDO2Passkey");
         }}
-        parentPage={PAGES.addMFAPage}
+        parentPage={PAGES.editEmailPage}
         onCancel={handleBackToProfile}
       />
     ),

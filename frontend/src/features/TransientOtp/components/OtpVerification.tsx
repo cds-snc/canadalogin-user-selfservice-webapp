@@ -67,7 +67,6 @@ export default function OtpVerification({
   const { t } = useTranslation(["verification", "common"]);
   const { mobile } = useBreakpoints();
   const [localError, setLocalError] = useState("");
-  const [isMaxAttemptsReached, setIsMaxAttemptsReached] = useState(false);
   const {
     fallbackSeconds,
     formattedCountdown,
@@ -121,7 +120,6 @@ export default function OtpVerification({
         })
       ) {
         const maxAttemptsMsg = t("Error.otp_max_attempts", { ns: "common" });
-        setIsMaxAttemptsReached(true);
         setLocalError(maxAttemptsMsg);
         setErrorMessage?.(maxAttemptsMsg);
         setErrorCode("otp_max_attempts");
@@ -308,7 +306,6 @@ export default function OtpVerification({
               gap="200"
             >
               <SubmitButton
-                disabled={isMaxAttemptsReached}
                 onGcdsClick={(ev) => {
                   ev.preventDefault();
                   void doSubmit();

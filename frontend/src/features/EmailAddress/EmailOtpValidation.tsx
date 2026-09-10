@@ -52,7 +52,7 @@ export default function EmailOtpValidation({
   handleChange,
   requestOtpCode,
   onBack,
-  isMaxAttemptsReached = false,
+  isMaxAttemptsReached: _isMaxAttemptsReached = false,
   resetAttempts,
   otpExpiry = null,
   otpCreatedAt = null,
@@ -225,10 +225,7 @@ export default function EmailOtpValidation({
                 />
 
                 <GcdsGrid columns="max-content max-content" gap="200">
-                  <SubmitButton
-                    currentLang={language ?? "en"}
-                    disabled={isMaxAttemptsReached}
-                  />
+                  <SubmitButton currentLang={language ?? "en"} />
                   <GcdsButton
                     buttonRole="secondary"
                     onGcdsClick={(ev) => {

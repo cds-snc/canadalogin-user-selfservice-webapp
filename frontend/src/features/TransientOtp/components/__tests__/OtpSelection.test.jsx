@@ -210,6 +210,11 @@ describe("OtpSelection Component", () => {
         screen.getByText(/To add a passkey or security key,/),
       ).toBeInTheDocument();
     });
+
+    it("renders editEmailPage parent page content", () => {
+      renderComponent({ parentPage: PAGES.editEmailPage });
+      expect(screen.getByText(/To change your email,/)).toBeInTheDocument();
+    });
   });
 
   // -------------------------------------------------------------------------
