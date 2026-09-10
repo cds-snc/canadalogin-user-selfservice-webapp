@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.33.3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.2...v1.33.3) (2026-09-10)
+
+
+### Bug Fixes
+
+* **email-otp-validation:** Improve validation messages for OTP length and max attempts ([#2131](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2131)) ([48989a9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/48989a9431938b36d8e48bc2520e8fba9a0d903d))
+
 ## [1.33.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.1...v1.33.2) (2026-09-10)
 
 
