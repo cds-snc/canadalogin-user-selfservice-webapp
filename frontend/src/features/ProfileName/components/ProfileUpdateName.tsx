@@ -3,7 +3,6 @@ import { useParams } from "react-router";
 import {
   GcdsButton,
   GcdsContainer,
-  GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
   GcdsInput,
@@ -72,7 +71,8 @@ export default function ProfileUpdateName({
   onNameFormChange,
   onNext,
   onCancel,
-  errorMessage,
+  givenNameErrorMessage,
+  familyNameErrorMessage,
   setErrorCode,
 }: ProfileNameEditProps) {
   const { language = "en" } = useParams<{ language: string }>();
@@ -116,12 +116,6 @@ export default function ProfileUpdateName({
 
   return (
     <GcdsContainer role="main">
-      {errorMessage ? (
-        <GcdsErrorMessage messageId="message-props">
-          {errorMessage}
-        </GcdsErrorMessage>
-      ) : null}
-
       <GcdsHeading tag="h1">{t("ProfileUpdateName.title")}</GcdsHeading>
 
       <GcdsText>
@@ -136,6 +130,7 @@ export default function ProfileUpdateName({
       <form onSubmit={onSubmitHandler}>
         <GcdsContainer style={{ marginTop: "1.5rem" }}>
           <GcdsInput
+            id="givenName"
             inputId="givenName"
             label={t("ProfileUpdateName.firstName")}
             name="givenName"
@@ -144,12 +139,14 @@ export default function ProfileUpdateName({
             data-testid="givenName"
             lang={routeLanguage}
             value={nameFormData.givenName}
+            errorMessage={givenNameErrorMessage}
             onInput={(event) => {
               handleInputTarget(event.target as NameInputTarget | null);
             }}
             onGcdsInput={handleGcdsInput("givenName")}
           />
           <GcdsInput
+            id="familyName"
             inputId="familyName"
             label={t("ProfileUpdateName.lastName")}
             name="familyName"
@@ -159,6 +156,7 @@ export default function ProfileUpdateName({
             lang={routeLanguage}
             required
             value={nameFormData.familyName}
+            errorMessage={familyNameErrorMessage}
             onInput={(event) => {
               handleInputTarget(event.target as NameInputTarget | null);
             }}

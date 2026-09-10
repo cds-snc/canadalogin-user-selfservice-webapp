@@ -17,6 +17,10 @@ export type EditableProfileNameField = Extract<
   "givenName" | "familyName"
 >;
 
+export type ProfileNameFieldErrorCodes = Partial<
+  Record<EditableProfileNameField, string>
+>;
+
 export type ProfileNameAsyncAction = () => void | Promise<void>;
 
 export type ProfileNameChangeHandler = <TField extends ProfileNameField>(
@@ -32,6 +36,8 @@ export type ProfileNameEditProps = {
   onNext: ProfileNameAsyncAction;
   onCancel: ProfileNameAsyncAction;
   errorMessage?: string;
+  givenNameErrorMessage?: string;
+  familyNameErrorMessage?: string;
   setErrorCode?: ProfileNameErrorCodeSetter;
 };
 

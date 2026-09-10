@@ -18,6 +18,8 @@ import ConfirmUpdate from "./ConfirmUpdate";
 import ProfileUpdateName from "./ProfileUpdateName";
 import SuccessfullyUpdated from "./SuccessfullyUpdated";
 import type {
+  EditableProfileNameField,
+  ProfileNameFieldErrorCodes,
   ProfileNameFormData,
   ProfileNameWizardStep,
 } from "../../../types/profileName";
@@ -56,6 +58,38 @@ const PROFILE_NAME_PAGE_BY_STEP: Record<ProfileNameWizardStep, string> = {
   success: PAGES.profileUpdateNameSuccess,
 };
 
+const PROFILE_NAME_INPUT_IDS: Record<EditableProfileNameField, string> = {
+  givenName: "givenName",
+  familyName: "familyName",
+};
+
+function isEditableProfileNameField(
+  field: keyof ProfileNameFormData,
+): field is EditableProfileNameField {
+  return field === "givenName" || field === "familyName";
+}
+
+function getNameValidationErrorCodes(
+  givenName: string,
+  familyName: string,
+): ProfileNameFieldErrorCodes {
+  const validationErrors: ProfileNameFieldErrorCodes = {};
+
+  if (!familyName) {
+    validationErrors.familyName = "lastNameRequired";
+  }
+
+  if (givenName.length > 80) {
+    validationErrors.givenName = "firstNameMaxLength";
+  }
+
+  if (familyName.length > 80) {
+    validationErrors.familyName = "lastNameMaxLength";
+  }
+
+  return validationErrors;
+}
+
 export default function EditProfileNamePage() {
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
@@ -66,6 +100,8 @@ export default function EditProfileNamePage() {
     useState<ProfileNameWizardStep>("editName");
   const [errorCode, setErrorCode] = useState("");
   const [localLoading, setLocalLoading] = useState(false);
+  const [fieldErrorCodes, setFieldErrorCodes] =
+    useState<ProfileNameFieldErrorCodes>({});
   const [nameFormData, setNameFormData] = useState<ProfileNameFormData>(
     normalizeNameFormData(state?.userProfile?.name),
   );
@@ -97,6 +133,19 @@ export default function EditProfileNamePage() {
     field: TField,
     value: ProfileNameFormData[TField],
   ) => {
+    if (isEditableProfileNameField(field)) {
+      setFieldErrorCodes((previous) => {
+        if (!previous[field]) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          [field]: undefined,
+        };
+      });
+    }
+
     setNameFormData((previous) => ({
       ...previous,
       [field]: value,
@@ -111,21 +160,18 @@ export default function EditProfileNamePage() {
       .trim()
       .replace(/\s+/g, " ");
     const formatted = `${givenName} ${familyName}`.trim();
+    const validationErrors = getNameValidationErrorCodes(givenName, familyName);
+    const hasValidationErrors =
+      Boolean(validationErrors.givenName) ||
+      Boolean(validationErrors.familyName);
 
-    if (!familyName) {
-      setErrorCode("lastNameRequired");
+    if (hasValidationErrors) {
+      setFieldErrorCodes(validationErrors);
+      setErrorCode("");
       return;
     }
 
-    if (givenName.length > 80) {
-      setErrorCode("firstNameMaxLength");
-      return;
-    }
-
-    if (familyName.length > 80) {
-      setErrorCode("lastNameMaxLength");
-      return;
-    }
+    setFieldErrorCodes({});
 
     setNameFormData((previous) => ({
       ...previous,
@@ -145,6 +191,7 @@ export default function EditProfileNamePage() {
     try {
       setLocalLoading(true);
       setErrorCode("");
+      setFieldErrorCodes({});
 
       const response = (await authService.update_my_user_profile({
         name: nameFormData,
@@ -189,6 +236,36 @@ export default function EditProfileNamePage() {
     ? t(`Error.${errorCode}`, { ns: "common", defaultValue: "" }) || errorCode
     : "";
 
+  const givenNameErrorMessage = fieldErrorCodes.givenName
+    ? t(`Error.${fieldErrorCodes.givenName}`, {
+        ns: "common",
+        defaultValue: fieldErrorCodes.givenName,
+      })
+    : "";
+  const familyNameErrorMessage = fieldErrorCodes.familyName
+    ? t(`Error.${fieldErrorCodes.familyName}`, {
+        ns: "common",
+        defaultValue: fieldErrorCodes.familyName,
+      })
+    : "";
+
+  const validationSummaryErrorLinks: Record<string, string> = {
+    ...(givenNameErrorMessage
+      ? {
+          [`#${PROFILE_NAME_INPUT_IDS.givenName}`]: givenNameErrorMessage,
+        }
+      : {}),
+    ...(familyNameErrorMessage
+      ? {
+          [`#${PROFILE_NAME_INPUT_IDS.familyName}`]: familyNameErrorMessage,
+        }
+      : {}),
+  };
+  const hasValidationSummaryErrors =
+    Object.keys(validationSummaryErrorLinks).length > 0;
+  const shouldShowValidationSummary =
+    wizardStep === "editName" && hasValidationSummaryErrors;
+
   const steps: Record<ProfileNameWizardStep, ReactNode> = {
     editName: (
       <ProfileUpdateName
@@ -197,6 +274,8 @@ export default function EditProfileNamePage() {
         onNext={handleSubmitNameForm}
         onCancel={handleBackToProfile}
         errorMessage={errorMessage}
+        givenNameErrorMessage={givenNameErrorMessage || undefined}
+        familyNameErrorMessage={familyNameErrorMessage || undefined}
         setErrorCode={setErrorCode}
       />
     ),
@@ -240,7 +319,17 @@ export default function EditProfileNamePage() {
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}
-      errorCode={wizardStep === "success" ? "" : errorCode}
+      errorCode={
+        wizardStep === "success" || shouldShowValidationSummary ? "" : errorCode
+      }
+      errorMessage={
+        shouldShowValidationSummary
+          ? t("Error.genericProblem", { ns: "common" })
+          : undefined
+      }
+      errorLinks={
+        shouldShowValidationSummary ? validationSummaryErrorLinks : undefined
+      }
       language={routeLanguage}
     />
   );

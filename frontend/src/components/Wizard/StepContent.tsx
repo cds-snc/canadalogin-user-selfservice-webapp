@@ -7,6 +7,7 @@ interface StepContentProps {
   language?: string;
   errorCode?: string | null;
   errorMessage?: string;
+  errorLinks?: Record<string, string>;
 }
 
 export default function StepContent({
@@ -14,12 +15,14 @@ export default function StepContent({
   language,
   errorCode,
   errorMessage,
+  errorLinks,
 }: StepContentProps) {
   return (
     <GcdsContainer>
       <ErrorSummaryWithFocus
         errorCode={errorCode}
         errorMessage={errorMessage}
+        errorLinks={errorLinks}
         language={language}
       />
 

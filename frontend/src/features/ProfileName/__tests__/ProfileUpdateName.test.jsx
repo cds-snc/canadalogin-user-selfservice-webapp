@@ -47,7 +47,7 @@ vi.mock("@gcds-core/components-react", () => ({
       className={className}
     />
   ),
-  GcdsInput: ({ inputId, ...props }) => {
+  GcdsInput: ({ inputId, errorMessage, ...props }) => {
     const {
       name,
       type,
@@ -61,15 +61,20 @@ vi.mock("@gcds-core/components-react", () => ({
       ...domProps
     } = props;
     return (
-      <input
-        {...domProps}
-        id={inputId}
-        name={name}
-        type={type}
-        value={value}
-        onInput={onInput}
-        data-testid={props["data-testid"]}
-      />
+      <div>
+        <input
+          {...domProps}
+          id={inputId}
+          name={name}
+          type={type}
+          value={value}
+          onInput={onInput}
+          data-testid={props["data-testid"]}
+        />
+        {errorMessage ? (
+          <div data-testid={`${inputId}-error`}>{errorMessage}</div>
+        ) : null}
+      </div>
     );
   },
   GcdsErrorMessage: ({ children, messageId, ...props }) => (
@@ -246,6 +251,8 @@ describe("UpdateProfileName Component", () => {
     onCancel: mockOnCancel,
     setErrorCode: mockSetErrorCode,
     errorMessage: "",
+    givenNameErrorMessage: "",
+    familyNameErrorMessage: "",
   };
 
   beforeEach(() => {
@@ -314,19 +321,25 @@ describe("UpdateProfileName Component", () => {
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
-  it("displays error message when provided", () => {
-    const propsWithError = {
+  it("displays first-name and last-name errors on corresponding inputs", () => {
+    const propsWithErrors = {
       ...defaultProps,
-      errorMessage: "Test error message",
+      givenNameErrorMessage: "First name error",
+      familyNameErrorMessage: "Last name error",
     };
 
     render(
       <TestWrapper>
-        <UpdateProfileName {...propsWithError} />
+        <UpdateProfileName {...propsWithErrors} />
       </TestWrapper>,
     );
 
-    expect(screen.getByText("Test error message")).toBeInTheDocument();
+    expect(screen.getByTestId("givenName-error")).toHaveTextContent(
+      "First name error",
+    );
+    expect(screen.getByTestId("familyName-error")).toHaveTextContent(
+      "Last name error",
+    );
   });
 
   it("clears error when user starts typing", () => {
