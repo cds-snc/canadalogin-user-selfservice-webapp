@@ -101,7 +101,7 @@ export default function AddMFAOtpVerification({
   requestNewOtpCode,
   onUseDifferentPhoneNumber,
   onSetupAlternateMFAMethod,
-  isMaxAttemptsReached = false,
+  isMaxAttemptsReached: _isMaxAttemptsReached = false,
   resetAttempts,
 }: AddMFAOtpVerificationProps) {
   const { language } = useParams();
@@ -277,7 +277,6 @@ export default function AddMFAOtpVerification({
         {!isExpired ? (
           <GcdsGrid columns="max-content max-content" gap="200">
             <SubmitButton
-              disabled={isMaxAttemptsReached}
               style={{ width: "fit-content" }}
               onGcdsClick={(ev) => {
                 ev.preventDefault();

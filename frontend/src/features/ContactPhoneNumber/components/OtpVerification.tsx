@@ -77,7 +77,7 @@ export default function OtpVerification({
   requestNewOtpCode,
   setErrorCode,
   setErrorMessage,
-  isMaxAttemptsReached = false,
+  isMaxAttemptsReached: _isMaxAttemptsReached = false,
   resetAttempts,
 }: ContactPhoneOtpVerificationProps) {
   const { language = "en" } = useParams<{ language: string }>();
@@ -262,7 +262,6 @@ export default function OtpVerification({
 
             <GcdsGrid columns="max-content max-content" gap="200">
               <SubmitButton
-                disabled={isMaxAttemptsReached}
                 style={{ width: "fit-content" }}
                 onGcdsClick={onSubmitClick}
                 currentLang={language}
