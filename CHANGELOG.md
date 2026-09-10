@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.33.4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.3...v1.33.4) (2026-09-10)
+
+
+### Bug Fixes
+
+* update submit button behavior for OTP pages when max attempts reached ([#2138](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2138)) ([7d998e5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7d998e57ab8a171a521ab0cebec7800dcbe5ca5d))
+
+
+### Miscellaneous Chores
+
+* bump staging version to 1.33.3 ([#2133](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2133)) ([7c1f66b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7c1f66b788f9384aa197e8ea7a1f38e3822b2e7c))
+
 ## [1.33.3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.2...v1.33.3) (2026-09-10)
 
 
