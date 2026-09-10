@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.33.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.1...v1.33.2) (2026-09-10)
+
+
+### Bug Fixes
+
+* Design QA various figma alignments ([#2125](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2125)) ([b30d638](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b30d638e8a405a2f3a74a13a26df89704135ebbb))
+* Enhance profile name validation and error handling for first and last names ([#2127](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2127)) ([24f73bb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/24f73bba88bb0dbc1d2e263180690a6a328059bb))
+* **identity-verification:** Fix Location State when changing lang ([#2082](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2082)) ([053bd97](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/053bd9737985bda35c433557d9a84b00f5f9ffd0))
+* implement OTP-based updates for flows flow with verification proof handling ([#2116](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2116)) ([55413eb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/55413eb0f63b4073957324430765a2bb4b3ceed1))
+* success message heading réussite does not match approved figma design opération réussie ([#2118](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2118)) ([1d04efe](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1d04efea5c7aa0dba4977ee691a9e82095181e7c))
+
 ## [1.33.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.0...v1.33.1) (2026-09-08)
 
 
