@@ -61,6 +61,7 @@ type EmailFormData = {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_EMAIL_LENGTH = 128;
 const NON_ASCII_CHARACTER_REGEX = /[^\u0000-\u007F]/;
+const OTP_CODE_MAX_LENGTH = 6;
 
 const normalizeEmail = (value: string | undefined | null): string =>
   (value || "").trim().toLowerCase();
@@ -470,12 +471,29 @@ export default function EditEmailAddressPage() {
       return;
     }
 
-    if (!userOtpValue || !userOtpValue.trim() || !otpSentResponse?.trxnId) {
+    const normalizedOtp = userOtpValue
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+
+    if (normalizedOtp.length < OTP_CODE_MAX_LENGTH) {
+      setCustomErrorMessage(t("Error.invalidCode", { ns: "common" }));
       setErrorCode("invalidCode");
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
         error: "invalidCode",
+      });
+      return;
+    }
+
+    if (!otpSentResponse?.trxnId) {
+      setIsEmailOtpMaxAttemptsReached(true);
+      setCustomErrorMessage(t("Error.otp_max_attempts", { ns: "common" }));
+      setErrorCode("otp_max_attempts");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+        error: "otp_max_attempts",
       });
       return;
     }
@@ -487,7 +505,7 @@ export default function EditEmailAddressPage() {
 
       const response = await authService.verify_email_otp_for_update(
         normalizedNewEmail,
-        userOtpValue.trim(),
+        normalizedOtp,
         otpSentResponse.trxnId,
         FLOW_TYPES.email,
       );
@@ -790,6 +808,8 @@ export default function EditEmailAddressPage() {
         formData={formData}
         setFormData={setFormData}
         errorMessage={otpDisplayError}
+        setErrorCode={setErrorCode}
+        setErrorMessage={setCustomErrorMessage}
         userOtpValue={userOtpValue}
         handleChange={handleSetUserOtpValue}
         requestOtpCode={async () => {
