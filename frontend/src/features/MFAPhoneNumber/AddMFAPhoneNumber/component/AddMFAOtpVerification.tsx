@@ -99,7 +99,7 @@ export default function AddMFAOtpVerification({
   setErrorCode,
   setErrorMessage,
   requestNewOtpCode,
-  onUseDifferentPhoneNumber,
+  onUseDifferentPhoneNumber: _onUseDifferentPhoneNumber,
   onSetupAlternateMFAMethod,
   isMaxAttemptsReached: _isMaxAttemptsReached = false,
   resetAttempts,
@@ -343,8 +343,7 @@ export default function AddMFAOtpVerification({
               style={{ textDecoration: "underline" }}
               onGcdsClick={async () => {
                 clearValues();
-                await onUseDifferentPhoneNumber();
-                onBack();
+                await onBack();
               }}
             >
               {t("Verification.differentPhoneNumber")}
