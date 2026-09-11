@@ -129,33 +129,12 @@ export default function AddMFAOtpVerification({
     setCodeRequested(false);
   };
 
-  const requestNewCode = async () => {
-    onChangePhoneForm("otp", "");
-    const requestResult = await requestNewOtpCode();
-
-    if (requestResult === false) {
-      setCodeRequested(false);
-      return;
-    }
-
-    setCodeRequested(true);
-    setLocalError("");
-    setErrorCode?.("");
-    setErrorMessage?.("");
-    restartFallbackCountdown();
-    resetAttempts?.();
-  };
-
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
     const sanitizedValue = value
       .replace(/\D/g, "")
       .slice(0, OTP_CODE_MAX_LENGTH);
     onChangePhoneForm("otp", sanitizedValue);
-    setCodeRequested(false);
-    setLocalError("");
-    setErrorCode?.("");
-    setErrorMessage?.("");
   };
 
   // Clear OTP field on mount
@@ -177,6 +156,7 @@ export default function AddMFAOtpVerification({
     if (normalizedOtp.length < OTP_CODE_MAX_LENGTH) {
       const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
       setLocalError(invalidCodeMessage);
+      setErrorMessage?.(invalidCodeMessage);
       setErrorCode?.("invalidCode");
       return;
     }
@@ -189,6 +169,27 @@ export default function AddMFAOtpVerification({
     void doSubmit();
   };
 
+  const handleRequestNewCode = async () => {
+    const requestSucceeded = await requestNewOtpCode();
+
+    if (requestSucceeded === false) {
+      setCodeRequested(false);
+      return;
+    }
+
+    setErrorCode?.("");
+    setErrorMessage?.("");
+    onChangePhoneForm("otp", "");
+    setLocalError("");
+    resetAttempts?.();
+    restartFallbackCountdown();
+    setCodeRequested(true);
+  };
+
+  const requestNewCodeAction = () => {
+    void handleRequestNewCode();
+  };
+
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
@@ -196,10 +197,10 @@ export default function AddMFAOtpVerification({
           <AccessibleNotice
             noticeRole="success"
             noticeTitleTag="h2"
-            noticeTitle={t("Verification.newCodeSent")}
+            noticeTitle={t("Verification.successTitle")}
             data-testid="linkSuccess"
           >
-            &nbsp;
+            <GcdsText>{t("Verification.newCodeSent")}</GcdsText>
           </AccessibleNotice>
         )}
 
@@ -224,7 +225,7 @@ export default function AddMFAOtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    void requestNewCode();
+                    void handleRequestNewCode();
                   }}
                 >
                   {t("Verification.requestNewCode")}
@@ -328,9 +329,7 @@ export default function AddMFAOtpVerification({
             ) : (
               <GcdsLink
                 style={{ textDecoration: "underline" }}
-                onGcdsClick={() => {
-                  void requestNewCode();
-                }}
+                onGcdsClick={requestNewCodeAction}
               >
                 {userMfaType !== FLOW_TYPES.email
                   ? t("Verification.requestNewCode")

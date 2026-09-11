@@ -648,6 +648,93 @@ describe("AddMFAOtpVerification Unit Tests", () => {
 
       expect(screen.queryByTestId("gcds-input-error")).not.toBeInTheDocument();
     });
+
+    it("should show success notice after requesting a new code", async () => {
+      mockRequestNewOtpCode.mockResolvedValue(true);
+
+      render(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={defaultPhoneFormData}
+            errorMessage=""
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      for (let second = 0; second < 11; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      const requestNewCodeLink = screen.getByText("Request a new code");
+      await act(async () => {
+        requestNewCodeLink.click();
+      });
+
+      expect(mockRequestNewOtpCode).toHaveBeenCalled();
+      const successNotice = screen.getByTestId("linkSuccess");
+      expect(successNotice).toBeInTheDocument();
+      expect(successNotice).toHaveTextContent("Success");
+      expect(successNotice).toHaveTextContent("We have sent you a new code");
+    });
+
+    it("should hide success notice when an error message is displayed", async () => {
+      mockRequestNewOtpCode.mockResolvedValue(true);
+
+      const { rerender } = render(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={defaultPhoneFormData}
+            errorMessage=""
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      for (let second = 0; second < 11; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      await act(async () => {
+        screen.getByText("Request a new code").click();
+      });
+
+      expect(screen.getByTestId("linkSuccess")).toBeInTheDocument();
+
+      rerender(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={defaultPhoneFormData}
+            errorMessage="Codes must be six digits. Try again."
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      expect(screen.queryByTestId("linkSuccess")).not.toBeInTheDocument();
+      expect(screen.getByTestId("gcds-input-error")).toHaveTextContent(
+        "Codes must be six digits. Try again.",
+      );
+    });
   });
 
   describe("French Language Support", () => {
