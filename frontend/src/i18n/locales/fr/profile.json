@@ -6,6 +6,7 @@
     "preferredNameDescription": "Ce nom est utilisé à des fins d'affichage uniquement",
     "exampleName": "Nom Exemple",
     "edit": "Modifier",
+    "change": "Changer",
     "contactInfo": "Coordonnées",
     "email": "Adresse courriel",
     "emailDescription": "Cette adresse courriel est utilisée pour la connexion et les communications :",
@@ -20,6 +21,7 @@
     "serviceNotifications": "Vous pourriez également recevoir des notifications provenant de services liés à votre identifiant ConnexionCanada. Vous pouvez gérer ces préférences dans les paramètres de chaque service.",
     "noPhoneAdded": "Aucun numéro de téléphone de contact n'a été ajouté",
     "addPhoneNumber": "Ajouter un numéro de téléphone",
+    "provenInformation": "Détails de la confirmation de l’identité",
     "maintenanceTitle": "Maintenance",
     "maintenanceNoticeBody": "Cette page est en cours de maintenance, la modification de vos renseignements sera à nouveau disponible sous peu.",
     "successNoticeTitle": "Vos renseignements ont été mis à jour avec succès dans ConnexionCanada"

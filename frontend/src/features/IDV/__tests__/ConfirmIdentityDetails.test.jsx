@@ -26,6 +26,14 @@ vi.mock("react-router", async () => {
 
 vi.mock("../api/identityVerificationApi", () => ({
   identityVerificationApi: {
+    getClaims: vi.fn().mockResolvedValue({
+      status: "verified",
+      verified_claims: {
+        verification: {
+          time: "2026-01-27T00:00:00Z",
+        },
+      },
+    }),
     getPostIdvRedirectUrl: vi.fn().mockResolvedValue({
       data: { redirect_url: "https://rp.example.com/service/return" },
     }),
@@ -59,10 +67,6 @@ vi.mock("../../LanguagePreference/components/ViewLanguagePreference", () => ({
   default: () => <div>Language preferences</div>,
 }));
 
-vi.mock("../../../components/Badges/VerifiedBadge", () => ({
-  default: ({ text }) => <div data-testid="verified-badge">{text}</div>,
-}));
-
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children, role }) => <div role={role}>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
@@ -92,6 +96,11 @@ vi.mock("@gcds-core/components-react", () => ({
     >
       {children}
     </button>
+  ),
+  GcdsIcon: ({ name, className, size }) => (
+    <span data-testid={`icon-${name}`} className={className} data-size={size}>
+      {name}
+    </span>
   ),
   GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag }) => {
     const TitleTag = noticeTitleTag ?? "h2";
@@ -145,18 +154,9 @@ describe("ConfirmIdentityDetails", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Confirm what will be saved to your CanadaLogin",
+        name: "Saved to your CanadaLogin",
       }),
     ).toBeInTheDocument();
-  });
-
-  it("shows verified badge", () => {
-    render(<ConfirmIdentityDetails />);
-
-    const badges = screen.getAllByTestId("verified-badge");
-    expect(
-      badges.some((b) => b.textContent === "Proven January 27, 2026"),
-    ).toBe(true);
   });
 
   it("shows the existing RP success notice when RP details are available", () => {
@@ -190,24 +190,12 @@ describe("ConfirmIdentityDetails", () => {
     ).toBeInTheDocument();
   });
 
-  it("navigates to start identity proofing when Update information is clicked", () => {
-    render(<ConfirmIdentityDetails />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Update information" }));
-
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/IdvStartIdentityProofingPage",
-    );
-  });
-
-  it("redirects to the stored RP target when Confirm and continue is clicked", async () => {
+  it("redirects to the stored RP target when Continue is clicked", async () => {
     mockJourneyType = "required";
 
     render(<ConfirmIdentityDetails />);
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "Confirm and continue" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
 
     await waitFor(() => {
       expect(identityVerificationApi.getPostIdvRedirectUrl).toHaveBeenCalled();
