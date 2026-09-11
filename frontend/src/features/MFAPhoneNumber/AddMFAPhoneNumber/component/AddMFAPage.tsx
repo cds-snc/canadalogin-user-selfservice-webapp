@@ -321,8 +321,8 @@ export default function AddMFAPage() {
             step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
             type: otpType ?? phoneFormData.otpType,
           });
-          return true;
         }
+        return true;
       }
       return false;
     } catch (error) {
