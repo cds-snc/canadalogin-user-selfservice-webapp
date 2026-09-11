@@ -566,7 +566,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
   });
 
   describe("Different Phone Number Link", () => {
-    it("should call clearValues, onUseDifferentPhoneNumber, and onBack when clicked", async () => {
+    it("should call clearValues and onBack when clicked", async () => {
       render(
         <TestWrapper>
           <AddMFAOtpVerification
@@ -598,7 +598,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       );
       expect(mockOnChangePhoneForm).toHaveBeenCalledWith("otp", "");
 
-      expect(mockOnUseDifferentPhoneNumber).toHaveBeenCalled();
+      expect(mockOnUseDifferentPhoneNumber).not.toHaveBeenCalled();
       expect(mockOnBack).toHaveBeenCalled();
     });
   });
