@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.33.5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.4...v1.33.5) (2026-09-11)
+
+
+### Bug Fixes
+
+* mask email address in phone auth factors response  ([#2148](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2148)) ([be60f8f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/be60f8f629227cb722cce375d4de5a49b77aa560))
+* mask email address in phone auth factors response and add related tests ([be60f8f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/be60f8f629227cb722cce375d4de5a49b77aa560))
+* refactor OTP code request handling and improve success notice display  ([#2143](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2143)) ([3cc9058](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3cc90585e14a76aad995f589f6243d5ff0ac7cb2))
+* update MFA navigation to prevent deletion of phone number on back action ([#2147](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2147)) ([6365bcd](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6365bcde688ab03b1dcc9df4df43cc2012bdd81a))
+
 ## [1.33.4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.3...v1.33.4) (2026-09-10)
 
 
