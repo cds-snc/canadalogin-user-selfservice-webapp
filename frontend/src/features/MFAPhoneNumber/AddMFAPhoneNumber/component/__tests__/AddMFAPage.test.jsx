@@ -890,8 +890,8 @@ describe("AddMFAPage Unit Tests", () => {
     });
   });
 
-  describe("deleteMFA Error Handling", () => {
-    it("should handle deleteMFA API error", async () => {
+  describe("Back Navigation Handling", () => {
+    it("should navigate back to add phone without deleting MFA", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
@@ -904,11 +904,6 @@ describe("AddMFAPage Unit Tests", () => {
       addMFAPhoneNumberApi.sendMFAOTP.mockResolvedValue({
         data: { id: "txn-456" },
       });
-
-      const deleteError = {
-        data: { message: "Delete failed" },
-      };
-      deleteMFAPhoneNumberApi.deleteMFA.mockRejectedValue(deleteError);
 
       render(
         <TestWrapper>
@@ -951,13 +946,14 @@ describe("AddMFAPage Unit Tests", () => {
         ).toBeInTheDocument();
       });
 
-      const useDifferentPhoneButton = screen.getByTestId("use-different-phone");
-      fireEvent.click(useDifferentPhoneButton);
+      const backButton = screen.getByTestId("add-mfa-otp-verification-back");
+      fireEvent.click(backButton);
 
-      // This should trigger deleteMFA error path (lines 188-203)
       await waitFor(() => {
-        expect(deleteMFAPhoneNumberApi.deleteMFA).toHaveBeenCalled();
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
+
+      expect(deleteMFAPhoneNumberApi.deleteMFA).not.toHaveBeenCalled();
     });
   });
 
@@ -1277,14 +1273,16 @@ describe("AddMFAPage Unit Tests", () => {
         ).toBeInTheDocument();
       });
 
-      // Test onBack function - triggers deleteMFA then navigates back to addMFANumber
+      // Test onBack function - navigates back to addMFANumber without deleting MFA
       const backButton = screen.getByTestId("add-mfa-otp-verification-back");
       fireEvent.click(backButton);
 
-      // onBack always navigates to addMFANumber (in the finally block)
+      // onBack navigates to addMFANumber
       await waitFor(() => {
         expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
+
+      expect(deleteMFAPhoneNumberApi.deleteMFA).not.toHaveBeenCalled();
     });
   });
 
@@ -1348,18 +1346,15 @@ describe("AddMFAPage Unit Tests", () => {
         ).toBeInTheDocument();
       });
 
-      // Test onUseDifferentPhoneNumber function which calls deleteMFA
+      // Test onUseDifferentPhoneNumber function which returns to add phone without deleting MFA
       const differentPhoneButton = screen.getByTestId("use-different-phone");
       fireEvent.click(differentPhoneButton);
 
       await waitFor(() => {
-        expect(deleteMFAPhoneNumberApi.deleteMFA).toHaveBeenCalledWith(
-          expect.objectContaining({
-            id: "mfa-id-123",
-            otpType: "sms",
-          }),
-        );
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
+
+      expect(deleteMFAPhoneNumberApi.deleteMFA).not.toHaveBeenCalled();
     });
 
     it("should test onAddSecondMFA function with voice to SMS conversion", async () => {
@@ -1868,14 +1863,10 @@ describe("AddMFAPage Unit Tests", () => {
       expect(mockRequestOtpCode).toHaveBeenCalled();
     });
 
-    it("should handle deleteMFA with default parameters", async () => {
+    it("should not call deleteMFA when navigating back from MFA verification", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
-      });
-
-      deleteMFAPhoneNumberApi.deleteMFA.mockResolvedValue({
-        success: true,
       });
 
       render(
@@ -1919,13 +1910,15 @@ describe("AddMFAPage Unit Tests", () => {
         ).toBeInTheDocument();
       });
 
-      // Test onBack function which calls deleteMFA with default parameters
+      // Test onBack function no longer calls deleteMFA
       const backButton = screen.getByTestId("add-mfa-otp-verification-back");
       fireEvent.click(backButton);
 
       await waitFor(() => {
-        expect(deleteMFAPhoneNumberApi.deleteMFA).toHaveBeenCalled();
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
       });
+
+      expect(deleteMFAPhoneNumberApi.deleteMFA).not.toHaveBeenCalled();
     });
 
     it("should handle verifyMFAOtp with duplicate phone number navigation", async () => {
