@@ -10,7 +10,7 @@ from app.users.schemas import (
     UserPhoneOTPFactors,
 )
 from app.utils.access_token import get_auth_request_headers
-from app.utils.string_masking import mask_phone_number
+from app.utils.string_masking import mask_email_address, mask_phone_number
 from httpx import AsyncClient
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,8 @@ async def parse_phone_auth_factors_response(
             if not email_address:
                 logger.warning("Factor %s has no emailAddress", factor.id)
                 continue
+            if masked:
+                email_address = mask_email_address(email_address)
             factors_list.append(
                 {
                     "id": factor.id,
