@@ -72,7 +72,6 @@ const RadioButtons = ({
     <GcdsRadios
       name="radio"
       legend={t("AddMFANumber.howToSendCode")}
-      hint={t("AddMFANumber.changeNextSignIn")}
       options={radioOptions}
       required={true}
       onGcdsChange={(e: CustomEvent<string>) => {
