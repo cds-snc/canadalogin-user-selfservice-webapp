@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.33.6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.5...v1.33.6) (2026-09-14)
+
+
+### Bug Fixes
+
+* add problems section with help link in AddFIDO2Passkey component ([dbbc0f4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/dbbc0f44a558ef544136ff51e8a6a9d5ac7384c0))
+* add problems with passkey section to add passkey page ([#2162](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2162)) ([dbbc0f4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/dbbc0f44a558ef544136ff51e8a6a9d5ac7384c0))
+* clear error states on navigation actions in OtpVerification  ([#2163](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2163)) ([b7859b0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b7859b0b82041b34981222d5ef5b517cae71d0a7))
+* clear error states on navigation actions in OtpVerification component ([b7859b0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b7859b0b82041b34981222d5ef5b517cae71d0a7))
+* update country not supported messages for phone number flow ([#2164](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2164)) ([a28a357](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a28a3572f362a5fbd7d3241abc327d7f2b275a18))
+* update French error messages for add passkey flow ([#2160](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2160)) ([7af9819](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7af9819e4178201fbe54f904036c37e80feb49a3))
+
+
+### Miscellaneous Chores
+
+* bump staging version to 1.33.5 ([#2149](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2149)) ([ac6cf01](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ac6cf019dbed7a3ef14eaffde07880c9a4c74b71))
+
 ## [1.33.5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.4...v1.33.5) (2026-09-11)
 
 
