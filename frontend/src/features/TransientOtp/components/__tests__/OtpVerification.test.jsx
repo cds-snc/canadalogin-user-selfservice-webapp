@@ -618,6 +618,22 @@ describe("OtpVerification Component", () => {
       await user.click(chooseDifferentMethodButton);
 
       expect(mockOnBack).toHaveBeenCalled();
+      expect(mockSetErrorCode).toHaveBeenCalledWith("");
+      expect(mockSetErrorMessage).toHaveBeenCalledWith("");
+    });
+
+    it("clears errors and calls onCancel when cancel is clicked", async () => {
+      const user = userEvent.setup({ delay: null });
+      renderComponent({ showTryAnotherWay: false });
+
+      const cancelButton = screen.getByRole("button", {
+        name: "Cancel",
+      });
+      await user.click(cancelButton);
+
+      expect(mockOnCancel).toHaveBeenCalled();
+      expect(mockSetErrorCode).toHaveBeenCalledWith("");
+      expect(mockSetErrorMessage).toHaveBeenCalledWith("");
     });
   });
 

@@ -20,6 +20,7 @@ import SubmitButton from "../../../components/Layout/SubmitButton";
 import { useBreakpoints } from "../../../hooks/useBreakpoints";
 import { useOtpExpiryCountdown } from "../../../hooks/useOtpExpiryCountdown";
 import { shouldDisplayOtpMaxAttempts } from "../../../utils/otpErrorMapping";
+import { clearFlowErrorState } from "../../../utils/errorUtils";
 import type { OtpFactor } from "../../../types/hooks";
 
 type CaughtApiError = {
@@ -88,10 +89,21 @@ export default function OtpVerification({
     setUserOtpValue(sanitizedValue);
   };
 
+  const clearAllErrors = () => {
+    clearFlowErrorState({
+      setErrorCode,
+      setErrorMessage,
+      setLocalError,
+    });
+  };
+
+  const clearErrorsAndNavigate = (navigateAction: () => void) => {
+    clearAllErrors();
+    navigateAction();
+  };
+
   const doSubmit = async () => {
-    setLocalError("");
-    setErrorCode("");
-    setErrorMessage?.("");
+    clearAllErrors();
 
     const normalizedOtp = userOtpValue
       .replace(/\D/g, "")
@@ -170,10 +182,8 @@ export default function OtpVerification({
       return;
     }
 
-    setErrorCode("");
-    setErrorMessage?.("");
+    clearAllErrors();
     setUserOtpValue("");
-    setLocalError("");
     resetAttempts?.();
     restartFallbackCountdown();
     setCodeRequested(true);
@@ -229,7 +239,7 @@ export default function OtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    onBack();
+                    clearErrorsAndNavigate(onBack);
                   }}
                 >
                   {t("Verification.chooseDifferentMethod")}
@@ -240,7 +250,7 @@ export default function OtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    onCancel();
+                    clearErrorsAndNavigate(onCancel);
                   }}
                 >
                   {t("Verification.cancel")}
@@ -319,7 +329,7 @@ export default function OtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    onBack();
+                    clearErrorsAndNavigate(onBack);
                   }}
                 >
                   {t("Verification.chooseDifferentMethod")}
@@ -330,7 +340,7 @@ export default function OtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    onCancel();
+                    clearErrorsAndNavigate(onCancel);
                   }}
                 >
                   {t("Verification.cancel")}
