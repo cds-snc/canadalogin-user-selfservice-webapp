@@ -6,11 +6,13 @@ import {
   GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
+  GcdsLink,
   GcdsText,
 } from "@gcds-core/components-react";
 
 import AccessibleNotice from "../../../../components/InfoBlocks/AccessibleNotice";
 import FIDOPasskeyCollage from "../../../../assets/icons/passkey_collage.svg?react";
+import { gcHelpCentreLinks } from "../../../../utils/constants";
 
 interface AddFIDO2PasskeyProps {
   errorMessage: string;
@@ -96,6 +98,22 @@ export default function AddFIDO2Passkey({
         >
           {t("AddFIDO2Passkey.cancelButton")}
         </GcdsButton>
+
+        <GcdsGrid columns="1" gap="300">
+          <GcdsHeading tag="h2">
+            {t("AddFIDO2Passkey.problemsTitle")}
+          </GcdsHeading>
+
+          <GcdsText>
+            <GcdsLink
+              target="_blank"
+              href={gcHelpCentreLinks.helpCreatingPasskey[language]}
+              style={{ textDecoration: "underline" }}
+            >
+              {t("AddFIDO2Passkey.helpLink")}
+            </GcdsLink>
+          </GcdsText>
+        </GcdsGrid>
       </GcdsGrid>
     </GcdsContainer>
   );
