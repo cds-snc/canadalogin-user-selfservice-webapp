@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -13,17 +14,34 @@ import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
-import ProvenInformationCard from "../IDV/ProvenInformationCard";
-import { identityVerificationApi } from "./api/identityVerificationApi";
-import VerifiedBadge from "../../components/Badges/VerifiedBadge";
+import ProvenInformationCard from "./ProvenInformationCard";
 import { path } from "../../utils/routeHelpers";
+import {
+  identityVerificationApi,
+  type IdentityVerificationClaimsResponse,
+} from "../../features/IDV/api/identityVerificationApi";
+import VerifiedBadge from "../../components/Badges/VerifiedBadge";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
-  const { t } = useTranslation("idv");
+  const { t, i18n } = useTranslation(["idv", "profile"]);
   const { language, journeyType } = useParams();
   const { relyingPartyUrl, relyingPartyName, hasRelyingParty } =
     useRelyingPartyInfo();
+
+  const [identityVerificationClaims, setIdentityVerificationClaims] =
+    useState<IdentityVerificationClaimsResponse>();
+
+  useEffect(() => {
+    if (!DEV_ONLY_FEATURE) {
+      return;
+    }
+
+    void identityVerificationApi
+      .getClaims()
+      .then(setIdentityVerificationClaims)
+      .catch(() => undefined);
+  }, []);
 
   const fallbackRedirectUrl = relyingPartyUrl || "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
@@ -63,6 +81,19 @@ export default function ConfirmIdentityDetails() {
     return null;
   }
 
+  const verifiedClaims =
+    identityVerificationClaims?.status === "verified"
+      ? identityVerificationClaims.verified_claims
+      : undefined;
+  const verificationTime = verifiedClaims?.verification?.time;
+  const provenDate = verificationTime
+    ? new Intl.DateTimeFormat(i18n.language, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(new Date(verificationTime))
+    : undefined;
+
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
@@ -85,18 +116,21 @@ export default function ConfirmIdentityDetails() {
 
           <GcdsText>{t("ConfirmIdentityDetails.description")}</GcdsText>
 
-          <GcdsHeading tag="h2" marginTop="0" marginBottom="0">
-            {t("ConfirmIdentityDetails.identityProofingDetails")}
-          </GcdsHeading>
-
-          <GcdsText marginBottom="300">
-            <VerifiedBadge
-              text={t("ConfirmIdentityDetails.verifiedBadgeText")}
-            />
-          </GcdsText>
-
-          <ProvenInformationCard />
-
+          {DEV_ONLY_FEATURE && verifiedClaims && (
+            <GcdsContainer>
+              <GcdsGrid columns="1fr auto" className="gridInline">
+                <GcdsHeading tag="h2" marginTop="0">
+                  {t("profile:ProfileHome.provenInformation")}
+                </GcdsHeading>
+                {provenDate && (
+                  <VerifiedBadge
+                    text={`${t("profile:ProfileHome.verified")} ${provenDate}`}
+                  />
+                )}
+              </GcdsGrid>
+              <ProvenInformationCard claims={verifiedClaims} />
+            </GcdsContainer>
+          )}
           <GcdsButton
             type="button"
             onGcdsClick={(event) => {
