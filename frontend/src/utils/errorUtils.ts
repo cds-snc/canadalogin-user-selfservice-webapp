@@ -1,5 +1,11 @@
 import i18n from "../i18n/index";
 
+type ClearFlowErrorStateParams = {
+  setErrorCode: (errorCode: string) => void;
+  setErrorMessage?: (errorMessage: string) => void;
+  setLocalError?: (errorMessage: string) => void;
+};
+
 export const getErrorMessage = (
   language: string | undefined,
   errorCode: string | null | undefined,
@@ -15,4 +21,14 @@ export const getErrorMessage = (
   }
 
   return i18n.t("Error.serverError", { ns: "common", lng, defaultValue: "" });
+};
+
+export const clearFlowErrorState = ({
+  setErrorCode,
+  setErrorMessage,
+  setLocalError,
+}: ClearFlowErrorStateParams): void => {
+  setLocalError?.("");
+  setErrorMessage?.("");
+  setErrorCode("");
 };
