@@ -96,16 +96,12 @@ export default function ProfileHome() {
         )}
         <GcdsContainer>
           <GcdsHeading tag="h2" marginTop="0">
-            {t("ProfileHome.basicInfo")}
-          </GcdsHeading>
-          <ViewNameCard />
-        </GcdsContainer>
-        <GcdsContainer>
-          <GcdsHeading tag="h2" marginTop="0">
             {t("ProfileHome.contactInfo")}
           </GcdsHeading>
 
           <GcdsContainer className="sectionCard">
+            <ViewNameCard />
+            <div className="separator" />
             <ViewEmailInfo />
             <div className="separator" />
             <ViewContactPhoneNumber phoneNumbers={phoneNumbers} />

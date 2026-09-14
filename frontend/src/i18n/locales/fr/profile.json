@@ -1,8 +1,7 @@
 {
   "ProfileHome": {
     "title": "Renseignements personnels",
-    "basicInfo": "Renseignements de base",
-    "preferredName": "Nom d'usage",
+    "preferredName": "Nom",
     "preferredNameDescription": "Ce nom est utilisé à des fins d'affichage uniquement",
     "exampleName": "Nom Exemple",
     "edit": "Modifier",
@@ -25,9 +24,9 @@
     "successNoticeTitle": "Vos renseignements ont été mis à jour avec succès dans ConnexionCanada"
   },
   "ProvenInformationCard": {
-    "name": "Nom",
+    "name": "Nom légal",
     "dateOfBirth": "Date de naissance",
-    "idDocument": "Document d'identité enregistré dans ConnexionCanada",
+    "idDocument": "Source des renseignements",
     "updateInfo": "Pour mettre à jour ces renseignements, vous devrez effectuer un autre processus de vérification d'identité.",
     "updateButton": "Mettre à jour les renseignements"
   },

@@ -32,9 +32,7 @@ export default function ViewProfileNameCard({
   });
 
   return (
-    <GcdsContainer
-      className={isConfirmIdentityDetails ? undefined : "sectionCard"}
-    >
+    <GcdsContainer>
       <GcdsHeading tag="h3" marginTop="300">
         {t("ProfileHome.preferredName")}
       </GcdsHeading>
