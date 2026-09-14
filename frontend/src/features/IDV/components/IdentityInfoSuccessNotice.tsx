@@ -1,4 +1,4 @@
-import { GcdsNotice } from "@gcds-core/components-react";
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
@@ -17,12 +17,12 @@ export default function IdentityInfoSuccessNotice({
   }
 
   return (
-    <GcdsNotice
+    <AccessibleNotice
       noticeRole="success"
       noticeTitleTag="h2"
       noticeTitle={t("ProfileHome.successNoticeTitle")}
     >
       &nbsp;
-    </GcdsNotice>
+    </AccessibleNotice>
   );
 }

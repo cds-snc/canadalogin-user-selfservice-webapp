@@ -6,9 +6,10 @@ import {
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { IDV_JOURNEY_TYPE } from "./constants";
@@ -97,7 +98,7 @@ export default function ConfirmIdentityDetails() {
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
         <GcdsContainer>
-          <GcdsNotice
+          <AccessibleNotice
             noticeRole="success"
             noticeTitleTag="h2"
             noticeTitle={t(successNoticeTitleKey)}
@@ -105,7 +106,7 @@ export default function ConfirmIdentityDetails() {
             <GcdsText>
               {t(successNoticeDescriptionKey, { appName: relyingPartyName })}
             </GcdsText>
-          </GcdsNotice>
+          </AccessibleNotice>
         </GcdsContainer>
 
         <GcdsContainer>

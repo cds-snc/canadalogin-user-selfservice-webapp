@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   GcdsButton,
@@ -7,16 +7,20 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router";
 import { FLOW_TYPES } from "../../../utils/constants";
 import { handleLinkButtonKeyDown } from "../../../utils/accessibility";
 import SubmitButton from "../../../components/Layout/SubmitButton";
+import { useBreakpoints } from "../../../hooks/useBreakpoints";
 import { useOtpExpiryCountdown } from "../../../hooks/useOtpExpiryCountdown";
+import { shouldDisplayOtpMaxAttempts } from "../../../utils/otpErrorMapping";
+import { clearFlowErrorState } from "../../../utils/errorUtils";
 import type { OtpFactor } from "../../../types/hooks";
 
 type CaughtApiError = {
@@ -24,6 +28,7 @@ type CaughtApiError = {
 };
 
 const initialTime = 10;
+const OTP_CODE_MAX_LENGTH = 6;
 
 interface OtpVerificationProps {
   userSelectedMfaFactor: OtpFactor;
@@ -59,36 +64,79 @@ export default function OtpVerification({
   onCancel,
 }: OtpVerificationProps) {
   const { language } = useParams();
-  const [time, setTime] = useState(initialTime);
   const [codeRequested, setCodeRequested] = useState(false);
   const { t } = useTranslation(["verification", "common"]);
+  const { mobile } = useBreakpoints();
   const [localError, setLocalError] = useState("");
-  const [isMaxAttemptsReached, setIsMaxAttemptsReached] = useState(false);
   const {
+    fallbackSeconds,
     formattedCountdown,
     hasServerExpiry,
     isExpired: isOtpExpired,
+    restartFallbackCountdown,
   } = useOtpExpiryCountdown(otpExpiry, initialTime, otpCreatedAt);
 
   const displayError = localError || errorMessage || "";
+  const shouldShowSuccessNotice = codeRequested && !displayError;
   const countdownDisplay = hasServerExpiry ? formattedCountdown : null;
+  const otpInputSize = mobile ? 18 : 6;
 
   const handleChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
-    setUserOtpValue(value);
+    const sanitizedValue = value
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    setUserOtpValue(sanitizedValue);
+  };
+
+  const clearAllErrors = () => {
+    clearFlowErrorState({
+      setErrorCode,
+      setErrorMessage,
+      setLocalError,
+    });
+  };
+
+  const clearErrorsAndNavigate = (navigateAction: () => void) => {
+    clearAllErrors();
+    navigateAction();
   };
 
   const doSubmit = async () => {
-    setLocalError("");
-    setErrorCode("");
-    setErrorMessage?.("");
+    clearAllErrors();
+
+    const normalizedOtp = userOtpValue
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    if (normalizedOtp.length < OTP_CODE_MAX_LENGTH) {
+      const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
+      setLocalError(invalidCodeMessage);
+      setErrorMessage?.(invalidCodeMessage);
+      setErrorCode("invalidCode");
+      return;
+    }
+
     try {
-      await validateOtpCode(userOtpValue);
+      await validateOtpCode(normalizedOtp);
     } catch (error) {
       const apiError = error as CaughtApiError;
       const messageId = apiError?.data?.message;
       const retries = apiError?.data?.retries;
       const attempts = apiError?.data?.attempts;
+
+      if (
+        shouldDisplayOtpMaxAttempts({
+          errorCode: messageId,
+          retries,
+          attempts,
+        })
+      ) {
+        const maxAttemptsMsg = t("Error.otp_max_attempts", { ns: "common" });
+        setLocalError(maxAttemptsMsg);
+        setErrorMessage?.(maxAttemptsMsg);
+        setErrorCode("otp_max_attempts");
+        return;
+      }
 
       if (
         retries !== undefined &&
@@ -99,20 +147,12 @@ export default function OtpVerification({
         // The backend enriches the error with retries (max allowed) and
         // attempts (used so far) from the IBM Verify retrieve endpoint.
         const remaining = retries - attempts;
-
-        if (remaining <= 0) {
-          const maxAttemptsMsg = t("Error.otp_max_attempts", { ns: "common" });
-          setIsMaxAttemptsReached(true);
-          setLocalError(maxAttemptsMsg);
-          setErrorMessage?.(maxAttemptsMsg);
-        } else {
-          const invalidAttemptsMsg = t("Error.otp_invalid_attempts", {
-            ns: "common",
-            count: remaining,
-          });
-          setLocalError(invalidAttemptsMsg);
-          setErrorMessage?.(invalidAttemptsMsg);
-        }
+        const invalidAttemptsMsg = t("Error.otp_invalid_attempts", {
+          ns: "common",
+          count: remaining,
+        });
+        setLocalError(invalidAttemptsMsg);
+        setErrorMessage?.(invalidAttemptsMsg);
         // Also set errorCode so the parent's StepContent shows
         // the error summary at the top of the page
         if (messageId) {
@@ -130,18 +170,6 @@ export default function OtpVerification({
     void doSubmit();
   };
 
-  useEffect(() => {
-    if (time <= 0) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setTime((prevTime) => prevTime - 1);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [time]);
-
   const userMfaType = userSelectedMfaFactor?.type;
   const isEmailFactor =
     userMfaType === FLOW_TYPES.email || userMfaType === FLOW_TYPES.emailOtp;
@@ -154,12 +182,11 @@ export default function OtpVerification({
       return;
     }
 
-    setCodeRequested(true);
-    setTime(initialTime);
-    setErrorCode("");
+    clearAllErrors();
     setUserOtpValue("");
-    setLocalError("");
     resetAttempts?.();
+    restartFallbackCountdown();
+    setCodeRequested(true);
   };
 
   const requestNewCodeAction = () => {
@@ -168,15 +195,15 @@ export default function OtpVerification({
 
   return (
     <GcdsContainer role="main">
-      {codeRequested ? (
-        <GcdsNotice
+      {shouldShowSuccessNotice ? (
+        <AccessibleNotice
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("Verification.successTitle")}
           data-testid="linkSuccess"
         >
           <GcdsText>{t("Verification.newCodeSent")}</GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
       ) : null}
 
       <GcdsContainer>
@@ -212,7 +239,7 @@ export default function OtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    onBack();
+                    clearErrorsAndNavigate(onBack);
                   }}
                 >
                   {t("Verification.chooseDifferentMethod")}
@@ -223,7 +250,7 @@ export default function OtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    onCancel();
+                    clearErrorsAndNavigate(onCancel);
                   }}
                 >
                   {t("Verification.cancel")}
@@ -268,12 +295,15 @@ export default function OtpVerification({
                 label={t("Verification.sixDigitCode")}
                 name="verificationCode"
                 type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength={OTP_CODE_MAX_LENGTH}
                 validateOn="other"
                 errorMessage={displayError}
                 value={userOtpValue}
                 onGcdsInput={handleChange}
                 lang={language}
-                size={18}
+                size={otpInputSize}
                 autocomplete="one-time-code"
                 autoFocus
               ></GcdsInput>
@@ -286,7 +316,6 @@ export default function OtpVerification({
               gap="200"
             >
               <SubmitButton
-                disabled={isMaxAttemptsReached}
                 onGcdsClick={(ev) => {
                   ev.preventDefault();
                   void doSubmit();
@@ -300,7 +329,7 @@ export default function OtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    onBack();
+                    clearErrorsAndNavigate(onBack);
                   }}
                 >
                   {t("Verification.chooseDifferentMethod")}
@@ -311,7 +340,7 @@ export default function OtpVerification({
                   style={{ width: "fit-content" }}
                   onGcdsClick={(ev) => {
                     ev.preventDefault();
-                    onCancel();
+                    clearErrorsAndNavigate(onCancel);
                   }}
                 >
                   {t("Verification.cancel")}
@@ -325,17 +354,18 @@ export default function OtpVerification({
       <GcdsHeading tag="h2">{t("Verification.problemsWithCode")}</GcdsHeading>
 
       <GcdsText>
-        {!isOtpExpired && time > 0 ? (
+        {!isOtpExpired && fallbackSeconds > 0 ? (
           <span>
             {t("Verification.requestNewCodeIn")}
             <strong>
               {" "}
-              {time} {t("Verification.seconds")}
+              {fallbackSeconds} {t("Verification.seconds")}
             </strong>
           </span>
         ) : (
           <GcdsLink
             role="button"
+            style={{ textDecoration: "underline" }}
             onGcdsClick={requestNewCodeAction}
             onKeyDown={(event) =>
               handleLinkButtonKeyDown(event, requestNewCodeAction)

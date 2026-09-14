@@ -1,4 +1,6 @@
-import { GcdsNotice, GcdsText } from "@gcds-core/components-react";
+import { GcdsText } from "@gcds-core/components-react";
+
+import AccessibleNotice from "./AccessibleNotice";
 
 interface EmailNotificationInfoNoticeProps {
   title: string;
@@ -12,13 +14,13 @@ export default function EmailNotificationInfoNotice({
   lang,
 }: EmailNotificationInfoNoticeProps) {
   return (
-    <GcdsNotice
+    <AccessibleNotice
       noticeRole="info"
       noticeTitleTag="h2"
       noticeTitle={title}
       lang={lang}
     >
       <GcdsText>{description}</GcdsText>
-    </GcdsNotice>
+    </AccessibleNotice>
   );
 }

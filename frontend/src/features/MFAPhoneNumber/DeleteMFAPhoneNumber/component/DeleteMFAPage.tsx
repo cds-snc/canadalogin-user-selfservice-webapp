@@ -74,6 +74,11 @@ export default function DeleteMFAPage() {
   const [selected2FAPasskey, setSelected2FAPasskey] =
     useState<Fido2Credential | null>(null);
   const [assertionResult, setAssertionResult] = useState<unknown>(null);
+  const [deletionVerificationProofId, setDeletionVerificationProofId] =
+    useState("");
+  const [verificationMethod, setVerificationMethod] = useState<
+    "otp" | "passkey" | null
+  >(null);
   const { userProfile } = state;
   const { id, userName } = userProfile ?? {};
   const navigate = useNavigate();
@@ -202,50 +207,162 @@ export default function DeleteMFAPage() {
     });
   };
 
+  const getDeleteMfaErrorData = (error: unknown) => {
+    const typedError = error as {
+      data?: {
+        message?: string;
+        retries?: number;
+        attempts?: number;
+        trxnId?: string;
+        created?: string;
+        expiry?: string;
+      };
+      response?: {
+        data?: {
+          message?: string;
+          retries?: number;
+          attempts?: number;
+          trxnId?: string;
+          created?: string;
+          expiry?: string;
+        };
+      };
+    };
+
+    return typedError.data ?? typedError.response?.data;
+  };
+
+  const getDeleteFactorsPayload = () =>
+    phoneFormData.mfaFactorsToDelete.map((factor) => ({
+      id: factor.id,
+      otpType: serverMapping[factor.type as keyof typeof serverMapping],
+    }));
+
+  const getSingleDeleteFactorPayload = () => {
+    const [firstFactor] = phoneFormData.mfaFactorsToDelete;
+    if (!firstFactor) {
+      return null;
+    }
+
+    return {
+      id: firstFactor.id,
+      otpType: serverMapping[firstFactor.type as keyof typeof serverMapping],
+    };
+  };
+
+  const getVerificationOtpType = () => {
+    if (userSelectedMfaFactor) {
+      return serverMapping[
+        userSelectedMfaFactor.type as keyof typeof serverMapping
+      ];
+    }
+
+    return getSingleDeleteFactorPayload()?.otpType;
+  };
+
+  const navigateBackToVerificationStep = (method: "otp" | "passkey" | null) => {
+    if (method === "passkey") {
+      setWizardStep("verifyFIDO2Passkey");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+        step: DELETE_MFA_ANALYTICS.STEPS.OTP_SELECTION,
+      });
+      return;
+    }
+
+    setWizardStep("otpValidation");
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+      step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+    });
+  };
+
+  const verifyDeletionWithPasskey = async (verifiedAssertion?: unknown) => {
+    const assertionToVerify = verifiedAssertion ?? assertionResult;
+    const singleFactor = getSingleDeleteFactorPayload();
+
+    if (!assertionToVerify || !singleFactor) {
+      setErrorCode("error_fido2_verification");
+      return;
+    }
+
+    try {
+      setErrorCode("");
+      setCustomErrorMessage("");
+      setDeletionVerificationProofId("");
+
+      const response =
+        phoneFormData.mfaFactorsToDelete.length > 1
+          ? await deleteMFAPhoneNumberApi.verifyDeleteMFABatch({
+              factors: getDeleteFactorsPayload(),
+              assertionResult: assertionToVerify,
+            })
+          : await deleteMFAPhoneNumberApi.verifyDeleteMFA({
+              id: singleFactor.id,
+              otpType: singleFactor.otpType,
+              assertionResult: assertionToVerify,
+            });
+
+      const verificationProofId = response?.data?.verificationProofId ?? "";
+      if (!response?.success || !verificationProofId) {
+        setErrorCode("invalidCode");
+        return;
+      }
+
+      setAssertionResult(assertionToVerify);
+      setVerificationMethod("passkey");
+      setDeletionVerificationProofId(verificationProofId);
+      setWizardStep("deleteMFAPhoneNumberConfirm");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+        step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
+        flow: DELETE_MFA_ANALYTICS.FLOW_ID,
+      });
+    } catch (error) {
+      const errorData = getDeleteMfaErrorData(error);
+      const message = errorData?.message ?? "error_fido2_verification";
+      setErrorCode(message);
+      setCustomErrorMessage("");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_MFA_ANALYTICS.STEPS.OTP_SELECTION,
+        error: message,
+      });
+    }
+  };
+
   const deleteMFA = async () => {
     try {
-      const verificationOtpType =
-        assertionResult || !phoneFormData.mfaFactorsToDelete.length
-          ? undefined
-          : userSelectedMfaFactor
-            ? serverMapping[
-                userSelectedMfaFactor.type as keyof typeof serverMapping
-              ]
-            : serverMapping[
-                phoneFormData.mfaFactorsToDelete[0]
-                  ?.type as keyof typeof serverMapping
-              ];
+      const singleFactor = getSingleDeleteFactorPayload();
+      if (!singleFactor) {
+        setErrorCode("invalidCode");
+        return;
+      }
+
+      if (!deletionVerificationProofId) {
+        setErrorCode("otp_expired");
+        setCustomErrorMessage("");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
+          error: "otp_expired",
+        });
+        navigateBackToVerificationStep(verificationMethod);
+        return;
+      }
 
       if (phoneFormData.mfaFactorsToDelete.length > 1) {
-        // Multiple factors tied to the same phone number — verify OTP once and
-        // delete all in a single batch request.  IBM Verify trxnIds are
-        // single-use, so sequential calls with the same trxnId would fail.
         await deleteMFAPhoneNumberApi.deleteMFABatch({
-          factors: phoneFormData.mfaFactorsToDelete.map((f) => ({
-            id: f.id,
-            otpType: serverMapping[f.type as keyof typeof serverMapping],
-          })),
-          ...(assertionResult
-            ? { assertionResult }
-            : {
-                otp: userOtpValue,
-                trxnId: otpSentResponse?.trxnId ?? "",
-                otpVerificationType: verificationOtpType,
-              }),
+          action: "commit",
+          factors: getDeleteFactorsPayload(),
+          verificationProofId: deletionVerificationProofId,
         });
       } else {
-        const [firstFactor] = phoneFormData.mfaFactorsToDelete;
         await deleteMFAPhoneNumberApi.deleteMFA({
-          id: firstFactor.id,
-          otpType:
-            serverMapping[firstFactor.type as keyof typeof serverMapping],
-          ...(assertionResult
-            ? { assertionResult }
-            : {
-                otp: userOtpValue,
-                trxnId: otpSentResponse?.trxnId,
-                otpVerificationType: verificationOtpType,
-              }),
+          action: "commit",
+          id: singleFactor.id,
+          otpType: singleFactor.otpType,
+          verificationProofId: deletionVerificationProofId,
         });
       }
 
@@ -253,6 +370,8 @@ export default function DeleteMFAPage() {
         event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
         step: DELETE_MFA_ANALYTICS.STEPS.SUCCESS,
       });
+      setDeletionVerificationProofId("");
+      setVerificationMethod(null);
       setErrorCode("");
       setCustomErrorMessage("");
       navigate(backToManage2FAVerificationsPage, {
@@ -262,14 +381,12 @@ export default function DeleteMFAPage() {
         },
       });
     } catch (error) {
-      const err = error as {
-        data?: { message?: string; retries?: number; attempts?: number };
-      };
       setOtpSentResponse((prev) =>
         mergeOtpSentResponseWithMetadata(prev, extractOtpServerMetadata(error)),
       );
-      const message = err?.data?.message ?? "";
-      const attemptsMessage = getOtpAttemptsErrorMessage(err?.data);
+      const errorData = getDeleteMfaErrorData(error);
+      const message = errorData?.message ?? "";
+      const attemptsMessage = getOtpAttemptsErrorMessage(errorData);
       setErrorCode(message);
       setCustomErrorMessage("");
       trackEvent({
@@ -278,40 +395,87 @@ export default function DeleteMFAPage() {
         error: message,
       });
       if (
+        message === "otp_expired" ||
+        message === "invalidCode" ||
         (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
-          err?.data?.message ?? "",
+          errorData?.message ?? "",
         )
       ) {
         if (attemptsMessage) {
           setCustomErrorMessage(attemptsMessage);
         }
-        // If OTP is invalid, go back to OTP validation step
-        setWizardStep("otpValidation");
-        trackEvent({
-          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-          step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
-        });
+        setDeletionVerificationProofId("");
+        navigateBackToVerificationStep(verificationMethod);
       }
     }
   };
 
-  // Custom validateOtpCode that handles delete MFA flow
-  const validateOtpCode = async (_otpValue: string) => {
+  // Custom validateOtpCode that verifies OTP before moving to confirm.
+  const validateOtpCode = async (otpValue: string) => {
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
       flow: DELETE_MFA_ANALYTICS.FLOW_ID,
       type: userSelectedMfaFactor?.type,
     });
-    setErrorCode("");
-    setCustomErrorMessage("");
-    setWizardStep("deleteMFAPhoneNumberConfirm");
-    trackEvent({
-      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-      step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
-      flow: DELETE_MFA_ANALYTICS.FLOW_ID,
-      type: userSelectedMfaFactor?.type,
-    });
+
+    const singleFactor = getSingleDeleteFactorPayload();
+    const verificationOtpType = getVerificationOtpType();
+    const trxnId = otpSentResponse?.trxnId;
+
+    try {
+      if (!singleFactor || !verificationOtpType || !trxnId) {
+        throw { data: { message: "otp_expired" } };
+      }
+
+      setErrorCode("");
+      setCustomErrorMessage("");
+      setDeletionVerificationProofId("");
+
+      const response =
+        phoneFormData.mfaFactorsToDelete.length > 1
+          ? await deleteMFAPhoneNumberApi.verifyDeleteMFABatch({
+              factors: getDeleteFactorsPayload(),
+              otp: otpValue,
+              trxnId,
+              otpVerificationType: verificationOtpType,
+            })
+          : await deleteMFAPhoneNumberApi.verifyDeleteMFA({
+              id: singleFactor.id,
+              otpType: singleFactor.otpType,
+              otp: otpValue,
+              trxnId,
+              otpVerificationType: verificationOtpType,
+            });
+
+      const verificationProofId = response?.data?.verificationProofId ?? "";
+      if (!response?.success || !verificationProofId) {
+        throw { data: { message: "invalidCode" } };
+      }
+
+      setVerificationMethod("otp");
+      setDeletionVerificationProofId(verificationProofId);
+      setWizardStep("deleteMFAPhoneNumberConfirm");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+        step: DELETE_MFA_ANALYTICS.STEPS.CONFIRM_DELETE,
+        flow: DELETE_MFA_ANALYTICS.FLOW_ID,
+        type: userSelectedMfaFactor?.type,
+      });
+    } catch (error) {
+      setOtpSentResponse((prev) =>
+        mergeOtpSentResponseWithMetadata(prev, extractOtpServerMetadata(error)),
+      );
+      const errorData = getDeleteMfaErrorData(error);
+      const message = errorData?.message ?? "invalidCode";
+      setErrorCode(message);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: DELETE_MFA_ANALYTICS.STEPS.OTP_VALIDATION,
+        error: message,
+      });
+      throw error;
+    }
   };
 
   useEffect(() => {
@@ -386,6 +550,10 @@ export default function DeleteMFAPage() {
           })();
         }}
         onSelectFIDO2={(passkey) => {
+          setDeletionVerificationProofId("");
+          setVerificationMethod(null);
+          setErrorCode("");
+          setCustomErrorMessage("");
           setSelected2FAPasskey(passkey);
           setAssertionResult(null);
           setWizardStep("verifyFIDO2Passkey");
@@ -459,10 +627,14 @@ export default function DeleteMFAPage() {
         assertionOptionsRequest={{ userVerification: "required" }}
         setAssertionResult={setAssertionResult}
         selectedPasskey={selected2FAPasskey}
-        onCallback={() => {
-          setWizardStep("deleteMFAPhoneNumberConfirm");
+        onCallback={(verifiedAssertion) => {
+          void verifyDeletionWithPasskey(verifiedAssertion);
         }}
         onTryAnotherWayHandler={() => {
+          setDeletionVerificationProofId("");
+          setVerificationMethod(null);
+          setErrorCode("");
+          setCustomErrorMessage("");
           setSelected2FAPasskey(null);
           setAssertionResult(null);
           setWizardStep("otpSelection");

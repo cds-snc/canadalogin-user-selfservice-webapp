@@ -48,6 +48,7 @@ vi.mock("@gcds-core/components-react", () => ({
     value,
     onGcdsInput,
     maxLength,
+    maxlength,
     validateOn: _va,
     errorMessage,
     hint: _hint,
@@ -61,7 +62,7 @@ vi.mock("@gcds-core/components-react", () => ({
         data-error-message={errorMessage}
         value={value}
         onChange={(e) => onGcdsInput?.(e)}
-        maxLength={maxLength}
+        maxLength={maxlength ?? maxLength}
         {...props}
       />
     </div>
@@ -257,7 +258,9 @@ describe("OtpVerification Component", () => {
 
     const otpInput = screen.getByTestId("gcds-input");
     expect(otpInput).toBeInTheDocument();
-    expect(otpInput).not.toHaveAttribute("maxLength");
+    expect(otpInput).toHaveAttribute("type", "text");
+    expect(otpInput).toHaveAttribute("maxLength", "6");
+    expect(otpInput).toHaveAttribute("size", "6");
   });
 
   it("calls onChangePhoneForm when OTP input changes", () => {
@@ -269,6 +272,19 @@ describe("OtpVerification Component", () => {
 
     const otpInput = screen.getByTestId("gcds-input");
     fireEvent.change(otpInput, { target: { value: "123456" } });
+
+    expect(mockOnChangePhoneForm).toHaveBeenCalledWith("otp", "123456");
+  });
+
+  it("clamps OTP input to six numeric digits", () => {
+    render(
+      <TestWrapper>
+        <OtpVerification {...defaultProps} />
+      </TestWrapper>,
+    );
+
+    const otpInput = screen.getByTestId("gcds-input");
+    fireEvent.change(otpInput, { target: { value: "123456789" } });
 
     expect(mockOnChangePhoneForm).toHaveBeenCalledWith("otp", "123456");
   });
@@ -365,6 +381,35 @@ describe("OtpVerification Component", () => {
     fireEvent.click(continueButton);
 
     expect(mockOnNext).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows invalidCode and does not call onNext when continue is clicked with fewer than 6 digits", () => {
+    const propsWithShortOtp = {
+      ...defaultProps,
+      phoneFormData: {
+        ...defaultProps.phoneFormData,
+        otp: "12345",
+      },
+    };
+
+    render(
+      <TestWrapper>
+        <OtpVerification {...propsWithShortOtp} />
+      </TestWrapper>,
+    );
+
+    const continueButtons = screen.getAllByTestId("gcds-button");
+    const continueButton = continueButtons.find((btn) =>
+      btn.textContent.includes("Continue"),
+    );
+    fireEvent.click(continueButton);
+
+    expect(mockOnNext).not.toHaveBeenCalled();
+    expect(mockSetErrorCode).toHaveBeenLastCalledWith("invalidCode");
+    expect(screen.getByTestId("gcds-input")).toHaveAttribute(
+      "data-error-message",
+      "Codes must be six digits. Try again.",
+    );
   });
 
   it("calls onCancel when cancel button is clicked", () => {

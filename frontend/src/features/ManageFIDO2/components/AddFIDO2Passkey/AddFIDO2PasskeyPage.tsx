@@ -38,6 +38,7 @@ import {
   extractOtpServerMetadata,
   mergeOtpSentResponseWithMetadata,
 } from "../../../../utils/otpMetadata";
+import { isOtpMaxAttemptsErrorCode } from "../../../../utils/otpErrorMapping";
 
 interface AddFIDO2PasskeyPageProps {
   step?: string;
@@ -336,12 +337,18 @@ export default function AddFIDO2PasskeyPage({
       // render "X retries remaining" / max-attempts. For other errors, surface
       // them via setErrorCode.
       if (!hasRetries && errorMessage) {
-        setErrorCode(errorMessage);
+        const normalizedMessage = isOtpMaxAttemptsErrorCode(errorMessage)
+          ? "otp_max_attempts"
+          : errorMessage;
+        setErrorCode(normalizedMessage);
       }
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: ADD_PASSKEY_ANALYTICS.STEPS.OTP_VALIDATION,
-        error: errorMessage || "error_otp_validation_failed",
+        error:
+          (errorMessage && isOtpMaxAttemptsErrorCode(errorMessage)
+            ? "otp_max_attempts"
+            : errorMessage) || "error_otp_validation_failed",
       });
       if (hasRetries) {
         setOtpSentResponse((prev) =>

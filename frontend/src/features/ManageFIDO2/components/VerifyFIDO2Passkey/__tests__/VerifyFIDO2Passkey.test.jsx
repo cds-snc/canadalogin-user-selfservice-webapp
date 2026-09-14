@@ -2,8 +2,9 @@
  * Unit tests for VerifyFIDO2Passkey component
  *
  * Tests verify component behaviour:
- * - Shows Loader on mount while FIDO2 authentication is in progress
- * - Automatically triggers FIDO2 verification on mount
+ * - Does not trigger FIDO2 verification on mount
+ * - Triggers FIDO2 verification only after Continue is clicked
+ * - Shows Loader after Continue while FIDO2 authentication is in progress
  * - Renders UI (heading, body text, SVG, buttons) once authentication completes
  * - Renders the selected passkey nickname in the body text
  * - Shows the Loader text while loading
@@ -170,6 +171,10 @@ const renderComponent = (props = {}) => {
   return render(<VerifyFIDO2Passkey {...defaultProps} {...props} />);
 };
 
+const clickContinue = async () => {
+  await userEvent.click(screen.getByRole("button", { name: "Continue" }));
+};
+
 // ─── Tests ─────────────────────────────────────────────────────────────────
 
 describe("VerifyFIDO2Passkey", () => {
@@ -181,6 +186,15 @@ describe("VerifyFIDO2Passkey", () => {
     mockAuthenticateFIDO2Credential.mockResolvedValue(defaultAssertionResult);
     mockSubmitAssertionResult.mockResolvedValue({ success: true });
     mockIsWebAuthnSupported.mockReturnValue(true);
+  });
+
+  // ── Trigger behavior ──────────────────────────────────────────────────
+
+  it("does not trigger verification on page load", () => {
+    renderComponent();
+
+    expect(mockGetAssertionOptions).not.toHaveBeenCalled();
+    expect(mockAuthenticateFIDO2Credential).not.toHaveBeenCalled();
   });
 
   // ── Loader ────────────────────────────────────────────────────────────
@@ -196,6 +210,8 @@ describe("VerifyFIDO2Passkey", () => {
 
     renderComponent();
 
+    await clickContinue();
+
     expect(screen.getByTestId("loader")).toBeInTheDocument();
     expect(screen.getByTestId("loader")).toHaveTextContent("Loading...");
 
@@ -207,12 +223,8 @@ describe("VerifyFIDO2Passkey", () => {
 
   // ── Successful flow ───────────────────────────────────────────────────
 
-  it("renders heading and buttons after successful authentication", async () => {
+  it("renders heading and buttons", () => {
     renderComponent();
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
 
     expect(
       screen.getByRole("heading", { name: "Verify with your passkey" }),
@@ -221,28 +233,21 @@ describe("VerifyFIDO2Passkey", () => {
     expect(screen.getByText("Choose a different method")).toBeInTheDocument();
   });
 
-  it("renders the passkey collage SVG icon after loading", async () => {
+  it("renders the passkey collage SVG icon", () => {
     renderComponent();
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
 
     expect(screen.getByTestId("passkey-collage")).toBeInTheDocument();
   });
 
-  it("renders the selected passkey nickname in the body text", async () => {
+  it("renders the selected passkey nickname in the body text", () => {
     renderComponent();
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
 
     expect(screen.getByText("Work Laptop")).toBeInTheDocument();
   });
 
   it("calls authenticateFIDO2Credential with the assertion data after getting options", async () => {
     renderComponent();
+    await clickContinue();
 
     await waitFor(() => {
       expect(mockAuthenticateFIDO2Credential).toHaveBeenCalledWith(
@@ -257,6 +262,7 @@ describe("VerifyFIDO2Passkey", () => {
     renderComponent({
       assertionOptionsRequest: { userVerification: "required" },
     });
+    await clickContinue();
 
     await waitFor(() => {
       expect(mockGetAssertionOptions).toHaveBeenCalledWith({
@@ -268,6 +274,7 @@ describe("VerifyFIDO2Passkey", () => {
   it("calls onCallback after successful auth", async () => {
     const onCallback = vi.fn();
     renderComponent({ onCallback });
+    await clickContinue();
 
     await waitFor(() => {
       expect(onCallback).toHaveBeenCalledOnce();
@@ -277,6 +284,7 @@ describe("VerifyFIDO2Passkey", () => {
   it("calls setAssertionResult with the assertion payload after successful auth", async () => {
     const setAssertionResult = vi.fn();
     renderComponent({ setAssertionResult });
+    await clickContinue();
 
     await waitFor(() => {
       expect(setAssertionResult).toHaveBeenCalledWith(defaultAssertionResult);
@@ -285,6 +293,7 @@ describe("VerifyFIDO2Passkey", () => {
 
   it("does not call submitAssertionResult when submitAttestationResult is false", async () => {
     renderComponent({ submitAttestationResult: false });
+    await clickContinue();
 
     await waitFor(() => {
       expect(mockSubmitAssertionResult).not.toHaveBeenCalled();
@@ -293,6 +302,7 @@ describe("VerifyFIDO2Passkey", () => {
 
   it("calls submitAssertionResult when submitAttestationResult is true", async () => {
     renderComponent({ submitAttestationResult: true });
+    await clickContinue();
 
     await waitFor(() => {
       expect(mockSubmitAssertionResult).toHaveBeenCalledWith(
@@ -305,6 +315,7 @@ describe("VerifyFIDO2Passkey", () => {
 
   it("filters allowCredentials to only the selected passkey's credentialId", async () => {
     renderComponent();
+    await clickContinue();
 
     await waitFor(() => {
       expect(mockAuthenticateFIDO2Credential).toHaveBeenCalledWith(
@@ -321,6 +332,7 @@ describe("VerifyFIDO2Passkey", () => {
       attributes: { nickname: "Old Key" },
     };
     renderComponent({ selectedPasskey: passkeyWithoutCredId });
+    await clickContinue();
 
     await waitFor(() => {
       expect(mockAuthenticateFIDO2Credential).toHaveBeenCalledWith(
@@ -333,6 +345,7 @@ describe("VerifyFIDO2Passkey", () => {
 
   it("does not filter allowCredentials when selectedPasskey is undefined", async () => {
     renderComponent({ selectedPasskey: undefined });
+    await clickContinue();
 
     await waitFor(() => {
       expect(mockAuthenticateFIDO2Credential).toHaveBeenCalledWith(
@@ -350,6 +363,7 @@ describe("VerifyFIDO2Passkey", () => {
     const setErrorCode = vi.fn();
 
     renderComponent({ setErrorCode });
+    await clickContinue();
 
     await waitFor(() => {
       expect(setErrorCode).toHaveBeenCalledWith("error_fido2_verification");
@@ -361,6 +375,7 @@ describe("VerifyFIDO2Passkey", () => {
     const setErrorCode = vi.fn();
 
     renderComponent({ setErrorCode });
+    await clickContinue();
 
     await waitFor(() => {
       expect(setErrorCode).toHaveBeenCalledWith("error_fido2_verification");
@@ -376,6 +391,7 @@ describe("VerifyFIDO2Passkey", () => {
     const setErrorCode = vi.fn();
 
     renderComponent({ setErrorCode });
+    await clickContinue();
 
     await waitFor(() => {
       expect(setErrorCode).toHaveBeenCalledWith("error_fido2_verification");
@@ -388,6 +404,7 @@ describe("VerifyFIDO2Passkey", () => {
     );
 
     renderComponent({ errorMessage: "Something went wrong" });
+    await clickContinue();
 
     await waitFor(() => {
       expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
@@ -398,12 +415,8 @@ describe("VerifyFIDO2Passkey", () => {
     );
   });
 
-  it("does not render GcdsErrorMessage when errorMessage is empty", async () => {
+  it("does not render GcdsErrorMessage when errorMessage is empty", () => {
     renderComponent({ errorMessage: "" });
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
 
     expect(screen.queryByTestId("error-message")).not.toBeInTheDocument();
   });
@@ -411,7 +424,7 @@ describe("VerifyFIDO2Passkey", () => {
   // ── Retry button ──────────────────────────────────────────────────────
 
   it("retries the FIDO2 flow when the Continue button is clicked", async () => {
-    // First call fails so the UI becomes visible
+    // First call fails, second succeeds
     mockGetAssertionOptions
       .mockResolvedValueOnce({ success: false })
       .mockResolvedValue(defaultAssertionOptions);
@@ -419,13 +432,8 @@ describe("VerifyFIDO2Passkey", () => {
     const onCallback = vi.fn();
     renderComponent({ onCallback });
 
-    // Wait for the initial (failed) attempt to settle and UI to appear
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
-
-    // Trigger retry
-    await userEvent.click(screen.getByText("Continue"));
+    await clickContinue();
+    await clickContinue();
 
     await waitFor(() => {
       expect(onCallback).toHaveBeenCalledOnce();
@@ -446,10 +454,6 @@ describe("VerifyFIDO2Passkey", () => {
       errorMessage: "some error",
     });
 
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
-
     await userEvent.click(screen.getByText("Choose a different method"));
 
     expect(setErrorCode).toHaveBeenLastCalledWith("");
@@ -458,25 +462,17 @@ describe("VerifyFIDO2Passkey", () => {
 
   // ── Nickname display ─────────────────────────────────────────────────
 
-  it("renders without crashing when selectedPasskey is undefined", async () => {
+  it("renders without crashing when selectedPasskey is undefined", () => {
     renderComponent({ selectedPasskey: undefined });
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
 
     expect(
       screen.getByRole("heading", { name: "Verify with your passkey" }),
     ).toBeInTheDocument();
   });
 
-  it("renders correctly when selectedPasskey has no nickname", async () => {
+  it("renders correctly when selectedPasskey has no nickname", () => {
     renderComponent({
       selectedPasskey: { id: "passkey-10", attributes: {} },
-    });
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
     });
 
     expect(
@@ -486,12 +482,8 @@ describe("VerifyFIDO2Passkey", () => {
 
   // ── Body text ────────────────────────────────────────────────────────
 
-  it("renders the instruction body text after loading", async () => {
+  it("renders the instruction body text", () => {
     renderComponent();
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
 
     expect(
       screen.getByText(
@@ -502,12 +494,8 @@ describe("VerifyFIDO2Passkey", () => {
 
   // ── Button roles ─────────────────────────────────────────────────────
 
-  it("Continue button has primary role", async () => {
+  it("Continue button has primary role", () => {
     renderComponent();
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
 
     expect(screen.getByText("Continue")).toHaveAttribute(
       "data-role",
@@ -515,12 +503,8 @@ describe("VerifyFIDO2Passkey", () => {
     );
   });
 
-  it("Choose a different method button has secondary role", async () => {
+  it("Choose a different method button has secondary role", () => {
     renderComponent();
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-    });
 
     expect(screen.getByText("Choose a different method")).toHaveAttribute(
       "data-role",
@@ -535,6 +519,7 @@ describe("VerifyFIDO2Passkey", () => {
     const setErrorCode = vi.fn();
 
     renderComponent({ setErrorCode });
+    await clickContinue();
 
     await waitFor(() => {
       expect(setErrorCode).toHaveBeenCalledWith("error_webauthn_not_supported");
@@ -548,6 +533,7 @@ describe("VerifyFIDO2Passkey", () => {
     const onError = vi.fn();
 
     renderComponent({ onError });
+    await clickContinue();
 
     await waitFor(() => {
       expect(onError).toHaveBeenCalledWith("error_webauthn_not_supported");
@@ -567,6 +553,7 @@ describe("VerifyFIDO2Passkey", () => {
     const setErrorCode = vi.fn();
 
     renderComponent({ setErrorCode });
+    await clickContinue();
 
     await waitFor(() => {
       expect(setErrorCode).toHaveBeenCalledWith("error_fido2_passkey_deleted");
@@ -586,6 +573,7 @@ describe("VerifyFIDO2Passkey", () => {
     const onError = vi.fn();
 
     renderComponent({ onError });
+    await clickContinue();
 
     await waitFor(() => {
       expect(onError).toHaveBeenCalledWith("error_fido2_passkey_deleted");

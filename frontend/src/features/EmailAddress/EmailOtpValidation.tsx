@@ -6,17 +6,21 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import SubmitButton from "../../components/Layout/SubmitButton";
+import { useBreakpoints } from "../../hooks/useBreakpoints";
 import { useOtpExpiryCountdown } from "../../hooks/useOtpExpiryCountdown";
 
 type EmailFormData = {
   emailAddress: string;
 };
+
+const OTP_CODE_MAX_LENGTH = 6;
 
 interface EmailOtpValidationProps {
   onSubmit: () => void | Promise<void>;
@@ -24,6 +28,8 @@ interface EmailOtpValidationProps {
   formData: EmailFormData;
   setFormData: (data: EmailFormData) => void;
   errorMessage?: string;
+  setErrorCode?: (errorCode: string) => void;
+  setErrorMessage?: (errorMessage: string) => void;
   userOtpValue: string;
   handleChange: (value: string) => void;
   requestOtpCode: () => Promise<void | boolean>;
@@ -40,17 +46,20 @@ export default function EmailOtpValidation({
   formData,
   setFormData,
   errorMessage,
+  setErrorCode,
+  setErrorMessage,
   userOtpValue,
   handleChange,
   requestOtpCode,
   onBack,
-  isMaxAttemptsReached = false,
+  isMaxAttemptsReached: _isMaxAttemptsReached = false,
   resetAttempts,
   otpExpiry = null,
   otpCreatedAt = null,
 }: EmailOtpValidationProps) {
   const { language } = useParams();
   const { t } = useTranslation(["email", "verification", "common"]);
+  const { mobile } = useBreakpoints();
 
   const [localError, setLocalError] = useState("");
   const [showResendSuccessNotice, setShowResendSuccessNotice] = useState(false);
@@ -63,6 +72,7 @@ export default function EmailOtpValidation({
   } = useOtpExpiryCountdown(otpExpiry, 10, otpCreatedAt);
 
   const displayError = localError || errorMessage || "";
+  const otpInputSize = mobile ? 18 : 6;
 
   const clearValues = () => {
     setFormData({ emailAddress: "" });
@@ -70,15 +80,37 @@ export default function EmailOtpValidation({
 
   const handleInputChange = (e: CustomEvent<string>) => {
     const value = (e.target as HTMLInputElement).value;
-    handleChange(value);
+    const sanitizedValue = value
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    handleChange(sanitizedValue);
     setLocalError("");
+  };
+
+  const doSubmit = async () => {
+    setLocalError("");
+    setErrorCode?.("");
+    setErrorMessage?.("");
+
+    const normalizedOtp = userOtpValue
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+    if (normalizedOtp.length < OTP_CODE_MAX_LENGTH) {
+      const invalidCodeMessage = t("Error.invalidCode", { ns: "common" });
+      setLocalError(invalidCodeMessage);
+      setErrorMessage?.(invalidCodeMessage);
+      setErrorCode?.("invalidCode");
+      return;
+    }
+
+    await onSubmit();
   };
 
   const onSubmitHandler: React.FormEventHandler<HTMLFormElement> = async (
     ev,
   ) => {
     ev.preventDefault();
-    await onSubmit();
+    void doSubmit();
   };
 
   const handleResendCode = async (ev?: Event) => {
@@ -90,6 +122,9 @@ export default function EmailOtpValidation({
 
         if (resendSucceeded) {
           setShowResendSuccessNotice(true);
+          setErrorCode?.("");
+          setErrorMessage?.("");
+          handleChange("");
           setLocalError("");
           restartFallbackCountdown();
           resetAttempts?.();
@@ -106,7 +141,7 @@ export default function EmailOtpValidation({
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
         {showResendSuccessNotice ? (
-          <GcdsNotice
+          <AccessibleNotice
             noticeRole="success"
             noticeTitle={t("Verification.successTitle", {
               ns: "verification",
@@ -119,7 +154,7 @@ export default function EmailOtpValidation({
                 ns: "verification",
               })}
             </GcdsText>
-          </GcdsNotice>
+          </AccessibleNotice>
         ) : null}
 
         <GcdsHeading tag="h1" lang={language}>
@@ -176,21 +211,21 @@ export default function EmailOtpValidation({
                   inputId="verificationCode"
                   name="verificationCode"
                   type="text"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  maxlength={OTP_CODE_MAX_LENGTH}
                   autocomplete="one-time-code"
                   validateOn="other"
                   errorMessage={displayError}
                   value={userOtpValue}
                   onGcdsInput={handleInputChange}
                   lang={language}
-                  size={18}
+                  size={otpInputSize}
                   autoFocus
                 />
 
                 <GcdsGrid columns="max-content max-content" gap="200">
-                  <SubmitButton
-                    currentLang={language ?? "en"}
-                    disabled={isMaxAttemptsReached}
-                  />
+                  <SubmitButton currentLang={language ?? "en"} />
                   <GcdsButton
                     buttonRole="secondary"
                     onGcdsClick={(ev) => {
@@ -212,6 +247,7 @@ export default function EmailOtpValidation({
 
         <GcdsText>
           <GcdsLink
+            style={{ textDecoration: "underline" }}
             onGcdsClick={async () => {
               clearValues();
               await onBack();
@@ -231,7 +267,10 @@ export default function EmailOtpValidation({
               </strong>
             </span>
           ) : (
-            <GcdsLink onGcdsClick={handleResendCode}>
+            <GcdsLink
+              style={{ textDecoration: "underline" }}
+              onGcdsClick={handleResendCode}
+            >
               {t("EmailOtpValidation.requestNewCode")}
             </GcdsLink>
           )}
