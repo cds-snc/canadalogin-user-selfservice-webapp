@@ -616,6 +616,7 @@ async def _build_email_mfa_sync_context(
         request.app.state.request_client,
         user_access_token,
         validated=None,
+        masked=False,
     )
 
     if not factors_response.success:

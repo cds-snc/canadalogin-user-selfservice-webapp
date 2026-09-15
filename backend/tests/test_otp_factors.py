@@ -363,3 +363,47 @@ async def test_parse_phone_auth_factors_response_mixed_types():
     types = {f["type"] for f in result}
     assert OtpType.SMSOTP.value in types
     assert OtpType.EMAILOTP.value in types
+
+
+@pytest.mark.asyncio
+async def test_get_user_otp_factors_supports_masked_override(monkeypatch):
+    async def mock_dispatch_user_auth_factors(
+        client, user_access_token, validated=True
+    ):
+        return {
+            "factors": [
+                {
+                    "id": "email-factor-1",
+                    "userId": "user123",
+                    "type": OtpType.EMAILOTP.value,
+                    "created": datetime.now().isoformat(),
+                    "updated": datetime.now().isoformat(),
+                    "attempted": datetime.now().isoformat(),
+                    "enabled": True,
+                    "validated": True,
+                    "attributes": {"emailAddress": "user@example.com"},
+                }
+            ],
+            "count": 1,
+            "limit": 10,
+            "page": 1,
+            "total": 1,
+        }
+
+    monkeypatch.setattr(
+        "app.users.services.otp_factors.dispatch_user_auth_factors",
+        mock_dispatch_user_auth_factors,
+    )
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        masked_response = await get_user_otp_factors(client, "fake-access-token")
+        unmasked_response = await get_user_otp_factors(
+            client,
+            "fake-access-token",
+            masked=False,
+        )
+
+        assert masked_response.data[0].destination == mask_email_address(
+            "user@example.com"
+        )
+        assert unmasked_response.data[0].destination == "user@example.com"

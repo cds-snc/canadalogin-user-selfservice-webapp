@@ -33,7 +33,7 @@
     "CSIAI0370E": "This password is too easy to guess. Choose a stronger password.",
     "error_webauthn_not_supported": "Votre navigateur n'est pas compatible avec les clés d'accès. Essayez un autre navigateur.",
     "error_failed_to_get_attestation_options": "Failed to get attestation options",
-    "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.",
+    "error_duplicate_passkey": "La demande de clé d’accès a été annulée ou a expiré, ou l’appareil a déjà été enregistré pour cet identifiant ConnexionCanada. Veuillez réessayer ou utiliser un autre appareil.",
     "error_passkey_name_required": "Pour continuer, entrez le nom que vous souhaitez donner à votre clé d’accès.",
     "error_delete_credential": "Failed to delete security key",
     "error_rename_credential": "Pour continuer, entrez le nom que vous souhaitez donner à votre clé d’accès.",

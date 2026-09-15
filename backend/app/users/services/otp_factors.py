@@ -143,6 +143,7 @@ async def get_user_otp_factors(
     global_http_client: AsyncClient,
     user_access_token: str,
     validated: Optional[bool] = True,
+    masked: bool = True,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -157,7 +158,9 @@ async def get_user_otp_factors(
 
     validated_data = UserAuthFactorsIbmResponse(**user_otp_factors_response)
 
-    phone_number_otp_factor = await parse_phone_auth_factors_response(validated_data)
+    phone_number_otp_factor = await parse_phone_auth_factors_response(
+        validated_data, masked
+    )
     logger.info("success response and data validation for user auth factors")
     return UserPhoneAuthFactorsResponse(
         success=True,
