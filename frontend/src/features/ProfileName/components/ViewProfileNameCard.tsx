@@ -32,9 +32,7 @@ export default function ViewProfileNameCard({
   const editPreferredNameAriaLabel = `${t("ProfileHome.edit")} ${t("ProfileHome.preferredName")}`;
 
   return (
-    <GcdsContainer
-      className={isConfirmIdentityDetails ? undefined : "sectionCard"}
-    >
+    <GcdsContainer>
       <GcdsHeading tag="h3" marginTop="300">
         {t("ProfileHome.preferredName")}
       </GcdsHeading>
