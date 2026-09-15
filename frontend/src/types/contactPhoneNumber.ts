@@ -40,12 +40,13 @@ export type ContactPhoneFormChangeHandler = <TField extends ContactPhoneField>(
 ) => void;
 
 export type ContactPhoneErrorCodeSetter = (errorCode: string) => void;
+export type ContactPhoneErrorMessageSetter = (errorMessage: string) => void;
 
 export type ContactPhoneAsyncAction = () => void | Promise<void>;
 
 export type ContactPhoneOtpRequestHandler = (
   otpType?: ContactPhoneOtpType,
-) => void | Promise<void>;
+) => void | boolean | Promise<void | boolean>;
 
 export type ContactPhoneStepProps = {
   userProfile?: UserProfile | null;
@@ -60,6 +61,7 @@ export type ContactPhoneStepProps = {
 export type ContactPhoneOtpVerificationProps = ContactPhoneStepProps & {
   onBack: ContactPhoneAsyncAction;
   requestNewOtpCode: ContactPhoneOtpRequestHandler;
+  setErrorMessage?: ContactPhoneErrorMessageSetter;
   isMaxAttemptsReached?: boolean;
   resetAttempts?: () => void;
 };

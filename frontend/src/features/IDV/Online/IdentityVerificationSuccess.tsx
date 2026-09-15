@@ -1,11 +1,12 @@
 import {
   GcdsButton,
   GcdsGrid,
-  GcdsNotice,
   GcdsText,
   GcdsContainer,
   GcdsHeading,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
@@ -36,7 +37,7 @@ export default function IdentityVerificationSuccess() {
         </GcdsContainer>
 
         <GcdsContainer>
-          <GcdsNotice
+          <AccessibleNotice
             noticeRole="info"
             noticeTitleTag="h2"
             noticeTitle={t("IdentityVerificationSuccess.moreInfoTitle")}
@@ -46,7 +47,7 @@ export default function IdentityVerificationSuccess() {
                 appName: tLayout("TopNavBar.appName"),
               })}
             </GcdsText>
-          </GcdsNotice>
+          </AccessibleNotice>
         </GcdsContainer>
 
         <GcdsGrid columns="max-content max-content" gap="200">

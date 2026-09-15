@@ -254,7 +254,7 @@
     "contactInfo": "Contact information",
     "phoneNumber": "Phone number",
     "communication": "Communication",
-    "confirmAndContinue": "Confirmer et continuer",
+    "confirmAndContinue": "Continuer",
     "successNoticeTitle": "Vos renseignements d’identité ont bien été vérifiés et la confirmation a été effectuée.",
     "successNoticeDescription": "Le processus est presque terminé. Confirmez vos renseignements et ajoutez-les à votre identifiant ConnexionCanada, puis transmettez les renseignements demandés {{appName}} pour obtenir votre accès.",
     "successNoticeTitleWithoutRp": "Your CanadaLogin has succesfully saved your changes",

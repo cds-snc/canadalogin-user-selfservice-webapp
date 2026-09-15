@@ -4,10 +4,11 @@ import {
   GcdsContainer,
   GcdsHeading,
   GcdsText,
-  GcdsNotice,
   GcdsButton,
   GcdsGrid,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 
 const initialTime = 20;
@@ -43,9 +44,13 @@ export default function PasswordChangedConfirmation({
 
   return (
     <GcdsContainer>
-      <GcdsNotice noticeRole="success" noticeTitleTag="h2" noticeTitle=" ">
+      <AccessibleNotice
+        noticeRole="success"
+        noticeTitleTag="h2"
+        noticeTitle=" "
+      >
         <GcdsText>{t("PasswordChangedConfirmation.title")}</GcdsText>
-      </GcdsNotice>
+      </AccessibleNotice>
       <br />
       &nbsp;
       <GcdsHeading tag="h1">

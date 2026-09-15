@@ -219,7 +219,8 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       expect(input).toHaveAttribute("name", "verificationCode");
       expect(input).toHaveAttribute("type", "text");
       expect(input).toHaveAttribute("maxLength", "6");
-      expect(input).toHaveAttribute("minLength", "6");
+      expect(input).toHaveAttribute("size", "6");
+      expect(input).not.toHaveAttribute("minLength");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
     });
 
@@ -358,6 +359,34 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       expect(mockOnChangePhoneForm).toHaveBeenCalledWith("otp", "123456");
     });
 
+    it("should clamp OTP input to six numeric digits", () => {
+      render(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={defaultPhoneFormData}
+            errorMessage=""
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      const input = screen.getByTestId("gcds-input");
+      act(() => {
+        Object.defineProperty(input, "value", {
+          value: "123456789",
+          writable: true,
+        });
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+
+      expect(mockOnChangePhoneForm).toHaveBeenCalledWith("otp", "123456");
+    });
+
     it("should display current OTP value in input", () => {
       const phoneFormDataWithOtp = {
         ...defaultPhoneFormData,
@@ -404,7 +433,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
   });
 
   describe("Button States and Actions", () => {
-    it("should disable Continue button when OTP is less than 6 digits", () => {
+    it("should keep Continue button enabled when OTP is less than 6 digits", () => {
       const phoneFormDataShortOtp = {
         ...defaultPhoneFormData,
         otp: "123",
@@ -426,7 +455,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       );
 
       const continueButton = screen.getByTestId("continue-button");
-      expect(continueButton).toBeDisabled();
+      expect(continueButton).not.toBeDisabled();
     });
 
     it("should enable Continue button when OTP is 6 digits", () => {
@@ -481,6 +510,38 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       expect(mockOnNext).toHaveBeenCalled();
     });
 
+    it("should not call onNext and should show invalid code when OTP has fewer than 6 digits", () => {
+      const phoneFormDataShortOtp = {
+        ...defaultPhoneFormData,
+        otp: "12345",
+      };
+
+      render(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={phoneFormDataShortOtp}
+            errorMessage=""
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      const continueButton = screen.getByTestId("continue-button");
+      act(() => {
+        continueButton.click();
+      });
+
+      expect(mockOnNext).not.toHaveBeenCalled();
+      expect(screen.getByTestId("gcds-input-error")).toHaveTextContent(
+        "Codes must be six digits. Try again.",
+      );
+    });
+
     it("should call onCancel when Cancel button is clicked", () => {
       render(
         <TestWrapper>
@@ -505,7 +566,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
   });
 
   describe("Different Phone Number Link", () => {
-    it("should call clearValues, onUseDifferentPhoneNumber, and onBack when clicked", async () => {
+    it("should call clearValues and onBack when clicked", async () => {
       render(
         <TestWrapper>
           <AddMFAOtpVerification
@@ -537,7 +598,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       );
       expect(mockOnChangePhoneForm).toHaveBeenCalledWith("otp", "");
 
-      expect(mockOnUseDifferentPhoneNumber).toHaveBeenCalled();
+      expect(mockOnUseDifferentPhoneNumber).not.toHaveBeenCalled();
       expect(mockOnBack).toHaveBeenCalled();
     });
   });
@@ -586,6 +647,93 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       });
 
       expect(screen.queryByTestId("gcds-input-error")).not.toBeInTheDocument();
+    });
+
+    it("should show success notice after requesting a new code", async () => {
+      mockRequestNewOtpCode.mockResolvedValue(true);
+
+      render(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={defaultPhoneFormData}
+            errorMessage=""
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      for (let second = 0; second < 11; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      const requestNewCodeLink = screen.getByText("Request a new code");
+      await act(async () => {
+        requestNewCodeLink.click();
+      });
+
+      expect(mockRequestNewOtpCode).toHaveBeenCalled();
+      const successNotice = screen.getByTestId("linkSuccess");
+      expect(successNotice).toBeInTheDocument();
+      expect(successNotice).toHaveTextContent("Success");
+      expect(successNotice).toHaveTextContent("We have sent you a new code");
+    });
+
+    it("should hide success notice when an error message is displayed", async () => {
+      mockRequestNewOtpCode.mockResolvedValue(true);
+
+      const { rerender } = render(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={defaultPhoneFormData}
+            errorMessage=""
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      for (let second = 0; second < 11; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      await act(async () => {
+        screen.getByText("Request a new code").click();
+      });
+
+      expect(screen.getByTestId("linkSuccess")).toBeInTheDocument();
+
+      rerender(
+        <TestWrapper>
+          <AddMFAOtpVerification
+            onNext={mockOnNext}
+            onCancel={mockOnCancel}
+            onBack={mockOnBack}
+            onChangePhoneForm={mockOnChangePhoneForm}
+            phoneFormData={defaultPhoneFormData}
+            errorMessage="Codes must be six digits. Try again."
+            requestNewOtpCode={mockRequestNewOtpCode}
+            onUseDifferentPhoneNumber={mockOnUseDifferentPhoneNumber}
+          />
+        </TestWrapper>,
+      );
+
+      expect(screen.queryByTestId("linkSuccess")).not.toBeInTheDocument();
+      expect(screen.getByTestId("gcds-input-error")).toHaveTextContent(
+        "Codes must be six digits. Try again.",
+      );
     });
   });
 
@@ -664,8 +812,8 @@ describe("AddMFAOtpVerification Unit Tests", () => {
         </TestWrapper>,
       );
 
-      // Initially, continue button should be disabled
-      expect(screen.getByTestId("continue-button")).toBeDisabled();
+      // Continue button should be enabled even with empty OTP
+      expect(screen.getByTestId("continue-button")).not.toBeDisabled();
 
       // Simulate user entering OTP
       const updatedPhoneFormData = { ...defaultPhoneFormData, otp: "123456" };

@@ -9,6 +9,7 @@ from app.users.schemas import (
     RelyingPartyResponse,
     UserPhoneAuthFactorsResponse,
     ProfileUpdateWithOtpRequest,
+    ProfileUpdateWithOtpResponse,
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.users.services.update_my_profile import update_my_profile
@@ -104,11 +105,11 @@ async def user_factors(
 
 @router.post(
     "/profile/update-with-otp",
-    response_model=ProfileResponse,
+    response_model=ProfileUpdateWithOtpResponse,
     response_model_by_alias=False,
     tags=["Users"],
-    summary="Update any profile field with OTP verification",
-    description="Generalized endpoint to atomically validate OTP and update any profile field (email, name, phone, language). Ensures profile changes only occur after successful OTP verification. When email is updated, email MFA factors are synchronized by adding the new email factor and deleting factors tied to the previous email.",
+    summary="Verify OTP or update profile with OTP verification",
+    description="Action-based endpoint for OTP-protected profile changes. Use action=verify to validate OTP and receive a short-lived verificationProofId. Use action=commit with that proof to apply the profile update atomically. Legacy action=commit_with_otp remains available for direct OTP+update in one request.",
 )
 async def update_user_profile_with_otp_verification(
     request: Request,
@@ -125,10 +126,10 @@ async def update_user_profile_with_otp_verification(
     - Preferred language (locale preference)
 
     The endpoint ensures security by:
-    1. First validating the provided OTP code
-    2. Only after successful OTP verification, updating the specified profile fields
+    1. Validating OTP in action=verify and minting a one-time verification proof
+    2. Consuming that proof in action=commit before updating profile fields
     3. Updating the user session if email/username changed
-    4. Maintaining atomicity - either all updates succeed or none do
+    4. Maintaining atomicity of the commit operation
 
     At least one profile field must be provided for update. The OTP type should
     match the delivery method used (email, sms, voice).

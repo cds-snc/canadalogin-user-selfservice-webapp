@@ -114,6 +114,7 @@ export default function OtpSelection({
     [PAGES.addMFAPage]: t("TransientOtpSelection.toAddPhone"),
     [PAGES.addFIDO2PasskeyPage]: t("TransientOtpSelection.toAddPasskey"),
     [PAGES.deleteFIDO2PasskeyPage]: t("TransientOtpSelection.toDeletePasskey"),
+    [PAGES.editEmailPage]: t("PasswordVerification.toChangeEmail"),
     [PAGES.password]: t("TransientOtpSelection.toChangePassword"),
   };
   const parentPageContent =
@@ -373,6 +374,7 @@ export default function OtpSelection({
           <GcdsLink
             href={gcHelpCentreLinks.twoStepVerification[language ?? "en"]}
             target="_blank"
+            style={{ textDecoration: "underline" }}
           >
             {t("TransientOtpSelection.helpLink")}
           </GcdsLink>

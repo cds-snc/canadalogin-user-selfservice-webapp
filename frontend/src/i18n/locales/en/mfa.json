@@ -48,13 +48,12 @@
     "countrySearchLabel": "Search for your country",
     "phoneLabel": "Phone number",
     "countryNotListed": "My country is not listed here",
-    "countryNotSupported": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to create a CanadaLogin at this time. We apologize for the inconvenience.",
+    "countryNotSupported": "Some countries are not supported due to technical limitations. If your country is not listed, you will be unable to add this phone number to your CanadaLogin at this time. We apologize for the inconvenience.",
     "howToSendCode": "How should we send you the code?",
     "textMessage": "Text message (SMS)",
     "textMessageHint": "Mobile only. Carrier charges may apply.",
     "voiceCall": "Voice call",
-    "voiceCallHint": "Mobile or landline. Carrier charges may apply.",
-    "changeNextSignIn": "You can change this the next time you sign in."
+    "voiceCallHint": "Mobile or landline. Carrier charges may apply."
   },
   "AddSecondMFAVoiceCall": {
     "youHaveAdded": "You have added",

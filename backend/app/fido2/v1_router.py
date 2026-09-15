@@ -95,9 +95,9 @@ async def get_registration_details(
 
 @router.delete(
     "/registration",
-    response_model=FIDO2UserResponseModel,
+    response_model=ResponseModel,
     summary="Delete FIDO2 registration",
-    description="Delete a FIDO2 registration with FIDO2 verification and return updated user credentials",
+    description="Delete a FIDO2 registration using action-based verify/commit or legacy commit_with_verification flow",
 )
 async def delete_fido2_registration(
     request: Request,

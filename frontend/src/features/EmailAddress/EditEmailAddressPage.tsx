@@ -24,6 +24,7 @@ import { useWizardPageTracking } from "../../hooks/useWizardPageTracking";
 import { GA_FORM_EVENTS } from "../../utils/analyticsConstants";
 import { EMAIL_ADDRESS_ANALYTICS } from "../../utils/analyticsConstants";
 import { mergeOtpSentResponseWithMetadata } from "../../utils/otpMetadata";
+import { shouldDisplayOtpMaxAttempts } from "../../utils/otpErrorMapping";
 import VerifyFIDO2Passkey from "../ManageFIDO2/components/VerifyFIDO2Passkey/VerifyFIDO2Passkey";
 import EditEmailEnterEmail from "./EditEmailEnterEmail";
 import EmailOtpValidation from "./EmailOtpValidation";
@@ -60,6 +61,7 @@ type EmailFormData = {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_EMAIL_LENGTH = 128;
 const NON_ASCII_CHARACTER_REGEX = /[^\u0000-\u007F]/;
+const OTP_CODE_MAX_LENGTH = 6;
 
 const normalizeEmail = (value: string | undefined | null): string =>
   (value || "").trim().toLowerCase();
@@ -168,6 +170,8 @@ export default function EditEmailAddressPage() {
     useState<Fido2Credential | null>(null);
   const [isEmailOtpMaxAttemptsReached, setIsEmailOtpMaxAttemptsReached] =
     useState(false);
+  const [emailOtpVerificationProofId, setEmailOtpVerificationProofId] =
+    useState("");
   const [formData, setFormData] = useState<EmailFormData>({
     emailAddress: "",
   });
@@ -195,27 +199,38 @@ export default function EditEmailAddressPage() {
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
     setErrorCode,
     async () => {
-      trackEvent({
-        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-        step:
-          userPhoneFactors &&
-          userPhoneFactors.length === 1 &&
-          fido2Data.length === 0
-            ? EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION
-            : EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_SELECTION,
-      });
+      const phoneFactorCount = userPhoneFactors?.length ?? 0;
+      const passkeyCount = fido2Data.length;
 
-      if (
-        userPhoneFactors &&
-        userPhoneFactors.length === 1 &&
-        fido2Data.length === 0
-      ) {
+      if (phoneFactorCount === 1 && passkeyCount === 0) {
         const success = await requestOtpCode();
         if (success) {
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_START,
+            step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
+            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+            type: userSelectedMfaFactor?.type,
+          });
           setWizardStep("otpValidation");
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+            step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
+          });
         }
+      } else if (phoneFactorCount === 0 && passkeyCount === 1) {
+        setSelected2FAPasskey(fido2Data[0]);
+        setWizardStep("verifyFIDO2Passkey");
       } else {
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_START,
+          step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_SELECTION,
+          flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+        });
         setWizardStep("otpSelection");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_SELECTION,
+        });
       }
     },
     false,
@@ -286,6 +301,7 @@ export default function EditEmailAddressPage() {
 
   const handleBackToEnterEmail = async () => {
     handleSetUserOtpValue("");
+    setEmailOtpVerificationProofId("");
     setErrorCode("");
     setCustomErrorMessage("");
     setIsEmailOtpMaxAttemptsReached(false);
@@ -360,16 +376,171 @@ export default function EditEmailAddressPage() {
     }
 
     // Send OTP to the new email address, then navigate to verification step
+    setEmailOtpVerificationProofId("");
     setErrorCode("");
     const success = await requestOtpCode({
       otpType: FLOW_TYPES.email,
       destination: normalizedNewEmail,
     });
     if (success) {
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_START,
+        step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+        flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+      });
       setWizardStep("emailOtpValidation");
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
         step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+      });
+    }
+  };
+
+  const syncEmailOtpErrorStateFromApi = (error: CaughtError): string => {
+    const apiErrorPayload = error?.data ?? error?.response?.data;
+    const retries = apiErrorPayload?.retries;
+    const attempts = apiErrorPayload?.attempts;
+    const payloadMessage = apiErrorPayload?.message;
+
+    setOtpSentResponse((prev) =>
+      mergeOtpSentResponseWithMetadata(prev, {
+        created: apiErrorPayload?.created,
+        expiry: apiErrorPayload?.expiry,
+        trxnId: apiErrorPayload?.trxnId,
+      }),
+    );
+
+    setIsEmailOtpMaxAttemptsReached(false);
+    setCustomErrorMessage("");
+
+    if (
+      shouldDisplayOtpMaxAttempts({
+        errorCode: payloadMessage,
+        retries,
+        attempts,
+      })
+    ) {
+      setIsEmailOtpMaxAttemptsReached(true);
+      setCustomErrorMessage(t("Error.otp_max_attempts", { ns: "common" }));
+      setErrorCode("otp_max_attempts");
+      return "otp_max_attempts";
+    }
+
+    if (
+      retries !== undefined &&
+      retries !== null &&
+      attempts !== undefined &&
+      attempts !== null
+    ) {
+      const remaining = retries - attempts;
+      const isMaxAttemptsReached = remaining <= 0;
+      setIsEmailOtpMaxAttemptsReached(isMaxAttemptsReached);
+      setCustomErrorMessage(
+        isMaxAttemptsReached
+          ? t("Error.otp_max_attempts", { ns: "common" })
+          : t("Error.otp_invalid_attempts", {
+              ns: "common",
+              count: remaining,
+            }),
+      );
+    }
+
+    const message = resolveEmailUpdateErrorCode(error);
+    setErrorCode(message);
+    return message;
+  };
+
+  const handleEmailOtpValidationSubmit = async () => {
+    trackEvent({
+      event: GA_FORM_EVENTS.FORM_STEP_START,
+      step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+      flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+    });
+
+    const normalizedNewEmail = normalizeEmail(formData.emailAddress);
+    const emailValidationErrorCode =
+      getEmailValidationErrorCode(normalizedNewEmail);
+
+    if (emailValidationErrorCode) {
+      setErrorCode(emailValidationErrorCode);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+        error: emailValidationErrorCode,
+      });
+      return;
+    }
+
+    const normalizedOtp = userOtpValue
+      .replace(/\D/g, "")
+      .slice(0, OTP_CODE_MAX_LENGTH);
+
+    if (normalizedOtp.length < OTP_CODE_MAX_LENGTH) {
+      setCustomErrorMessage(t("Error.invalidCode", { ns: "common" }));
+      setErrorCode("invalidCode");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+        error: "invalidCode",
+      });
+      return;
+    }
+
+    if (!otpSentResponse?.trxnId) {
+      setIsEmailOtpMaxAttemptsReached(true);
+      setCustomErrorMessage(t("Error.otp_max_attempts", { ns: "common" }));
+      setErrorCode("otp_max_attempts");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+        error: "otp_max_attempts",
+      });
+      return;
+    }
+
+    try {
+      setErrorCode("");
+      setCustomErrorMessage("");
+      setIsEmailOtpMaxAttemptsReached(false);
+
+      const response = await authService.verify_email_otp_for_update(
+        normalizedNewEmail,
+        normalizedOtp,
+        otpSentResponse.trxnId,
+        FLOW_TYPES.email,
+      );
+
+      const verificationProofId =
+        (response?.data as { verificationProofId?: string } | undefined)
+          ?.verificationProofId ?? "";
+
+      if (!response?.success || !verificationProofId) {
+        setErrorCode("FAILED_TO_UPDATE_EMAIL");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+          error: "FAILED_TO_UPDATE_EMAIL",
+        });
+        return;
+      }
+
+      setEmailOtpVerificationProofId(verificationProofId);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_START,
+        step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
+        flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+      });
+      setWizardStep("emailConfirmUpdate");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+        step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
+      });
+    } catch (error) {
+      const message = syncEmailOtpErrorStateFromApi(error as CaughtError);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
+        error: message,
       });
     }
   };
@@ -392,25 +563,25 @@ export default function EditEmailAddressPage() {
         return;
       }
 
-      if (!userOtpValue || !otpSentResponse?.trxnId) {
-        setErrorCode("OTP_VERIFICATION_REQUIRED");
-        setIsEmailOtpMaxAttemptsReached(false);
+      if (!emailOtpVerificationProofId) {
+        setErrorCode("otp_max_attempts");
+        setIsEmailOtpMaxAttemptsReached(true);
+        setCustomErrorMessage(t("Error.otp_max_attempts", { ns: "common" }));
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-          error: "OTP_VERIFICATION_REQUIRED",
+          error: "otp_max_attempts",
         });
         return;
       }
 
       const response = await authService.update_email_with_otp(
         normalizedNewEmail,
-        userOtpValue,
-        otpSentResponse.trxnId,
-        FLOW_TYPES.email,
+        emailOtpVerificationProofId,
       );
 
       if (response && response.success && response.data) {
+        setEmailOtpVerificationProofId("");
         updateProfileSuccess(
           response.data as Parameters<typeof updateProfileSuccess>[0],
         );
@@ -419,6 +590,11 @@ export default function EditEmailAddressPage() {
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
           step: EMAIL_ADDRESS_ANALYTICS.STEPS.SUCCESS,
+        });
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_START,
+          step: EMAIL_ADDRESS_ANALYTICS.STEPS.SUCCESS,
+          flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
         });
         setWizardStep("emailUpdateSuccess");
       } else {
@@ -433,54 +609,26 @@ export default function EditEmailAddressPage() {
       console.error("Error updating email address with OTP:", error);
       const apiError = error as CaughtError;
       const apiErrorPayload = apiError?.data ?? apiError?.response?.data;
-      setOtpSentResponse((prev) =>
-        mergeOtpSentResponseWithMetadata(prev, {
-          created: apiErrorPayload?.created,
-          expiry: apiErrorPayload?.expiry,
-          trxnId: apiErrorPayload?.trxnId,
-        }),
-      );
-
-      const message = resolveEmailUpdateErrorCode(apiError);
-      const retries = apiErrorPayload?.retries;
-      const attempts = apiErrorPayload?.attempts;
-
-      setIsEmailOtpMaxAttemptsReached(false);
-      setCustomErrorMessage("");
-
-      if (
-        retries !== undefined &&
-        retries !== null &&
-        attempts !== undefined &&
-        attempts !== null
-      ) {
-        const remaining = retries - attempts;
-        const isMaxAttemptsReached = remaining <= 0;
-        setIsEmailOtpMaxAttemptsReached(isMaxAttemptsReached);
-        setCustomErrorMessage(
-          isMaxAttemptsReached
-            ? t("Error.otp_max_attempts", { ns: "common" })
-            : t("Error.otp_invalid_attempts", {
-                ns: "common",
-                count: remaining,
-              }),
-        );
-      }
+      const message = syncEmailOtpErrorStateFromApi(apiError);
 
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
         error: message,
       });
-      setErrorCode(message);
 
       const shouldNavigateBackToEmailOtpValidation =
         message === EXISTING_EMAIL_CONFLICT_ERROR_CODE ||
+        message === "otp_expired" ||
+        message === "otp_max_attempts" ||
+        message === "invalidCode" ||
         (INVALID_OTP_ERROR_CODES as readonly string[]).includes(
           apiErrorPayload?.message ?? "",
-        );
+        ) ||
+        hasRemainingOtpAttempts(apiErrorPayload);
 
       if (shouldNavigateBackToEmailOtpValidation) {
+        setEmailOtpVerificationProofId("");
         setWizardStep("emailOtpValidation");
       }
     }
@@ -516,6 +664,12 @@ export default function EditEmailAddressPage() {
           void (async () => {
             const success = await requestOtpCode();
             if (success) {
+              trackEvent({
+                event: GA_FORM_EVENTS.FORM_STEP_START,
+                step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
+                flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
+                type: userSelectedMfaFactor?.type,
+              });
               setWizardStep("otpValidation");
               trackEvent({
                 event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -528,7 +682,7 @@ export default function EditEmailAddressPage() {
           setSelected2FAPasskey(passkey);
           setWizardStep("verifyFIDO2Passkey");
         }}
-        parentPage={PAGES.addMFAPage}
+        parentPage={PAGES.editEmailPage}
         onCancel={handleBackToProfile}
       />
     ),
@@ -562,12 +716,6 @@ export default function EditEmailAddressPage() {
         userOtpValue={userOtpValue}
         setUserOtpValue={handleSetUserOtpValue}
         requestOtpCode={() => {
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_STEP_START,
-            step: EMAIL_ADDRESS_ANALYTICS.STEPS.OTP_VALIDATION,
-            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
-            type: userSelectedMfaFactor?.type,
-          });
           return requestOtpCode();
         }}
         validateOtpCode={(otpValue) => {
@@ -634,6 +782,8 @@ export default function EditEmailAddressPage() {
         setErrorCode={setErrorCode}
         setErrorMessage={setCustomErrorMessage}
         errorMessage={errorMessage}
+        otpExpiry={otpSentResponse?.expiry}
+        otpCreatedAt={otpSentResponse?.created}
         onCancel={handleBackToProfile}
         showTryAnotherWay={
           (userPhoneFactors != null && userPhoneFactors.length > 1) ||
@@ -653,32 +803,13 @@ export default function EditEmailAddressPage() {
     ),
     emailOtpValidation: (
       <EmailOtpValidation
-        onSubmit={() => {
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_STEP_START,
-            step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
-            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
-          });
-
-          if (userOtpValue && userOtpValue.trim()) {
-            setWizardStep("emailConfirmUpdate");
-            trackEvent({
-              event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-              step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-            });
-          } else {
-            setErrorCode("OTP_REQUIRED");
-            trackEvent({
-              event: GA_FORM_EVENTS.FORM_STEP_END,
-              step: EMAIL_ADDRESS_ANALYTICS.STEPS.EMAIL_OTP_VALIDATION,
-              error: "OTP_REQUIRED",
-            });
-          }
-        }}
+        onSubmit={handleEmailOtpValidationSubmit}
         onCancel={handleBackToProfile}
         formData={formData}
         setFormData={setFormData}
         errorMessage={otpDisplayError}
+        setErrorCode={setErrorCode}
+        setErrorMessage={setCustomErrorMessage}
         userOtpValue={userOtpValue}
         handleChange={handleSetUserOtpValue}
         requestOtpCode={async () => {
@@ -689,6 +820,7 @@ export default function EditEmailAddressPage() {
           });
           setIsEmailOtpMaxAttemptsReached(false);
           setCustomErrorMessage("");
+          setEmailOtpVerificationProofId("");
           return requestOtpCode({
             otpType: FLOW_TYPES.email,
             destination: formData.emailAddress,
@@ -707,11 +839,6 @@ export default function EditEmailAddressPage() {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-          });
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_STEP_START,
-            step: EMAIL_ADDRESS_ANALYTICS.STEPS.CONFIRM_UPDATE,
-            flow: EMAIL_ADDRESS_ANALYTICS.FLOW_ID,
           });
           return handleEmailChangeWithOtp();
         }}

@@ -257,6 +257,10 @@ vi.mock("../../../services/authService", () => ({
     logout: vi.fn().mockResolvedValue({
       data: { redirect_url: "https://logout.example.com" },
     }),
+    verify_email_otp_for_update: vi.fn().mockResolvedValue({
+      success: true,
+      data: { verificationProofId: "proof-123", expiresIn: 300 },
+    }),
     update_email_with_otp: vi.fn().mockResolvedValue({
       success: true,
       data: { userName: "updated@example.com" },
@@ -680,15 +684,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
-      });
-
-      await act(async () => {
-        fireEvent.click(screen.getByTestId("select-passkey-btn"));
+        expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId("verify-fido2-passkey")).toBeInTheDocument();
+        expect(screen.queryByTestId("otp-selection")).not.toBeInTheDocument();
       });
 
       await act(async () => {
@@ -1367,6 +1367,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
           event: "form_step_change",
           step: "otp_selection",
         });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "otp_selection",
+          flow: "email_address_update",
+        });
       });
     });
 
@@ -1389,6 +1394,12 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",
           step: "otp_validation",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "otp_validation",
+          flow: "email_address_update",
+          type: "sms",
         });
       });
     });
@@ -1469,6 +1480,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
           event: "form_step_change",
           step: "email_otp_validation",
         });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "email_otp_validation",
+          flow: "email_address_update",
+        });
       });
     });
 
@@ -1521,6 +1537,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_change",
           step: "confirm_update",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "confirm_update",
+          flow: "email_address_update",
         });
       });
     });
@@ -1591,6 +1612,11 @@ describe("EditEmailAddressPage Integration Tests", () => {
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_submit_complete",
           step: "email_update_success",
+        });
+        expect(mockTrackEvent).toHaveBeenCalledWith({
+          event: "form_step_start",
+          step: "email_update_success",
+          flow: "email_address_update",
         });
       });
     });

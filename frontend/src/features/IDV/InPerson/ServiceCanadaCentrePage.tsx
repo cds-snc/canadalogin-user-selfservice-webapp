@@ -3,7 +3,6 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
   GcdsContainer,
   GcdsSelect,
@@ -11,6 +10,8 @@ import {
   GcdsInput,
   GcdsFieldset,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
@@ -387,7 +388,7 @@ export default function ServiceCanadaCentrePage() {
             </GcdsButton>
           </GcdsGrid>
 
-          <GcdsNotice
+          <AccessibleNotice
             noticeRole="info"
             noticeTitleTag="h2"
             noticeTitle={t("ServiceCanadaCentre.moreInfoTitle")}
@@ -395,10 +396,14 @@ export default function ServiceCanadaCentrePage() {
             {
               //TODO: populate with real URL once available
             }
-            <GcdsLink href={"#"} external={true}>
+            <GcdsLink
+              href={"#"}
+              external={true}
+              style={{ textDecoration: "underline" }}
+            >
               {t("ServiceCanadaCentre.learnMoreLink")}
             </GcdsLink>
-          </GcdsNotice>
+          </AccessibleNotice>
         </GcdsGrid>
       </form>
     </GcdsContainer>

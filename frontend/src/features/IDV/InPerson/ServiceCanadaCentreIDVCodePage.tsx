@@ -2,11 +2,12 @@ import {
   GcdsButton,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
   GcdsContainer,
   GcdsGrid,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
@@ -211,7 +212,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
           </GcdsContainer>
         </GcdsContainer>
 
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="info"
           noticeTitleTag="h2"
           noticeTitle={t("ServiceCanadaCentreCode.findNearestTitle")}
@@ -221,12 +222,12 @@ export default function ServiceCanadaCentreIDVCodePage() {
             {
               //TODO: populate with real URL once available
             }
-            <GcdsLink href="#" external>
+            <GcdsLink href="#" external style={{ textDecoration: "underline" }}>
               {t("ServiceCanadaCentreCode.findNearestLink")}
             </GcdsLink>
             .
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
       </GcdsGrid>
     </GcdsContainer>
   );

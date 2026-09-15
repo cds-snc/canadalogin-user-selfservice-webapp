@@ -7,10 +7,11 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsLink,
-  GcdsNotice,
   GcdsSelect,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
@@ -395,15 +396,19 @@ export default function VisitCanadaPost() {
             </GcdsButton>
           </GcdsGrid>
 
-          <GcdsNotice
+          <AccessibleNotice
             noticeRole="info"
             noticeTitleTag="h2"
             noticeTitle={t("VisitCanadaPost.moreInfoTitle")}
           >
-            <GcdsLink href="#" external={true}>
+            <GcdsLink
+              href="#"
+              external={true}
+              style={{ textDecoration: "underline" }}
+            >
               {t("VisitCanadaPost.learnMoreLink")}
             </GcdsLink>
-          </GcdsNotice>
+          </AccessibleNotice>
         </GcdsGrid>
       </form>
     </GcdsContainer>

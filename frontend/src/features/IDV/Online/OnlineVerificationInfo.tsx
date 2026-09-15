@@ -3,11 +3,12 @@ import {
   GcdsDetails,
   GcdsGrid,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
   GcdsContainer,
   GcdsHeading,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { DEV_ONLY_FEATURE } from "../../../utils/constants";
@@ -125,7 +126,7 @@ export default function OnlineVerificationInfo() {
           </GcdsButton>
         </GcdsGrid>
 
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="info"
           noticeTitleTag="h2"
           noticeTitle={t("OnlineVerificationInfo.moreInfoTitle")}
@@ -133,10 +134,14 @@ export default function OnlineVerificationInfo() {
           {
             // TODO: populate with real URL once available
           }
-          <GcdsLink href={"#"} external={true}>
+          <GcdsLink
+            href={"#"}
+            external={true}
+            style={{ textDecoration: "underline" }}
+          >
             {t("OnlineVerificationInfo.learnMoreLink")}
           </GcdsLink>
-        </GcdsNotice>
+        </AccessibleNotice>
       </GcdsGrid>
     </GcdsContainer>
   );

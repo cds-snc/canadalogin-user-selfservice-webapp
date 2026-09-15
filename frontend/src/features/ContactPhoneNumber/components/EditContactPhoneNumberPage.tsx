@@ -37,6 +37,7 @@ import {
   extractOtpServerMetadata,
   hasOtpServerMetadata,
 } from "../../../utils/otpMetadata";
+import { shouldDisplayOtpMaxAttempts } from "../../../utils/otpErrorMapping";
 
 type UpdatePhoneTransport = "sms" | "voice";
 
@@ -79,6 +80,11 @@ export default function EditContactPhoneNumberPage() {
     useState<ContactPhoneWizardStep>("enterPhone");
   const [errorCode, setErrorCode] = useState("");
   const [localLoading, setLocalLoading] = useState(false);
+  const [customErrorMessage, setCustomErrorMessage] = useState("");
+  const [isPhoneOtpMaxAttemptsReached, setIsPhoneOtpMaxAttemptsReached] =
+    useState(false);
+  const [phoneOtpVerificationProofId, setPhoneOtpVerificationProofId] =
+    useState("");
   const [phoneFormData, setPhoneFormData] =
     useState<ContactPhoneFormData>(initialPhoneFormData);
 
@@ -112,12 +118,15 @@ export default function EditContactPhoneNumberPage() {
   }: {
     reSendOtpCode?: boolean;
     otpType?: ContactPhoneOtpType;
-  } = {}) => {
+  } = {}): Promise<boolean> => {
     try {
       if (!reSendOtpCode) {
         setLocalLoading(true);
       }
 
+      setPhoneOtpVerificationProofId("");
+      setCustomErrorMessage("");
+      setIsPhoneOtpMaxAttemptsReached(false);
       setErrorCode("");
 
       const result = await authService.transientOtpSend({
@@ -145,7 +154,11 @@ export default function EditContactPhoneNumberPage() {
             type: otpType ?? phoneFormData.otpType,
           });
         }
+
+        return true;
       }
+
+      return false;
     } catch (error) {
       const metadata = extractOtpServerMetadata(error);
       if (hasOtpServerMetadata(metadata)) {
@@ -167,9 +180,89 @@ export default function EditContactPhoneNumberPage() {
           error: message,
         });
       }
+
+      return false;
     } finally {
       setLocalLoading(false);
     }
+  };
+
+  const syncPhoneOtpErrorStateFromApi = (error: unknown): string => {
+    const authError = error as AuthServiceError & {
+      data?: {
+        message?: string;
+        retries?: number;
+        attempts?: number;
+        trxnId?: string;
+        created?: string;
+        expiry?: string;
+      };
+      response?: {
+        data?: {
+          message?: string;
+          retries?: number;
+          attempts?: number;
+          trxnId?: string;
+          created?: string;
+          expiry?: string;
+        };
+      };
+    };
+
+    const payload = authError.data ?? authError.response?.data;
+    const metadata = extractOtpServerMetadata(error);
+
+    if (hasOtpServerMetadata(metadata)) {
+      setPhoneFormData((prev) => ({
+        ...prev,
+        trxnId: metadata.trxnId ?? prev.trxnId,
+        created: metadata.created ?? prev.created,
+        expiry: metadata.expiry ?? prev.expiry,
+      }));
+    }
+
+    setIsPhoneOtpMaxAttemptsReached(false);
+    setCustomErrorMessage("");
+
+    const retries = payload?.retries;
+    const attempts = payload?.attempts;
+    const payloadMessage = payload?.message;
+
+    if (
+      shouldDisplayOtpMaxAttempts({
+        errorCode: payloadMessage,
+        retries,
+        attempts,
+      })
+    ) {
+      setIsPhoneOtpMaxAttemptsReached(true);
+      setCustomErrorMessage(t("Error.otp_max_attempts", { ns: "common" }));
+      setErrorCode("otp_max_attempts");
+      return "otp_max_attempts";
+    }
+
+    if (
+      retries !== undefined &&
+      retries !== null &&
+      attempts !== undefined &&
+      attempts !== null
+    ) {
+      const remaining = retries - attempts;
+      const isMaxAttemptsReached = remaining <= 0;
+      setIsPhoneOtpMaxAttemptsReached(isMaxAttemptsReached);
+      setCustomErrorMessage(
+        isMaxAttemptsReached
+          ? t("Error.otp_max_attempts", { ns: "common" })
+          : t("Error.otp_invalid_attempts", {
+              ns: "common",
+              count: remaining,
+            }),
+      );
+    }
+
+    const message = getApiErrorMessage(error) || "PHONE_UPDATE_FAILED";
+    setErrorCode(message);
+    return message;
   };
 
   const verifyOtp = async () => {
@@ -177,11 +270,60 @@ export default function EditContactPhoneNumberPage() {
       event: GA_FORM_EVENTS.FORM_STEP_START,
       step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
     });
-    setWizardStep("confirmUpdate");
-    trackEvent({
-      event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-      step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
-    });
+
+    if (!phoneFormData.otp.trim() || !phoneFormData.trxnId) {
+      setErrorCode("invalidCode");
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
+        error: "invalidCode",
+      });
+      return;
+    }
+
+    try {
+      setLocalLoading(true);
+      setErrorCode("");
+      setCustomErrorMessage("");
+      setIsPhoneOtpMaxAttemptsReached(false);
+
+      const result = await authService.verify_phone_otp_for_update(
+        phoneFormData.phoneNumber,
+        phoneFormData.otp.trim(),
+        phoneFormData.trxnId,
+        serverMapping[phoneFormData.otpType],
+      );
+      const response = result as AuthServiceResponse<{
+        verificationProofId?: string;
+      }>;
+
+      const verificationProofId = response?.data?.verificationProofId ?? "";
+
+      if (response?.success && verificationProofId) {
+        setPhoneOtpVerificationProofId(verificationProofId);
+        setWizardStep("confirmUpdate");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+        });
+      } else {
+        setErrorCode("PHONE_UPDATE_FAILED");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
+          error: "PHONE_UPDATE_FAILED",
+        });
+      }
+    } catch (error) {
+      const message = syncPhoneOtpErrorStateFromApi(error);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
+        error: message,
+      });
+    } finally {
+      setLocalLoading(false);
+    }
   };
 
   const updateProfile = async () => {
@@ -189,15 +331,27 @@ export default function EditContactPhoneNumberPage() {
       setLocalLoading(true);
       setErrorCode("");
 
+      if (!phoneOtpVerificationProofId) {
+        setErrorCode("otp_expired");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          error: "otp_expired",
+        });
+        return;
+      }
+
       const result = await authService.update_phone_with_otp(
         phoneFormData.phoneNumber,
-        phoneFormData.otp,
-        phoneFormData.trxnId,
-        serverMapping[phoneFormData.otpType],
+        phoneOtpVerificationProofId,
       );
       const response = result as AuthServiceResponse<UserProfile>;
 
       if (response?.success && response.data) {
+        setPhoneOtpVerificationProofId("");
+        setErrorCode("");
+        setCustomErrorMessage("");
+        setIsPhoneOtpMaxAttemptsReached(false);
         updateProfileSuccess(response.data);
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
@@ -213,28 +367,32 @@ export default function EditContactPhoneNumberPage() {
         });
       }
     } catch (error) {
-      const message = getApiErrorMessage(error);
-      if (message) {
-        setErrorCode(message);
+      const authError = error as AuthServiceError;
+      const payloadMessage =
+        authError.data?.message ?? authError.response?.data?.message;
+      const message = syncPhoneOtpErrorStateFromApi(error);
+      trackEvent({
+        event: GA_FORM_EVENTS.FORM_STEP_END,
+        step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+        error: message,
+      });
+
+      if (
+        message === "otp_expired" ||
+        message === "otp_max_attempts" ||
+        message === "invalidCode" ||
+        (payloadMessage != null &&
+          INVALID_OTP_ERROR_CODES.includes(
+            payloadMessage as (typeof INVALID_OTP_ERROR_CODES)[number],
+          ))
+      ) {
+        setPhoneOtpVerificationProofId("");
+        setWizardStep("verifyOtp");
         trackEvent({
-          event: GA_FORM_EVENTS.FORM_STEP_END,
-          step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
           error: message,
         });
-
-        if (
-          INVALID_OTP_ERROR_CODES.includes(
-            message as (typeof INVALID_OTP_ERROR_CODES)[number],
-          )
-        ) {
-          console.log("OTP validation failed during phone update:", message);
-          setWizardStep("verifyOtp");
-          trackEvent({
-            event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
-            step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
-            error: message,
-          });
-        }
       }
     } finally {
       setLocalLoading(false);
@@ -246,6 +404,9 @@ export default function EditContactPhoneNumberPage() {
   };
 
   const handleBackToEnterPhone = () => {
+    setPhoneOtpVerificationProofId("");
+    setCustomErrorMessage("");
+    setIsPhoneOtpMaxAttemptsReached(false);
     setErrorCode("");
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -255,12 +416,17 @@ export default function EditContactPhoneNumberPage() {
     navigate(`/${language}/profile/update-contact-phone`, { replace: true });
   };
 
-  let errorMessage = errorCode
+  let translatedErrorMessage = errorCode
     ? t(`Error.${errorCode}`, { ns: "common", defaultValue: "" })
     : "";
-  if (errorCode && errorMessage === "") {
-    errorMessage = errorCode;
+  if (errorCode && translatedErrorMessage === "") {
+    translatedErrorMessage = errorCode;
   }
+  const errorMessage = customErrorMessage || translatedErrorMessage;
+
+  const resetOtpAttemptState = () => {
+    setIsPhoneOtpMaxAttemptsReached(false);
+  };
 
   const steps: Record<ContactPhoneWizardStep, ReactNode> = {
     enterPhone: (
@@ -269,7 +435,7 @@ export default function EditContactPhoneNumberPage() {
         phoneFormData={phoneFormData}
         onChangePhoneForm={handlePhoneFormChange}
         errorMessage={errorMessage}
-        onNext={() => {
+        onNext={async () => {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_SUBMIT,
             step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
@@ -278,7 +444,7 @@ export default function EditContactPhoneNumberPage() {
             event: GA_FORM_EVENTS.FORM_STEP_START,
             step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
           });
-          return sendOtp({ reSendOtpCode: false });
+          await sendOtp({ reSendOtpCode: false });
         }}
         onCancel={handleBackToProfile}
         setErrorCode={setErrorCode}
@@ -307,7 +473,10 @@ export default function EditContactPhoneNumberPage() {
           });
           return sendOtp({ reSendOtpCode: true, otpType });
         }}
+        isMaxAttemptsReached={isPhoneOtpMaxAttemptsReached}
+        resetAttempts={resetOtpAttemptState}
         setErrorCode={setErrorCode}
+        setErrorMessage={setCustomErrorMessage}
       />
     ),
     confirmUpdate: (
@@ -346,8 +515,8 @@ export default function EditContactPhoneNumberPage() {
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}
-      errorCode={errorCode}
-      errorMessage={errorMessage}
+      errorCode={wizardStep === "success" ? "" : errorCode}
+      errorMessage={wizardStep === "success" ? "" : errorMessage}
       language={language}
     />
   );

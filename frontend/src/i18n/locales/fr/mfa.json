@@ -48,13 +48,12 @@
     "countrySearchLabel": "Recherchez votre pays",
     "phoneLabel": "Numéro de téléphone",
     "countryNotListed": "Mon pays n'apparaît pas dans la liste.",
-    "countryNotSupported": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n'apparaît pas dans la liste, vous ne pouvez pas créer d'identifiant ConnexionCanada à l'heure actuelle. Nous nous excusons des désagréments que cela pourrait causer.",
+    "countryNotSupported": "Certains pays ne sont pas pris en charge en raison de limitations techniques. Si votre pays n’apparaît pas dans la liste, vous ne pouvez pas associer ce numéro de téléphone à votre identifiant ConnexionCanada pour le moment. Nous nous excusons du dérangement.",
     "howToSendCode": "Comment souhaitez-vous recevoir le code?",
     "textMessage": "Message texte (SMS)",
     "textMessageHint": "Numéro de téléphone cellulaire seulement. Des frais d'opérateur peuvent s'appliquer.",
     "voiceCall": "Appel vocal",
-    "voiceCallHint": "Numéro de téléphone cellulaire ou fixe. Des frais d'opérateur peuvent s'appliquer.",
-    "changeNextSignIn": "Vous pourrez modifier ce choix lors de votre prochaine connexion."
+    "voiceCallHint": "Numéro de téléphone cellulaire ou fixe. Des frais d'opérateur peuvent s'appliquer."
   },
   "AddSecondMFAVoiceCall": {
     "youHaveAdded": "Vous avez ajouté le",

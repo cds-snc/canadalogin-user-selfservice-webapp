@@ -5,9 +5,10 @@ import {
   GcdsErrorMessage,
   GcdsGrid,
   GcdsHeading,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 
 import { useTranslation, Trans } from "react-i18next";
 
@@ -70,13 +71,17 @@ export default function ConfirmUpdate({
             </GcdsText>
           </div>
 
-          <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
+          <AccessibleNotice
+            noticeRole="info"
+            noticeTitleTag="h2"
+            noticeTitle=" "
+          >
             <GcdsText>
               {t("ProfileUpdateNameConfirmUpdate.thisText")}{" "}
               <strong>{t("ProfileUpdateNameConfirmUpdate.doesNot")}</strong>{" "}
               {t("ProfileUpdateNameConfirmUpdate.legallyChangeName")}
             </GcdsText>
-          </GcdsNotice>
+          </AccessibleNotice>
           <GcdsGrid columns="max-content max-content" gap="200">
             <SubmitButton
               onGcdsClick={onSubmitHandler}

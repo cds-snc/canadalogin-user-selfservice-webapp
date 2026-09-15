@@ -10,7 +10,7 @@ from app.users.schemas import (
     UserPhoneOTPFactors,
 )
 from app.utils.access_token import get_auth_request_headers
-from app.utils.string_masking import mask_phone_number
+from app.utils.string_masking import mask_email_address, mask_phone_number
 from httpx import AsyncClient
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,8 @@ async def parse_phone_auth_factors_response(
             if not email_address:
                 logger.warning("Factor %s has no emailAddress", factor.id)
                 continue
+            if masked:
+                email_address = mask_email_address(email_address)
             factors_list.append(
                 {
                     "id": factor.id,
@@ -141,6 +143,7 @@ async def get_user_otp_factors(
     global_http_client: AsyncClient,
     user_access_token: str,
     validated: Optional[bool] = True,
+    masked: bool = True,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -155,7 +158,9 @@ async def get_user_otp_factors(
 
     validated_data = UserAuthFactorsIbmResponse(**user_otp_factors_response)
 
-    phone_number_otp_factor = await parse_phone_auth_factors_response(validated_data)
+    phone_number_otp_factor = await parse_phone_auth_factors_response(
+        validated_data, masked
+    )
     logger.info("success response and data validation for user auth factors")
     return UserPhoneAuthFactorsResponse(
         success=True,

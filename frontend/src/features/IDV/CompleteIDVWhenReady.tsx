@@ -86,7 +86,12 @@ export default function CompleteIdentityProofingPage() {
           </GcdsText>
           <GcdsText>
             {t("CompleteIdentityProofing.noDocumentsNoticeText")}
-            <GcdsLink href="#" external size="regular">
+            <GcdsLink
+              href="#"
+              external
+              size="regular"
+              style={{ textDecoration: "underline" }}
+            >
               {t("CompleteIdentityProofing.contactLink", {
                 rpServicePortal: relyingPartyLinkName,
               })}

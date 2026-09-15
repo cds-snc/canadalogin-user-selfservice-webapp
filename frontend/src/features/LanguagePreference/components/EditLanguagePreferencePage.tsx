@@ -125,6 +125,7 @@ export default function EditLanguagePreferencePage() {
       const response = result as AuthServiceResponse<UserProfile>;
 
       if (response?.data) {
+        setErrorCode("");
         updateProfileSuccess(response.data);
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,
@@ -225,7 +226,7 @@ export default function EditLanguagePreferencePage() {
   ) : (
     <StepContent
       StepComponent={steps[wizardStep]}
-      errorCode={errorCode}
+      errorCode={wizardStep === "success" ? "" : errorCode}
       language={routeLanguage}
     />
   );
