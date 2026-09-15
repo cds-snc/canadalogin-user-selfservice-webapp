@@ -33,7 +33,7 @@
     "CSIAI0370E": "This password is too easy to guess. Choose a stronger password.",
     "error_webauthn_not_supported": "Your browser is not compatible with passkey. Try using a different browser.",
     "error_failed_to_get_attestation_options": "Failed to get attestation options",
-    "error_duplicate_passkey": "The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.",
+    "error_duplicate_passkey": "The passkey request was either cancelled, timed out or the device is already registered to this CanadaLogin. Try again or try using another device.",
     "error_passkey_name_required": "Passkey name required.",
     "error_delete_credential": "Failed to delete security key",
     "error_rename_credential": "Enter a name for your passkey to continue",

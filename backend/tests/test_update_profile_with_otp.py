@@ -1140,6 +1140,13 @@ class TestBuildEmailMfaSyncContext:
             new_email="new@example.com",
         )
 
+        mock_get_user_otp_factors.assert_awaited_once_with(
+            request.app.state.request_client,
+            "user-token",
+            validated=None,
+            masked=False,
+        )
+
         assert result is not None
         assert result.normalized_new_email == "new@example.com"
         assert result.has_new_email_factor is True
