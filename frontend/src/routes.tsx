@@ -146,6 +146,7 @@ export const appRoutes: RouteObject[] = [
                     {
                       path: "connected-services",
                       element: <ConnectedServicesPage />,
+                      handle: { id: PAGES.connectedServices },
                     },
                     {
                       path: "identity-verification/:journeyType?",
