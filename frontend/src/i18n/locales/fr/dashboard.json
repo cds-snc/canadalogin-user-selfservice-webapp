@@ -7,6 +7,8 @@
     "securitySettingsDescription": "Gérez votre mot de passe et votre vérification en deux étapes : ",
     "securitySettingsPhone": "Numéro de téléphone",
     "securitySettingsPasskey": "Clé d’accès",
+    "connectedServices": "Connected Services",
+    "connectedServicesDescription": "View the services currently connected with your CanadaLogin and other available government programs.",
     "pageTitle": "Gérer ConnexionCanada"
   }
 }

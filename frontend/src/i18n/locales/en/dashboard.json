@@ -7,6 +7,8 @@
     "securitySettingsDescription": "Manage your password and 2-step verification:",
     "securitySettingsPhone": "Phone",
     "securitySettingsPasskey": "Passkey",
+    "connectedServices": "Connected services",
+    "connectedServicesDescription": "View the services currently connected with your CanadaLogin and other available government programs.",
     "pageTitle": "Manage CanadaLogin"
   }
 }
