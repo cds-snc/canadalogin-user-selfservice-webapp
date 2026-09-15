@@ -67,10 +67,7 @@ vi.mock("../../../utils/gatag", () => ({
 type GcdsCardProps = PropsWithChildren<{
   cardTitle: string;
   href: string;
-  onGcdsClick?: (event: {
-    detail: string;
-    preventDefault: () => void;
-  }) => void;
+  onGcdsClick?: (event: { detail: string; preventDefault: () => void }) => void;
   imgSrc: string;
 }>;
 
