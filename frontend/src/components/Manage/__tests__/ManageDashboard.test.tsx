@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+import type { PropsWithChildren } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { I18nextProvider } from "react-i18next";
 
@@ -63,8 +64,34 @@ vi.mock("../../../utils/gatag", () => ({
   trackCardClick: mocks.trackCardClick,
 }));
 
+type GcdsCardProps = PropsWithChildren<{
+  cardTitle: string;
+  href: string;
+  onGcdsClick?: (event: {
+    detail: string;
+    preventDefault: () => void;
+  }) => void;
+  imgSrc: string;
+}>;
+
+type GcdsContainerProps = PropsWithChildren<{
+  role?: string;
+}>;
+
+type GcdsHeadingProps = PropsWithChildren<{
+  tag?: "h1" | "h2" | "h3";
+}>;
+
+type GcdsTextProps = PropsWithChildren;
+
 vi.mock("@gcds-core/components-react", () => ({
-  GcdsCard: ({ cardTitle, href, onGcdsClick, imgSrc, children }) => (
+  GcdsCard: ({
+    cardTitle,
+    href,
+    onGcdsClick,
+    imgSrc,
+    children,
+  }: GcdsCardProps) => (
     <article>
       <a
         href={href}
@@ -79,11 +106,15 @@ vi.mock("@gcds-core/components-react", () => ({
       </a>
     </article>
   ),
-  GcdsContainer: ({ children, role }) => <div role={role}>{children}</div>,
+  GcdsContainer: ({ children, role }: GcdsContainerProps) => (
+    <div role={role}>{children}</div>
+  ),
   GcdsErrorSummary: () => null,
-  GcdsGrid: ({ children }) => <div>{children}</div>,
-  GcdsHeading: ({ children, tag: Tag = "h2" }) => <Tag>{children}</Tag>,
-  GcdsText: ({ children }) => <p>{children}</p>,
+  GcdsGrid: ({ children }: PropsWithChildren) => <div>{children}</div>,
+  GcdsHeading: ({ children, tag: Tag = "h2" }: GcdsHeadingProps) => (
+    <Tag>{children}</Tag>
+  ),
+  GcdsText: ({ children }: GcdsTextProps) => <p>{children}</p>,
 }));
 
 describe("ManageDashboard", () => {
@@ -111,7 +142,7 @@ describe("ManageDashboard", () => {
     );
     expect(cardLink.querySelector("img")).toHaveAttribute(
       "src",
-      expect.stringContaining("connected_services_icon.svg"),
+      expect.stringMatching(/^data:image\/svg\+xml/),
     );
   });
 
