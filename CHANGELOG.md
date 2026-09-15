@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.33.7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.6...v1.33.7) (2026-09-15)
+
+
+### Bug Fixes
+
+* **identity-verification:** [FE] Update details confirmation page to show verified claims ([#2117](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2117)) ([54eafb7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/54eafb717f174bfa0cea562a51b51b2cecc929b3))
+* **otp-factors:** add masked parameter to get_user_otp_factors and update related tests ([edfb681](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/edfb681bf2fa9c6bd68a0f7f32781ee4a5dbf546))
+* update email should correctly delete old email mfa ([#2168](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2168)) ([edfb681](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/edfb681bf2fa9c6bd68a0f7f32781ee4a5dbf546))
+
+
+### Miscellaneous Chores
+
+* **deps:** lock file maintenance ([#2007](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2007)) ([cd95515](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/cd95515340a3bb12247c043fb15fe7dcf344ea2b))
+
 ## [1.33.6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.5...v1.33.6) (2026-09-14)
 
 
