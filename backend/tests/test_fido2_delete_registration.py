@@ -6,10 +6,12 @@ Uses importlib to import the actual module for patching.
 """
 
 import importlib
+import time
 import pytest
 from fastapi import HTTPException, status
 from httpx import AsyncClient
 from unittest.mock import AsyncMock, MagicMock, patch
+from app.fido2.schemas import DeleteRegistrationRequest
 
 # Import the module using importlib to get the actual module object
 delete_module = importlib.import_module("app.fido2.services.delete_fido2_registration")
@@ -431,3 +433,115 @@ class TestDeleteRegistration:
 
         assert exc_info.value.status_code == status.HTTP_409_CONFLICT
         assert exc_info.value.detail == "Cannot delete last remaining MFA factor"
+
+    @pytest.mark.asyncio
+    @patch.object(delete_module, "_get_fido2_delete_otp_proof_ttl_seconds")
+    @patch.object(delete_module, "verify_registration_ownership")
+    @patch.object(delete_module, "get_user_profile_info")
+    @patch.object(delete_module, "verify_otp_before_operation")
+    @patch.object(delete_module, "get_tenant_url")
+    async def test_verify_action_issues_proof(
+        self,
+        mock_get_tenant_url,
+        mock_verify_otp_before_operation,
+        mock_get_user_profile_info,
+        mock_verify_registration_ownership,
+        mock_get_fido2_delete_otp_proof_ttl_seconds,
+        mock_http_client,
+        mock_request,
+    ):
+        """Verify action should issue a proof without deleting registration."""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_fido2_delete_otp_proof_ttl_seconds.return_value = 120
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
+        mock_verify_registration_ownership.return_value = None
+        mock_verify_otp_before_operation.return_value = None
+
+        request_data = DeleteRegistrationRequest(
+            id="registration-123",
+            action=DeleteRegistrationRequest.Action.VERIFY,
+            otp="123456",
+            trxnId="txn-123",
+            otpVerificationType="sms",
+        )
+
+        result = await delete_registration(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token-abc",
+            request_data=request_data,
+        )
+
+        assert result.success is True
+        assert result.message == "FIDO2 deletion verification successful"
+        assert isinstance(result.data.get("verificationProofId"), str)
+        assert result.data.get("expiresIn") == 120
+        mock_http_client.delete.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch.object(delete_module, "dispatch_get_my_profile_from_ibm")
+    @patch.object(delete_module, "get_auth_request_headers")
+    @patch.object(delete_module, "verify_registration_ownership")
+    @patch.object(delete_module, "get_user_profile_info")
+    @patch.object(delete_module, "get_tenant_url")
+    async def test_commit_action_consumes_proof(
+        self,
+        mock_get_tenant_url,
+        mock_get_user_profile_info,
+        mock_verify_registration_ownership,
+        mock_get_auth_request_headers,
+        mock_dispatch_get_my_profile_from_ibm,
+        mock_http_client,
+        mock_request,
+    ):
+        """Commit action should consume proof and perform deletion."""
+        mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
+        mock_get_user_profile_info.return_value = (
+            "user@example.com",
+            "Test User",
+            "user-456",
+        )
+        mock_verify_registration_ownership.return_value = None
+        mock_get_auth_request_headers.return_value = {
+            "Authorization": "Bearer user-token-abc"
+        }
+        mock_profile = MagicMock()
+        mock_profile.preferredLanguage = "en"
+        mock_dispatch_get_my_profile_from_ibm.return_value = mock_profile
+
+        proof_id = "proof-123"
+        mock_request.session = {
+            "fido2_delete_verification_proofs": {
+                proof_id: {
+                    "expiresAt": int(time.time()) + 120,
+                    "registrationId": "registration-123",
+                }
+            }
+        }
+
+        mock_delete_response = MagicMock()
+        mock_delete_response.status_code = 204
+        mock_delete_response.raise_for_status = MagicMock()
+        mock_http_client.delete = AsyncMock(return_value=mock_delete_response)
+
+        request_data = DeleteRegistrationRequest(
+            id="registration-123",
+            action=DeleteRegistrationRequest.Action.COMMIT,
+            verificationProofId=proof_id,
+        )
+
+        result = await delete_registration(
+            request=mock_request,
+            http_client=mock_http_client,
+            user_access_token="user-token-abc",
+            request_data=request_data,
+        )
+
+        assert result.success is True
+        assert result.message == "FIDO2 registration deleted successfully"
+        assert proof_id not in mock_request.session["fido2_delete_verification_proofs"]
+        mock_http_client.delete.assert_called_once()

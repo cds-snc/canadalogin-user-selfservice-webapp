@@ -6,9 +6,10 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsLink,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 
 import { useTranslation, Trans } from "react-i18next";
 import parsePhoneNumberFromString from "libphonenumber-js";
@@ -101,7 +102,7 @@ export default function ConfirmUpdate({
           />
         </GcdsText>
 
-        <GcdsNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
+        <AccessibleNotice noticeRole="info" noticeTitleTag="h2" noticeTitle=" ">
           <GcdsText>
             {t("ConfirmContactPhoneNumberUpdate.onlyChanges")}{" "}
             <strong>
@@ -109,12 +110,15 @@ export default function ConfirmUpdate({
             </strong>
             <GcdsText>
               {t("ConfirmContactPhoneNumberUpdate.changeTwoStep")}{" "}
-              <GcdsLink href={manage2FAVerificationsPage}>
+              <GcdsLink
+                href={manage2FAVerificationsPage}
+                style={{ textDecoration: "underline" }}
+              >
                 {t("ConfirmContactPhoneNumberUpdate.securitySettings")}
               </GcdsLink>
             </GcdsText>
           </GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
         <GcdsGrid columns="max-content max-content" gap="200">
           <SubmitButton
             disabled={localLoading}

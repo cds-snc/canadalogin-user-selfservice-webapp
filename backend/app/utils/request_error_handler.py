@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from httpx import HTTPStatusError, RequestError, TimeoutException
 from authlib.integrations.starlette_client import OAuthError
 from pydantic import ValidationError
+from app.utils.url_sanitization import sanitize_url_for_logging
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,8 @@ class RequestErrorHandler:
                 if exc.response
                 else status.HTTP_502_BAD_GATEWAY
             )
-            url = str(exc.request.url) if exc.request else "unknown"
+            raw_url = str(exc.request.url) if exc.request else "unknown"
+            url = sanitize_url_for_logging(raw_url)
             logger.error(
                 "%s failed (status=%s, url=%s)", context, response_status_code, url
             )
@@ -78,7 +80,8 @@ class RequestErrorHandler:
             ) from exc
 
         elif isinstance(exc, RequestError):
-            url = str(exc.request.url) if exc.request else "unknown"
+            raw_url = str(exc.request.url) if exc.request else "unknown"
+            url = sanitize_url_for_logging(raw_url)
             logger.error("%s upstream request failed (url=%s)", context, url)
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,

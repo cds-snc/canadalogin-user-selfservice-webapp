@@ -7,6 +7,7 @@ from authlib.integrations.starlette_client import OAuthError
 from pydantic import ValidationError
 
 from app.utils.standardized_logging import StandardizedLogging
+from app.utils.url_sanitization import sanitize_url_for_logging
 from app.auth.services.auth import redirect_user_to_idp_verify
 
 import logging
@@ -83,7 +84,8 @@ async def http_status_error_handler(request: Request, exc: HTTPStatusError):
     status_code = (
         exc.response.status_code if exc.response else status.HTTP_502_BAD_GATEWAY
     )
-    url = str(exc.request.url) if exc.request else "unknown"
+    raw_url = str(exc.request.url) if exc.request else "unknown"
+    url = sanitize_url_for_logging(raw_url)
 
     message = (
         f"Upstream service returned the following HTTP status code: {status_code}."
@@ -97,11 +99,11 @@ async def http_status_error_handler(request: Request, exc: HTTPStatusError):
         body = extract_response_body(exc.response)
         if "messageId" in body:
             message = body.get("messageId", "N/A")
-        logger.exception(
+        logger.error(
             f"Correlation ID: {correlation_id} - Upstream service returned an error (status={status_code}, url={url}, messageId={body.get('messageId', 'N/A')}, message={body.get('message', 'N/A')}, detail={body.get('detail', 'N/A')})"
         )
     else:
-        logger.exception(
+        logger.error(
             f"Correlation ID: {correlation_id} - Upstream service returned an error (status={status_code}, url={url})"
         )
 

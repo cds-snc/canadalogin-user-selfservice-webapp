@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type CountdownAnchor =
   | {
@@ -157,10 +157,10 @@ export function useOtpExpiryCountdown(
   initialFallbackSeconds = 10,
   otpCreatedAt?: string | null,
 ) {
+  const fallbackWindowSecondsRef = useRef(initialFallbackSeconds);
   const [fallbackSeconds, setFallbackSeconds] = useState(
     initialFallbackSeconds,
   );
-  const [resetCounter, setResetCounter] = useState(0);
   const [countdownAnchor, setCountdownAnchor] =
     useState<CountdownAnchor | null>(() =>
       buildCountdownAnchor(otpExpiry, otpCreatedAt),
@@ -173,8 +173,12 @@ export function useOtpExpiryCountdown(
     const nextAnchor = buildCountdownAnchor(otpExpiry, otpCreatedAt);
     setCountdownAnchor(nextAnchor);
     setRemainingSeconds(getRemainingSeconds(nextAnchor));
+  }, [otpExpiry, otpCreatedAt]);
+
+  useEffect(() => {
+    fallbackWindowSecondsRef.current = initialFallbackSeconds;
     setFallbackSeconds(initialFallbackSeconds);
-  }, [otpExpiry, otpCreatedAt, initialFallbackSeconds, resetCounter]);
+  }, [initialFallbackSeconds]);
 
   useEffect(() => {
     if (remainingSeconds === null || remainingSeconds <= 0) {
@@ -209,7 +213,8 @@ export function useOtpExpiryCountdown(
     hasServerExpiry: remainingSeconds !== null,
     isExpired: remainingSeconds !== null && remainingSeconds <= 0,
     restartFallbackCountdown: () => {
-      setResetCounter((prev) => prev + 1);
+      fallbackWindowSecondsRef.current += initialFallbackSeconds;
+      setFallbackSeconds(fallbackWindowSecondsRef.current);
     },
   };
 }

@@ -171,10 +171,13 @@ vi.mock("../../../../../services/authService", () => ({
 }));
 
 const mockDeleteRegistration = vi.fn();
+const mockVerifyDeleteRegistration = vi.fn();
 
 vi.mock("../../../api/fido2Api", () => ({
   fido2Api: {
     deleteRegistration: (...args) => mockDeleteRegistration(...args),
+    verifyDeleteRegistration: (...args) =>
+      mockVerifyDeleteRegistration(...args),
   },
 }));
 
@@ -225,7 +228,9 @@ vi.mock("../../../../TransientOtp/components/OtpVerification", () => ({
     <div data-testid="step-otpValidation">
       <button
         data-testid="otp-validate"
-        onClick={() => validateOtpCode("123456")}
+        onClick={() => {
+          void Promise.resolve(validateOtpCode("123456")).catch(() => {});
+        }}
       >
         Validate OTP
       </button>
@@ -245,7 +250,11 @@ vi.mock("../../VerifyFIDO2Passkey/VerifyFIDO2Passkey", () => ({
       <button
         data-testid="fido2-verify-callback"
         onClick={() => {
-          onCallback();
+          onCallback({
+            id: "assertion-id",
+            rawId: "raw-id",
+            type: "public-key",
+          });
         }}
       >
         Verify
@@ -291,6 +300,10 @@ describe("DeleteFIDO2PasskeyPage", () => {
     vi.clearAllMocks();
     mockUseOtpOperations.mockReturnValue({ ...mockOtpOpsDefaults });
     mockUsePasskeyOperations.mockReturnValue({ ...mockPasskeyOpsDefaults });
+    mockVerifyDeleteRegistration.mockResolvedValue({
+      success: true,
+      data: { verificationProofId: "proof-id" },
+    });
     mockValidatePasswordLoading.value = false;
     capturedPasswordSuccessCallback = null;
     mockLocation.state = {
@@ -530,28 +543,26 @@ describe("DeleteFIDO2PasskeyPage", () => {
   });
 
   it("navigates back to otpValidation when delete fails with an invalid OTP error code", async () => {
-    // Override the hook to provide a real OTP value so the OTP path is taken
+    // Override the hook to provide a real OTP value so OTP verify is attempted.
     mockUseOtpOperations.mockReturnValue({
       ...mockOtpOpsDefaults,
       userOtpValue: "123456",
       otpSentResponse: { trxnId: "txn-123" },
     });
-    mockDeleteRegistration.mockRejectedValueOnce({
+    mockVerifyDeleteRegistration.mockRejectedValueOnce({
       data: { message: "CSIAM0011E" },
     });
     renderPage({ step: "otpValidation" });
-    // Advance to confirmation
+
+    // OTP validation should fail immediately and remain on OTP step.
     await userEvent.click(screen.getByTestId("otp-validate"));
-    await waitFor(() =>
-      expect(
-        getStep("step-deleteFIDO2PasskeyConfirmation"),
-      ).toBeInTheDocument(),
-    );
-    // Attempt deletion — should fail with invalid OTP and go back
-    await userEvent.click(screen.getByTestId("confirm-delete"));
+
     await waitFor(() =>
       expect(getStep("step-otpValidation")).toBeInTheDocument(),
     );
+    expect(
+      getStep("step-deleteFIDO2PasskeyConfirmation"),
+    ).not.toBeInTheDocument();
   });
 
   // ── VerifyFIDO2Passkey step ───────────────────────────────────────────
@@ -559,6 +570,13 @@ describe("DeleteFIDO2PasskeyPage", () => {
   it("navigates to deleteFIDO2PasskeyConfirmation after FIDO2 verification callback", async () => {
     renderPage({ step: "verifyFIDO2Passkey" });
     await userEvent.click(screen.getByTestId("fido2-verify-callback"));
+    await waitFor(() => {
+      expect(mockVerifyDeleteRegistration).toHaveBeenCalledWith("passkey-42", {
+        id: "assertion-id",
+        rawId: "raw-id",
+        type: "public-key",
+      });
+    });
     expect(getStep("step-deleteFIDO2PasskeyConfirmation")).toBeInTheDocument();
   });
 
@@ -581,6 +599,16 @@ describe("DeleteFIDO2PasskeyPage", () => {
 
     await waitFor(() =>
       expect(getStep("step-deleteFIDO2PasskeySuccess")).toBeInTheDocument(),
+    );
+
+    expect(mockDeleteRegistration).toHaveBeenCalledWith(
+      "passkey-42",
+      undefined,
+      undefined,
+      {
+        action: "commit",
+        verificationProofId: "proof-id",
+      },
     );
   });
 

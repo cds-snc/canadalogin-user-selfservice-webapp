@@ -131,6 +131,37 @@ body,
   align-items: center;
 }
 
+.mobileOverflowWrap {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  column-gap: var(--gcds-spacing-100);
+}
+
+.mobileOverflowWrapMain {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.mobileOverflowWrapMain > * {
+  width: 100%;
+}
+
+.mobileOverflowWrapAction {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 47.999em) {
+  .mobileOverflowWrap {
+    flex-wrap: wrap;
+    row-gap: var(--gcds-spacing-100);
+  }
+}
+
 .separator {
   border-bottom: 1px solid #a8adb4;
   margin: var(--gcds-spacing-200) 0;

@@ -46,7 +46,11 @@ export default function SecuritySettings() {
           <GcdsText>
             {t("SecuritySettings.lastChangedOn")} {formattedPasswordChangeDate}
           </GcdsText>
-          <GcdsLink size="regular" href={passwordPage}>
+          <GcdsLink
+            size="regular"
+            href={passwordPage}
+            style={{ textDecoration: "underline" }}
+          >
             {t("SecuritySettings.change")}
           </GcdsLink>
         </GcdsGrid>
@@ -59,7 +63,11 @@ export default function SecuritySettings() {
         <GcdsText>{t("SecuritySettings.twoStepDescription")}</GcdsText>
         <GcdsGrid columns="1fr" gap="300" align-items="center">
           <EnabledBadge text={t("SecuritySettings.enabled")} />
-          <GcdsLink href={manage2FAVerificationsPage} size="regular">
+          <GcdsLink
+            href={manage2FAVerificationsPage}
+            size="regular"
+            style={{ textDecoration: "underline" }}
+          >
             {t("SecuritySettings.manage")}
           </GcdsLink>
         </GcdsGrid>

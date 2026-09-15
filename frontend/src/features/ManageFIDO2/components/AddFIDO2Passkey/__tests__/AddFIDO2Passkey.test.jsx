@@ -15,13 +15,21 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import AddFIDO2Passkey from "../AddFIDO2Passkey";
 
+let mockRouteLanguage = "en";
+
 vi.mock("react-router", () => ({
-  useParams: () => ({ language: "en" }),
+  useParams: () => ({ language: mockRouteLanguage }),
 }));
 
 vi.mock("../../../../../utils/constants", () => ({
   PAGES: {
     addFIDO2Passkey: "AddFIDO2Passkey",
+  },
+  gcHelpCentreLinks: {
+    helpCreatingPasskey: {
+      en: "https://example.test/en/create-passkey-help",
+      fr: "https://example.test/fr/create-passkey-help",
+    },
   },
   SERVICES: [],
   VITE_ENVIRONMENTS: { dev: "development", test: "test" },
@@ -92,6 +100,7 @@ describe("AddFIDO2Passkey", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRouteLanguage = "en";
   });
 
   it("renders the page heading", () => {
@@ -134,14 +143,23 @@ describe("AddFIDO2Passkey", () => {
     ).toBeInTheDocument();
   });
 
-  it("does not render problems with passkey section", () => {
+  it("renders problems with passkey section and help link", () => {
     render(<AddFIDO2Passkey {...defaultProps} />);
+
+    expect(screen.getByText("Problems with passkey?")).toBeInTheDocument();
     expect(
-      screen.queryByText("Problems with passkey?"),
-    ).not.toBeInTheDocument();
+      screen.getByRole("link", { name: "Help with creating a passkey" }),
+    ).toHaveAttribute("href", "https://example.test/en/create-passkey-help");
+  });
+
+  it("uses french help link when route language is fr", () => {
+    mockRouteLanguage = "fr";
+
+    render(<AddFIDO2Passkey {...defaultProps} />);
+
     expect(
-      screen.queryByText("Help with creating a passkey"),
-    ).not.toBeInTheDocument();
+      screen.getByRole("link", { name: "Help with creating a passkey" }),
+    ).toHaveAttribute("href", "https://example.test/fr/create-passkey-help");
   });
 
   it("renders the primary and cancel buttons", () => {

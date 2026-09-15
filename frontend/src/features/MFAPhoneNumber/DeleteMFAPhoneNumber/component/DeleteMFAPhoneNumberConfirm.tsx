@@ -55,7 +55,10 @@ export default function DeleteMFAPhoneNumberConfirm({
               {t("DeleteMFAPhoneNumberConfirm.thisText")}{" "}
               <strong>{t("DeleteMFAPhoneNumberConfirm.willNot")}</strong>{" "}
               {t("DeleteMFAPhoneNumberConfirm.deleteFromContact")}{" "}
-              <GcdsLink href={backtoProfilePage}>
+              <GcdsLink
+                href={backtoProfilePage}
+                style={{ textDecoration: "underline" }}
+              >
                 {t("DeleteMFAPhoneNumberConfirm.personalInformation")}
               </GcdsLink>
               {t("DeleteMFAPhoneNumberConfirm.period")}

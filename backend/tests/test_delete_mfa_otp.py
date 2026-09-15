@@ -1,8 +1,10 @@
 from datetime import datetime
+import time
 from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
 from app.otp.schemas import (
+    OtpDeletionAction,
     OtpBatchDeletionRequest,
     OtpDeletionRequest,
     OtpFactorItem,
@@ -723,6 +725,165 @@ async def test_handle_otp_deletion_validated_factor_without_otp(monkeypatch):
 
     assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
     assert "OTP verification is required" in str(exc_info.value.detail)
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_deletion_verify_action_issues_proof(monkeypatch):
+    """Verify action should validate OTP and issue a one-time proof."""
+
+    async def mock_verify_otp(
+        global_http_client, otp, trxn_id, otp_type, user_access_token
+    ):
+        return None
+
+    async def mock_get_my_profile(client, token):
+        return ProfileResponse(
+            success=True,
+            message="Profile retrieved successfully",
+            data=IBMVerifyUserProfileSchema(
+                id="user123",
+                userName="testuser@example.com",
+                active=True,
+                meta={
+                    "created": datetime.now().isoformat(),
+                    "lastModified": datetime.now().isoformat(),
+                    "location": "https://example.com/scim/v2/Users/user123",
+                    "resourceType": "User",
+                },
+                emails=[
+                    {"value": "testuser@example.com", "primary": True, "type": "work"}
+                ],
+                name={
+                    "formatted": "Test User",
+                    "givenName": "Test",
+                    "familyName": "User",
+                },
+                contactNumber="+12345678901",
+            ),
+        )
+
+    async def mock_get_proof_ttl(request, trxn_id, otp_type, user_access_token):
+        return 120
+
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_my_profile",
+        mock_get_my_profile,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp._get_mfa_delete_otp_proof_ttl_seconds",
+        mock_get_proof_ttl,
+    )
+
+    deletion_request = OtpDeletionRequest(
+        id="factor123",
+        otpType=OtpType.SMS,
+        action=OtpDeletionAction.VERIFY,
+        otp="123456",
+        trxnId="txn123",
+        otpVerificationType=OtpType.SMS,
+    )
+    mock_request = MagicMock()
+    mock_request.session = {}
+    mock_request.app = MagicMock()
+    mock_request.app.state = MagicMock()
+    mock_request.app.state.request_client = MagicMock()
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        result = await handle_otp_deletion(
+            global_http_client=client,
+            deletion_request=deletion_request,
+            user_access_token="fake-token",
+            request=mock_request,
+        )
+
+    assert result.success is True
+    assert isinstance(result.data, dict)
+    assert result.data["expiresIn"] == 120
+    assert isinstance(result.data.get("verificationProofId"), str)
+    assert result.data["verificationProofId"]
+    assert "mfa_delete_verification_proofs" in mock_request.session
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_deletion_commit_action_consumes_proof(monkeypatch):
+    """Commit action should consume a valid proof and perform deletion."""
+
+    async def mock_get_my_profile(client, token):
+        return ProfileResponse(
+            success=True,
+            message="Profile retrieved successfully",
+            data=IBMVerifyUserProfileSchema(
+                id="user123",
+                userName="testuser@example.com",
+                active=True,
+                meta={
+                    "created": datetime.now().isoformat(),
+                    "lastModified": datetime.now().isoformat(),
+                    "location": "https://example.com/scim/v2/Users/user123",
+                    "resourceType": "User",
+                },
+                emails=[
+                    {"value": "testuser@example.com", "primary": True, "type": "work"}
+                ],
+                name={
+                    "formatted": "Test User",
+                    "givenName": "Test",
+                    "familyName": "User",
+                },
+                contactNumber="+12345678901",
+            ),
+        )
+
+    async def mock_dispatch_otp_deletion(
+        client, deletion_request, user_access_token, language=None
+    ):
+        mock_response = Mock(spec=Response)
+        mock_response.status_code = 204
+        return mock_response
+
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_my_profile",
+        mock_get_my_profile,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.dispatch_otp_deletion",
+        mock_dispatch_otp_deletion,
+    )
+
+    proof_id = "proof-123"
+    mock_request = MagicMock()
+    mock_request.session = {
+        "mfa_delete_verification_proofs": {
+            proof_id: {
+                "expiresAt": int(time.time()) + 120,
+                "fingerprint": {
+                    "mode": "single",
+                    "factorIds": ["factor123"],
+                    "otpTypes": ["sms"],
+                },
+            }
+        }
+    }
+
+    deletion_request = OtpDeletionRequest(
+        id="factor123",
+        otpType=OtpType.SMS,
+        action=OtpDeletionAction.COMMIT,
+        verificationProofId=proof_id,
+    )
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        result = await handle_otp_deletion(
+            global_http_client=client,
+            deletion_request=deletion_request,
+            user_access_token="fake-token",
+            request=mock_request,
+        )
+
+    assert result.success is True
+    assert result.data["factorId"] == "factor123"
+    assert proof_id not in mock_request.session["mfa_delete_verification_proofs"]
 
 
 # ---------------------------------------------------------------------------

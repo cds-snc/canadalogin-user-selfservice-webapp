@@ -199,6 +199,7 @@ const mockSetUserOtpValue = vi.fn();
 const mockRequestOtpCode = vi.fn();
 const mockValidateOtpCode = vi.fn();
 const mockSetErrorCode = vi.fn();
+const mockSetErrorMessage = vi.fn();
 const mockOnCancel = vi.fn(() => mockNavigateHelper("/en/security-settings"));
 
 const defaultProps = {
@@ -207,6 +208,7 @@ const defaultProps = {
   requestOtpCode: mockRequestOtpCode,
   validateOtpCode: mockValidateOtpCode,
   setErrorCode: mockSetErrorCode,
+  setErrorMessage: mockSetErrorMessage,
   onCancel: mockOnCancel,
   errorMessage: "",
   userSelectedMfaFactor: {
@@ -321,7 +323,8 @@ describe("OtpVerification Component", () => {
       expect(input).toBeInTheDocument();
       expect(input).toHaveAttribute("type", "text");
       expect(input).toHaveAttribute("maxLength", "6");
-      expect(input).toHaveAttribute("minLength", "6");
+      expect(input).toHaveAttribute("size", "6");
+      expect(input).not.toHaveAttribute("minLength");
     });
 
     it("renders submit, cancel, and choose different method buttons", () => {
@@ -447,6 +450,15 @@ describe("OtpVerification Component", () => {
       expect(mockSetUserOtpValue).toHaveBeenCalledTimes(6);
     });
 
+    it("clamps input to six digits and strips non-numeric characters", () => {
+      renderComponent();
+
+      const input = screen.getByTestId("verificationCode");
+      fireEvent.change(input, { target: { value: "123456789" } });
+
+      expect(mockSetUserOtpValue).toHaveBeenLastCalledWith("123456");
+    });
+
     it("displays the current userOtpValue", () => {
       renderComponent({ userOtpValue: "123456" });
 
@@ -456,11 +468,11 @@ describe("OtpVerification Component", () => {
   });
 
   describe("Submit Button Behavior", () => {
-    it("disables submit button when code is less than 6 digits", () => {
+    it("keeps submit button enabled when code is less than 6 digits", () => {
       renderComponent({ userOtpValue: "12345" });
 
       const submitButton = screen.getByTestId("submit-button");
-      expect(submitButton).toBeDisabled();
+      expect(submitButton).not.toBeDisabled();
     });
 
     it("enables submit button when code is 6 digits", () => {
@@ -479,6 +491,19 @@ describe("OtpVerification Component", () => {
 
       await waitFor(() => {
         expect(mockValidateOtpCode).toHaveBeenCalledWith("123456");
+      });
+    });
+
+    it("shows invalidCode and does not call validateOtpCode when OTP is shorter than 6 digits", async () => {
+      const user = userEvent.setup({ delay: null });
+      renderComponent({ userOtpValue: "12345" });
+
+      const submitButton = screen.getByTestId("submit-button");
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockValidateOtpCode).not.toHaveBeenCalled();
+        expect(mockSetErrorCode).toHaveBeenLastCalledWith("invalidCode");
       });
     });
 
@@ -523,6 +548,38 @@ describe("OtpVerification Component", () => {
       });
     });
 
+    it("maps expired OTP errors to otp_max_attempts", async () => {
+      const user = userEvent.setup({ delay: null });
+      mockValidateOtpCode.mockRejectedValue({
+        data: { message: "CSIAM0010E" },
+      });
+
+      renderComponent({ userOtpValue: "123456" });
+
+      const submitButton = screen.getByTestId("submit-button");
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockSetErrorCode).toHaveBeenCalledWith("otp_max_attempts");
+      });
+    });
+
+    it("maps exhausted OTP retries to otp_max_attempts", async () => {
+      const user = userEvent.setup({ delay: null });
+      mockValidateOtpCode.mockRejectedValue({
+        data: { message: "CSIAM0011E", retries: 5, attempts: 5 },
+      });
+
+      renderComponent({ userOtpValue: "123456" });
+
+      const submitButton = screen.getByTestId("submit-button");
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockSetErrorCode).toHaveBeenCalledWith("otp_max_attempts");
+      });
+    });
+
     it("clears error code when submitting again", async () => {
       const user = userEvent.setup({ delay: null });
       mockValidateOtpCode.mockRejectedValueOnce({
@@ -561,6 +618,22 @@ describe("OtpVerification Component", () => {
       await user.click(chooseDifferentMethodButton);
 
       expect(mockOnBack).toHaveBeenCalled();
+      expect(mockSetErrorCode).toHaveBeenCalledWith("");
+      expect(mockSetErrorMessage).toHaveBeenCalledWith("");
+    });
+
+    it("clears errors and calls onCancel when cancel is clicked", async () => {
+      const user = userEvent.setup({ delay: null });
+      renderComponent({ showTryAnotherWay: false });
+
+      const cancelButton = screen.getByRole("button", {
+        name: "Cancel",
+      });
+      await user.click(cancelButton);
+
+      expect(mockOnCancel).toHaveBeenCalled();
+      expect(mockSetErrorCode).toHaveBeenCalledWith("");
+      expect(mockSetErrorMessage).toHaveBeenCalledWith("");
     });
   });
 
@@ -634,6 +707,57 @@ describe("OtpVerification Component", () => {
         "We have sent you a new code",
       );
     });
+
+    it("increases the resend delay by 10 seconds after each successful resend", async () => {
+      vi.useFakeTimers();
+      mockRequestOtpCode.mockResolvedValue(true);
+
+      renderComponent();
+
+      for (let second = 0; second < 10; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Request a new code"));
+      });
+
+      expect(screen.getByText(/20\s+seconds/)).toBeInTheDocument();
+
+      for (let second = 0; second < 20; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Request a new code"));
+      });
+
+      expect(screen.getByText(/30\s+seconds/)).toBeInTheDocument();
+    });
+
+    it("clears parent error message after requesting a new code", async () => {
+      vi.useFakeTimers();
+      mockRequestOtpCode.mockResolvedValue(true);
+
+      renderComponent();
+
+      for (let second = 0; second < 10; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      const requestNewCodeLink = screen.getByText("Request a new code");
+      await act(async () => {
+        fireEvent.click(requestNewCodeLink);
+      });
+
+      expect(mockSetErrorMessage).toHaveBeenCalledWith("");
+    });
   });
 
   describe("Error Display", () => {
@@ -701,7 +825,7 @@ describe("OtpVerification Component", () => {
       expect(input).toHaveValue("");
 
       const submitButton = screen.getByTestId("submit-button");
-      expect(submitButton).toBeDisabled();
+      expect(submitButton).not.toBeDisabled();
     });
 
     it("handles OTP send error without message", async () => {
@@ -833,7 +957,7 @@ describe("OtpVerification Component", () => {
       const input = screen.getByTestId("verificationCode");
       expect(input).toHaveAttribute("type", "text");
       expect(input).toHaveAttribute("maxLength", "6");
-      expect(input).toHaveAttribute("minLength", "6");
+      expect(input).not.toHaveAttribute("minLength");
       expect(input).toHaveAttribute("required");
     });
 

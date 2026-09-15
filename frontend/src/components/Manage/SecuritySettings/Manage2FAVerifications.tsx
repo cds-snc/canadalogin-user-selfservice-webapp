@@ -122,7 +122,9 @@ export default function Manage2FAVerifications() {
     <Loader text={t("Manage2FAVerifications.loading")} />
   ) : (
     <GcdsContainer role="main">
-      <ErrorSummaryWithFocus errorCode={errorCode} language={language} />
+      {!savedNoticeState?.noticeType && (
+        <ErrorSummaryWithFocus errorCode={errorCode} language={language} />
+      )}
       {savedNoticeState?.noticeType && (
         <NoticeFactory
           noticeType={savedNoticeState?.noticeType}

@@ -982,11 +982,18 @@ export const ResendOtpCode = (() => {
         });
         await waitFor(
           async () => {
+            await expect(
+              canvas.queryByText(/Request a new code in/i),
+            ).not.toBeInTheDocument();
+
             const resendLinks = canvasElement.querySelectorAll("gcds-link");
-            const resendLink = Array.from(resendLinks).find((link) =>
-              link.textContent.includes("Request a new code"),
+            const resendLink = Array.from(resendLinks).find(
+              (link) =>
+                (link.textContent || "").trim() === "Request a new code",
             );
-            await expect(resendLink).toBeInTheDocument();
+            if (!resendLink) {
+              throw new Error("Resend link is not available yet");
+            }
 
             const gcdsClickEvent = new CustomEvent("gcdsClick", {
               bubbles: true,
@@ -995,7 +1002,7 @@ export const ResendOtpCode = (() => {
             });
             resendLink.dispatchEvent(gcdsClickEvent);
           },
-          { timeout: 11000 },
+          { timeout: 15000 },
         );
 
         // Wait for resend request to process

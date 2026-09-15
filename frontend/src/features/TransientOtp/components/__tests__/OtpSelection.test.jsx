@@ -148,7 +148,7 @@ describe("OtpSelection Component", () => {
       expect(links).toHaveLength(1);
       expect(links[0]).toHaveAttribute(
         "href",
-        "https://login.canada.ca/en/users/get-started/two-step-verification-methods/",
+        "https://login.canada.ca/en/users/trouble-signing-in/problems-signing-in-with-2-step-verification/",
       );
     });
 
@@ -209,6 +209,11 @@ describe("OtpSelection Component", () => {
       expect(
         screen.getByText(/To add a passkey or security key,/),
       ).toBeInTheDocument();
+    });
+
+    it("renders editEmailPage parent page content", () => {
+      renderComponent({ parentPage: PAGES.editEmailPage });
+      expect(screen.getByText(/To change your email,/)).toBeInTheDocument();
     });
   });
 
@@ -409,7 +414,7 @@ describe("OtpSelection Component", () => {
 
       expect(screen.getByText("Verify")).toHaveAttribute(
         "aria-label",
-        "Verify with 1Password passkey",
+        "Verify with 1Password",
       );
     });
 

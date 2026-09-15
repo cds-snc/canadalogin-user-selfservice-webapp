@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  act,
+  fireEvent,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router";
 import React from "react";
@@ -174,6 +180,8 @@ describe("EmailOtpValidation", () => {
   const mockSetFormData = vi.fn();
   const mockHandleChange = vi.fn();
   const mockRequestOtpCode = vi.fn();
+  const mockSetErrorCode = vi.fn();
+  const mockSetErrorMessage = vi.fn();
   const mockUseParams = vi.mocked(useParams);
 
   const defaultProps = {
@@ -183,6 +191,8 @@ describe("EmailOtpValidation", () => {
     formData: { emailAddress: "test@example.com" },
     setFormData: mockSetFormData,
     errorMessage: "",
+    setErrorCode: mockSetErrorCode,
+    setErrorMessage: mockSetErrorMessage,
     userOtpValue: "",
     handleChange: mockHandleChange,
     requestOtpCode: mockRequestOtpCode,
@@ -242,9 +252,9 @@ describe("EmailOtpValidation", () => {
       expect(input).toHaveAttribute("name", "verificationCode");
       expect(input).toHaveAttribute("id", "verificationCode");
       expect(input).toHaveAttribute("autoComplete", "one-time-code");
-      expect(input).toHaveAttribute("size", "18");
+      expect(input).toHaveAttribute("size", "6");
       expect(input).toHaveAttribute("maxLength", "6");
-      expect(input).toHaveAttribute("minLength", "6");
+      expect(input).not.toHaveAttribute("minLength");
     });
 
     it("renders submit and cancel buttons", () => {
@@ -313,7 +323,7 @@ describe("EmailOtpValidation", () => {
   describe("Form Interactions", () => {
     it("submit button is clickable", async () => {
       const user = userEvent.setup();
-      renderComponent();
+      renderComponent({ userOtpValue: "123456" });
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);
@@ -334,7 +344,10 @@ describe("EmailOtpValidation", () => {
     it("handles form submission via onSubmitHandler", async () => {
       const user = userEvent.setup();
       const mockAsyncOnSubmit = vi.fn().mockResolvedValue();
-      renderComponent({ onSubmit: mockAsyncOnSubmit });
+      renderComponent({
+        onSubmit: mockAsyncOnSubmit,
+        userOtpValue: "123456",
+      });
 
       const form = screen.getByTestId("gcds-container").querySelector("form");
       if (form) {
@@ -342,6 +355,22 @@ describe("EmailOtpValidation", () => {
       }
 
       expect(mockAsyncOnSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not submit and shows invalid-code validation when OTP is shorter than 6 digits", async () => {
+      const user = userEvent.setup();
+      renderComponent({ userOtpValue: "12345" });
+
+      await user.click(screen.getByTestId("submit-button"));
+
+      expect(mockOnSubmit).not.toHaveBeenCalled();
+      expect(mockSetErrorCode).toHaveBeenCalledWith("invalidCode");
+      expect(mockSetErrorMessage).toHaveBeenCalledWith(
+        "Codes must be six digits. Try again.",
+      );
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Codes must be six digits. Try again.",
+      );
     });
 
     it("handles OTP input changes", async () => {
@@ -352,6 +381,16 @@ describe("EmailOtpValidation", () => {
       await user.type(input, "123456");
 
       expect(mockHandleChange).toHaveBeenCalled();
+    });
+
+    it("clamps OTP input to six numeric digits", async () => {
+      const user = userEvent.setup();
+      renderComponent();
+
+      const input = screen.getByTestId("gcds-input");
+      await user.type(input, "123456789");
+
+      expect(mockHandleChange).toHaveBeenLastCalledWith("123456");
     });
 
     it("back link is clickable", async () => {
@@ -434,6 +473,35 @@ describe("EmailOtpValidation", () => {
         screen.queryByText("We have sent you a new code"),
       ).not.toBeInTheDocument();
     });
+
+    it("increases resend delay by 10 seconds after each successful resend", async () => {
+      vi.useFakeTimers();
+      mockRequestOtpCode.mockResolvedValue(true);
+
+      renderComponent();
+
+      for (let second = 0; second < 10; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Request a new code"));
+      });
+      expect(screen.getByText(/20\s+seconds/)).toBeInTheDocument();
+
+      for (let second = 0; second < 20; second += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1000);
+        });
+      }
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Request a new code"));
+      });
+      expect(screen.getByText(/30\s+seconds/)).toBeInTheDocument();
+    });
   });
 
   describe("GCDS Component Interactions", () => {
@@ -479,7 +547,7 @@ describe("EmailOtpValidation", () => {
 
     it("should handle multiple button clicks", async () => {
       const user = userEvent.setup();
-      renderComponent();
+      renderComponent({ userOtpValue: "123456" });
 
       const submitButton = screen.getByTestId("submit-button");
       const cancelButton = screen.getByTestId("gcds-button");
@@ -506,7 +574,10 @@ describe("EmailOtpValidation", () => {
       const user = userEvent.setup();
       const mockAsyncOnSubmit = vi.fn().mockResolvedValue();
 
-      renderComponent({ onSubmit: mockAsyncOnSubmit });
+      renderComponent({
+        onSubmit: mockAsyncOnSubmit,
+        userOtpValue: "123456",
+      });
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);
@@ -563,7 +634,7 @@ describe("EmailOtpValidation", () => {
       const user = userEvent.setup();
       const mockOnSubmit = vi.fn();
 
-      renderComponent({ onSubmit: mockOnSubmit });
+      renderComponent({ onSubmit: mockOnSubmit, userOtpValue: "123456" });
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);
@@ -669,7 +740,10 @@ describe("EmailOtpValidation", () => {
     it("tests async operations with await", async () => {
       const user = userEvent.setup();
       const mockAsyncOnSubmit = vi.fn().mockResolvedValue("success");
-      renderComponent({ onSubmit: mockAsyncOnSubmit });
+      renderComponent({
+        onSubmit: mockAsyncOnSubmit,
+        userOtpValue: "123456",
+      });
 
       const submitButton = screen.getByTestId("submit-button");
       await user.click(submitButton);

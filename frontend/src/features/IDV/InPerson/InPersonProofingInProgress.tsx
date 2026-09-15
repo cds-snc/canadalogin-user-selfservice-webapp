@@ -4,9 +4,10 @@ import {
   GcdsDetails,
   GcdsGrid,
   GcdsHeading,
-  GcdsNotice,
   GcdsText,
 } from "@gcds-core/components-react";
+
+import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
@@ -87,7 +88,7 @@ export default function InPersonProofingInProgress() {
           </GcdsHeading>
         </GcdsContainer>
 
-        <GcdsNotice
+        <AccessibleNotice
           noticeRole="warning"
           noticeTitleTag="h2"
           noticeTitle={t("InPersonProofingInProgress.noticeHeading")}
@@ -101,7 +102,7 @@ export default function InPersonProofingInProgress() {
           </GcdsText>
 
           <GcdsText>{t("InPersonProofingInProgress.changedMindText")}</GcdsText>
-        </GcdsNotice>
+        </AccessibleNotice>
         <GcdsContainer>
           <GcdsDetails
             detailsTitle={t(

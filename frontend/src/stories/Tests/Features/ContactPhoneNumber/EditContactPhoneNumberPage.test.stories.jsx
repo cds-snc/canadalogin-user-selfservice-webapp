@@ -56,7 +56,10 @@ export const EditContactPhoneNumber = (() => {
         response: {
           success: true,
           data: {
+            verificationProofId: "proof-phone-update",
+            id: "test-user-123",
             userName: "test@example.com",
+            preferredLanguage: "en",
             phoneNumbers: [{ value: "+15551234567", type: "mobile" }],
           },
         },
