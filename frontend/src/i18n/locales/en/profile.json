@@ -1,8 +1,7 @@
 {
   "ProfileHome": {
     "title": "Personal information",
-    "basicInfo": "Basic information",
-    "preferredName": "Preferred name",
+    "preferredName": "Name",
     "preferredNameDescription": "This name is used for display purposes only",
     "exampleName": "Example Name",
     "edit": "Edit",
@@ -27,9 +26,9 @@
     "successNoticeTitle": "Your information was successfully updated in CanadaLogin"
   },
   "ProvenInformationCard": {
-    "name": "Name",
+    "name": "Legal Name",
     "dateOfBirth": "Date of birth",
-    "idDocument": "ID document saved to CanadaLogin",
+    "idDocument": "Source of information",
     "updateInfo": "To update this information, you'll need to complete identity proofing again.",
     "updateButton": "Update information"
   },
