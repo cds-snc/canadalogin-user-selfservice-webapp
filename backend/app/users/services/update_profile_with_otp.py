@@ -46,6 +46,7 @@ logger = logging.getLogger(__name__)
 MAX_EMAIL_LENGTH = 128
 NON_ASCII_CHARACTER_REGEX = re.compile(r"[^\x00-\x7F]")
 PROFILE_UPDATE_OTP_PROOFS_SESSION_KEY = "profile_update_otp_proofs"
+PROFILE_UPDATE_EMAIL_CONFLICTS_SESSION_KEY = "profile_update_email_conflicts"
 
 
 @dataclass
@@ -286,6 +287,17 @@ async def _apply_profile_update_otp_action(
                 detail="otp_expired",
             )
 
+        if _has_cached_email_conflict(
+            request=request,
+            trxn_id=trxn_id,
+            new_email_address=profile_update_data.newEmailAddress,
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="email_already_associated",
+            )
+
+        # Resolve proof TTL for this transaction before issuing a one-time proof.
         proof_ttl_seconds = await _get_profile_update_otp_proof_ttl_seconds(
             request=request,
             trxn_id=trxn_id,
@@ -302,11 +314,23 @@ async def _apply_profile_update_otp_action(
         )
         logger.info("OTP verification successful")
 
-        await _run_preflight_checks_for_verified_action(
-            request=request,
-            profile_update_data=profile_update_data,
-            user_access_token=user_access_token,
-        )
+        try:
+            await _run_preflight_checks_for_verified_action(
+                request=request,
+                profile_update_data=profile_update_data,
+                user_access_token=user_access_token,
+            )
+        except HTTPException as exc:
+            if (
+                exc.status_code == status.HTTP_400_BAD_REQUEST
+                and exc.detail == "email_already_associated"
+            ):
+                _cache_email_conflict(
+                    request=request,
+                    trxn_id=trxn_id,
+                    new_email_address=profile_update_data.newEmailAddress,
+                )
+            raise
 
         verification_proof_id = _store_profile_update_otp_proof(
             request,
@@ -428,6 +452,50 @@ def _get_profile_update_otp_proof_store(request: Request) -> dict[str, dict]:
     if isinstance(proof_store, dict):
         return proof_store
     return {}
+
+
+def _get_profile_update_email_conflict_store(request: Request) -> set[str]:
+    conflict_store = request.session.get(PROFILE_UPDATE_EMAIL_CONFLICTS_SESSION_KEY, [])
+    if isinstance(conflict_store, list):
+        return {entry for entry in conflict_store if isinstance(entry, str)}
+    return set()
+
+
+def _build_email_conflict_cache_key(
+    trxn_id: str,
+    new_email_address: str | None,
+) -> str | None:
+    normalized_email = _normalize_email(new_email_address)
+    if not trxn_id or not normalized_email:
+        return None
+    return f"{trxn_id}:{normalized_email}"
+
+
+def _has_cached_email_conflict(
+    request: Request,
+    trxn_id: str,
+    new_email_address: str | None,
+) -> bool:
+    cache_key = _build_email_conflict_cache_key(trxn_id, new_email_address)
+    if not cache_key:
+        return False
+
+    conflict_store = _get_profile_update_email_conflict_store(request)
+    return cache_key in conflict_store
+
+
+def _cache_email_conflict(
+    request: Request,
+    trxn_id: str,
+    new_email_address: str | None,
+) -> None:
+    cache_key = _build_email_conflict_cache_key(trxn_id, new_email_address)
+    if not cache_key:
+        return
+
+    conflict_store = _get_profile_update_email_conflict_store(request)
+    conflict_store.add(cache_key)
+    request.session[PROFILE_UPDATE_EMAIL_CONFLICTS_SESSION_KEY] = list(conflict_store)
 
 
 def _prune_expired_profile_update_otp_proofs(
