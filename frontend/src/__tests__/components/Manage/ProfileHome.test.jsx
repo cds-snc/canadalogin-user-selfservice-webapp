@@ -152,22 +152,15 @@ describe("ProfileHome", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the Basic information section", () => {
-    render(<ProfileHome />);
-    expect(
-      screen.getByRole("heading", { name: "Basic information" }),
-    ).toBeInTheDocument();
-    expect(screen.getByTestId("view-name-card")).toBeInTheDocument();
-    expect(
-      screen.queryByText("This name is used for display purposes only"),
-    ).not.toBeInTheDocument();
-  });
-
   it("renders the Contact information section", () => {
     render(<ProfileHome />);
     expect(
       screen.getByRole("heading", { name: "Contact information" }),
     ).toBeInTheDocument();
+    expect(screen.getByTestId("view-name-card")).toBeInTheDocument();
+    expect(
+      screen.queryByText("This name is used for display purposes only"),
+    ).not.toBeInTheDocument();
     expect(screen.getByTestId("view-contact-phone-number")).toBeInTheDocument();
   });
 

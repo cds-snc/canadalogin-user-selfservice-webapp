@@ -93,7 +93,9 @@ describe("ProvenInformationCard", () => {
 
   it("renders the Name section heading", () => {
     render(<ProvenInformationCard claims={claims} />);
-    expect(screen.getByRole("heading", { name: "Name" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Legal Name" }),
+    ).toBeInTheDocument();
   });
 
   it("renders the formatted name from user context", () => {
@@ -120,7 +122,7 @@ describe("ProvenInformationCard", () => {
   it("renders the ID document section heading", () => {
     render(<ProvenInformationCard claims={claims} />);
     expect(
-      screen.getByRole("heading", { name: "ID document saved to CanadaLogin" }),
+      screen.getByRole("heading", { name: "Source of information" }),
     ).toBeInTheDocument();
   });
 
@@ -145,7 +147,9 @@ describe("ProvenInformationCard", () => {
       <ProvenInformationCard claims={{ claims: {} }} />,
     );
 
-    expect(screen.getByRole("heading", { name: "Name" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Legal Name" }),
+    ).toBeInTheDocument();
     expect(container.querySelectorAll(".separator")).toHaveLength(1);
   });
 });
