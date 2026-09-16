@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.33.8](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.7...v1.33.8) (2026-09-16)
+
+
+### Bug Fixes
+
+* handle email conflict during profile update verification ([#2187](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2187)) ([da05dc9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/da05dc91f0a93efa7b6ab75b3f06c5c968238c44))
+* implement language support in login flow and related redirects ([#2180](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2180)) ([86bbb7d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/86bbb7dc18d23801990546be4ce5ed3f05a6e2de))
+
 ## [1.33.7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.6...v1.33.7) (2026-09-15)
 
 
