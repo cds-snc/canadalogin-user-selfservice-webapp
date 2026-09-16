@@ -370,6 +370,57 @@ class TestUpdateProfileWithOtpVerification:
         mock_verify_action_preflight.assert_called_once()
 
     @pytest.mark.asyncio
+    @patch(PROOF_TTL_IMPORT_PATH)
+    @patch(VERIFY_ACTION_PREFLIGHT_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_verify_action_duplicate_email_preflight_is_cached_across_retries(
+        self,
+        mock_verify_otp,
+        mock_verify_action_preflight,
+        mock_proof_ttl,
+    ):
+        mock_verify_otp.return_value = None
+        mock_proof_ttl.return_value = 123
+        mock_verify_action_preflight.side_effect = HTTPException(
+            status_code=400,
+            detail="email_already_associated",
+        )
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {}
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp="123456",
+            trxnId="verify-trxn-id",
+            otpType=OtpType.EMAIL,
+            newEmailAddress="new@example.com",
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request, profile_update_data, "user-token"
+            )
+
+        assert exc.value.status_code == 400
+        assert exc.value.detail == "email_already_associated"
+        mock_verify_otp.assert_called_once()
+        mock_verify_action_preflight.assert_called_once()
+
+        with pytest.raises(HTTPException) as retry_exc:
+            await update_profile_with_otp_verification(
+                mock_request, profile_update_data, "user-token"
+            )
+
+        assert retry_exc.value.status_code == 400
+        assert retry_exc.value.detail == "email_already_associated"
+        mock_verify_otp.assert_called_once()
+        mock_verify_action_preflight.assert_called_once()
+
+    @pytest.mark.asyncio
     @patch(PREFLIGHT_EMAIL_CHECK_IMPORT_PATH)
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
