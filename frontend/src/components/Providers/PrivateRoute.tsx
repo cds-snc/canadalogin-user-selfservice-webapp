@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from "react";
-import { Outlet, useLocation, useSearchParams } from "react-router";
+import { Outlet, useLocation, useParams, useSearchParams } from "react-router";
 import { useUser } from "./useUser";
 import Loader from "../../components/Layout/Loading";
 
@@ -29,12 +29,21 @@ function PrivateRoute() {
   const { state } = useUser();
   const { t } = useTranslation("security");
   const { pathname, search } = useLocation();
+  const { language = "en" } = useParams<{ language: string }>();
+  const routeLanguage = language === "fr" ? "fr" : "en";
 
   const returnToPage = `${pathname}${search}`;
   const isLanguageRootPath = /^\/(en|fr)\/?$/.test(pathname);
   const shouldIncludeReturnToPage = Boolean(search) || !isLanguageRootPath;
-  const loginWithReturnToPage = shouldIncludeReturnToPage
-    ? `${OIDC_REDIRECT.login}?returnToPage=${encodeURIComponent(returnToPage)}`
+  const loginSearchParams = new URLSearchParams();
+  if (shouldIncludeReturnToPage) {
+    loginSearchParams.set("returnToPage", returnToPage);
+  }
+  if (routeLanguage) {
+    loginSearchParams.set("lang", routeLanguage);
+  }
+  const loginWithReturnToPage = loginSearchParams.toString()
+    ? `${OIDC_REDIRECT.login}?${loginSearchParams.toString()}`
     : OIDC_REDIRECT.login;
 
   useEffect(() => {
@@ -51,15 +60,29 @@ function PrivateRoute() {
         // Do not pass returnToPage here; backend logout already stored one-time
         // returnToPage in session and we don't want to overwrite it.
         if (postLogoutReturnToPage) {
-          window.location.href = `${OIDC_REDIRECT.login}?returnToPage=${encodeURIComponent(postLogoutReturnToPage)}`;
+          const postLogoutSearchParams = new URLSearchParams();
+          postLogoutSearchParams.set("returnToPage", postLogoutReturnToPage);
+          if (routeLanguage) {
+            postLogoutSearchParams.set("lang", routeLanguage);
+          }
+          window.location.href = `${OIDC_REDIRECT.login}?${postLogoutSearchParams.toString()}`;
         } else {
-          window.location.href = OIDC_REDIRECT.login;
+          if (routeLanguage) {
+            window.location.href = `${OIDC_REDIRECT.login}?lang=${routeLanguage}`;
+          } else {
+            window.location.href = OIDC_REDIRECT.login;
+          }
         }
       } else {
         window.location.href = loginWithReturnToPage;
       }
     }
-  }, [loginWithReturnToPage, state.isLoading, state.userProfile]);
+  }, [
+    loginWithReturnToPage,
+    routeLanguage,
+    state.isLoading,
+    state.userProfile,
+  ]);
   if (state.isLoading) {
     return (
       <Loader
@@ -78,6 +101,8 @@ function StepupPrivateRoute({ redirectPath = "" }: StepupPrivateRouteProps) {
   const { state, dispatch } = useUser();
   const { setAuthenticatedPage } = userProfileDispatch(dispatch);
   const { pathname } = useLocation();
+  const { language = "en" } = useParams<{ language: string }>();
+  const routeLanguage = language === "fr" ? "fr" : "en";
   const [searchParams] = useSearchParams();
   const navigateHelper = useNavigateHelper();
   const { t } = useTranslation("security");
@@ -94,10 +119,18 @@ function StepupPrivateRoute({ redirectPath = "" }: StepupPrivateRouteProps) {
     returnToPagePath === pathname;
 
   const performStepupRedirect = useCallback(() => {
-    const redirectUrl = `${OIDC_REDIRECT.reauth}?${returnToPageKey}=${redirectPath ? encodeURIComponent(redirectPath) : encodeURIComponent(pathname)}`;
+    const reauthSearchParams = new URLSearchParams();
+    reauthSearchParams.set(
+      returnToPageKey,
+      redirectPath ? redirectPath : pathname,
+    );
+    if (routeLanguage) {
+      reauthSearchParams.set("lang", routeLanguage);
+    }
+    const redirectUrl = `${OIDC_REDIRECT.reauth}?${reauthSearchParams.toString()}`;
 
     window.location.href = redirectUrl;
-  }, [pathname, returnToPageKey, redirectPath]);
+  }, [pathname, returnToPageKey, redirectPath, routeLanguage]);
 
   const handleAuthenticationSuccess = useCallback(() => {
     console.log(
