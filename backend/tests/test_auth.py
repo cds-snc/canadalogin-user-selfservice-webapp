@@ -239,16 +239,26 @@ def app(monkeypatch, mock_token_transport):
         request: Request,
         returnToPage: str | None = None,
         partner: str | None = None,
+        lang: str | None = None,
     ):
         return await auth_module.redirect_user_to_idp_verify(
             request,
             returnToPage=returnToPage,
             partner=partner,
+            lang=lang,
         )
 
     @base.get("/reauth")
-    async def reauth(request: Request, returnToPage: str = "/"):
-        return await auth_module.reauthenticate_user(request, returnToPage=returnToPage)
+    async def reauth(
+        request: Request,
+        returnToPage: str = "/",
+        lang: str | None = None,
+    ):
+        return await auth_module.reauthenticate_user(
+            request,
+            returnToPage=returnToPage,
+            lang=lang,
+        )
 
     # Utilities to seed & read session in tests
     @base.get("/seed-session")
@@ -328,6 +338,50 @@ async def test_redirect_user_to_idp_verify_redirects(app, client):
         app.state.oauth_verify.last_authorize_redirect_kwargs.get("response_type")
         == "code"
     )
+
+
+@pytest.mark.asyncio
+async def test_login_passes_lang_to_authorize_redirect(app, client):
+    resp = await client.get("/login", params={"lang": "fr"}, follow_redirects=False)
+
+    assert resp.status_code in (302, 307)
+    assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("lang") == "fr"
+
+
+@pytest.mark.asyncio
+async def test_login_derives_lang_from_return_to_page(app, client):
+    resp = await client.get(
+        "/login",
+        params={"returnToPage": "/fr/security-settings"},
+        follow_redirects=False,
+    )
+
+    assert resp.status_code in (302, 307)
+    assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("lang") == "fr"
+
+
+@pytest.mark.asyncio
+async def test_login_derives_lang_from_referer(app, client):
+    resp = await client.get(
+        "/login",
+        headers={"referer": "http://testserver/fr"},
+        follow_redirects=False,
+    )
+
+    assert resp.status_code in (302, 307)
+    assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("lang") == "fr"
+
+
+@pytest.mark.asyncio
+async def test_login_invalid_lang_falls_back_to_return_to_page(app, client):
+    resp = await client.get(
+        "/login",
+        params={"lang": "es", "returnToPage": "/fr/profile"},
+        follow_redirects=False,
+    )
+
+    assert resp.status_code in (302, 307)
+    assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("lang") == "fr"
 
 
 @pytest.mark.asyncio
@@ -631,3 +685,19 @@ async def test_reauthenticate_user_with_acr_values_for_stepup(app, client):
         == "loa3_stepup"
     )
     assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("max_age") is None
+
+
+@pytest.mark.asyncio
+async def test_reauthenticate_user_passes_lang_to_authorize_redirect(app, client):
+    resp = await client.get(
+        "/reauth",
+        params={"returnToPage": "/fr/security", "lang": "fr"},
+        follow_redirects=False,
+    )
+
+    assert resp.status_code in (302, 307)
+    assert (
+        app.state.oauth_verify.last_authorize_redirect_kwargs.get("acr_values")
+        == "loa3_stepup"
+    )
+    assert app.state.oauth_verify.last_authorize_redirect_kwargs.get("lang") == "fr"

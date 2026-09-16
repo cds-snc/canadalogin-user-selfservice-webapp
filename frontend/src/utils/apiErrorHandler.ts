@@ -4,7 +4,15 @@ import type { ApiErrorLike } from "../types/utils";
 export const redirectToLogin = (returnToPage?: string): void => {
   const fallbackReturnToPage = `${window.location.pathname}${window.location.search}`;
   const targetReturnToPage = returnToPage ?? fallbackReturnToPage;
-  window.location.href = `${OIDC_REDIRECT.login}?returnToPage=${encodeURIComponent(targetReturnToPage)}`;
+  const languageMatch = window.location.pathname.match(/^\/(en|fr)(?:\/|$)/);
+  const lang = languageMatch?.[1];
+  const loginSearchParams = new URLSearchParams();
+  loginSearchParams.set("returnToPage", targetReturnToPage);
+  if (lang) {
+    loginSearchParams.set("lang", lang);
+  }
+
+  window.location.href = `${OIDC_REDIRECT.login}?${loginSearchParams.toString()}`;
 };
 
 export const handleApiError = (error: ApiErrorLike): never => {
