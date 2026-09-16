@@ -45,6 +45,9 @@ export default function ProvincialVerificationPage() {
       : partnerSuccessPage;
     url.searchParams.set("returnToPage", returnToPage);
     url.searchParams.set("partner", partnerId.toLowerCase());
+    if (language === "en" || language === "fr") {
+      url.searchParams.set("lang", language);
+    }
 
     return url.toString();
   };

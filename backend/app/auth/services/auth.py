@@ -13,6 +13,7 @@ from app.auth.services.auth_user_session import update_session_tokens
 from authlib.integrations.starlette_client import OAuthError
 
 logger = logging.getLogger(__name__)
+SUPPORTED_LOGIN_LANGUAGES = {"en", "fr"}
 
 
 def build_identity_source_redirect_url(
@@ -52,6 +53,48 @@ def is_safe_return_to_page(return_to_page: Optional[str]) -> bool:
     return re.fullmatch(r"/(en|fr)/?", return_to_page) is None
 
 
+def normalize_login_language(lang: Optional[str]) -> Optional[str]:
+    if not lang or not isinstance(lang, str):
+        return None
+
+    normalized_lang = lang.strip().lower()
+    if normalized_lang in SUPPORTED_LOGIN_LANGUAGES:
+        return normalized_lang
+
+    return None
+
+
+def extract_language_from_path(path: Optional[str]) -> Optional[str]:
+    if not path or not isinstance(path, str):
+        return None
+
+    language_match = re.match(r"^/(en|fr)(?:/|$)", path.strip().lower())
+    if language_match:
+        return language_match.group(1)
+
+    return None
+
+
+def resolve_oidc_login_language(
+    request: Request,
+    lang: Optional[str],
+    return_to_page: Optional[str],
+) -> Optional[str]:
+    normalized_lang = normalize_login_language(lang)
+    if normalized_lang:
+        return normalized_lang
+
+    route_lang = extract_language_from_path(return_to_page)
+    if route_lang:
+        return route_lang
+
+    referer = request.headers.get("referer")
+    if not referer:
+        return None
+
+    return extract_language_from_path(urlparse(referer).path)
+
+
 def get_base_profile_management_url():
     config = get_configuration()
     redirectValue = config.PROFILE_MANAGEMENT_DOMAIN
@@ -80,6 +123,7 @@ async def redirect_user_to_idp_verify(
     prompt: Optional[str] = None,
     returnToPage: Optional[str] = None,
     partner: Optional[str] = None,
+    lang: Optional[str] = None,
 ):
     """
     Get the redirect URL for the OAuth login flow.
@@ -106,6 +150,10 @@ async def redirect_user_to_idp_verify(
 
     extra_params = {}
     extra_params["response_type"] = "code"
+    resolved_lang = resolve_oidc_login_language(request, lang, returnToPage)
+    if resolved_lang:
+        extra_params["lang"] = resolved_lang
+
     if prompt:
         extra_params["prompt"] = prompt
     if partner:
@@ -191,7 +239,11 @@ async def callback_handler(request: Request):
     return RedirectResponse(url=redirectValue)
 
 
-async def reauthenticate_user(request: Request, returnToPage: str = "/"):
+async def reauthenticate_user(
+    request: Request,
+    returnToPage: str = "/",
+    lang: Optional[str] = None,
+):
     """
     Get the redirect URL for the OAuth login flow.
     This function is used to initiate a reauthentication flow with IBM Verify.
@@ -206,7 +258,12 @@ async def reauthenticate_user(request: Request, returnToPage: str = "/"):
         request.session[SessionKeys.RETURN_TO_PAGE.value] = returnToPage
         logger.info(f"Return to page set in session: {returnToPage}")
     acr_value = "loa3_stepup"
+    resolved_lang = resolve_oidc_login_language(request, lang, returnToPage)
+    reauth_params = {"acr_values": acr_value}
+    if resolved_lang:
+        reauth_params["lang"] = resolved_lang
+
     # Use acr_values for step-up authentication to require LOA3 level
     return await oauth.verify.authorize_redirect(
-        request, callback_redirect_uri, acr_values=acr_value
+        request, callback_redirect_uri, **reauth_params
     )
