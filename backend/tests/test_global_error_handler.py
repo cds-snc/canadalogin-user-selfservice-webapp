@@ -310,7 +310,7 @@ class TestErrorHandlingDeleteMfaOtp:
         response = client.request("DELETE", "/v1/otp/mfa/delete", json=deletion_request)
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_404_NOT_FOUND
         assert not response_json["success"]
         assert response_json["message"] == "test123"
 
@@ -353,7 +353,7 @@ class TestErrorHandlingDeleteMfaOtp:
         response = client.request("DELETE", "/v1/otp/mfa/delete", json=deletion_request)
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_200_OK
         assert not response_json["success"]
         assert (
             response_json["message"]
@@ -505,7 +505,7 @@ class TestErrorHandlingFido2AttestationOptions:
         )
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert not response_json["success"]
         assert response_json["message"] == "test123"
 
@@ -642,7 +642,7 @@ class TestErrorHandlingFido2AttestationResults:
         )
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert not response_json["success"]
         assert response_json["message"] == "test123"
 
@@ -767,7 +767,7 @@ class TestErrorHandlingFido2AssertionOptions:
         )
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert not response_json["success"]
         assert response_json["message"] == "test123"
 
@@ -1010,7 +1010,7 @@ class TestErrorHandlingFido2SubmitAssertionResult:
         )
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert not response_json["success"]
         assert (
             response_json["message"]
@@ -1329,7 +1329,7 @@ class TestErrorHandlingFido2DeleteRegistration:
         response = client.request("DELETE", "/v1/fido2/registration", json=request_data)
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_404_NOT_FOUND
         assert not response_json["success"]
         assert response_json["message"] == "test123"
 
@@ -1731,7 +1731,7 @@ class TestErrorHandlingFido2UpdateRegistrations:
         response = client.request("PUT", "/v1/fido2/registration", json=request_data)
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert not response_json["success"]
         assert response_json["message"] == "test123"
 
@@ -1953,7 +1953,7 @@ class TestErrorHandlingSendMfaOtp:
         response = client.request("POST", "/v1/otp/mfa/send", json=request_data)
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert not response_json["success"]
         assert response_json["message"] == "test123"
 
@@ -2011,7 +2011,7 @@ class TestErrorHandlingSendMfaOtp:
         response = client.request("POST", "/v1/otp/mfa/verify", json=request_data)
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert not response_json["success"]
         assert (
             response_json["message"]
@@ -2140,11 +2140,36 @@ class TestErrorHandlingGetMyProfile:
         response = client.request("GET", "/v1/users/profile")
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         assert not response_json["success"]
         assert (
             response_json["message"]
             == "Upstream service returned the following HTTP status code: 500."
+        )
+
+    @pytest.mark.asyncio
+    @patch.object(get_my_profile_module, "get_configuration")
+    async def test_dispatch_get_my_profile_http_error_without_response(
+        self, mock_get_configuration, mock_test_client
+    ):
+        mock_get_configuration.return_value = MagicMock()
+
+        mock_client = AsyncMock(spec=AsyncClient)
+        mock_request = Request("GET", "https://mocked-api.ibm.com/v2.0/Me")
+        mock_client.get.side_effect = HTTPStatusError(
+            "Upstream request failed", request=mock_request, response=None
+        )
+
+        client = mock_test_client(mock_client)
+
+        response = client.request("GET", "/v1/users/profile")
+        response_json = response.json()
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert not response_json["success"]
+        assert (
+            response_json["message"]
+            == "Upstream service returned the following HTTP status code: 502."
         )
 
     @pytest.mark.asyncio
@@ -2535,7 +2560,7 @@ class TestErrorHandlingSendTransientOtp:
         response = client.request("POST", "/v1/otp/transient/send", json=request_data)
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert not response_json["success"]
         assert (
             response_json["message"]
@@ -2688,7 +2713,7 @@ class TestErrorHandlingVerifyPassword:
         response = client.request("POST", "/v1/password/verify", json=request_data)
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_404_NOT_FOUND
         assert not response_json["success"]
         assert response_json["message"] == "test123"
 
@@ -2955,7 +2980,7 @@ class TestErrorHandlingVerifyPassword:
         mock_dispatch_get_my_profile_from_ibm,
         mock_test_client,
     ):
-        """IBM Verify returns 401 without messageId — should return 502 with generic message."""
+        """IBM Verify returns 401 without messageId and keeps a generic message."""
         mock_dispatch_get_my_profile_from_ibm.return_value = MagicMock()
         mock_get_admin_token.return_value = "admin-token-123"
         mock_get_auth_request_headers.return_value = {
@@ -2995,7 +3020,7 @@ class TestErrorHandlingVerifyPassword:
         response = client.request("POST", "/v1/password/verify", json=request_data)
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert not response_json["success"]
         assert (
             response_json["message"]
@@ -3384,7 +3409,7 @@ class TestErrorHandlingRpInfo:
         response = client.request("GET", "/v1/users/rp_info")
         response_json = response.json()
 
-        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         assert not response_json["success"]
         assert (
             response_json["message"]
