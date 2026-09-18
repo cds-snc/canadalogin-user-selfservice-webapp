@@ -2,12 +2,35 @@ from starlette.datastructures import MutableHeaders
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from app.constants.session_keys import SessionKeys
+from app.config import get_configuration
+
+configuration = get_configuration()
+
+
+def _build_content_security_policy() -> str:
+    """Build CSP dynamically based on current environment to allow testing."""
+    img_src = (
+        "img-src 'self' data: http: https:; "
+        if configuration.ENVIRONMENT == "local"
+        else "img-src 'self' data: https:; "
+    )
+    return (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self'; "
+        + img_src
+        + "font-src 'self'; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'; "
+        "upgrade-insecure-requests"
+    )
+
 
 # Restrict browser execution and reduce attack surface by blocking most active content
 # and disallowing embedding of this application in a frame.
-CONTENT_SECURITY_POLICY = (
-    "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
-)
+CONTENT_SECURITY_POLICY = _build_content_security_policy()
 
 # Helps isolate this site from cross-origin opener attacks by limiting window access.
 CROSS_ORIGIN_OPENER_POLICY = "same-origin"
@@ -42,15 +65,13 @@ DEFAULT_SECURITY_HEADERS = {
     "X-Content-Type-Options": X_CONTENT_TYPE_OPTIONS,
     "X-DNS-Prefetch-Control": X_DNS_PREFETCH_CONTROL,
     "X-Frame-Options": X_FRAME_OPTIONS,
+    "X-Permitted-Cross-Domain-Policies": "none",
     "X-Robots-Tag": "noindex, nofollow",
     "X-XSS-Protection": "0",
 }
 
-# Force HTTPS for a full year and include all subdomains; only enabled outside local dev.
-DEFAULT_STRICT_TRANSPORT_SECURITY = "max-age=63072000; includeSubDomains; preload"
-
-# Prevent browsers from caching authenticated API responses containing sensitive data.
-AUTHENTICATED_CACHE_CONTROL = "no-store"
+# Force HTTPS for 1 year and include all subdomains; preload disabled to allow recovery from misconfiguration.
+DEFAULT_STRICT_TRANSPORT_SECURITY = "max-age=31536000; includeSubDomains"
 
 # Ensure caches vary based on the session cookie so authenticated responses are not reused.
 AUTHENTICATED_VARY_HEADER = "Cookie"
@@ -63,8 +84,6 @@ AUTHENTICATED_SESSION_KEYS = {
 
 
 class SecurityHeadersMiddleware:
-    _DOCS_PATHS = {"/docs", "/redoc", "/openapi.json"}
-
     def __init__(
         self,
         app: ASGIApp,
@@ -74,7 +93,11 @@ class SecurityHeadersMiddleware:
         enable_hsts: bool = True,
     ) -> None:
         self.app = app
-        self.headers = headers or DEFAULT_SECURITY_HEADERS
+        # Rebuild default headers with current CSP to support environment changes in tests
+        if headers is None:
+            headers = DEFAULT_SECURITY_HEADERS.copy()
+            headers["Content-Security-Policy"] = _build_content_security_policy()
+        self.headers = headers
         self.strict_transport_security = strict_transport_security
         self.enable_hsts = enable_hsts
 
@@ -100,12 +123,6 @@ class SecurityHeadersMiddleware:
                 headers = MutableHeaders(scope=message)
 
                 for header_name, header_value in self.headers.items():
-                    if (
-                        path in self._DOCS_PATHS
-                        and header_name == "Content-Security-Policy"
-                    ):
-                        continue
-
                     if header_name not in headers:
                         headers[header_name] = header_value
 
@@ -116,17 +133,12 @@ class SecurityHeadersMiddleware:
                         self.strict_transport_security
                     )
 
+                # Default to no-store for all responses unless the endpoint explicitly sets Cache-Control
+                # Prevent browsers from caching API responses containing sensitive data.
+                if "Cache-Control" not in headers:
+                    headers["Cache-Control"] = "no-store"
+
                 if self._has_authenticated_session(scope):
-                    cache_control = headers.get("Cache-Control")
-                    if cache_control is None:
-                        headers["Cache-Control"] = AUTHENTICATED_CACHE_CONTROL
-                    elif AUTHENTICATED_CACHE_CONTROL not in {
-                        directive.strip().lower()
-                        for directive in cache_control.split(",")
-                    }:
-                        headers["Cache-Control"] = (
-                            f"{cache_control}, {AUTHENTICATED_CACHE_CONTROL}"
-                        )
                     headers.add_vary_header(AUTHENTICATED_VARY_HEADER)
 
             await send(message)

@@ -49,7 +49,16 @@ def test_app_starts():
         "service": "gc-signin-backend",
     }
     assert response.headers["content-security-policy"] == (
-        "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self'; "
+        "img-src 'self' data: http: https:; "
+        "font-src 'self'; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'; "
+        "upgrade-insecure-requests"
     )
     assert response.headers["cross-origin-opener-policy"] == "same-origin"
     assert response.headers["cross-origin-resource-policy"] == "same-site"
@@ -61,6 +70,7 @@ def test_app_starts():
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["x-dns-prefetch-control"] == "off"
     assert response.headers["x-frame-options"] == "DENY"
+    assert response.headers["x-permitted-cross-domain-policies"] == "none"
     assert response.headers["x-robots-tag"] == "noindex, nofollow"
     assert response.headers["x-xss-protection"] == "0"
     assert "strict-transport-security" not in response.headers
@@ -74,8 +84,20 @@ def test_create_app_adds_hsts_outside_local(monkeypatch):
     response = client.get("/health/health")
 
     assert response.headers["strict-transport-security"] == (
-        "max-age=63072000; includeSubDomains; preload"
+        "max-age=31536000; includeSubDomains"
     )
+
+
+def test_create_app_uses_https_only_csp_in_production(monkeypatch):
+    monkeypatch.setattr(main_module.configuration, "ENVIRONMENT", "prod")
+
+    app = main_module.create_app()
+    client = TestClient(app)
+    response = client.get("/health/health")
+
+    # Production CSP should use https only, not http
+    assert "img-src 'self' data: https:; " in response.headers["content-security-policy"]
+    assert "http:" not in response.headers["content-security-policy"]
 
 
 def test_security_headers_middleware_skips_hsts_when_disabled():
@@ -133,16 +155,27 @@ def test_security_headers_middleware_preserves_existing_cache_control():
     client = TestClient(app)
     response = client.get("/events")
 
-    assert response.headers["cache-control"] == "no-cache, no-store"
+    assert response.headers["cache-control"] == "no-cache"
     assert "cookie" in response.headers["vary"].lower()
 
 
-def test_create_app_docs_are_not_forced_to_use_strict_csp():
+def test_create_app_docs_are_forced_to_use_strict_csp():
     client = TestClient(main_module.app)
     response = client.get("/docs")
 
     assert response.status_code == 200
-    assert "content-security-policy" not in response.headers
+    assert response.headers["content-security-policy"] == (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self'; "
+        "img-src 'self' data: http: https:; "
+        "font-src 'self'; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'; "
+        "upgrade-insecure-requests"
+    )
 
 
 def test_create_app_excludes_identity_verification_routes_outside_local_and_dev(
