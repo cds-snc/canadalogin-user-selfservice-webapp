@@ -94,7 +94,7 @@ describe("ProvenInformationCard", () => {
   it("renders the Name section heading", () => {
     render(<ProvenInformationCard claims={claims} />);
     expect(
-      screen.getByRole("heading", { name: "Legal Name" }),
+      screen.getByRole("heading", { name: "Legal name" }),
     ).toBeInTheDocument();
   });
 
@@ -148,7 +148,7 @@ describe("ProvenInformationCard", () => {
     );
 
     expect(
-      screen.getByRole("heading", { name: "Legal Name" }),
+      screen.getByRole("heading", { name: "Legal name" }),
     ).toBeInTheDocument();
     expect(container.querySelectorAll(".separator")).toHaveLength(1);
   });
