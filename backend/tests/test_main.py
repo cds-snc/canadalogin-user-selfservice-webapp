@@ -96,7 +96,9 @@ def test_create_app_uses_https_only_csp_in_production(monkeypatch):
     response = client.get("/health/health")
 
     # Production CSP should use https only, not http
-    assert "img-src 'self' data: https:; " in response.headers["content-security-policy"]
+    assert (
+        "img-src 'self' data: https:; " in response.headers["content-security-policy"]
+    )
     assert "http:" not in response.headers["content-security-policy"]
 
 

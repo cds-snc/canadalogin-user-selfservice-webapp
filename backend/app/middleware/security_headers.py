@@ -17,9 +17,7 @@ def _build_content_security_policy() -> str:
     return (
         "default-src 'self'; "
         "script-src 'self'; "
-        "style-src 'self'; "
-        + img_src
-        + "font-src 'self'; "
+        "style-src 'self'; " + img_src + "font-src 'self'; "
         "connect-src 'self'; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
