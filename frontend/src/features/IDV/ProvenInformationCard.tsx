@@ -1,5 +1,5 @@
 import {
-  GcdsButton,
+  GcdsLink,
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
@@ -74,20 +74,14 @@ export default function ProvenInformationCard({
         </GcdsText>
       </GcdsContainer>
     ) : null,
-    <GcdsGrid columns="1fr auto" className="gridInline">
-      <GcdsText marginBottom="300">
-        {t("ProvenInformationCard.updateInfo")}
+    <GcdsContainer>
+      <GcdsText>{t("ProvenInformationCard.updateInfo")}</GcdsText>
+      <GcdsText>
+        <GcdsLink href={startIdentityVerificationFlow}>
+          {t("ProvenInformationCard.updateButton")}
+        </GcdsLink>
       </GcdsText>
-      <GcdsButton
-        buttonRole="secondary"
-        type="button"
-        onGcdsClick={() => {
-          navigate(startIdentityVerificationFlow);
-        }}
-      >
-        {t("ProvenInformationCard.updateButton")}
-      </GcdsButton>
-    </GcdsGrid>,
+    </GcdsContainer>,
   ].filter(Boolean);
 
   return (
