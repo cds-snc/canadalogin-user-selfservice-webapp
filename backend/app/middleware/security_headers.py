@@ -122,6 +122,10 @@ class SecurityHeadersMiddleware:
             if message["type"] == "http.response.start":
                 headers = MutableHeaders(scope=message)
 
+                # Remove Server header to prevent technology stack disclosure
+                if "server" in headers:
+                    del headers["server"]
+
                 for header_name, header_value in self.headers.items():
                     if header_name not in headers:
                         headers[header_name] = header_value
