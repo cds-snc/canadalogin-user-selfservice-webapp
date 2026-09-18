@@ -241,9 +241,9 @@ PREFLIGHT_EMAIL_CHECK_IMPORT_PATH = (
 )
 VERIFY_ACTION_PREFLIGHT_IMPORT_PATH = "app.users.services.update_profile_with_otp._run_preflight_checks_for_verified_action"
 PROOF_TTL_IMPORT_PATH = "app.users.services.update_profile_with_otp._get_profile_update_otp_proof_ttl_seconds"
-ASSERT_PHONE_MFA_RATE_LIMIT_IMPORT_PATH = "app.users.services.update_profile_with_otp.assert_phone_mfa_change_rate_limit_not_exceeded"
+ASSERT_PHONE_MFA_RATE_LIMIT_IMPORT_PATH = "app.users.services.update_profile_with_otp.assert_contact_phone_update_rate_limit_not_exceeded"
 RECORD_PHONE_MFA_RATE_LIMIT_IMPORT_PATH = (
-    "app.users.services.update_profile_with_otp.record_phone_mfa_change_event"
+    "app.users.services.update_profile_with_otp.record_contact_phone_update_event"
 )
 
 

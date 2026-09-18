@@ -125,10 +125,10 @@ class TestSMSEnrollment:
                 )
 
                 with patch(
-                    "app.otp.services.enroll_mfa_otp.assert_phone_mfa_change_rate_limit_not_exceeded"
+                    "app.otp.services.enroll_mfa_otp.assert_phone_mfa_registration_rate_limit_not_exceeded"
                 ) as mock_assert_rate_limit:
                     with patch(
-                        "app.otp.services.enroll_mfa_otp.record_phone_mfa_change_event"
+                        "app.otp.services.enroll_mfa_otp.record_phone_mfa_registration_event"
                     ) as mock_record_rate_limit:
                         with patch(
                             "app.otp.services.enroll_mfa_otp.dispatch_otp_enrollment"
@@ -179,7 +179,7 @@ class TestSMSEnrollment:
                 )
 
                 with patch(
-                    "app.otp.services.enroll_mfa_otp.assert_phone_mfa_change_rate_limit_not_exceeded"
+                    "app.otp.services.enroll_mfa_otp.assert_phone_mfa_registration_rate_limit_not_exceeded"
                 ) as mock_assert_rate_limit:
                     mock_assert_rate_limit.side_effect = HTTPException(
                         status_code=429,

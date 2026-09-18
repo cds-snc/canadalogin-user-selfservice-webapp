@@ -41,8 +41,8 @@ from app.auth.services.auth_user_session import update_session_user_info
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import verify_otp_before_operation
 from app.utils.phone_mfa_rate_limit import (
-    assert_phone_mfa_change_rate_limit_not_exceeded,
-    record_phone_mfa_change_event,
+    assert_contact_phone_update_rate_limit_not_exceeded,
+    record_contact_phone_update_event,
 )
 
 logger = logging.getLogger(__name__)
@@ -171,7 +171,7 @@ async def _handle_profile_update_commit_after_verification(
 
     is_phone_number_update = profile_update_data.phoneNumbers is not None
     if is_phone_number_update:
-        await assert_phone_mfa_change_rate_limit_not_exceeded(
+        await assert_contact_phone_update_rate_limit_not_exceeded(
             request,
             current_profile_response.id,
         )
@@ -218,7 +218,7 @@ async def _handle_profile_update_commit_after_verification(
     _update_session_user_info_best_effort(request, profile_update_data)
 
     if is_phone_number_update:
-        await record_phone_mfa_change_event(request, current_profile_response.id)
+        await record_contact_phone_update_event(request, current_profile_response.id)
 
     logger.info("Profile updated successfully with OTP verification")
 
@@ -427,7 +427,7 @@ async def _apply_profile_update_otp_action(
                     detail="Unable to retrieve current user profile",
                 )
 
-            await assert_phone_mfa_change_rate_limit_not_exceeded(
+            await assert_contact_phone_update_rate_limit_not_exceeded(
                 request,
                 current_profile_response.id,
             )
