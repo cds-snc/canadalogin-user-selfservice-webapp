@@ -133,7 +133,7 @@ def test_security_headers_middleware_preserves_existing_cache_control():
     client = TestClient(app)
     response = client.get("/events")
 
-    assert response.headers["cache-control"] == "no-cache"
+    assert response.headers["cache-control"] == "no-cache, no-store"
     assert "cookie" in response.headers["vary"].lower()
 
 

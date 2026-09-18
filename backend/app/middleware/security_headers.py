@@ -117,7 +117,16 @@ class SecurityHeadersMiddleware:
                     )
 
                 if self._has_authenticated_session(scope):
-                    headers.setdefault("Cache-Control", AUTHENTICATED_CACHE_CONTROL)
+                    cache_control = headers.get("Cache-Control")
+                    if cache_control is None:
+                        headers["Cache-Control"] = AUTHENTICATED_CACHE_CONTROL
+                    elif AUTHENTICATED_CACHE_CONTROL not in {
+                        directive.strip().lower()
+                        for directive in cache_control.split(",")
+                    }:
+                        headers["Cache-Control"] = (
+                            f"{cache_control}, {AUTHENTICATED_CACHE_CONTROL}"
+                        )
                     headers.add_vary_header(AUTHENTICATED_VARY_HEADER)
 
             await send(message)
