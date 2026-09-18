@@ -73,7 +73,6 @@ const RadioButtons = ({
       name="radio"
       legend={t("AddMFANumber.howToSendCode")}
       options={radioOptions}
-      required={true}
       onGcdsChange={(e: CustomEvent<string>) => {
         onChangePhoneForm("otpType", (e.target as HTMLInputElement).value);
       }}

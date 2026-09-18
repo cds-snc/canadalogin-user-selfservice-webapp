@@ -25,6 +25,7 @@ export const pageIds = [
   "Error",
   "ManageDashboard",
   "ProfileHome",
+  "ConnectedServices",
   "ProfileUpdateNameSuccess",
   "ProfileUpdateNameConfirmUpdate",
   "ProfileUpdateName",

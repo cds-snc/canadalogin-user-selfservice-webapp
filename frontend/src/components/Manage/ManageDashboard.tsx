@@ -10,12 +10,13 @@ import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useError } from "../../hooks/useError";
 import { useNavigateHelper } from "../../hooks/useNavigate";
-import { PAGES } from "../../utils/constants";
+import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 import { useUser } from "../Providers/useUser";
 import { trackCardClick } from "../../utils/gatag";
 import imgPersonalInfo from "../../assets/icons/personal_info_icon.svg";
 import imgSecuritySettings from "../../assets/icons/security_settings_icon.svg";
+import imgConnectedServices from "../../assets/icons/connected_services_icon.svg";
 
 type GcdsNavigationEvent = CustomEvent<string> & {
   preventDefault: () => void;
@@ -35,6 +36,9 @@ export default function ManageDashboard() {
     language,
   });
   const securitySettingsLink = path(PAGES.securitySettings, {
+    language,
+  });
+  const connectedServicesLink = path(PAGES.connectedServices, {
     language,
   });
 
@@ -57,6 +61,18 @@ export default function ManageDashboard() {
       card_name: "Security Settings",
       card_type: "navigation",
       destination: securitySettingsLink,
+    });
+
+    navigateHelper(event.detail);
+  };
+
+  const handleConnectedServicesClick = (event: GcdsNavigationEvent) => {
+    event.preventDefault();
+
+    trackCardClick({
+      card_name: "Connected Services",
+      card_type: "navigation",
+      destination: connectedServicesLink,
     });
 
     navigateHelper(event.detail);
@@ -112,6 +128,20 @@ export default function ManageDashboard() {
             </li>
           </ul>
         </GcdsCard>
+        {DEV_ONLY_FEATURE && (
+          <GcdsCard
+            className="dashboard-card"
+            cardTitle={t("ManageDashboard.connectedServices")}
+            cardTitleTag="h3"
+            href={connectedServicesLink}
+            onGcdsClick={handleConnectedServicesClick}
+            imgSrc={imgConnectedServices}
+          >
+            <GcdsText marginBottom="0">
+              {t("ManageDashboard.connectedServicesDescription")}
+            </GcdsText>
+          </GcdsCard>
+        )}
       </GcdsGrid>
     </GcdsContainer>
   );

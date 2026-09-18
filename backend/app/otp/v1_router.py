@@ -110,7 +110,10 @@ async def enroll_otp(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await handle_otp_enrollment(
-        request.app.state.request_client, enrollment_request, user_access_token
+        request.app.state.request_client,
+        enrollment_request,
+        user_access_token,
+        request=request,
     )
 
 

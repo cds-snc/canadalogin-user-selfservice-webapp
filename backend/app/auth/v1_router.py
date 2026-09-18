@@ -41,12 +41,14 @@ async def redirect_url(
     ),
     returnToPage: Optional[str] = Query(default=None),
     partner: Optional[str] = Query(default=None),
+    lang: Optional[str] = Query(default=None),
 ):
     return await redirect_user_to_idp_verify(
         request,
         prompt=prompt,
         returnToPage=returnToPage,
         partner=partner,
+        lang=lang,
     )
 
 
@@ -71,9 +73,10 @@ async def callback(request: Request):
 async def reauth(
     request: Request,
     returnToPage: str = "/",
+    lang: Optional[str] = Query(default=None),
     user_access_token: None = Depends(get_users_current_session),
 ):
-    return await reauthenticate_user(request, returnToPage)
+    return await reauthenticate_user(request, returnToPage, lang=lang)
 
 
 @router.post(

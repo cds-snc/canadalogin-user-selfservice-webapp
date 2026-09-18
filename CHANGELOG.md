@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.33.8](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.7...v1.33.8) (2026-09-16)
+
+
+### Bug Fixes
+
+* handle email conflict during profile update verification ([#2187](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2187)) ([da05dc9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/da05dc91f0a93efa7b6ab75b3f06c5c968238c44))
+* implement language support in login flow and related redirects ([#2180](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2180)) ([86bbb7d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/86bbb7dc18d23801990546be4ce5ed3f05a6e2de))
+
+## [1.33.7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.6...v1.33.7) (2026-09-15)
+
+
+### Bug Fixes
+
+* **identity-verification:** [FE] Update details confirmation page to show verified claims ([#2117](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2117)) ([54eafb7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/54eafb717f174bfa0cea562a51b51b2cecc929b3))
+* **otp-factors:** add masked parameter to get_user_otp_factors and update related tests ([edfb681](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/edfb681bf2fa9c6bd68a0f7f32781ee4a5dbf546))
+* update email should correctly delete old email mfa ([#2168](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2168)) ([edfb681](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/edfb681bf2fa9c6bd68a0f7f32781ee4a5dbf546))
+
+
+### Miscellaneous Chores
+
+* **deps:** lock file maintenance ([#2007](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2007)) ([cd95515](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/cd95515340a3bb12247c043fb15fe7dcf344ea2b))
+
 ## [1.33.6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.5...v1.33.6) (2026-09-14)
 
 

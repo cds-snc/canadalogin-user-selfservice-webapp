@@ -131,6 +131,7 @@ export const PAGES = {
   error: "Error",
   manageDashboard: "ManageDashboard",
   ProfileHome: "ProfileHome",
+  connectedServices: "ConnectedServices",
   profileUpdateNameSuccess: "ProfileUpdateNameSuccess",
   profileUpdateNameConfirmUpdate: "ProfileUpdateNameConfirmUpdate",
   profileUpdateName: "ProfileUpdateName",

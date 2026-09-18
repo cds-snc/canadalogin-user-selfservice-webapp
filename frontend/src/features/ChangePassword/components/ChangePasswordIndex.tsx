@@ -99,7 +99,12 @@ export default function ChangePasswordIndex() {
   const backToSecuritySettingsPage = path(PAGES.securitySettings, {
     language,
   });
-  const loginWithSecuritySettingsReturn = `${OIDC_REDIRECT.login}?returnToPage=${encodeURIComponent(backToSecuritySettingsPage)}`;
+  const loginSearchParams = new URLSearchParams();
+  loginSearchParams.set("returnToPage", backToSecuritySettingsPage);
+  if (language === "en" || language === "fr") {
+    loginSearchParams.set("lang", language);
+  }
+  const loginWithSecuritySettingsReturn = `${OIDC_REDIRECT.login}?${loginSearchParams.toString()}`;
 
   // Use the password validation hook
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
