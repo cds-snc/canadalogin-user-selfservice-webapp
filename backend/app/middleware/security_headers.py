@@ -109,6 +109,8 @@ class SecurityHeadersMiddleware:
                     if header_name not in headers:
                         headers[header_name] = header_value
 
+                # Keep HSTS off in local development so browsers do not cache an
+                # HTTPS-only policy for localhost and break HTTP-based dev flows.
                 if self.enable_hsts and "Strict-Transport-Security" not in headers:
                     headers["Strict-Transport-Security"] = (
                         self.strict_transport_security
