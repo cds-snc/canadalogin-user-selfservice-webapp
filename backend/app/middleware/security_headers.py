@@ -114,8 +114,6 @@ class SecurityHeadersMiddleware:
             await self.app(scope, receive, send)
             return
 
-        path = scope.get("path")
-
         async def send_with_security_headers(message: Message) -> None:
             if message["type"] == "http.response.start":
                 headers = MutableHeaders(scope=message)
