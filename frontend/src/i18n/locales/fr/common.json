@@ -42,6 +42,7 @@
     "error_fido2_passkey_deleted": "Cette clé d'accès ne peut plus être utilisée. Choisissez une autre clé d'accès ou connectez-vous avec une autre méthode.",
     "error_get_assertion_options": "Échec de l'obtention des options d'authentification",
     "mfa_phone_duplicate": "Ce numéro de téléphone a déjà été enregistré pour cet identifiant. Veuillez entrer un numéro différent.",
+    "mfa_phone_max_factors": "Vous ne pouvez pas ajouter une autre méthode de vérification par téléphone pour le moment.",
     "otp_invalid_attempts_one": "Code invalide. Il vous reste {{count}} tentative.",
     "otp_invalid_attempts_other": "Code invalide. Il vous reste {{count}} tentatives.",
     "otp_max_attempts": "Votre code a expiré. Veuillez demander un nouveau code ci-dessous.",
@@ -52,7 +53,8 @@
     "password_invalid_attempts_one": "Mot de passe incorrect. Il vous reste {{count}} tentative.",
     "password_invalid_attempts_other": "Mot de passe incorrect. Il vous reste {{count}} tentatives.",
     "password_max_attempts": "Vous avez atteint la limite de tentatives de vérification. Attendez 15 minutes et réessayez.",
-    "otp_expired": "Votre code a expiré. Demandez un nouveau code ci-dessous."
+    "otp_expired": "Votre code a expiré. Demandez un nouveau code ci-dessous.",
+    "phone_mfa_change_rate_limit": "Vous avez atteint la limite de modifications de la vérification par téléphone."
   },
   "RelyingParty": {
     "canadaLogin": "CanadaLogin"

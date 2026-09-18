@@ -396,6 +396,52 @@ describe("EditContactPhoneNumberPage Component", () => {
     });
   });
 
+  it("shows rate-limit error when phone verification change limit is reached", async () => {
+    mockAuthService.transientOtpSend.mockResolvedValue({
+      data: { trxnId: "test-trxn-id" },
+    });
+    mockAuthService.verify_phone_otp_for_update.mockResolvedValue({
+      success: true,
+      data: { verificationProofId: "test-proof-id" },
+    });
+    mockAuthService.update_phone_with_otp.mockRejectedValue({
+      data: { message: "phone_mfa_change_rate_limit" },
+    });
+
+    render(
+      <TestWrapper>
+        <EditContactPhoneNumberPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.change(screen.getByTestId("phone-input"), {
+      target: { value: "+15551234567" },
+    });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByTestId("otp-input"), {
+      target: { value: "123456" },
+    });
+    fireEvent.click(screen.getByTestId("verify-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("confirm-btn"));
+
+    await waitFor(() => {
+      const lastStepContentCall = mockStepContent.mock.calls.at(-1)?.[0];
+      expect(lastStepContentCall?.errorCode).toBe(
+        "phone_mfa_change_rate_limit",
+      );
+    });
+  });
+
   it("handles back navigation from OTP verification", async () => {
     mockAuthService.transientOtpSend.mockResolvedValue({
       data: { trxnId: "test-trxn-id" },
