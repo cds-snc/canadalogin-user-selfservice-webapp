@@ -26,7 +26,7 @@
     "successNoticeTitle": "Your information was successfully updated in CanadaLogin"
   },
   "ProvenInformationCard": {
-    "name": "Legal Name",
+    "name": "Legal name",
     "dateOfBirth": "Date of birth",
     "idDocument": "Source of information",
     "updateInfo": "To update this information, you'll need to complete identity proofing again.",
