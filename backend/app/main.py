@@ -15,6 +15,7 @@ from pydantic import ValidationError
 
 from app.config import get_configuration
 from app.constants.redis_keys import RedisKeys
+from app.middleware import SecurityHeadersMiddleware
 
 from .routers import health
 from app.users import v1_router as v1_users_router
@@ -138,6 +139,11 @@ def create_app():
         docs_url="/docs" if is_local_environment else None,
         redoc_url="/redoc" if is_local_environment else None,
         openapi_url="/openapi.json" if is_local_environment else None,
+    )
+
+    app.add_middleware(
+        SecurityHeadersMiddleware,
+        enable_hsts=configuration.ENVIRONMENT != "local",
     )
 
     # Determine session domain
