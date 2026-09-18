@@ -75,15 +75,13 @@ export default function ProvenInformationCard({
       </GcdsContainer>
     ) : null,
     <GcdsContainer>
-      <GcdsText>
-        {t("ProvenInformationCard.updateInfo")}
-      </GcdsText>
+      <GcdsText>{t("ProvenInformationCard.updateInfo")}</GcdsText>
       <GcdsText>
         <GcdsLink href={startIdentityVerificationFlow}>
           {t("ProvenInformationCard.updateButton")}
         </GcdsLink>
       </GcdsText>
-      </GcdsContainer>,
+    </GcdsContainer>,
   ].filter(Boolean);
 
   return (
