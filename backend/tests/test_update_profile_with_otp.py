@@ -241,6 +241,10 @@ PREFLIGHT_EMAIL_CHECK_IMPORT_PATH = (
 )
 VERIFY_ACTION_PREFLIGHT_IMPORT_PATH = "app.users.services.update_profile_with_otp._run_preflight_checks_for_verified_action"
 PROOF_TTL_IMPORT_PATH = "app.users.services.update_profile_with_otp._get_profile_update_otp_proof_ttl_seconds"
+ASSERT_PHONE_MFA_RATE_LIMIT_IMPORT_PATH = "app.users.services.update_profile_with_otp.assert_phone_mfa_change_rate_limit_not_exceeded"
+RECORD_PHONE_MFA_RATE_LIMIT_IMPORT_PATH = (
+    "app.users.services.update_profile_with_otp.record_phone_mfa_change_event"
+)
 
 
 class TestUpdateProfileWithOtpVerification:
@@ -368,6 +372,61 @@ class TestUpdateProfileWithOtpVerification:
         )
         mock_verify_otp.assert_called_once()
         mock_verify_action_preflight.assert_called_once()
+
+    @pytest.mark.asyncio
+    @patch(PROOF_TTL_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    @patch(ASSERT_PHONE_MFA_RATE_LIMIT_IMPORT_PATH)
+    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
+    async def test_verify_action_phone_update_rate_limit_blocks_before_otp_verify(
+        self,
+        mock_get_profile,
+        mock_assert_phone_mfa_rate_limit,
+        mock_verify_otp,
+        mock_proof_ttl,
+    ):
+        mock_get_profile.return_value = IBMVerifyUserProfileSchema(
+            id="user-123",
+            userName="user@example.com",
+            emails=[EmailItem(value="user@example.com", type="work")],
+            active=True,
+            meta={
+                "location": "https://example.com/users/user-123",
+                "created": "2023-01-01T00:00:00Z",
+                "lastModified": "2023-09-22T12:30:00Z",
+                "resourceType": "User",
+            },
+        )
+        mock_assert_phone_mfa_rate_limit.side_effect = HTTPException(
+            status_code=429,
+            detail="phone_mfa_change_rate_limit",
+        )
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {}
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp="123456",
+            trxnId="verify-trxn-id",
+            otpType=OtpType.SMS,
+            phoneNumbers=[MetaDataTypeValue(value="+15551234567", type="mobile")],
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request,
+                profile_update_data,
+                "user-token",
+            )
+
+        assert exc.value.status_code == 429
+        assert exc.value.detail == "phone_mfa_change_rate_limit"
+        mock_verify_otp.assert_not_called()
+        mock_proof_ttl.assert_not_called()
 
     @pytest.mark.asyncio
     @patch(PROOF_TTL_IMPORT_PATH)
@@ -695,6 +754,8 @@ class TestUpdateProfileWithOtpVerification:
         mock_enroll_validate_email_mfa.assert_not_called()
 
     @pytest.mark.asyncio
+    @patch(RECORD_PHONE_MFA_RATE_LIMIT_IMPORT_PATH)
+    @patch(ASSERT_PHONE_MFA_RATE_LIMIT_IMPORT_PATH)
     @patch(ENROLL_VALIDATE_EMAIL_MFA_IMPORT_PATH)
     @patch(DELETE_OLD_EMAIL_MFA_IMPORT_PATH)
     @patch(BUILD_EMAIL_MFA_SYNC_CONTEXT_IMPORT_PATH)
@@ -711,6 +772,8 @@ class TestUpdateProfileWithOtpVerification:
         mock_build_email_sync_context,
         mock_delete_old_email_mfa,
         mock_enroll_validate_email_mfa,
+        mock_assert_phone_mfa_rate_limit,
+        mock_record_phone_mfa_rate_limit,
     ):
         """Test successful profile update with phone number change (no session update)"""
         # Arrange
@@ -773,6 +836,76 @@ class TestUpdateProfileWithOtpVerification:
         mock_build_email_sync_context.assert_not_called()
         mock_delete_old_email_mfa.assert_not_called()
         mock_enroll_validate_email_mfa.assert_not_called()
+        mock_assert_phone_mfa_rate_limit.assert_awaited_once_with(
+            mock_request,
+            "user-123",
+        )
+        mock_record_phone_mfa_rate_limit.assert_awaited_once_with(
+            mock_request,
+            "user-123",
+        )
+
+    @pytest.mark.asyncio
+    @patch(ASSERT_PHONE_MFA_RATE_LIMIT_IMPORT_PATH)
+    @patch(UPDATE_PROFILE_IMPORT_PATH)
+    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
+    async def test_phone_update_rate_limit_blocks_commit_action(
+        self,
+        mock_get_profile,
+        mock_update_profile,
+        mock_assert_phone_mfa_rate_limit,
+    ):
+        current_profile = IBMVerifyUserProfileSchema(
+            id="user-123",
+            userName="same@example.com",
+            emails=[EmailItem(value="same@example.com", type="work")],
+            active=True,
+            meta={
+                "location": "https://example.com/users/user-123",
+                "created": "2023-01-01T00:00:00Z",
+                "lastModified": "2023-09-22T12:30:00Z",
+                "resourceType": "User",
+            },
+        )
+        mock_get_profile.return_value = current_profile
+        mock_assert_phone_mfa_rate_limit.side_effect = HTTPException(
+            status_code=429,
+            detail="phone_mfa_change_rate_limit",
+        )
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "profile_update_otp_proofs": {
+                "proof-123": {
+                    "expiresAt": 4102444800,
+                    "otpType": "sms",
+                    "fingerprint": {
+                        "newEmailAddress": "",
+                        "phoneNumbers": [{"type": "mobile", "value": "+15551234567"}],
+                    },
+                }
+            }
+        }
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
+            verificationProofId="proof-123",
+            phoneNumbers=[MetaDataTypeValue(value="+15551234567", type="mobile")],
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request,
+                profile_update_data,
+                "user-token",
+            )
+
+        assert exc.value.status_code == 429
+        assert exc.value.detail == "phone_mfa_change_rate_limit"
+        mock_update_profile.assert_not_called()
 
     @pytest.mark.asyncio
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
