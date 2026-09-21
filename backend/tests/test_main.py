@@ -1,5 +1,5 @@
 import app.main as main_module
-from app.middleware import SecurityHeadersMiddleware
+from app.middleware.security_headers import SecurityHeadersMiddleware
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
 from fastapi.responses import Response
