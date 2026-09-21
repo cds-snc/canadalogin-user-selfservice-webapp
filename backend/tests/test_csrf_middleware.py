@@ -7,7 +7,7 @@ can run even in environments where authlib/cryptography imports fail.
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.middleware.csrf import CSRFMiddleware, CSRF_COOKIE_NAME, CSRF_HEADER_NAME
+from app.middleware.csrf import CSRFMiddleware, CSRF_TOKEN_KEY, CSRF_HEADER_NAME
 
 
 class SessionInjectorMiddleware:
@@ -56,7 +56,7 @@ def test_get_request_issues_csrf_cookie():
     response = client.get("/get")
 
     assert response.status_code == 200
-    assert CSRF_COOKIE_NAME in response.cookies
+    assert CSRF_TOKEN_KEY in response.cookies
 
 
 def test_post_without_csrf_header_is_rejected():
@@ -68,12 +68,27 @@ def test_post_without_csrf_header_is_rejected():
     assert response.status_code == 403
 
 
+def test_post_without_session_is_rejected():
+    app = FastAPI()
+
+    @app.post("/post")
+    async def post_endpoint():
+        return {"ok": True}
+
+    app.add_middleware(CSRFMiddleware)
+    client = TestClient(app)
+
+    response = client.post("/post")
+
+    assert response.status_code == 403
+
+
 def test_post_with_matching_csrf_header_is_accepted():
     SessionInjectorMiddleware._store.clear()
     client = TestClient(build_app())
 
     client.get("/get")
-    token = client.cookies.get(CSRF_COOKIE_NAME)
+    token = client.cookies.get(CSRF_TOKEN_KEY)
 
     response = client.post("/post", headers={CSRF_HEADER_NAME: token})
 

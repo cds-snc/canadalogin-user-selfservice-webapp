@@ -13,11 +13,10 @@ logger = logging.getLogger(__name__)
 
 configuration = get_configuration()
 
-# Session key used to store the per-session CSRF token server-side.
-CSRF_SESSION_KEY = "csrf_token"
-
-# Cookie exposing the token to JavaScript so the SPA can echo it back in a header.
-CSRF_COOKIE_NAME = "csrf_token"
+# Key used both as the session dict key for the server-side token and as the
+# name of the cookie that mirrors it to the browser (kept as one constant since
+# both must reference the same underlying token).
+CSRF_TOKEN_KEY = "csrf_token"
 
 # Header the SPA must send on state-changing requests; value must match the session token.
 CSRF_HEADER_NAME = "X-CSRF-Token"
@@ -54,38 +53,59 @@ class CSRFMiddleware:
         session = scope.get("session")
         token = None
 
-        if isinstance(session, dict):
-            if (
-                scope["method"] not in SAFE_METHODS
-                and connection.url.path not in CSRF_EXEMPT_PATHS
-            ):
-                session_token = session.get(CSRF_SESSION_KEY)
-                request_token = connection.headers.get(CSRF_HEADER_NAME)
-                if (
-                    not session_token
-                    or not request_token
-                    or not hmac.compare_digest(session_token, request_token)
-                ):
-                    logger.warning(
-                        f"Rejected request to {connection.url.path} with missing or invalid CSRF token"
-                    )
-                    response = JSONResponse(
-                        {"detail": "CSRF token missing or invalid."},
-                        status_code=403,
-                    )
-                    await response(scope, receive, send)
-                    return
+        requires_csrf = (
+            scope["method"] not in SAFE_METHODS
+            and connection.url.path not in CSRF_EXEMPT_PATHS
+        )
+        has_session = isinstance(session, dict)
 
-            token = session.get(CSRF_SESSION_KEY)
-            if not token:
-                token = secrets.token_urlsafe(32)
-                session[CSRF_SESSION_KEY] = token
+        # Unsafe routes require a loaded session so the server-side token can be checked.
+        if requires_csrf and not has_session:
+            logger.warning(
+                f"Rejected request to {connection.url.path} because no session is available for CSRF validation"
+            )
+            response = JSONResponse(
+                {"detail": "CSRF token missing or invalid."},
+                status_code=403,
+            )
+            await response(scope, receive, send)
+            return
+
+        # Safe and explicitly exempt requests do not need a session or CSRF cookie.
+        if not has_session:
+            await self.app(scope, receive, send)
+            return
+
+        # Validate the SPA-supplied token against the server-side session token.
+        if requires_csrf:
+            session_token = session.get(CSRF_TOKEN_KEY)
+            request_token = connection.headers.get(CSRF_HEADER_NAME)
+            if (
+                not session_token
+                or not request_token
+                or not hmac.compare_digest(session_token, request_token)
+            ):
+                logger.warning(
+                    f"Rejected request to {connection.url.path} with missing or invalid CSRF token"
+                )
+                response = JSONResponse(
+                    {"detail": "CSRF token missing or invalid."},
+                    status_code=403,
+                )
+                await response(scope, receive, send)
+                return
+
+        # Create the token lazily so it is persisted in the session before the response.
+        token = session.get(CSRF_TOKEN_KEY)
+        if not token:
+            token = secrets.token_urlsafe(32)
+            session[CSRF_TOKEN_KEY] = token
 
         async def send_with_csrf_cookie(message: Message) -> None:
             if message["type"] == "http.response.start" and token is not None:
                 headers = MutableHeaders(scope=message)
                 cookie_parts = [
-                    f"{CSRF_COOKIE_NAME}={token}",
+                    f"{CSRF_TOKEN_KEY}={token}",
                     "path=/",
                     f"max-age={configuration.session_config.SESSION_LIFETIME}",
                     "samesite=lax",
