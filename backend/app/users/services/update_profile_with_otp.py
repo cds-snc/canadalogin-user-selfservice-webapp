@@ -40,6 +40,10 @@ from app.users.services.update_my_profile import (
 from app.auth.services.auth_user_session import update_session_user_info
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import verify_otp_before_operation
+from app.utils.phone_mfa_rate_limit import (
+    assert_contact_phone_update_rate_limit_not_exceeded,
+    record_contact_phone_update_event,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -148,10 +152,90 @@ async def update_profile_with_otp_verification(
 
     logger.info("Preparing profile update workflow after verification checks")
 
-    # Step 2: Get current user profile to validate user context and prepare updates
-    # retrieve the unmasked profile
+    return await _handle_profile_update_commit_after_verification(
+        request=request,
+        profile_update_data=profile_update_data,
+        user_access_token=user_access_token,
+    )
+
+
+async def _handle_profile_update_commit_after_verification(
+    request: Request,
+    profile_update_data: ProfileUpdateWithOtpRequest,
+    user_access_token: str,
+) -> ProfileUpdateWithOtpResponse:
+    current_profile_response = await _get_current_profile_for_update_or_raise(
+        request=request,
+        user_access_token=user_access_token,
+    )
+
+    is_phone_number_update = profile_update_data.phoneNumbers is not None
+    if is_phone_number_update:
+        await assert_contact_phone_update_rate_limit_not_exceeded(
+            request,
+            current_profile_response.id,
+        )
+
+    email_mfa_theme = _get_email_mfa_theme()
+    email_mfa_sync_context, deleted_old_email_mfa_factors = (
+        await _prepare_email_mfa_sync_before_profile_update(
+            request=request,
+            profile_update_data=profile_update_data,
+            user_access_token=user_access_token,
+            current_profile=current_profile_response,
+            email_mfa_theme=email_mfa_theme,
+        )
+    )
+
+    profile_update_request = _build_profile_update_request(
+        profile_update_data,
+        current_profile_response,
+    )
+    logger.info(
+        f"Updating profile fields: {_get_update_field_names(profile_update_data)}"
+    )
+
+    profile_update_response = await _update_profile_with_restore_on_failure(
+        request=request,
+        profile_update_request=profile_update_request,
+        user_access_token=user_access_token,
+        email_mfa_sync_context=email_mfa_sync_context,
+        deleted_old_email_mfa_factors=deleted_old_email_mfa_factors,
+        user_id=current_profile_response.id,
+        preferred_language=current_profile_response.preferredLanguage,
+        email_mfa_theme=email_mfa_theme,
+    )
+
+    await _enroll_new_email_mfa_if_needed(
+        request=request,
+        user_access_token=user_access_token,
+        user_id=current_profile_response.id,
+        preferred_language=current_profile_response.preferredLanguage,
+        email_mfa_theme=email_mfa_theme,
+        email_mfa_sync_context=email_mfa_sync_context,
+    )
+
+    _update_session_user_info_best_effort(request, profile_update_data)
+
+    if is_phone_number_update:
+        await record_contact_phone_update_event(request, current_profile_response.id)
+
+    logger.info("Profile updated successfully with OTP verification")
+
+    return ProfileUpdateWithOtpResponse(
+        success=True,
+        message="Profile updated successfully after OTP verification",
+        data=profile_update_response.data,
+    )
+
+
+async def _get_current_profile_for_update_or_raise(
+    request: Request,
+    user_access_token: str,
+):
     current_profile_response = await dispatch_get_my_profile_from_ibm(
-        request.app.state.request_client, user_access_token
+        request.app.state.request_client,
+        user_access_token,
     )
 
     if not current_profile_response.userName:
@@ -162,114 +246,156 @@ async def update_profile_with_otp_verification(
         )
 
     logger.info(f"Current user: {current_profile_response.id}")
+    return current_profile_response
 
-    email_mfa_sync_context: EmailMfaSyncContext | None = None
-    email_mfa_theme = _get_email_mfa_theme()
-    deleted_old_email_mfa_factors = False
 
-    if profile_update_data.newEmailAddress:
-        email_mfa_sync_context = await _build_email_mfa_sync_context(
-            request=request,
-            user_access_token=user_access_token,
-            old_email=current_profile_response.userName,
-            new_email=profile_update_data.newEmailAddress,
+async def _prepare_email_mfa_sync_before_profile_update(
+    request: Request,
+    profile_update_data: ProfileUpdateWithOtpRequest,
+    user_access_token: str,
+    current_profile,
+    email_mfa_theme: str | None,
+) -> tuple[EmailMfaSyncContext | None, bool]:
+    if not profile_update_data.newEmailAddress:
+        return None, False
+
+    email_mfa_sync_context = await _build_email_mfa_sync_context(
+        request=request,
+        user_access_token=user_access_token,
+        old_email=current_profile.userName,
+        new_email=profile_update_data.newEmailAddress,
+    )
+    if email_mfa_sync_context is None:
+        return None, False
+
+    is_email_already_associated = await _is_email_already_associated(
+        request,
+        email_mfa_sync_context.normalized_new_email,
+    )
+    if is_email_already_associated:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="email_already_associated",
         )
 
-        if email_mfa_sync_context is not None:
-            is_email_already_associated = await _is_email_already_associated(
-                request,
-                email_mfa_sync_context.normalized_new_email,
-            )
-            if is_email_already_associated:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="email_already_associated",
-                )
-
-            await _delete_old_email_mfa_factors(
-                request=request,
-                user_access_token=user_access_token,
-                factor_ids=email_mfa_sync_context.old_email_factor_ids,
-                preferred_language=current_profile_response.preferredLanguage,
-                theme_id=email_mfa_theme,
-            )
-            deleted_old_email_mfa_factors = (
-                len(email_mfa_sync_context.old_email_factor_ids) > 0
-            )
-
-    # Step 3: Build the profile update request based on provided fields
-    profile_update_request = _build_profile_update_request(
-        profile_update_data, current_profile_response
+    await _delete_old_email_mfa_factors(
+        request=request,
+        user_access_token=user_access_token,
+        factor_ids=email_mfa_sync_context.old_email_factor_ids,
+        preferred_language=current_profile.preferredLanguage,
+        theme_id=email_mfa_theme,
     )
 
-    logger.info(
-        f"Updating profile fields: {_get_update_field_names(profile_update_data)}"
+    deleted_old_email_mfa_factors = len(email_mfa_sync_context.old_email_factor_ids) > 0
+    return email_mfa_sync_context, deleted_old_email_mfa_factors
+
+
+async def _restore_old_email_factor_if_needed(
+    request: Request,
+    user_access_token: str,
+    email_mfa_sync_context: EmailMfaSyncContext | None,
+    deleted_old_email_mfa_factors: bool,
+    user_id: str,
+    preferred_language: str | None,
+    email_mfa_theme: str | None,
+) -> None:
+    if email_mfa_sync_context is None or not deleted_old_email_mfa_factors:
+        return
+
+    await _restore_old_email_mfa_factor_after_failed_update(
+        request=request,
+        user_access_token=user_access_token,
+        user_id=user_id,
+        old_email=email_mfa_sync_context.normalized_old_email,
+        preferred_language=preferred_language,
+        theme_id=email_mfa_theme,
     )
 
-    # Step 4: Update the profile using the secure update function
+
+async def _update_profile_with_restore_on_failure(
+    request: Request,
+    profile_update_request: UserProfileUpdateRequest,
+    user_access_token: str,
+    email_mfa_sync_context: EmailMfaSyncContext | None,
+    deleted_old_email_mfa_factors: bool,
+    user_id: str,
+    preferred_language: str | None,
+    email_mfa_theme: str | None,
+):
     try:
         profile_update_response = await update_profile_for_verified_changes(
-            request, profile_update_request, user_access_token
+            request,
+            profile_update_request,
+            user_access_token,
         )
     except Exception:
-        if email_mfa_sync_context is not None and deleted_old_email_mfa_factors:
-            await _restore_old_email_mfa_factor_after_failed_update(
-                request=request,
-                user_access_token=user_access_token,
-                user_id=current_profile_response.id,
-                old_email=email_mfa_sync_context.normalized_old_email,
-                preferred_language=current_profile_response.preferredLanguage,
-                theme_id=email_mfa_theme,
-            )
-        raise
-
-    if not profile_update_response.success:
-        logger.error("Profile update failed after successful OTP verification")
-        if email_mfa_sync_context is not None and deleted_old_email_mfa_factors:
-            await _restore_old_email_mfa_factor_after_failed_update(
-                request=request,
-                user_access_token=user_access_token,
-                user_id=current_profile_response.id,
-                old_email=email_mfa_sync_context.normalized_old_email,
-                preferred_language=current_profile_response.preferredLanguage,
-                theme_id=email_mfa_theme,
-            )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Profile update failed after OTP verification",
-        )
-
-    if email_mfa_sync_context is not None:
-        await _enroll_and_validate_new_email_mfa_factor(
+        await _restore_old_email_factor_if_needed(
             request=request,
             user_access_token=user_access_token,
-            user_id=current_profile_response.id,
-            new_email=email_mfa_sync_context.normalized_new_email,
-            has_new_email_factor=email_mfa_sync_context.has_new_email_factor,
-            preferred_language=current_profile_response.preferredLanguage,
-            theme_id=email_mfa_theme,
+            email_mfa_sync_context=email_mfa_sync_context,
+            deleted_old_email_mfa_factors=deleted_old_email_mfa_factors,
+            user_id=user_id,
+            preferred_language=preferred_language,
+            email_mfa_theme=email_mfa_theme,
         )
+        raise
 
-    # Step 5: Update session if email/username was changed
-    session_updates = _build_session_updates(profile_update_data)
-    if session_updates:
-        try:
-            logger.info(
-                f"Updating session with changes: {list(session_updates.keys())}"
-            )
-            update_session_user_info(request, session_updates)
-            logger.info("Session updated successfully after profile change")
-        except Exception as e:
-            logger.warning(f"Failed to update session after profile change: {str(e)}")
-            # Don't fail the entire operation if session update fails
+    if profile_update_response.success:
+        return profile_update_response
 
-    logger.info("Profile updated successfully with OTP verification")
-
-    return ProfileUpdateWithOtpResponse(
-        success=True,
-        message="Profile updated successfully after OTP verification",
-        data=profile_update_response.data,
+    logger.error("Profile update failed after successful OTP verification")
+    await _restore_old_email_factor_if_needed(
+        request=request,
+        user_access_token=user_access_token,
+        email_mfa_sync_context=email_mfa_sync_context,
+        deleted_old_email_mfa_factors=deleted_old_email_mfa_factors,
+        user_id=user_id,
+        preferred_language=preferred_language,
+        email_mfa_theme=email_mfa_theme,
     )
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail="Profile update failed after OTP verification",
+    )
+
+
+async def _enroll_new_email_mfa_if_needed(
+    request: Request,
+    user_access_token: str,
+    user_id: str,
+    preferred_language: str | None,
+    email_mfa_theme: str | None,
+    email_mfa_sync_context: EmailMfaSyncContext | None,
+) -> None:
+    if email_mfa_sync_context is None:
+        return
+
+    await _enroll_and_validate_new_email_mfa_factor(
+        request=request,
+        user_access_token=user_access_token,
+        user_id=user_id,
+        new_email=email_mfa_sync_context.normalized_new_email,
+        has_new_email_factor=email_mfa_sync_context.has_new_email_factor,
+        preferred_language=preferred_language,
+        theme_id=email_mfa_theme,
+    )
+
+
+def _update_session_user_info_best_effort(
+    request: Request,
+    profile_update_data: ProfileUpdateWithOtpRequest,
+) -> None:
+    session_updates = _build_session_updates(profile_update_data)
+    if not session_updates:
+        return
+
+    try:
+        logger.info(f"Updating session with changes: {list(session_updates.keys())}")
+        update_session_user_info(request, session_updates)
+        logger.info("Session updated successfully after profile change")
+    except Exception as e:
+        logger.warning(f"Failed to update session after profile change: {str(e)}")
+        # Don't fail the entire operation if session update fails
 
 
 async def _apply_profile_update_otp_action(
@@ -285,6 +411,25 @@ async def _apply_profile_update_otp_action(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="otp_expired",
+            )
+
+        if profile_update_data.phoneNumbers is not None:
+            current_profile_response = await dispatch_get_my_profile_from_ibm(
+                request.app.state.request_client,
+                user_access_token,
+            )
+            if not current_profile_response.userName:
+                logger.error(
+                    "Failed to get current user profile during phone update verify"
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Unable to retrieve current user profile",
+                )
+
+            await assert_contact_phone_update_rate_limit_not_exceeded(
+                request,
+                current_profile_response.id,
             )
 
         if _has_cached_email_conflict(
