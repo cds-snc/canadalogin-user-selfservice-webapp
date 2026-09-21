@@ -555,6 +555,54 @@ describe("AddMFAPage Unit Tests", () => {
       });
     });
 
+    it("should display rate-limit error when MFA phone change limit is reached", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      addMFAPhoneNumberApi.enrollMFA.mockRejectedValue({
+        data: { message: "phone_mfa_change_rate_limit" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+          "data-error-code",
+          "phone_mfa_change_rate_limit",
+        );
+      });
+    });
+
     it("should handle enrollMFA error without data.message", async () => {
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
         success: true,
