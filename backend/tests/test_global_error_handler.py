@@ -1776,19 +1776,16 @@ class TestErrorHandlingEnrollMfaOtp:
     @patch.object(
         enroll_mfa_otp_module, "assert_phone_mfa_registration_rate_limit_not_exceeded"
     )
-    @patch.object(enroll_mfa_otp_module, "assert_registered_phone_mfa_capacity")
     @patch.object(enroll_mfa_otp_module, "get_my_profile")
     @patch.object(enroll_mfa_otp_module, "dispatch_otp_enrollment")
     async def test_handle_sms_otp_enrollment_ibm_error(
         self,
         mock_dispatch_otp_enrollment,
         mock_get_my_profile,
-        mock_assert_registered_phone_mfa_capacity,
         mock_assert_phone_mfa_registration_rate_limit_not_exceeded,
         mock_test_client,
     ):
 
-        mock_assert_registered_phone_mfa_capacity.return_value = None
         mock_assert_phone_mfa_registration_rate_limit_not_exceeded.return_value = None
         mock_get_my_profile.return_value = MagicMock(success=True)
 
@@ -1814,19 +1811,16 @@ class TestErrorHandlingEnrollMfaOtp:
     @patch.object(
         enroll_mfa_otp_module, "assert_phone_mfa_registration_rate_limit_not_exceeded"
     )
-    @patch.object(enroll_mfa_otp_module, "assert_registered_phone_mfa_capacity")
     @patch.object(enroll_mfa_otp_module, "get_my_profile")
     @patch.object(enroll_mfa_otp_module, "dispatch_otp_enrollment")
     async def test_handle_voice_otp_enrollment_ibm_error(
         self,
         mock_dispatch_otp_enrollment,
         mock_get_my_profile,
-        mock_assert_registered_phone_mfa_capacity,
         mock_assert_phone_mfa_registration_rate_limit_not_exceeded,
         mock_test_client,
     ):
 
-        mock_assert_registered_phone_mfa_capacity.return_value = None
         mock_assert_phone_mfa_registration_rate_limit_not_exceeded.return_value = None
         mock_get_my_profile.return_value = MagicMock(success=True)
 
