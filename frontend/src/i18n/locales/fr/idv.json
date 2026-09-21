@@ -13,7 +13,8 @@
     "provinceRequired": "Province/ Territory is required.",
     "countryRequired": "Country is required.",
     "idTypeRequired": "Select an ID type.",
-    "idExpiryRequired": "ID expiry date is required."
+    "idExpiryRequired": "ID expiry date is required.",
+    "selectOptionRequired": "Select an option to continue."
   },
   "ServiceCanadaCentre": {
     "heading": "Préparez-vous à vous rendre dans un centre Service Canada",
