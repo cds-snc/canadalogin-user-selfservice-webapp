@@ -95,9 +95,7 @@ export default function StartIdentityProofingPage() {
       ? AVAILABLE_LANGUAGES.fr
       : AVAILABLE_LANGUAGES.en;
   const selectOptionErrorMessage =
-    hasSubmitted && !selectedOption
-      ? getSelectOptionRequiredMessage(t)
-      : "";
+    hasSubmitted && !selectedOption ? getSelectOptionRequiredMessage(t) : "";
   const onlineSelectionPage = path(PAGES.idvProveIdentityOnlinePage, {
     language,
     journeyType,
