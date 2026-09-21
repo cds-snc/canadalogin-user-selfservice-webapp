@@ -141,11 +141,6 @@ def create_app():
         openapi_url="/openapi.json" if is_local_environment else None,
     )
 
-    app.add_middleware(
-        SecurityHeadersMiddleware,
-        enable_hsts=configuration.ENVIRONMENT != "local",
-    )
-
     # Determine session domain
     # ROOT_DOMAIN is .<ROOT_DOMAIN> example: .signin-connexion.cdssandbox.xyz
     session_domain = None
@@ -185,6 +180,11 @@ def create_app():
         lifetime=configuration.session_config.SESSION_LIFETIME,
         cookie_domain=configuration.ROOT_DOMAIN,
         cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
+    )
+
+    app.add_middleware(
+        SecurityHeadersMiddleware,
+        enable_hsts=configuration.ENVIRONMENT != "local",
     )
 
     app.include_router(health.router, prefix="/health")
