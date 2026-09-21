@@ -14,6 +14,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starsessions import SessionMiddleware
 from authlib.integrations.starlette_client import OAuthError
 
+from app.middleware.csrf import CSRF_HEADER_NAME, CSRF_TOKEN_KEY
+
 from app.auth.services.auth_user_session import (
     get_users_current_session,
     get_user_info,
@@ -115,10 +117,12 @@ def mock_test_client():
 
     clients_to_close = []
 
-    def _make_client(request_client, session_data={}, disable_overrides=False):
+    def _make_client(request_client, session_data=None, disable_overrides=False):
         from app.main import create_app
 
         app = create_app()
+        session_data = dict(session_data or {})
+        session_data.setdefault(CSRF_TOKEN_KEY, "test-csrf-token")
 
         if not disable_overrides:
             """A factory fixture to create a TestClient with custom state."""
@@ -140,6 +144,7 @@ def mock_test_client():
         app.middleware_stack = app.build_middleware_stack()
 
         client = TestClient(app, raise_server_exceptions=False)
+        client.headers[CSRF_HEADER_NAME] = session_data[CSRF_TOKEN_KEY]
         clients_to_close.append(client)
         return client
 

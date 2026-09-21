@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from fastapi import FastAPI
 from fastapi.responses import Response
 from datetime import datetime
+from starsessions import SessionAutoloadMiddleware, SessionMiddleware
 
 
 class InjectSessionMiddleware:
@@ -38,8 +39,18 @@ def get_all_route_paths(app):
     return paths
 
 
+def build_isolated_client(app):
+    app.user_middleware = [
+        middleware
+        for middleware in app.user_middleware
+        if middleware.cls not in {SessionMiddleware, SessionAutoloadMiddleware}
+    ]
+    app.middleware_stack = app.build_middleware_stack()
+    return TestClient(app, raise_server_exceptions=False)
+
+
 def test_app_starts():
-    client = TestClient(main_module.app)
+    client = build_isolated_client(main_module.create_app())
     response = client.get("/health/health")
     print(response.json())
     assert response.status_code == 200
@@ -79,7 +90,7 @@ def test_create_app_adds_hsts_outside_local(monkeypatch):
     monkeypatch.setattr(main_module.configuration, "ENVIRONMENT", "prod")
 
     app = main_module.create_app()
-    client = TestClient(app)
+    client = build_isolated_client(app)
     response = client.get("/health/health")
 
     assert response.headers["strict-transport-security"] == (
@@ -91,7 +102,7 @@ def test_create_app_uses_https_only_csp_in_production(monkeypatch):
     monkeypatch.setattr(main_module.configuration, "ENVIRONMENT", "prod")
 
     app = main_module.create_app()
-    client = TestClient(app)
+    client = build_isolated_client(app)
     response = client.get("/health/health")
 
     # Production CSP should use https only, not http
@@ -161,7 +172,7 @@ def test_security_headers_middleware_preserves_existing_cache_control():
 
 
 def test_create_app_docs_are_forced_to_use_strict_csp():
-    client = TestClient(main_module.app)
+    client = build_isolated_client(main_module.create_app())
     response = client.get("/docs")
 
     assert response.status_code == 200
