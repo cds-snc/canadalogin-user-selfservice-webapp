@@ -6,11 +6,15 @@ from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
 from app.users.services.otp_factors import get_user_otp_factor
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_auth_request_headers
+from app.utils.phone_mfa_rate_limit import (
+    assert_contact_phone_update_rate_limit_not_exceeded,
+    record_contact_phone_update_event,
+)
 from app.utils.helpers import (
     prepare_pydantic_phone_number_for_verify,
 )
 from app.utils.schemas import ResponseModel
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status
 from httpx import AsyncClient, HTTPStatusError
 
 logger = logging.getLogger(__name__)
@@ -20,6 +24,7 @@ async def handle_otp_send(
     global_http_client: AsyncClient,
     user_otp_info: UserOtpInfo,
     user_access_token: str,
+    request: Request | None = None,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
@@ -27,9 +32,19 @@ async def handle_otp_send(
     logger.info(f"Attempting to send {user_otp_info.otpType} OTP")
     start_time = datetime.now()
     my_profile_response = await get_my_profile(global_http_client, user_access_token)
+    user_id = my_profile_response.data.id
     # Get user's preferred language from profile
     user_language = my_profile_response.data.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
+
+    should_apply_contact_phone_rate_limit = (
+        request is not None
+        and user_otp_info.countAsContactPhoneUpdate
+        and user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}
+    )
+
+    if should_apply_contact_phone_rate_limit:
+        await assert_contact_phone_update_rate_limit_not_exceeded(request, user_id)
 
     if user_otp_info.factor_id is not None:
         user_otp_factor = await get_user_otp_factor(
@@ -66,6 +81,9 @@ async def handle_otp_send(
         )
 
     response_json = http_client_response.json()
+
+    if should_apply_contact_phone_rate_limit:
+        await record_contact_phone_update_event(request, user_id)
 
     if http_client_response.status_code == 201:
         logger.info(f"{user_otp_info.otpType} OTP created and sent")
