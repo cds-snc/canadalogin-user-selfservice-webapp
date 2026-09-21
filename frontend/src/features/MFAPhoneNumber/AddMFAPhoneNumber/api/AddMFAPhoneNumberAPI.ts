@@ -14,6 +14,7 @@ interface MFAEnrollParams {
 interface MFASendParams {
   id: string;
   otpType: string;
+  countAsMfaAddition?: boolean;
 }
 
 interface MFAVerifyParams {
@@ -44,13 +45,18 @@ export const addMFAPhoneNumberApi = {
   },
 
   // Send MFA OTP code via SMS or Voice
-  sendMFAOTP: async ({ id, otpType }: MFASendParams): Promise<unknown> => {
+  sendMFAOTP: async ({
+    id,
+    otpType,
+    countAsMfaAddition,
+  }: MFASendParams): Promise<unknown> => {
     try {
       const response = await axios.post(
         `${config.apiUrl}${SUBMIT_END_POINTS.mfaSend}`,
         {
           id,
           otpType,
+          ...(countAsMfaAddition !== undefined ? { countAsMfaAddition } : {}),
         },
       );
       return response.data;
