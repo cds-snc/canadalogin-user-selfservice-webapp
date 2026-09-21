@@ -1543,11 +1543,17 @@ describe("AddMFAPage Unit Tests", () => {
         ).toBeInTheDocument();
       });
 
+      expect(addMFAPhoneNumberApi.sendMFAOTP).toHaveBeenNthCalledWith(1, {
+        id: "mfa-123",
+        otpType: "sms",
+        countAsMfaAddition: true,
+      });
+
       const requestNewOtpButton = screen.getByTestId("request-new-otp");
       fireEvent.click(requestNewOtpButton);
 
       await waitFor(() => {
-        expect(addMFAPhoneNumberApi.sendMFAOTP).toHaveBeenCalledWith({
+        expect(addMFAPhoneNumberApi.sendMFAOTP).toHaveBeenNthCalledWith(2, {
           id: "mfa-123",
           otpType: "sms",
         });

@@ -6,10 +6,6 @@ from app.config import get_configuration
 from app.otp.schemas import EnrollmentResponseData, OtpEnrollmentRequest, OtpType
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_auth_request_headers
-from app.utils.phone_mfa_rate_limit import (
-    assert_phone_mfa_registration_rate_limit_not_exceeded,
-    record_phone_mfa_registration_event,
-)
 from app.utils.helpers import (
     prepare_pydantic_phone_number_for_verify,
 )
@@ -56,14 +52,6 @@ async def handle_otp_enrollment(
         f"Enrolling {otp_type} OTP for user: {user_id}, language: {user_language}"
     )
 
-    should_apply_phone_rate_limit = request is not None and otp_type in {
-        OtpType.SMS,
-        OtpType.VOICE,
-    }
-
-    if should_apply_phone_rate_limit:
-        await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
-
     http_client_response = await dispatch_otp_enrollment(
         global_http_client,
         enrollment_request,
@@ -86,9 +74,6 @@ async def handle_otp_enrollment(
         )
 
     response_json = http_client_response.json()
-
-    if should_apply_phone_rate_limit:
-        await record_phone_mfa_registration_event(request, user_id)
 
     # Parse the enrollment response
     # Add destination from request since it may not be in IBM response
