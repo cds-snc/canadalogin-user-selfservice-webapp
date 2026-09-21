@@ -182,10 +182,7 @@ def create_app():
         cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
     )
 
-    app.add_middleware(
-        SecurityHeadersMiddleware,
-        enable_hsts=configuration.ENVIRONMENT != "local",
-    )
+    app.add_middleware(SecurityHeadersMiddleware)
 
     app.include_router(health.router, prefix="/health")
 

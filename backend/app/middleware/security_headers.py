@@ -85,19 +85,11 @@ class SecurityHeadersMiddleware:
     def __init__(
         self,
         app: ASGIApp,
-        *,
-        headers: dict[str, str] | None = None,
-        strict_transport_security: str = DEFAULT_STRICT_TRANSPORT_SECURITY,
-        enable_hsts: bool = True,
     ) -> None:
         self.app = app
         # Rebuild default headers with current CSP to support environment changes in tests
-        if headers is None:
-            headers = DEFAULT_SECURITY_HEADERS.copy()
-            headers["Content-Security-Policy"] = _build_content_security_policy()
-        self.headers = headers
-        self.strict_transport_security = strict_transport_security
-        self.enable_hsts = enable_hsts
+        self.headers = DEFAULT_SECURITY_HEADERS.copy()
+        self.headers["Content-Security-Policy"] = _build_content_security_policy()
 
     @staticmethod
     def _has_authenticated_session(scope: Scope) -> bool:
@@ -128,9 +120,12 @@ class SecurityHeadersMiddleware:
 
                 # Keep HSTS off in local development so browsers do not cache an
                 # HTTPS-only policy for localhost and break HTTP-based dev flows.
-                if self.enable_hsts and "Strict-Transport-Security" not in headers:
+                if (
+                    configuration.ENVIRONMENT != "local"
+                    and "Strict-Transport-Security" not in headers
+                ):
                     headers["Strict-Transport-Security"] = (
-                        self.strict_transport_security
+                        DEFAULT_STRICT_TRANSPORT_SECURITY
                     )
 
                 # Default to no-store for all responses unless the endpoint explicitly sets Cache-Control

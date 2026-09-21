@@ -102,14 +102,14 @@ def test_create_app_uses_https_only_csp_in_production(monkeypatch):
     assert "http:" not in response.headers["content-security-policy"]
 
 
-def test_security_headers_middleware_skips_hsts_when_disabled():
+def test_security_headers_middleware_skips_hsts_locally():
     app = FastAPI()
 
     @app.get("/health")
     async def read_health():
         return {"status": "ok"}
 
-    app.add_middleware(SecurityHeadersMiddleware, enable_hsts=False)
+    app.add_middleware(SecurityHeadersMiddleware)
 
     client = TestClient(app)
     response = client.get("/health")
@@ -128,7 +128,7 @@ def test_security_headers_middleware_sets_no_store_on_authenticated_response():
         InjectSessionMiddleware,
         session_data={"access_token": "token-value"},
     )
-    app.add_middleware(SecurityHeadersMiddleware, enable_hsts=False)
+    app.add_middleware(SecurityHeadersMiddleware)
 
     client = TestClient(app)
     response = client.get("/profile")
@@ -152,7 +152,7 @@ def test_security_headers_middleware_preserves_existing_cache_control():
         InjectSessionMiddleware,
         session_data={"token": {"userinfo": {"sub": "123"}}},
     )
-    app.add_middleware(SecurityHeadersMiddleware, enable_hsts=False)
+    app.add_middleware(SecurityHeadersMiddleware)
 
     client = TestClient(app)
     response = client.get("/events")
