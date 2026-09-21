@@ -58,7 +58,6 @@ def test_app_starts():
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
         "form-action 'self'; "
-        "upgrade-insecure-requests"
     )
     assert response.headers["cross-origin-opener-policy"] == "same-origin"
     assert response.headers["cross-origin-resource-policy"] == "same-site"
@@ -176,7 +175,6 @@ def test_create_app_docs_are_forced_to_use_strict_csp():
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
         "form-action 'self'; "
-        "upgrade-insecure-requests"
     )
 
 
