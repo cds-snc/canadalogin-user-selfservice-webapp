@@ -57,7 +57,7 @@ def test_app_starts():
         "connect-src 'self'; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
-        "form-action 'self';"
+        "form-action 'self'; "
     )
     assert response.headers["cross-origin-opener-policy"] == "same-origin"
     assert response.headers["cross-origin-resource-policy"] == "same-site"
@@ -174,7 +174,7 @@ def test_create_app_docs_are_forced_to_use_strict_csp():
         "connect-src 'self'; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
-        "form-action 'self';"
+        "form-action 'self'; "
     )
 
 
