@@ -116,5 +116,5 @@ class CSRFMiddleware:
                     cookie_parts.append(f"domain={configuration.ROOT_DOMAIN}")
                 headers.append("set-cookie", "; ".join(cookie_parts))
             await send(message)
-
+        # test
         await self.app(scope, receive, send_with_csrf_cookie)
