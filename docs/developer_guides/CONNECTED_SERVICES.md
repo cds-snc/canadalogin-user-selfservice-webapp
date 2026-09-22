@@ -21,7 +21,7 @@ The backend uses these server-side IBM Verify APIs:
 - `GET /v2.0/Me` with the authenticated user's access token to read the user's custom attributes and obtain the configured `pairwiseIdPerClient` entries.
 - `GET /v1.0/user/applications` with the authenticated user's server-side access token to retrieve that user's entitled applications. IBM's `searchuserapplication` reference documents this as an authenticated-user API and identifies `id`, `name`, `links`, and `status` as application fields.
 
-The OIDC `sub` claim is read from the authenticated session's server-side `userinfo`. Since `GET /v2.0/Me` is already scoped to the authenticated user, every `clientId` listed under `pairwiseIdPerClient` belongs to them; the backend collects all of these `clientId` values (regardless of their `pai`) and matches each to an application `id`. The raw custom attribute, OIDC claims, user UUID, client secret, and administrative token are never returned to the browser.
+The authenticated user's access token is used for both IBM Verify calls. Since `GET /v2.0/Me` is already scoped to the authenticated user, every `clientId` listed under `pairwiseIdPerClient` belongs to them; the backend collects all of these `clientId` values (regardless of their `pai`) and matches each to an application `id`. The raw custom attribute, user UUID, client secret, and administrative token are never returned to the browser.
 
 The existing server-side client credentials remain available for administrative application lookups used by the legacy RP-info route. Connected Services uses the authenticated user token for the user-entitlements lookup. No new browser credentials or environment variables are required.
 
