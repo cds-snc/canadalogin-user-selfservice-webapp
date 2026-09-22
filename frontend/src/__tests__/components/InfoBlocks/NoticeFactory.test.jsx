@@ -82,13 +82,19 @@ describe("NoticeFactory", () => {
       const notice = screen.getByTestId("gcds-notice");
       expect(notice).toHaveAttribute("data-page-focus-target", "true");
       expect(notice).toHaveAttribute("tabindex", "-1");
+      expect(notice).toHaveClass("notice-focus-no-ring");
     });
 
     it("moves focus to the rendered notice on mount", async () => {
       render(<NoticeFactory noticeType="passkeyAdded" />);
 
       await waitFor(() => {
-        expect(screen.getByTestId("gcds-notice")).toHaveFocus();
+        const notice = screen.getByTestId("gcds-notice");
+        expect(notice).toHaveFocus();
+        expect(notice).toHaveAttribute(
+          "aria-label",
+          expect.stringContaining("Success. Your passkey has been created"),
+        );
       });
     });
   });
