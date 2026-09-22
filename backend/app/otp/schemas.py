@@ -44,6 +44,7 @@ class UserOtpInfo(BaseModel):
     user_id: str
     otpType: OtpType
     destination: Optional[str] = None
+    countAsContactPhoneUpdate: bool = False
 
     @model_validator(mode="after")
     def validate(self):
@@ -168,6 +169,7 @@ class OtpVerificationCreateRequest(BaseModel):
 
     id: str
     otpType: OtpType
+    countAsMfaAddition: bool = False
 
 
 class VerificationCreateResponseData(BaseModel):

@@ -266,6 +266,104 @@ class TestHandleMFAOTPVerificationCreate:
                 assert "sms MFA OTP verification created successfully" in result.message
 
     @pytest.mark.asyncio
+    async def test_verification_create_counts_rate_limit_for_add_mfa_send(
+        self, mock_successful_verification_response
+    ):
+        """Count rate-limit only when send request marks this as a new MFA addition."""
+        mock_http_client = AsyncMock()
+        verification_request = OtpVerificationCreateRequest(
+            id="factor123",
+            otpType=OtpType.SMS,
+            countAsMfaAddition=True,
+        )
+        mock_request = MagicMock()
+
+        mock_profile = MagicMock(success=True)
+        mock_profile.data = MagicMock(id="user123", preferredLanguage="en")
+
+        with patch("app.otp.services.send_mfa_otp.get_my_profile") as mock_get_profile:
+            mock_get_profile.return_value = mock_profile
+
+            with patch(
+                "app.otp.services.send_mfa_otp.assert_phone_mfa_registration_rate_limit_not_exceeded"
+            ) as mock_assert_rate_limit:
+                with patch(
+                    "app.otp.services.send_mfa_otp.record_phone_mfa_registration_event"
+                ) as mock_record_rate_limit:
+                    with patch(
+                        "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
+                    ) as mock_dispatch:
+                        mock_response = MagicMock()
+                        mock_response.json.return_value = (
+                            mock_successful_verification_response
+                        )
+                        mock_dispatch.return_value = mock_response
+
+                        result = await handle_send_mfa_otp(
+                            mock_http_client,
+                            verification_request,
+                            "user_token",
+                            OtpType.SMS,
+                            request=mock_request,
+                        )
+
+                        assert result.success is True
+                        mock_assert_rate_limit.assert_awaited_once_with(
+                            mock_request,
+                            "user123",
+                        )
+                        mock_record_rate_limit.assert_awaited_once_with(
+                            mock_request,
+                            "user123",
+                        )
+
+    @pytest.mark.asyncio
+    async def test_verification_create_does_not_count_rate_limit_for_resend(
+        self, mock_successful_verification_response
+    ):
+        """Do not count resend/retry sends against add-MFA rate-limit."""
+        mock_http_client = AsyncMock()
+        verification_request = OtpVerificationCreateRequest(
+            id="factor123",
+            otpType=OtpType.SMS,
+            countAsMfaAddition=False,
+        )
+        mock_request = MagicMock()
+
+        mock_profile = MagicMock(success=True)
+        mock_profile.data = MagicMock(id="user123", preferredLanguage="en")
+
+        with patch("app.otp.services.send_mfa_otp.get_my_profile") as mock_get_profile:
+            mock_get_profile.return_value = mock_profile
+
+            with patch(
+                "app.otp.services.send_mfa_otp.assert_phone_mfa_registration_rate_limit_not_exceeded"
+            ) as mock_assert_rate_limit:
+                with patch(
+                    "app.otp.services.send_mfa_otp.record_phone_mfa_registration_event"
+                ) as mock_record_rate_limit:
+                    with patch(
+                        "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
+                    ) as mock_dispatch:
+                        mock_response = MagicMock()
+                        mock_response.json.return_value = (
+                            mock_successful_verification_response
+                        )
+                        mock_dispatch.return_value = mock_response
+
+                        result = await handle_send_mfa_otp(
+                            mock_http_client,
+                            verification_request,
+                            "user_token",
+                            OtpType.SMS,
+                            request=mock_request,
+                        )
+
+                        assert result.success is True
+                        mock_assert_rate_limit.assert_not_awaited()
+                        mock_record_rate_limit.assert_not_awaited()
+
+    @pytest.mark.asyncio
     async def test_verification_create_success_voice(
         self,
         mock_voice_verification_create_request,

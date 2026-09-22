@@ -133,6 +133,7 @@ export default function EditContactPhoneNumberPage() {
         destination: phoneFormData.phoneNumber,
         user_id: id,
         otpType: serverMapping[otpType ?? phoneFormData.otpType],
+        ...(reSendOtpCode ? {} : { countAsContactPhoneUpdate: true }),
       });
       const response =
         result as AuthServiceResponse<ContactPhoneTransactionData>;

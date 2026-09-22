@@ -4,14 +4,8 @@ from urllib.parse import quote
 
 from app.config import get_configuration
 from app.otp.schemas import EnrollmentResponseData, OtpEnrollmentRequest, OtpType
-from app.password.schemas import OtpType as FactorOtpType
-from app.users.services.otp_factors import get_user_otp_factors
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_auth_request_headers
-from app.utils.phone_mfa_rate_limit import (
-    assert_phone_mfa_registration_rate_limit_not_exceeded,
-    record_phone_mfa_registration_event,
-)
 from app.utils.helpers import (
     prepare_pydantic_phone_number_for_verify,
 )
@@ -20,9 +14,6 @@ from fastapi import HTTPException, Request, status
 from httpx import AsyncClient
 
 logger = logging.getLogger(__name__)
-
-MAX_REGISTERED_PHONE_MFA_FACTORS = 4
-MAX_REGISTERED_PHONE_MFA_ERROR_CODE = "mfa_phone_max_factors"
 
 
 def _append_theme_id_query(url: str, theme_id: str | None) -> str:
@@ -61,20 +52,6 @@ async def handle_otp_enrollment(
         f"Enrolling {otp_type} OTP for user: {user_id}, language: {user_language}"
     )
 
-    should_apply_phone_rate_limit = request is not None and otp_type in {
-        OtpType.SMS,
-        OtpType.VOICE,
-    }
-
-    if should_apply_phone_rate_limit:
-        await assert_registered_phone_mfa_capacity(
-            global_http_client,
-            user_access_token,
-        )
-
-    if should_apply_phone_rate_limit:
-        await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
-
     http_client_response = await dispatch_otp_enrollment(
         global_http_client,
         enrollment_request,
@@ -98,9 +75,6 @@ async def handle_otp_enrollment(
 
     response_json = http_client_response.json()
 
-    if should_apply_phone_rate_limit:
-        await record_phone_mfa_registration_event(request, user_id)
-
     # Parse the enrollment response
     # Add destination from request since it may not be in IBM response
     response_json["destination"] = enrollment_request.destination
@@ -111,40 +85,6 @@ async def handle_otp_enrollment(
         data=enrollment_data,
         message=f"{otp_type.value} OTP factor enrolled successfully",
     )
-
-
-async def assert_registered_phone_mfa_capacity(
-    global_http_client: AsyncClient,
-    user_access_token: str,
-) -> None:
-    factors_response = await get_user_otp_factors(
-        global_http_client,
-        user_access_token,
-        validated=None,
-        masked=False,
-    )
-
-    if not factors_response.success:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Unable to retrieve user MFA factors",
-        )
-
-    phone_factor_types = {
-        FactorOtpType.SMSOTP.value,
-        FactorOtpType.VOICEOTP.value,
-    }
-    registered_phone_factor_count = 0
-    for factor in factors_response.data:
-        factor_type = getattr(factor.type, "value", factor.type)
-        if factor_type in phone_factor_types:
-            registered_phone_factor_count += 1
-
-    if registered_phone_factor_count >= MAX_REGISTERED_PHONE_MFA_FACTORS:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=MAX_REGISTERED_PHONE_MFA_ERROR_CODE,
-        )
 
 
 async def dispatch_otp_enrollment(

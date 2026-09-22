@@ -1,6 +1,7 @@
 # backend/tests/test_send_transient_otp.py
 import json
 from types import SimpleNamespace
+from unittest.mock import AsyncMock
 
 import app.otp.services.send_transient_otp as feature_module
 import pytest
@@ -254,6 +255,108 @@ async def test_handle_success_returns_data_and_message(otp_type):
         assert model.phoneNumber == "+1 (***) ***-1234"
     # success message uses enum .value per implementation
     assert (message or "").startswith(f"{otp_type.value} OTP sent successfully")
+
+
+@pytest.mark.asyncio
+async def test_handle_contact_phone_update_counted_send_checks_and_records_rate_limit(
+    monkeypatch,
+):
+    payload = make_valid_payload(
+        OtpType.SMS,
+        correlation_id="corr-rate-limit-counted",
+        trxn_id="counted-send-1",
+    )
+
+    mock_assert_rate_limit = AsyncMock()
+    mock_record_rate_limit = AsyncMock()
+    monkeypatch.setattr(
+        feature_module,
+        "assert_contact_phone_update_rate_limit_not_exceeded",
+        mock_assert_rate_limit,
+    )
+    monkeypatch.setattr(
+        feature_module,
+        "record_contact_phone_update_event",
+        mock_record_rate_limit,
+    )
+
+    def handler(request: Request) -> Response:
+        return Response(201, json=payload)
+
+    transport = build_transport(handler)
+    async with AsyncClient(transport=transport) as client:
+        info = UserOtpInfo(
+            otpType=OtpType.SMS,
+            user_id="user@example.com",
+            destination="+14165551234",
+            countAsContactPhoneUpdate=True,
+        )
+        request = SimpleNamespace(
+            session={},
+            app=SimpleNamespace(state=SimpleNamespace(redis_client=None)),
+        )
+
+        result = await handle_otp_send(
+            client,
+            info,
+            user_access_token="USER_TOKEN",
+            request=request,
+        )
+
+    assert result.success is True
+    mock_assert_rate_limit.assert_awaited_once_with(request, "user@example.com")
+    mock_record_rate_limit.assert_awaited_once_with(request, "user@example.com")
+
+
+@pytest.mark.asyncio
+async def test_handle_contact_phone_update_resend_does_not_touch_rate_limit(
+    monkeypatch,
+):
+    payload = make_valid_payload(
+        OtpType.SMS,
+        correlation_id="corr-rate-limit-resend",
+        trxn_id="resend-1",
+    )
+
+    mock_assert_rate_limit = AsyncMock()
+    mock_record_rate_limit = AsyncMock()
+    monkeypatch.setattr(
+        feature_module,
+        "assert_contact_phone_update_rate_limit_not_exceeded",
+        mock_assert_rate_limit,
+    )
+    monkeypatch.setattr(
+        feature_module,
+        "record_contact_phone_update_event",
+        mock_record_rate_limit,
+    )
+
+    def handler(request: Request) -> Response:
+        return Response(201, json=payload)
+
+    transport = build_transport(handler)
+    async with AsyncClient(transport=transport) as client:
+        info = UserOtpInfo(
+            otpType=OtpType.SMS,
+            user_id="user@example.com",
+            destination="+14165551234",
+            countAsContactPhoneUpdate=False,
+        )
+        request = SimpleNamespace(
+            session={},
+            app=SimpleNamespace(state=SimpleNamespace(redis_client=None)),
+        )
+
+        result = await handle_otp_send(
+            client,
+            info,
+            user_access_token="USER_TOKEN",
+            request=request,
+        )
+
+    assert result.success is True
+    mock_assert_rate_limit.assert_not_awaited()
+    mock_record_rate_limit.assert_not_awaited()
 
 
 @pytest.mark.asyncio

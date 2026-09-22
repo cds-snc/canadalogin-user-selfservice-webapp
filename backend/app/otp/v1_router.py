@@ -54,6 +54,7 @@ async def send_otp(
         request.app.state.request_client,
         user_otp_info,
         user_access_token,
+        request=request,
     )
 
 
@@ -136,6 +137,7 @@ async def create_mfa_otp_verification(
         verification_request,
         user_access_token,
         verification_request.otpType,
+        request=request,
     )
 
 

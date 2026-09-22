@@ -15,6 +15,7 @@ from pydantic import ValidationError
 
 from app.config import get_configuration
 from app.constants.redis_keys import RedisKeys
+from app.middleware import SecurityHeadersMiddleware
 
 from .routers import health
 from app.users import v1_router as v1_users_router
@@ -180,6 +181,8 @@ def create_app():
         cookie_domain=configuration.ROOT_DOMAIN,
         cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
     )
+
+    app.add_middleware(SecurityHeadersMiddleware)
 
     app.include_router(health.router, prefix="/health")
 
