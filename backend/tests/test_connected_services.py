@@ -139,9 +139,7 @@ async def test_returns_all_applications_matching_pairwise_client_ids():
     ):
         response = await get_connected_services(request, "user-token")
 
-    get_applications.assert_awaited_once_with(
-        request, user_access_token="user-token"
-    )
+    get_applications.assert_awaited_once_with(request, user_access_token="user-token")
     assert [service.model_dump() for service in response.services] == [
         {
             "clientId": "client-1",
@@ -165,7 +163,9 @@ async def test_returns_empty_when_user_has_no_pairwise_entries():
         patch(
             "app.users.services.connected_services.dispatch_get_my_profile_from_ibm",
             new=AsyncMock(
-                return_value=SimpleNamespace(details=SimpleNamespace(customAttributes=None))
+                return_value=SimpleNamespace(
+                    details=SimpleNamespace(customAttributes=None)
+                )
             ),
         ),
         patch(
