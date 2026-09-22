@@ -4,9 +4,12 @@ from unittest.mock import AsyncMock
 import pytest
 from fastapi import HTTPException
 
+import app.utils.phone_mfa_rate_limit as phone_mfa_rate_limit_module
 from app.utils.phone_mfa_rate_limit import (
     CONTACT_PHONE_UPDATE_REDIS_KEY_PREFIX,
     CONTACT_PHONE_UPDATE_SESSION_KEY,
+    PHONE_RATE_LIMIT_WINDOW_SECONDS_NON_PROD,
+    PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD,
     PHONE_MFA_REGISTRATION_REDIS_KEY_PREFIX,
     PHONE_MFA_REGISTRATION_SESSION_KEY,
     assert_contact_phone_update_rate_limit_not_exceeded,
@@ -70,3 +73,53 @@ async def test_phone_mfa_and_contact_phone_events_use_different_redis_keys():
 
     expire_keys = [call.args[0] for call in redis_client.expire.await_args_list]
     assert expire_keys == increment_keys
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("environment", ["local", "dev", "test"])
+async def test_phone_mfa_rate_limit_window_is_five_minutes_in_non_prod_environments(
+    monkeypatch,
+    environment,
+):
+    monkeypatch.setattr(
+        phone_mfa_rate_limit_module,
+        "get_configuration",
+        lambda: SimpleNamespace(ENVIRONMENT=environment),
+    )
+
+    redis_client = AsyncMock()
+    redis_client.incr.return_value = 1
+    request = _build_request_with_session(redis_client=redis_client)
+    user_id = "user-123"
+
+    await record_phone_mfa_registration_event(request, user_id)
+
+    redis_client.expire.assert_awaited_once_with(
+        f"{PHONE_MFA_REGISTRATION_REDIS_KEY_PREFIX}{user_id}",
+        PHONE_RATE_LIMIT_WINDOW_SECONDS_NON_PROD,
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("environment", ["staging", "prod"])
+async def test_contact_phone_rate_limit_window_is_24_hours_in_prod_environments(
+    monkeypatch,
+    environment,
+):
+    monkeypatch.setattr(
+        phone_mfa_rate_limit_module,
+        "get_configuration",
+        lambda: SimpleNamespace(ENVIRONMENT=environment),
+    )
+
+    redis_client = AsyncMock()
+    redis_client.incr.return_value = 1
+    request = _build_request_with_session(redis_client=redis_client)
+    user_id = "user-123"
+
+    await record_contact_phone_update_event(request, user_id)
+
+    redis_client.expire.assert_awaited_once_with(
+        f"{CONTACT_PHONE_UPDATE_REDIS_KEY_PREFIX}{user_id}",
+        PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD,
+    )

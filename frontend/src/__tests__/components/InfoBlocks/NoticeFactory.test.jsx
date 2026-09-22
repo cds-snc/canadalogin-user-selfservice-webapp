@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { vi, describe, beforeEach, it, expect, afterEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import NoticeFactory from "../../../components/InfoBlocks/NoticeFactory";
@@ -75,6 +75,27 @@ describe("NoticeFactory", () => {
       render(<NoticeFactory noticeType="mfaAdded" />);
       const notice = screen.getByTestId("gcds-notice");
       expect(notice).toHaveAttribute("data-notice-role", "success");
+    });
+
+    it("marks the rendered notice as the page focus target", () => {
+      render(<NoticeFactory noticeType="passkeyAdded" />);
+      const notice = screen.getByTestId("gcds-notice");
+      expect(notice).toHaveAttribute("data-page-focus-target", "true");
+      expect(notice).toHaveAttribute("tabindex", "-1");
+      expect(notice).toHaveClass("notice-focus-no-ring");
+    });
+
+    it("moves focus to the rendered notice on mount", async () => {
+      render(<NoticeFactory noticeType="passkeyAdded" />);
+
+      await waitFor(() => {
+        const notice = screen.getByTestId("gcds-notice");
+        expect(notice).toHaveFocus();
+        expect(notice).toHaveAttribute(
+          "aria-label",
+          expect.stringContaining("Success. Your passkey has been created"),
+        );
+      });
     });
   });
 
