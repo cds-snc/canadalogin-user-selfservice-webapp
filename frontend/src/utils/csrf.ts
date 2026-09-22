@@ -8,7 +8,14 @@ export function getCsrfTokenFromCookie(): string | null {
   const match = document.cookie.match(
     new RegExp(`(?:^|; )${CSRF_COOKIE_NAME}=([^;]*)`),
   );
-  return match ? decodeURIComponent(match[1]) : null;
+  if (!match) {
+    return null;
+  }
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return null;
+  }
 }
 
 // Echo the server-issued CSRF cookie back as a header on state-changing requests,
