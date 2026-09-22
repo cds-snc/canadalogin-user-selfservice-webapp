@@ -6,8 +6,12 @@ from app.otp.schemas import (
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_auth_request_headers
+from app.utils.phone_mfa_rate_limit import (
+    assert_phone_mfa_registration_rate_limit_not_exceeded,
+    record_phone_mfa_registration_event,
+)
 from app.utils.schemas import ResponseModel
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status
 
 
 from httpx import AsyncClient
@@ -50,6 +54,7 @@ async def handle_send_mfa_otp(
     verification_request: OtpVerificationCreateRequest,
     user_access_token: str,
     otp_type: OtpType,
+    request: Request | None = None,
 ):
     """Send an MFA OTP for SMS, Voice, or Email."""
 
@@ -65,8 +70,22 @@ async def handle_send_mfa_otp(
         )
 
     # Get user's preferred language from profile
+    user_id = my_profile_response.data.id
     user_language = my_profile_response.data.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
+
+    should_apply_phone_rate_limit = (
+        request is not None
+        and verification_request.countAsMfaAddition
+        and otp_type
+        in {
+            OtpType.SMS,
+            OtpType.VOICE,
+        }
+    )
+
+    if should_apply_phone_rate_limit:
+        await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
 
     http_client_response = await dispatch_send_mfa_otp(
         global_http_client,
@@ -75,6 +94,9 @@ async def handle_send_mfa_otp(
         user_access_token,
         user_language,
     )
+
+    if should_apply_phone_rate_limit:
+        await record_phone_mfa_registration_event(request, user_id)
 
     response_json = http_client_response.json()
     logger.info(f"IBM Verify MFA OTP response: {response_json}")

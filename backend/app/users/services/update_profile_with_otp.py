@@ -40,10 +40,6 @@ from app.users.services.update_my_profile import (
 from app.auth.services.auth_user_session import update_session_user_info
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import verify_otp_before_operation
-from app.utils.phone_mfa_rate_limit import (
-    assert_contact_phone_update_rate_limit_not_exceeded,
-    record_contact_phone_update_event,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -169,13 +165,6 @@ async def _handle_profile_update_commit_after_verification(
         user_access_token=user_access_token,
     )
 
-    is_phone_number_update = profile_update_data.phoneNumbers is not None
-    if is_phone_number_update:
-        await assert_contact_phone_update_rate_limit_not_exceeded(
-            request,
-            current_profile_response.id,
-        )
-
     email_mfa_theme = _get_email_mfa_theme()
     email_mfa_sync_context, deleted_old_email_mfa_factors = (
         await _prepare_email_mfa_sync_before_profile_update(
@@ -216,9 +205,6 @@ async def _handle_profile_update_commit_after_verification(
     )
 
     _update_session_user_info_best_effort(request, profile_update_data)
-
-    if is_phone_number_update:
-        await record_contact_phone_update_event(request, current_profile_response.id)
 
     logger.info("Profile updated successfully with OTP verification")
 
@@ -411,25 +397,6 @@ async def _apply_profile_update_otp_action(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="otp_expired",
-            )
-
-        if profile_update_data.phoneNumbers is not None:
-            current_profile_response = await dispatch_get_my_profile_from_ibm(
-                request.app.state.request_client,
-                user_access_token,
-            )
-            if not current_profile_response.userName:
-                logger.error(
-                    "Failed to get current user profile during phone update verify"
-                )
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Unable to retrieve current user profile",
-                )
-
-            await assert_contact_phone_update_rate_limit_not_exceeded(
-                request,
-                current_profile_response.id,
             )
 
         if _has_cached_email_conflict(

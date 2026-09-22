@@ -293,10 +293,12 @@ export default function AddMFAPage() {
     reSendOtpCode = false,
     mfaId,
     otpType,
+    countAsMfaAddition = false,
   }: {
     reSendOtpCode?: boolean;
     mfaId?: string;
     otpType?: string;
+    countAsMfaAddition?: boolean;
   } = {}): Promise<boolean> => {
     setErrorCode("");
     setCustomErrorMessage("");
@@ -309,6 +311,7 @@ export default function AddMFAPage() {
           serverMapping[
             (otpType ?? phoneFormData.otpType) as keyof typeof serverMapping
           ],
+        ...(countAsMfaAddition ? { countAsMfaAddition: true } : {}),
       };
 
       const response = await addMFAPhoneNumberApi.sendMFAOTP(payload);
@@ -608,6 +611,7 @@ export default function AddMFAPage() {
         navigateToValidation = await sendMFAOtp({
           reSendOtpCode: false,
           mfaId,
+          countAsMfaAddition: true,
         });
       }
     } finally {
@@ -658,6 +662,7 @@ export default function AddMFAPage() {
         reSendOtpCode: false,
         mfaId,
         otpType: secondMFAOtpType,
+        countAsMfaAddition: true,
       });
     }
     return false;
@@ -805,9 +810,7 @@ export default function AddMFAPage() {
           });
           await verifyMFAOtp();
         }}
-        onCancel={async () => {
-          navigate(backToManage2FAVerificationsPage);
-        }}
+        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         requestNewOtpCode={async () => {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
