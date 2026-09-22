@@ -53,7 +53,7 @@
     "password_invalid_attempts_other": "Incorrect password. You have {{count}} attempts remaining.",
     "password_max_attempts": "You have reached the limit for verification attempts. Wait 15 minutes and try again.",
     "otp_expired": "Your code has expired. Request a new code below.",
-    "phone_mfa_change_rate_limit": "You cannot add another phone verification method right now."
+    "phone_mfa_change_rate_limit": "You have reached the maximum number of phone registrations for today."
   },
   "RelyingParty": {
     "canadaLogin": "CanadaLogin"
