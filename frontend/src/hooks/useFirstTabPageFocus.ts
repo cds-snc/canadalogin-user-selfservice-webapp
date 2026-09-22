@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 // Matches elements that participate in normal keyboard navigation.
 const FOCUSABLE_SELECTOR =
@@ -115,7 +115,7 @@ export const useFirstTabPageFocus = ({
     }
   }, [enabled, hash, mainContentId]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!enabled) {
       shouldHandleFirstTabRef.current = false;
       forceInterceptNextTabRef.current = false;
