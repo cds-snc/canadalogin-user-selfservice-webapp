@@ -2,12 +2,14 @@ import logging
 import time
 from typing import Any
 
+from app.config import get_configuration
 from fastapi import HTTPException, Request, status
 
 logger = logging.getLogger(__name__)
 
 PHONE_RATE_LIMIT = 3
-PHONE_RATE_LIMIT_WINDOW_SECONDS = 24 * 60 * 60
+PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD = 24 * 60 * 60
+PHONE_RATE_LIMIT_WINDOW_SECONDS_NON_PROD = 5 * 60
 PHONE_RATE_LIMIT_ERROR_CODE = "phone_mfa_change_rate_limit"
 
 PHONE_MFA_REGISTRATION_SESSION_KEY = "phone_mfa_registration_events"
@@ -17,12 +19,29 @@ CONTACT_PHONE_UPDATE_SESSION_KEY = "contact_phone_update_events"
 CONTACT_PHONE_UPDATE_REDIS_KEY_PREFIX = "rate_limit:contact_phone_update:"
 
 
+def _get_rate_limit_window_seconds() -> int:
+    environment = get_configuration().ENVIRONMENT.strip().lower()
+
+    if environment in {"staging", "prod"}:
+        return PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD
+
+    if environment in {"local", "dev", "test"}:
+        return PHONE_RATE_LIMIT_WINDOW_SECONDS_NON_PROD
+
+    # Fail closed to production-level limits for unknown environments.
+    return PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD
+
+
 def _build_rate_limit_key(redis_key_prefix: str, user_id: str) -> str:
     return f"{redis_key_prefix}{user_id}"
 
 
-def _prune_expired_session_events(events: list[int], now: int) -> list[int]:
-    cutoff = now - PHONE_RATE_LIMIT_WINDOW_SECONDS
+def _prune_expired_session_events(
+    events: list[int],
+    now: int,
+    window_seconds: int,
+) -> list[int]:
+    cutoff = now - window_seconds
     return [event_time for event_time in events if event_time > cutoff]
 
 
@@ -59,8 +78,11 @@ def _assert_session_rate_limit_not_exceeded(
     session_key: str,
 ) -> None:
     now = int(time.time())
+    window_seconds = _get_rate_limit_window_seconds()
     event_store = _get_session_event_store(request, session_key)
-    user_events = _prune_expired_session_events(event_store.get(user_id, []), now)
+    user_events = _prune_expired_session_events(
+        event_store.get(user_id, []), now, window_seconds
+    )
     event_store[user_id] = user_events
     _store_session_event_store(request, session_key, event_store)
 
@@ -77,8 +99,11 @@ def _record_session_event(
     session_key: str,
 ) -> None:
     now = int(time.time())
+    window_seconds = _get_rate_limit_window_seconds()
     event_store = _get_session_event_store(request, session_key)
-    user_events = _prune_expired_session_events(event_store.get(user_id, []), now)
+    user_events = _prune_expired_session_events(
+        event_store.get(user_id, []), now, window_seconds
+    )
     user_events.append(now)
     event_store[user_id] = user_events
     _store_session_event_store(request, session_key, event_store)
@@ -134,6 +159,7 @@ async def _record_rate_limit_event(
     session_key: str,
     redis_key_prefix: str,
 ) -> None:
+    window_seconds = _get_rate_limit_window_seconds()
     redis_client = _get_redis_client_from_request(request)
     if redis_client is None:
         _record_session_event(request, user_id, session_key)
@@ -144,7 +170,7 @@ async def _record_rate_limit_event(
     try:
         count = await redis_client.incr(key)
         if count == 1:
-            await redis_client.expire(key, PHONE_RATE_LIMIT_WINDOW_SECONDS)
+            await redis_client.expire(key, window_seconds)
     except Exception as exc:  # noqa: BLE001 - fail open when limiter is unavailable
         logger.warning(
             "Phone rate-limit record failed, falling back to session: %s",
