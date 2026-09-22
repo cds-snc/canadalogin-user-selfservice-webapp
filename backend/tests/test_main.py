@@ -197,6 +197,11 @@ def test_create_app_csrf_flow_uses_real_session_middlewares(monkeypatch):
             super().__init__()
 
     monkeypatch.setattr(main_module, "RedisStore", InMemoryRedisStore)
+    # CI sets ROOT_DOMAIN (e.g. test.com), which would scope the CSRF cookie to
+    # that domain. TestClient's default host is "testserver", so a domain-scoped
+    # cookie would be silently dropped by the cookie jar; pin it to None since
+    # this test exercises the CSRF/session flow, not domain-scoping.
+    monkeypatch.setattr(main_module.configuration, "ROOT_DOMAIN", None)
     app = main_module.create_app()
 
     @app.get("/csrf-test")

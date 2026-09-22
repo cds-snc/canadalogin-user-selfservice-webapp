@@ -4,10 +4,21 @@ Deliberately avoids importing `app.main` (which pulls in authlib) so this file
 can run even in environments where authlib/cryptography imports fail.
 """
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from app.middleware import csrf as csrf_module
 from app.middleware.csrf import CSRFMiddleware, CSRF_TOKEN_KEY, CSRF_HEADER_NAME
+
+
+@pytest.fixture(autouse=True)
+def _no_domain_scoped_cookie(monkeypatch):
+    # Some CI environments set ROOT_DOMAIN (e.g. test.com), which would scope the
+    # CSRF cookie to that domain. TestClient's default host is "testserver", so a
+    # domain-scoped cookie would be silently dropped by the cookie jar. These
+    # tests exercise the token flow itself, not domain-scoping, so pin it to None.
+    monkeypatch.setattr(csrf_module.configuration, "ROOT_DOMAIN", None)
 
 
 class SessionInjectorMiddleware:

@@ -117,5 +117,4 @@ class CSRFMiddleware:
                 headers.append("set-cookie", "; ".join(cookie_parts))
             await send(message)
 
-        # test
         await self.app(scope, receive, send_with_csrf_cookie)
