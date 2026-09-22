@@ -61,7 +61,7 @@ export default function ProvincialVerificationPage() {
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="450">
+      <GcdsGrid columns="1" gap="400">
         <GcdsContainer>
           <GcdsHeading tag="h1">
             {t("ProvincialVerification.heading")}
@@ -86,7 +86,7 @@ export default function ProvincialVerificationPage() {
           </ol>
         </GcdsContainer>
 
-        <GcdsGrid columns="1" gap="300">
+        <GcdsGrid columns="1" gap="400">
           <GcdsCard
             cardTitle={t("ProvincialVerification.bcServicesCard")}
             cardTitleTag="h3"
@@ -110,7 +110,7 @@ export default function ProvincialVerificationPage() {
           ></GcdsCard>
         </GcdsGrid>
 
-        <GcdsGrid columns="max-content" gap="200">
+        <GcdsGrid columns="max-content" gap="450">
           <GcdsButton
             type="button"
             buttonRole="secondary"

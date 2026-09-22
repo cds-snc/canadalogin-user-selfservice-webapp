@@ -38,7 +38,6 @@ export default function AccessibleNotice(props: AccessibleNoticeProps) {
 
   const noticeTitleForAnnouncement =
     typeof noticeProps.noticeTitle === "string" ? noticeProps.noticeTitle : "";
-
   if (focusOnMount) {
     if (!noticeProps.id) {
       noticeProps.id = `accessible-notice-${generatedId}`;
@@ -96,7 +95,6 @@ export default function AccessibleNotice(props: AccessibleNoticeProps) {
           noticeElement.setAttribute("aria-label", announcementText);
         }
       }
-
       noticeElement?.focus();
     }, 0);
 
