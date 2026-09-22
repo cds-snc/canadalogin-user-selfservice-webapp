@@ -7,9 +7,13 @@
   "description": "Services connected with CanadaLogin only receive your updated information when you sign in again. Until you sign out and sign back in, the services below will keep showing your previous information.",
   "servicesHeading": "Services needing you to sign in again",
   "servicesDescription": "Be sure to save any active progress. If you choose to do this later, these services will keep showing your old information until you next sign out and sign back in to each one.",
+  "loading": "Loading connected services.",
+  "error": "We could not load your connected services. Try again later.",
+  "empty": "You do not have any connected services.",
   "sessions": {
     "activeSession": "Active session",
-    "inactiveSession": "Inactive session"
+    "inactiveSession": "Inactive session",
+    "unknownSession": "Connected"
   },
   "signOutEverywhere": "Sign out everywhere",
   "doThisLater": "I'll do this later",

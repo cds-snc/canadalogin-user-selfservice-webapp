@@ -23,7 +23,7 @@ def _build_content_security_policy() -> str:
         "base-uri 'self'; "
         "form-action 'self'; "
         + ("upgrade-insecure-requests" if configuration.ENVIRONMENT != "local" else "")
-    )
+    ).strip()
 
 
 # Restrict browser execution and reduce attack surface by blocking most active content
