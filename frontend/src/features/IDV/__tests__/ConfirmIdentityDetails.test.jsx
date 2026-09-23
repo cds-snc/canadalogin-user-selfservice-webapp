@@ -167,7 +167,7 @@ describe("ConfirmIdentityDetails", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with CRA to get access.",
+        /You're almost done\. Review your details saved to CanadaLogin, then share the requested information with .+ to get access\./,
       ),
     ).toBeInTheDocument();
   });
