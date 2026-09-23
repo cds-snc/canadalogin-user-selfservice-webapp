@@ -1,7 +1,9 @@
 import { GcdsErrorSummary } from "@gcds-core/components-react";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import type { ComponentPropsWithoutRef } from "react";
 import { useTranslation } from "react-i18next";
+
+const ERROR_SUMMARY_FOCUS_NO_RING_CLASS = "error-summary-focus-no-ring";
 
 const FOCUSABLE_SELECTOR =
   "a[href], button, input, select, textarea, [tabindex]:not([tabindex='-1']), [contenteditable='true']";
@@ -176,19 +178,32 @@ export default function ErrorSummaryWithFocus({
       ? t(`Error.${errorCode}`, { defaultValue: t("Error.serverError") })
       : "");
 
+  useLayoutEffect(() => {
+    if (!errorMessage || !autoFocus) {
+      return;
+    }
+
+    // Attempt immediate focus synchronously after render.
+    focusErrorSummary(id);
+  }, [errorMessage, autoFocus, id]);
+
   useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const timeoutIds: ReturnType<typeof setTimeout>[] = [];
 
     if (errorMessage && autoFocus) {
-      timeoutId = setTimeout(() => {
-        focusErrorSummary(id);
-      }, 100);
+      // Keep a JS fallback because native autoFocus can be unreliable on
+      // dynamically rendered custom elements.
+      // Retry focus briefly in case another control steals focus during render.
+      [100, 250].forEach((delayMs) => {
+        const timeoutId = setTimeout(() => {
+          focusErrorSummary(id);
+        }, delayMs);
+        timeoutIds.push(timeoutId);
+      });
     }
 
     return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
+      timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
     };
   }, [errorMessage, autoFocus, id]);
 
@@ -237,6 +252,13 @@ export default function ErrorSummaryWithFocus({
       errorLinks={errorLinks || defaultErrorLinks}
       heading={t("Error.genericProblem")}
       lang={language}
+      autoFocus={autoFocus}
+      className={
+        typeof otherProps.className === "string"
+          ? `${otherProps.className} ${ERROR_SUMMARY_FOCUS_NO_RING_CLASS}`
+          : ERROR_SUMMARY_FOCUS_NO_RING_CLASS
+      }
+      data-page-focus-target="true"
       {...otherProps}
     />
   );
