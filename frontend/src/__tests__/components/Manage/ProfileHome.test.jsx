@@ -188,7 +188,7 @@ describe("ProfileHome", () => {
     render(<ProfileHome />);
     await waitFor(() => {
       expect(
-        screen.getByRole("heading", { name: "Proven information" }),
+        screen.getByRole("heading", { name: "Identity details" }),
       ).toBeInTheDocument();
       expect(screen.getByTestId("proven-information-card")).toBeInTheDocument();
       expect(
@@ -202,7 +202,7 @@ describe("ProfileHome", () => {
     render(<ProfileHome />);
     expect(screen.queryByTestId("idv-complete-notice")).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("heading", { name: "Proven information" }),
+      screen.queryByRole("heading", { name: "Identity details" }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByTestId("proven-information-card"),
