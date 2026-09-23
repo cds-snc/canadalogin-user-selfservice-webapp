@@ -116,3 +116,63 @@ def test_post_with_mismatched_csrf_header_is_rejected():
     response = client.post("/post", headers={CSRF_HEADER_NAME: "wrong-token"})
 
     assert response.status_code == 403
+
+
+def test_post_with_cross_site_fetch_metadata_is_rejected_even_with_valid_token():
+    SessionInjectorMiddleware._store.clear()
+    client = TestClient(build_app())
+
+    client.get("/get")
+    token = client.cookies.get(CSRF_TOKEN_KEY)
+
+    response = client.post(
+        "/post",
+        headers={CSRF_HEADER_NAME: token, "sec-fetch-site": "cross-site"},
+    )
+
+    assert response.status_code == 403
+
+
+def test_post_with_same_site_fetch_metadata_and_valid_token_is_accepted():
+    SessionInjectorMiddleware._store.clear()
+    client = TestClient(build_app())
+
+    client.get("/get")
+    token = client.cookies.get(CSRF_TOKEN_KEY)
+
+    response = client.post(
+        "/post",
+        headers={CSRF_HEADER_NAME: token, "sec-fetch-site": "same-site"},
+    )
+
+    assert response.status_code == 200
+
+
+def test_post_with_disallowed_origin_is_rejected_even_with_valid_token():
+    SessionInjectorMiddleware._store.clear()
+    client = TestClient(build_app())
+
+    client.get("/get")
+    token = client.cookies.get(CSRF_TOKEN_KEY)
+
+    response = client.post(
+        "/post",
+        headers={CSRF_HEADER_NAME: token, "origin": "https://evil.example.com"},
+    )
+
+    assert response.status_code == 403
+
+
+def test_post_with_allowed_origin_and_valid_token_is_accepted():
+    SessionInjectorMiddleware._store.clear()
+    client = TestClient(build_app())
+
+    client.get("/get")
+    token = client.cookies.get(CSRF_TOKEN_KEY)
+
+    response = client.post(
+        "/post",
+        headers={CSRF_HEADER_NAME: token, "origin": "http://localhost:3000"},
+    )
+
+    assert response.status_code == 200

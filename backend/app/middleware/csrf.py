@@ -38,11 +38,33 @@ class CSRFMiddleware:
     `X-CSRF-Token` header on state-changing requests; requests where the header is
     missing or does not match the session-stored value are rejected.
 
+    Two OWASP-recommended defense-in-depth layers run ahead of the token check:
+    Fetch Metadata (`Sec-Fetch-Site`) and `Origin` verification. Neither replaces
+    the token check; they only reject requests earlier/cheaper when a browser
+    reports enough context to prove the request is cross-site or off-origin.
+
     Must run after session middleware has populated `scope["session"]`.
     """
 
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
+
+    def _fetch_metadata_rejection_reason(self, connection: HTTPConnection) -> str | None:
+        # Rejects requests only when Sec-Fetch-Site explicitly identifies them as
+        # cross-site; the header's absence (older browsers, non-browser clients)
+        # is not itself treated as suspicious and falls through to the token check.
+        if connection.headers.get("sec-fetch-site") == "cross-site":
+            return "Sec-Fetch-Site reported cross-site"
+        return None
+
+    def _origin_rejection_reason(self, connection: HTTPConnection) -> str | None:
+        # Origin is absent on same-origin GET/HEAD navigations and some older
+        # clients, so a missing header is allowed through to the token check
+        # rather than rejected here; only a present-but-untrusted value is rejected.
+        origin = connection.headers.get("origin")
+        if origin is not None and origin not in configuration.cors_origins_list:
+            return f"Origin header '{origin}' is not an allowed origin"
+        return None
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http":
@@ -57,6 +79,22 @@ class CSRFMiddleware:
             scope["method"] not in SAFE_METHODS
             and connection.url.path not in CSRF_EXEMPT_PATHS
         )
+
+        if requires_csrf:
+            rejection_reason = self._fetch_metadata_rejection_reason(
+                connection
+            ) or self._origin_rejection_reason(connection)
+            if rejection_reason:
+                logger.warning(
+                    f"Rejected request to {connection.url.path}: {rejection_reason}"
+                )
+                response = JSONResponse(
+                    {"detail": "CSRF token missing or invalid."},
+                    status_code=403,
+                )
+                await response(scope, receive, send)
+                return
+
         has_session = isinstance(session, dict)
 
         # Unsafe routes require a loaded session so the server-side token can be checked.

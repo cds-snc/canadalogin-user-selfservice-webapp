@@ -13,6 +13,13 @@ The backend uses a synchronizer-token pattern:
 
 A cross-site form can cause a browser to send cookies, but it cannot normally read the CSRF cookie or set this custom header. The request is therefore rejected unless the attacker also knows the token.
 
+Two OWASP-recommended defense-in-depth checks run ahead of the token comparison, on every unsafe, non-exempt request:
+
+1. **Fetch Metadata** - if the browser sends `Sec-Fetch-Site: cross-site`, the request is rejected immediately, before the token is even checked.
+2. **Origin verification** - if an `Origin` header is present, it must match one of the configured CORS origins.
+
+Both checks are advisory when their header is absent (older browsers, some proxies), so the token check remains the primary, mandatory defense.
+
 ## Protected Methods
 
 The following methods are treated as safe and do not require CSRF validation:
@@ -44,7 +51,9 @@ sequenceDiagram
         R-->>M: Response
         M-->>B: Response, plus CSRF cookie when session exists
     else Unsafe method
-        alt Missing session
+        alt Cross-site Fetch Metadata or disallowed Origin
+            M-->>B: 403 CSRF token missing or invalid
+        else Missing session
             M-->>B: 403 CSRF token missing or invalid
         else Invalid or missing header
             M-->>B: 403 CSRF token missing or invalid
@@ -164,7 +173,7 @@ When adding or changing exemptions, add a full-stack route test as well as middl
 ## Security Notes
 
 - Keep the session cookie `HttpOnly` and `Secure` outside local development.
-- Treat `ROOT_DOMAIN` as a trusted boundary. A domain-scoped CSRF cookie is readable by sibling subdomains.
+- Treat `ROOT_DOMAIN` as a trusted boundary. A domain-scoped CSRF cookie is readable by sibling subdomains. Because validation compares the header against the **session-stored** token (not the cookie value itself), a subdomain that injects its own `csrf_token` cookie still cannot forge a match.
 - Keep state-changing operations out of `GET` routes.
 - Do not log token values. The middleware logs paths and failure reasons only.
 - CSRF protection does not replace authentication or authorization.

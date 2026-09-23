@@ -1,32 +1,10 @@
 import axios from "axios";
 
-const CSRF_COOKIE_NAME = "csrf_token";
-const CSRF_HEADER_NAME = "X-CSRF-Token";
-const SAFE_METHODS = new Set(["get", "head", "options"]);
-
-export function getCsrfTokenFromCookie(): string | null {
-  const match = document.cookie.match(
-    new RegExp(`(?:^|; )${CSRF_COOKIE_NAME}=([^;]*)`),
-  );
-  if (!match) {
-    return null;
-  }
-  try {
-    return decodeURIComponent(match[1]);
-  } catch {
-    return null;
-  }
-}
-
-// Echo the server-issued CSRF cookie back as a header on state-changing requests,
-// as required by the backend's synchronizer-token CSRF protection.
-axios.interceptors.request.use((requestConfig) => {
-  const method = requestConfig.method?.toLowerCase();
-  if (method && !SAFE_METHODS.has(method)) {
-    const token = getCsrfTokenFromCookie();
-    if (token) {
-      requestConfig.headers.set(CSRF_HEADER_NAME, token);
-    }
-  }
-  return requestConfig;
-});
+// Double-submit-cookie CSRF handling, built into axios: it reads the
+// `csrf_token` cookie and echoes it as `X-CSRF-Token` on every request,
+// matching the backend's synchronizer-token check (app/middleware/csrf.py).
+axios.defaults.xsrfCookieName = "csrf_token";
+axios.defaults.xsrfHeaderName = "X-CSRF-Token";
+// The API is on a different origin/subdomain, so this is required -
+// axios only does this automatically for same-origin requests otherwise.
+axios.defaults.withXSRFToken = true;
