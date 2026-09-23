@@ -19,6 +19,45 @@ from httpx import AsyncClient, HTTPStatusError
 
 logger = logging.getLogger(__name__)
 
+CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY = "contact_phone_sent_destinations"
+
+
+def _normalize_destination_for_session(destination: str | None) -> str:
+    if destination is None:
+        return ""
+
+    return "".join(char for char in str(destination) if char.isdigit())
+
+
+def _get_sent_destinations_from_session(request: Request) -> set[str]:
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return set()
+
+    stored_value = session.get(CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY, [])
+    if not isinstance(stored_value, list):
+        return set()
+
+    return {
+        destination
+        for destination in stored_value
+        if isinstance(destination, str) and destination
+    }
+
+
+def _mark_destination_as_sent(request: Request, destination: str | None) -> None:
+    normalized_destination = _normalize_destination_for_session(destination)
+    if not normalized_destination:
+        return
+
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return
+
+    sent_destinations = _get_sent_destinations_from_session(request)
+    sent_destinations.add(normalized_destination)
+    session[CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY] = list(sent_destinations)
+
 
 async def handle_otp_send(
     global_http_client: AsyncClient,
@@ -39,12 +78,26 @@ async def handle_otp_send(
 
     should_apply_contact_phone_rate_limit = (
         request is not None
-        and user_otp_info.countAsContactPhoneUpdate
         and user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}
+        and user_otp_info.destination is not None
     )
 
     if should_apply_contact_phone_rate_limit:
         await assert_contact_phone_update_rate_limit_not_exceeded(request, user_id)
+
+    should_record_contact_phone_rate_limit_event = False
+    if should_apply_contact_phone_rate_limit:
+        # Backend anti-bypass guard:
+        # if this is the first successful send for a destination in this session,
+        # count it even when countAsContactPhoneUpdate is false.
+        sent_destinations = _get_sent_destinations_from_session(request)
+        normalized_destination = _normalize_destination_for_session(
+            user_otp_info.destination
+        )
+        should_record_contact_phone_rate_limit_event = (
+            user_otp_info.countAsContactPhoneUpdate
+            or normalized_destination not in sent_destinations
+        )
 
     if user_otp_info.factor_id is not None:
         user_otp_factor = await get_user_otp_factor(
@@ -83,6 +136,9 @@ async def handle_otp_send(
     response_json = http_client_response.json()
 
     if should_apply_contact_phone_rate_limit:
+        _mark_destination_as_sent(request, user_otp_info.destination)
+
+    if should_record_contact_phone_rate_limit_event:
         await record_contact_phone_update_event(request, user_id)
 
     if http_client_response.status_code == 201:

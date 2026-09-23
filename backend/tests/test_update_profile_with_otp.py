@@ -241,6 +241,7 @@ PREFLIGHT_EMAIL_CHECK_IMPORT_PATH = (
 )
 VERIFY_ACTION_PREFLIGHT_IMPORT_PATH = "app.users.services.update_profile_with_otp._run_preflight_checks_for_verified_action"
 PROOF_TTL_IMPORT_PATH = "app.users.services.update_profile_with_otp._get_profile_update_otp_proof_ttl_seconds"
+CONTACT_PHONE_RATE_LIMIT_ASSERT_IMPORT_PATH = "app.users.services.update_profile_with_otp.assert_contact_phone_update_rate_limit_not_exceeded"
 
 
 class TestUpdateProfileWithOtpVerification:
@@ -368,6 +369,59 @@ class TestUpdateProfileWithOtpVerification:
         )
         mock_verify_otp.assert_called_once()
         mock_verify_action_preflight.assert_called_once()
+
+    @pytest.mark.asyncio
+    @patch(PROOF_TTL_IMPORT_PATH)
+    @patch(VERIFY_ACTION_PREFLIGHT_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    @patch(CONTACT_PHONE_RATE_LIMIT_ASSERT_IMPORT_PATH)
+    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
+    async def test_verify_action_phone_update_rate_limited_before_otp_verify(
+        self,
+        mock_get_profile,
+        mock_assert_contact_phone_update_rate_limit_not_exceeded,
+        mock_verify_otp,
+        mock_verify_action_preflight,
+        mock_proof_ttl,
+    ):
+        mock_proof_ttl.return_value = 123
+        mock_get_profile.return_value = Mock(id="user-123")
+        mock_assert_contact_phone_update_rate_limit_not_exceeded.side_effect = (
+            HTTPException(
+                status_code=429,
+                detail="phone_mfa_change_rate_limit",
+            )
+        )
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {}
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp="123456",
+            trxnId="verify-phone-trxn-id",
+            otpType=OtpType.SMS,
+            phoneNumbers=[MetaDataTypeValue(type="mobile", value="+14165551234")],
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request,
+                profile_update_data,
+                "user-token",
+            )
+
+        assert exc.value.status_code == 429
+        assert exc.value.detail == "phone_mfa_change_rate_limit"
+        mock_assert_contact_phone_update_rate_limit_not_exceeded.assert_awaited_once_with(
+            mock_request,
+            "user-123",
+        )
+        mock_verify_otp.assert_not_called()
+        mock_verify_action_preflight.assert_not_called()
 
     @pytest.mark.asyncio
     @patch(PROOF_TTL_IMPORT_PATH)

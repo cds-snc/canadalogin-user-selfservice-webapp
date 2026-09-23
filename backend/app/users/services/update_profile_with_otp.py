@@ -40,6 +40,9 @@ from app.users.services.update_my_profile import (
 from app.auth.services.auth_user_session import update_session_user_info
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.helpers import verify_otp_before_operation
+from app.utils.phone_mfa_rate_limit import (
+    assert_contact_phone_update_rate_limit_not_exceeded,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -389,6 +392,23 @@ async def _apply_profile_update_otp_action(
     profile_update_data: ProfileUpdateWithOtpRequest,
     user_access_token: str,
 ) -> ProfileUpdateWithOtpResponse | None:
+    should_enforce_contact_phone_rate_limit = profile_update_data.otpType in {
+        OtpType.SMS,
+        OtpType.VOICE,
+    } and bool(profile_update_data.phoneNumbers)
+
+    async def enforce_contact_phone_rate_limit_if_needed() -> None:
+        if not should_enforce_contact_phone_rate_limit:
+            return
+
+        current_profile = await dispatch_get_my_profile_from_ibm(
+            request.app.state.request_client, user_access_token
+        )
+        await assert_contact_phone_update_rate_limit_not_exceeded(
+            request,
+            current_profile.id,
+        )
+
     if profile_update_data.action == ProfileUpdateWithOtpAction.VERIFY:
         otp_type = profile_update_data.otpType
         trxn_id = profile_update_data.trxnId
@@ -416,6 +436,8 @@ async def _apply_profile_update_otp_action(
             otp_type=otp_type,
             user_access_token=user_access_token,
         )
+
+        await enforce_contact_phone_rate_limit_if_needed()
 
         await verify_otp_before_operation(
             global_http_client=request.app.state.request_client,
@@ -463,6 +485,8 @@ async def _apply_profile_update_otp_action(
 
     if profile_update_data.action == ProfileUpdateWithOtpAction.COMMIT_WITH_OTP:
         # Legacy mode: verify OTP and commit in a single request.
+        await enforce_contact_phone_rate_limit_if_needed()
+
         await verify_otp_before_operation(
             global_http_client=request.app.state.request_client,
             otp=profile_update_data.otp,
