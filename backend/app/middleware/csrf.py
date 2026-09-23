@@ -51,7 +51,9 @@ class CSRFMiddleware:
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
 
-    def _fetch_metadata_rejection_reason(self, connection: HTTPConnection) -> str | None:
+    def _fetch_metadata_rejection_reason(
+        self, connection: HTTPConnection
+    ) -> str | None:
         # Rejects requests only when Sec-Fetch-Site explicitly identifies them as
         # cross-site; the header's absence (older browsers, non-browser clients)
         # is not itself treated as suspicious and falls through to the token check.
