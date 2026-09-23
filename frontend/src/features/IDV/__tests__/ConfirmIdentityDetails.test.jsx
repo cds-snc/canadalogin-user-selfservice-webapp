@@ -163,9 +163,7 @@ describe("ConfirmIdentityDetails", () => {
     render(<ConfirmIdentityDetails />);
 
     expect(
-      screen.getByText(
-        "Your identity information was successfully proven.",
-      ),
+      screen.getByText("Your identity information was successfully proven."),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
