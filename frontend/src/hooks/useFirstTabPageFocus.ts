@@ -227,7 +227,7 @@ export const useFirstTabPageFocus = ({
     };
   }, [enabled, mainContentId]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Capture Tab key presses before native tabbing so we can redirect only once.
     const onKeyDown = (event: KeyboardEvent) => {
       if (
