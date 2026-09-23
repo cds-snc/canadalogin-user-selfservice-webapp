@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.34.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.34.0...v1.34.1) (2026-09-23)
+
+
+### Bug Fixes
+
+* **ErrorSummaryWithFocus:** improve focus handling and accessibility for error messages ([#2233](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2233)) ([5730afb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5730afb514717e0f35beb573276cdc81ec934071))
+
 ## [1.34.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.33.8...v1.34.0) (2026-09-22)
 
 
