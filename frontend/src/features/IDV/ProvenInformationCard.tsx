@@ -1,5 +1,5 @@
 import {
-  GcdsButton,
+  GcdsLink,
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
@@ -23,7 +23,6 @@ export default function ProvenInformationCard({
   claims,
 }: ProvenInformationCardProps) {
   const { t, i18n } = useTranslation("profile");
-  const navigate = useNavigate();
   const { language } = useParams();
   const name = [claims?.claims?.given_name, claims?.claims?.family_name]
     .filter(Boolean)
@@ -74,20 +73,14 @@ export default function ProvenInformationCard({
         </GcdsText>
       </GcdsContainer>
     ) : null,
-    <GcdsGrid columns="1fr auto" className="gridInline">
-      <GcdsText marginBottom="300">
-        {t("ProvenInformationCard.updateInfo")}
+    <GcdsContainer>
+      <GcdsText>{t("ProvenInformationCard.updateInfo")}</GcdsText>
+      <GcdsText>
+        <GcdsLink href={startIdentityVerificationFlow}>
+          {t("ProvenInformationCard.updateButton")}
+        </GcdsLink>
       </GcdsText>
-      <GcdsButton
-        buttonRole="secondary"
-        type="button"
-        onGcdsClick={() => {
-          navigate(startIdentityVerificationFlow);
-        }}
-      >
-        {t("ProvenInformationCard.updateButton")}
-      </GcdsButton>
-    </GcdsGrid>,
+    </GcdsContainer>,
   ].filter(Boolean);
 
   return (
