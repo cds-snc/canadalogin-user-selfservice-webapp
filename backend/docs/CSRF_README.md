@@ -20,6 +20,14 @@ Two OWASP-recommended defense-in-depth checks run ahead of the token comparison,
 
 Both checks are advisory when their header is absent (older browsers, some proxies), so the token check remains the primary, mandatory defense.
 
+## Why a Cookie, Not a GET Endpoint
+
+OWASP's cheat sheet describes two ways to hand the token to the SPA: a dedicated `GET` endpoint that returns it in a JSON body, or a readable cookie that JavaScript reads directly (used in the _Synchronizer Token_ pattern here and in the _Double-Submit Cookie_ pattern). This implementation uses the cookie:
+
+- A `GET` endpoint requires the SPA to cache the token in JS memory or `localStorage` for later requests; `localStorage` is explicitly discouraged by OWASP because it is readable by any injected script, making the token easier to exfiltrate via XSS than a same-site cookie.
+- The cookie is re-issued on every response (see `send_with_csrf_cookie`), so the SPA always has the current token without an extra round trip or client-side cache-invalidation logic.
+- The cookie approach keeps the contract stateless from the frontend's perspective: `axios` reads `csrf_token` from `document.cookie` and attaches it automatically (see [`frontend/src/utils/csrf.ts`](../../frontend/src/utils/csrf.ts)), rather than the app having to fetch and thread a token through every request manually.
+
 ## Protected Methods
 
 The following methods are treated as safe and do not require CSRF validation:

@@ -33,10 +33,12 @@ CSRF_EXEMPT_PATHS = {
 class CSRFMiddleware:
     """Synchronizer-token CSRF protection.
 
-    A random token is stored server-side in the user's session and mirrored in a
-    non-HttpOnly cookie. The SPA must echo the cookie value back via the
-    `X-CSRF-Token` header on state-changing requests; requests where the header is
-    missing or does not match the session-stored value are rejected.
+    A random token is stored server-side in the user's session (persisted in
+    Redis via `starsessions.stores.redis.RedisStore`, see `app/main.py`) and
+    mirrored in a non-HttpOnly cookie. The SPA must echo the cookie value back
+    via the `X-CSRF-Token` header on state-changing requests; requests where
+    the header is missing or does not match the session-stored value are
+    rejected.
 
     Two OWASP-recommended defense-in-depth layers run ahead of the token check:
     Fetch Metadata (`Sec-Fetch-Site`) and `Origin` verification. Neither replaces
@@ -133,7 +135,9 @@ class CSRFMiddleware:
                 await response(scope, receive, send)
                 return
 
-        # Create the token lazily so it is persisted in the session before the response.
+        # Create the token lazily so it is persisted in the session before the
+        # response; `session[key] = token` writes through to Redis, not memory,
+        # so the token survives restarts and is shared across app instances.
         token = session.get(CSRF_TOKEN_KEY)
         if not token:
             token = secrets.token_urlsafe(32)
