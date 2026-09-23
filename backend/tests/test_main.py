@@ -1,9 +1,12 @@
 import app.main as main_module
-from app.middleware import SecurityHeadersMiddleware
+from app.middleware.security_headers import SecurityHeadersMiddleware
+from app.middleware.csrf import CSRF_HEADER_NAME, CSRF_TOKEN_KEY
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
 from fastapi.responses import Response
 from datetime import datetime
+from starsessions import SessionAutoloadMiddleware, SessionMiddleware
+from starsessions.stores import InMemoryStore
 
 
 class InjectSessionMiddleware:
@@ -38,8 +41,18 @@ def get_all_route_paths(app):
     return paths
 
 
+def build_isolated_client(app):
+    app.user_middleware = [
+        middleware
+        for middleware in app.user_middleware
+        if middleware.cls not in {SessionMiddleware, SessionAutoloadMiddleware}
+    ]
+    app.middleware_stack = app.build_middleware_stack()
+    return TestClient(app, raise_server_exceptions=False)
+
+
 def test_app_starts():
-    client = TestClient(main_module.app)
+    client = build_isolated_client(main_module.create_app())
     response = client.get("/health/health")
     print(response.json())
     assert response.status_code == 200
@@ -79,7 +92,7 @@ def test_create_app_adds_hsts_outside_local(monkeypatch):
     monkeypatch.setattr(main_module.configuration, "ENVIRONMENT", "prod")
 
     app = main_module.create_app()
-    client = TestClient(app)
+    client = build_isolated_client(app)
     response = client.get("/health/health")
 
     assert response.headers["strict-transport-security"] == (
@@ -91,7 +104,7 @@ def test_create_app_uses_https_only_csp_in_production(monkeypatch):
     monkeypatch.setattr(main_module.configuration, "ENVIRONMENT", "prod")
 
     app = main_module.create_app()
-    client = TestClient(app)
+    client = build_isolated_client(app)
     response = client.get("/health/health")
 
     # Production CSP should use https only, not http
@@ -161,7 +174,7 @@ def test_security_headers_middleware_preserves_existing_cache_control():
 
 
 def test_create_app_docs_are_forced_to_use_strict_csp():
-    client = TestClient(main_module.app)
+    client = build_isolated_client(main_module.create_app())
     response = client.get("/docs")
 
     assert response.status_code == 200
@@ -176,6 +189,44 @@ def test_create_app_docs_are_forced_to_use_strict_csp():
         "base-uri 'self'; "
         "form-action 'self'; "
     )
+
+
+def test_create_app_csrf_flow_uses_real_session_middlewares(monkeypatch):
+    class InMemoryRedisStore(InMemoryStore):
+        def __init__(self, *args, **kwargs):
+            super().__init__()
+
+    monkeypatch.setattr(main_module, "RedisStore", InMemoryRedisStore)
+    # CI sets ROOT_DOMAIN (e.g. test.com), which would scope the CSRF cookie to
+    # that domain. TestClient's default host is "testserver", so a domain-scoped
+    # cookie would be silently dropped by the cookie jar; pin it to None since
+    # this test exercises the CSRF/session flow, not domain-scoping.
+    monkeypatch.setattr(main_module.configuration, "ROOT_DOMAIN", None)
+    app = main_module.create_app()
+
+    @app.get("/csrf-test")
+    async def csrf_get():
+        return {"ok": True}
+
+    @app.post("/csrf-test")
+    async def csrf_post():
+        return {"ok": True}
+
+    client = TestClient(app, raise_server_exceptions=False)
+
+    get_response = client.get("/csrf-test")
+    csrf_token = get_response.cookies.get(CSRF_TOKEN_KEY)
+
+    assert get_response.status_code == 200
+    assert csrf_token is not None
+
+    post_response = client.post(
+        "/csrf-test",
+        headers={CSRF_HEADER_NAME: csrf_token},
+    )
+
+    assert post_response.status_code == 200
+    assert post_response.json() == {"ok": True}
 
 
 def test_create_app_excludes_identity_verification_routes_outside_local_and_dev(
