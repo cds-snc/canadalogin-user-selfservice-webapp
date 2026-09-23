@@ -1773,23 +1773,14 @@ class TestErrorHandlingFido2UpdateRegistrations:
 class TestErrorHandlingEnrollMfaOtp:
 
     @pytest.mark.asyncio
-    @patch.object(
-        enroll_mfa_otp_module, "assert_phone_mfa_registration_rate_limit_not_exceeded"
-    )
-    @patch.object(enroll_mfa_otp_module, "assert_registered_phone_mfa_capacity")
     @patch.object(enroll_mfa_otp_module, "get_my_profile")
     @patch.object(enroll_mfa_otp_module, "dispatch_otp_enrollment")
     async def test_handle_sms_otp_enrollment_ibm_error(
         self,
         mock_dispatch_otp_enrollment,
         mock_get_my_profile,
-        mock_assert_registered_phone_mfa_capacity,
-        mock_assert_phone_mfa_registration_rate_limit_not_exceeded,
         mock_test_client,
     ):
-
-        mock_assert_registered_phone_mfa_capacity.return_value = None
-        mock_assert_phone_mfa_registration_rate_limit_not_exceeded.return_value = None
         mock_get_my_profile.return_value = MagicMock(success=True)
 
         mock_response = MagicMock(status_code=400)
@@ -1811,23 +1802,14 @@ class TestErrorHandlingEnrollMfaOtp:
         )
 
     @pytest.mark.asyncio
-    @patch.object(
-        enroll_mfa_otp_module, "assert_phone_mfa_registration_rate_limit_not_exceeded"
-    )
-    @patch.object(enroll_mfa_otp_module, "assert_registered_phone_mfa_capacity")
     @patch.object(enroll_mfa_otp_module, "get_my_profile")
     @patch.object(enroll_mfa_otp_module, "dispatch_otp_enrollment")
     async def test_handle_voice_otp_enrollment_ibm_error(
         self,
         mock_dispatch_otp_enrollment,
         mock_get_my_profile,
-        mock_assert_registered_phone_mfa_capacity,
-        mock_assert_phone_mfa_registration_rate_limit_not_exceeded,
         mock_test_client,
     ):
-
-        mock_assert_registered_phone_mfa_capacity.return_value = None
-        mock_assert_phone_mfa_registration_rate_limit_not_exceeded.return_value = None
         mock_get_my_profile.return_value = MagicMock(success=True)
 
         mock_response = MagicMock(status_code=400)
@@ -1855,6 +1837,43 @@ class TestErrorHandlingEnrollMfaOtp:
 
 
 class TestErrorHandlingSendMfaOtp:
+
+    @pytest.mark.asyncio
+    @patch.object(
+        send_mfa_otp_module, "assert_phone_mfa_registration_rate_limit_not_exceeded"
+    )
+    @patch.object(send_mfa_otp_module, "get_my_profile")
+    async def test_verification_create_rate_limited_for_counted_add_mfa_send(
+        self,
+        mock_get_my_profile,
+        mock_assert_phone_mfa_registration_rate_limit_not_exceeded,
+        mock_test_client,
+    ):
+        mock_profile = MagicMock(success=True)
+        mock_profile.data = MagicMock(id="user-123", preferredLanguage="en")
+        mock_get_my_profile.return_value = mock_profile
+
+        mock_assert_phone_mfa_registration_rate_limit_not_exceeded.side_effect = (
+            HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="phone_mfa_change_rate_limit",
+            )
+        )
+
+        request_data = {
+            "id": "factor123",
+            "otpType": "sms",
+            "countAsMfaAddition": True,
+        }
+
+        client = mock_test_client(MagicMock())
+
+        response = client.request("POST", "/v1/otp/mfa/send", json=request_data)
+        response_json = response.json()
+
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+        assert not response_json["success"]
+        assert response_json["message"] == "phone_mfa_change_rate_limit"
 
     @pytest.mark.asyncio
     @patch.object(send_mfa_otp_module, "get_my_profile")
@@ -2561,6 +2580,47 @@ class TestErrorHandlingRetrieveTransientOtp:
 
 
 class TestErrorHandlingSendTransientOtp:
+
+    @pytest.mark.asyncio
+    @patch.object(otp_router, "validate_user_id_matches_session")
+    @patch.object(
+        send_transient_otp_module,
+        "assert_contact_phone_update_rate_limit_not_exceeded",
+    )
+    @patch.object(send_transient_otp_module, "get_my_profile")
+    async def test_handle_contact_phone_counted_send_rate_limit(
+        self,
+        mock_get_my_profile,
+        mock_assert_contact_phone_update_rate_limit_not_exceeded,
+        mock_validate_user_id_matches_session,
+        mock_test_client,
+    ):
+        mock_validate_user_id_matches_session.return_value = MagicMock()
+        mock_profile = MagicMock()
+        mock_profile.data = MagicMock(id="user-123", preferredLanguage="en")
+        mock_get_my_profile.return_value = mock_profile
+        mock_assert_contact_phone_update_rate_limit_not_exceeded.side_effect = (
+            HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="phone_mfa_change_rate_limit",
+            )
+        )
+
+        request_data = {
+            "otpType": "sms",
+            "user_id": "user@example.com",
+            "destination": "+14165551234",
+            "countAsContactPhoneUpdate": True,
+        }
+
+        client = mock_test_client(MagicMock())
+
+        response = client.request("POST", "/v1/otp/transient/send", json=request_data)
+        response_json = response.json()
+
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+        assert not response_json["success"]
+        assert response_json["message"] == "phone_mfa_change_rate_limit"
 
     @pytest.mark.asyncio
     @patch.object(otp_router, "validate_user_id_matches_session")

@@ -42,7 +42,6 @@
     "error_fido2_passkey_deleted": "This passkey can no longer be used. Choose a different passkey or sign in with a different method.",
     "error_get_assertion_options": "Failed to get authentication options",
     "mfa_phone_duplicate": "This number has already been registered to this CanadaLogin. Enter another number.",
-    "mfa_phone_max_factors": "You cannot add another phone verification method right now.",
     "otp_invalid_attempts_one": "Invalid code. You have {{count}} attempt remaining.",
     "otp_invalid_attempts_other": "Invalid code. You have {{count}} attempts remaining.",
     "otp_max_attempts": "Your code has expired. Request a new code below.",
@@ -54,7 +53,7 @@
     "password_invalid_attempts_other": "Incorrect password. You have {{count}} attempts remaining.",
     "password_max_attempts": "You have reached the limit for verification attempts. Wait 15 minutes and try again.",
     "otp_expired": "Your code has expired. Request a new code below.",
-    "phone_mfa_change_rate_limit": "You have reached the limit for phone verification changes."
+    "phone_mfa_change_rate_limit": "You have reached the maximum number of phone registrations for today."
   },
   "RelyingParty": {
     "canadaLogin": "CanadaLogin"

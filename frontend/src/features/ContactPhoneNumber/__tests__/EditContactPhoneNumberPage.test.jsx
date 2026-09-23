@@ -264,6 +264,7 @@ describe("EditContactPhoneNumberPage Component", () => {
         destination: "+15551234567",
         user_id: "test-user-123",
         otpType: "sms",
+        countAsContactPhoneUpdate: true,
       });
     });
 
