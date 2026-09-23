@@ -378,7 +378,15 @@ export default function EditContactPhoneNumberPage() {
         error: message,
       });
 
-      if (
+      if (message === "phone_mfa_change_rate_limit") {
+        setPhoneOtpVerificationProofId("");
+        setWizardStep("enterPhone");
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
+          error: message,
+        });
+      } else if (
         message === "otp_expired" ||
         message === "otp_max_attempts" ||
         message === "invalidCode" ||
@@ -518,6 +526,11 @@ export default function EditContactPhoneNumberPage() {
       StepComponent={steps[wizardStep]}
       errorCode={wizardStep === "success" ? "" : errorCode}
       errorMessage={wizardStep === "success" ? "" : errorMessage}
+      errorLinks={
+        wizardStep === "enterPhone" && errorCode
+          ? { "#cp-phone-number": errorMessage }
+          : undefined
+      }
       language={language}
     />
   );

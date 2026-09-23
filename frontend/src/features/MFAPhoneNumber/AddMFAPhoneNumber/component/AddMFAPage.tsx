@@ -888,6 +888,11 @@ export default function AddMFAPage() {
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
       errorMessage={errorMessage}
+      errorLinks={
+        wizardStep === "addMFANumber" && errorCode
+          ? { "#mfa-phone-number": errorMessage }
+          : undefined
+      }
       language={language}
     />
   );
