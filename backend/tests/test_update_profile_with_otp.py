@@ -276,6 +276,10 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.app.state.redis_client = None
+        mock_request.session = {}
+        mock_request.app.state.redis_client = None
+        mock_request.session = {}
 
         profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
             otp="123456",
@@ -641,6 +645,8 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.app.state.redis_client = None
+        mock_request.session = {}
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
@@ -805,6 +811,8 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.app.state.redis_client = None
+        mock_request.session = {}
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",

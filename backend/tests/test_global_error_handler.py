@@ -1998,16 +1998,19 @@ class TestErrorHandlingSendMfaOtp:
         assert "Network error" in caplog.text
 
     @pytest.mark.asyncio
+    @patch.object(verify_mfa_otp_module, "_resolve_factor_verification_context")
     @patch.object(verify_mfa_otp_module, "get_my_profile")
     @patch.object(verify_mfa_otp_module, "dispatch_verify_mfa_otp")
     async def test_verification_attempt_general_exception(
         self,
         mock_dispatch_verify_mfa_otp,
         mock_get_my_profile,
+        mock_resolve_factor_verification_context,
         mock_test_client,
         caplog,
     ):
         mock_get_my_profile.return_value = MagicMock(success=True)
+        mock_resolve_factor_verification_context.return_value = (OtpType.SMS, False)
         mock_dispatch_verify_mfa_otp.side_effect = Exception("Network error")
 
         request_data = {
@@ -2097,6 +2100,7 @@ class TestErrorHandlingSendMfaOtp:
         assert response_json["message"] == "The provided data is not valid."
 
     @pytest.mark.asyncio
+    @patch.object(verify_mfa_otp_module, "_resolve_factor_verification_context")
     @patch.object(verify_mfa_otp_module, "get_my_profile")
     @patch.object(verify_mfa_otp_module, "get_auth_request_headers")
     @patch.object(verify_mfa_otp_module, "get_configuration")
@@ -2105,9 +2109,11 @@ class TestErrorHandlingSendMfaOtp:
         mock_get_configuration,
         mock_get_auth_request_headers,
         mock_get_my_profile,
+        mock_resolve_factor_verification_context,
         mock_test_client,
     ):
         mock_get_my_profile.return_value = MagicMock(success=True)
+        mock_resolve_factor_verification_context.return_value = (OtpType.SMS, False)
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin_token"
         }
