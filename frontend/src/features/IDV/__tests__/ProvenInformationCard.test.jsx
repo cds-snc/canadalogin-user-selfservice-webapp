@@ -62,14 +62,6 @@ vi.mock("@gcds-core/components-react", async (importOriginal) => {
       return <Tag>{children}</Tag>;
     },
     GcdsText: ({ children }) => <p>{children}</p>,
-    GcdsButton: ({ children, onGcdsClick, buttonRole }) => (
-      <button
-        data-testid={buttonRole === "secondary" ? "update-button" : "button"}
-        onClick={onGcdsClick}
-      >
-        {children}
-      </button>
-    ),
   };
 });
 
@@ -138,13 +130,6 @@ describe("ProvenInformationCard", () => {
         "To update this information, you'll need to complete identity proofing again.",
       ),
     ).toBeInTheDocument();
-  });
-
-  it("renders the Update information button", () => {
-    render(<ProvenInformationCard claims={claims} />);
-    expect(screen.getByTestId("update-button")).toHaveTextContent(
-      "Update information",
-    );
   });
 
   it("renders an empty name when claims have no name", () => {
