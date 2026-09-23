@@ -23,7 +23,6 @@ export default function ProvenInformationCard({
   claims,
 }: ProvenInformationCardProps) {
   const { t, i18n } = useTranslation("profile");
-  const navigate = useNavigate();
   const { language } = useParams();
   const name = [claims?.claims?.given_name, claims?.claims?.family_name]
     .filter(Boolean)
