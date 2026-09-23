@@ -10,6 +10,7 @@ import ReactGA from "react-ga4";
 
 import config from "./config";
 import { VITE_ENVIRONMENTS } from "./utils/constants";
+import "./utils/csrf";
 
 if (config.gatag) {
   ReactGA.initialize(config.gatag, {
