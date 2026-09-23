@@ -61,84 +61,78 @@ export default function ProvincialVerificationPage() {
 
   return (
     <GcdsContainer role="main">
+      <GcdsHeading tag="h1">{t("ProvincialVerification.heading")}</GcdsHeading>
+
+      <section style={{ marginTop: "24px", marginBottom: "36px" }}>
+        <GcdsText>
+          <strong>{t("ProvincialVerification.followSteps")}</strong>
+        </GcdsText>
+        <ol>
+          <li>
+            <GcdsText marginBottom="0">
+              {t("ProvincialVerification.step1")}
+            </GcdsText>
+          </li>
+          <li>
+            <GcdsText marginBottom="0">
+              {t("ProvincialVerification.step2")}
+            </GcdsText>
+          </li>
+        </ol>
+      </section>
+
       <GcdsGrid columns="1" gap="400">
-        <GcdsContainer>
-          <GcdsHeading tag="h1">
-            {t("ProvincialVerification.heading")}
-          </GcdsHeading>
-        </GcdsContainer>
-
-        <GcdsContainer>
-          <GcdsText>
-            <strong>{t("ProvincialVerification.followSteps")}</strong>
-          </GcdsText>
-          <ol>
-            <li>
-              <GcdsText marginBottom="0">
-                {t("ProvincialVerification.step1")}
-              </GcdsText>
-            </li>
-            <li>
-              <GcdsText marginBottom="0">
-                {t("ProvincialVerification.step2")}
-              </GcdsText>
-            </li>
-          </ol>
-        </GcdsContainer>
-
-        <GcdsGrid columns="1" gap="400">
-          <GcdsCard
-            cardTitle={t("ProvincialVerification.bcServicesCard")}
-            cardTitleTag="h3"
-            href={bcPartnerLoginHref}
-            imgSrc={imgBcServicesCard}
-            imgAlt="British Columbia Logo"
-          ></GcdsCard>
-          <GcdsCard
-            cardTitle={t("ProvincialVerification.albertaAccount")}
-            cardTitleTag="h3"
-            href={abPartnerLoginHref}
-            imgSrc={imgAlbertaAccount}
-            imgAlt="Alberta Logo"
-          ></GcdsCard>
-          <GcdsCard
-            cardTitle={t("ProvincialVerification.quebecAccount")}
-            cardTitleTag="h3"
-            href={quebecPartnerLoginHref}
-            imgSrc={imgQuebecAccount}
-            imgAlt="Québec Logo"
-          ></GcdsCard>
-        </GcdsGrid>
-
-        <GcdsGrid columns="max-content" gap="450">
-          <GcdsButton
-            type="button"
-            buttonRole="secondary"
-            onClick={() => {
-              navigate(-1);
-            }}
-          >
-            {t("ProvincialVerification.chooseDifferentMethodButton")}
-          </GcdsButton>
-        </GcdsGrid>
-
-        <AccessibleNotice
-          noticeRole="info"
-          noticeTitleTag="h2"
-          noticeTitle={t("ProvincialVerification.moreInfoTitle")}
-        >
-          {
-            // TODO: populate with real URL once available
-          }
-          <GcdsLink
-            href={"#"}
-            external={true}
-            style={{ textDecoration: "underline" }}
-          >
-            {t("ProvincialVerification.learnMoreLink")}
-          </GcdsLink>
-        </AccessibleNotice>
+        <GcdsCard
+          cardTitle={t("ProvincialVerification.bcServicesCard")}
+          cardTitleTag="h3"
+          href={bcPartnerLoginHref}
+          imgSrc={imgBcServicesCard}
+          imgAlt="British Columbia Logo"
+        ></GcdsCard>
+        <GcdsCard
+          cardTitle={t("ProvincialVerification.albertaAccount")}
+          cardTitleTag="h3"
+          href={abPartnerLoginHref}
+          imgSrc={imgAlbertaAccount}
+          imgAlt="Alberta Logo"
+        ></GcdsCard>
+        <GcdsCard
+          cardTitle={t("ProvincialVerification.quebecAccount")}
+          cardTitleTag="h3"
+          href={quebecPartnerLoginHref}
+          imgSrc={imgQuebecAccount}
+          imgAlt="Québec Logo"
+        ></GcdsCard>
       </GcdsGrid>
+
+      <section style={{ marginTop: "36px", marginBottom: "36px" }}>
+        <GcdsButton
+          type="button"
+          buttonRole="secondary"
+          onClick={() => {
+            navigate(-1);
+          }}
+        >
+          {t("ProvincialVerification.chooseDifferentMethodButton")}
+        </GcdsButton>
+      </section>
+
+      <AccessibleNotice
+        noticeRole="info"
+        noticeTitleTag="h2"
+        noticeTitle={t("ProvincialVerification.moreInfoTitle")}
+      >
+        {
+          // TODO: populate with real URL once available
+        }
+        <GcdsLink
+          href={"#"}
+          external={true}
+          style={{ textDecoration: "underline" }}
+        >
+          {t("ProvincialVerification.learnMoreLink")}
+        </GcdsLink>
+      </AccessibleNotice>
     </GcdsContainer>
   );
 }
