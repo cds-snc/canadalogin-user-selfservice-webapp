@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.36.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.35.0...v1.36.0) (2026-09-24)
+
+
+### Features
+
+* **identity-verification:** [BE] GET Users Connected Services from IBM Verify ([#2224](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2224)) ([6932055](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6932055d776b5e1e2fa30f82dc791710432b0406))
+
+
+### Bug Fixes
+
+* check factor id against user profile and enforce single destination ([#2243](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2243)) ([ba69505](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ba69505e79805a3198be989a3ac506760aee1ee8))
+
 ## [1.35.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.34.1...v1.35.0) (2026-09-24)
 
 
