@@ -7,7 +7,7 @@ from fastapi import HTTPException, Request, status
 
 logger = logging.getLogger(__name__)
 
-PHONE_RATE_LIMIT = 3
+PHONE_RATE_LIMIT = 5
 PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD = 24 * 60 * 60
 PHONE_RATE_LIMIT_WINDOW_SECONDS_NON_PROD = 5 * 60
 PHONE_RATE_LIMIT_ERROR_CODE = "phone_mfa_change_rate_limit"

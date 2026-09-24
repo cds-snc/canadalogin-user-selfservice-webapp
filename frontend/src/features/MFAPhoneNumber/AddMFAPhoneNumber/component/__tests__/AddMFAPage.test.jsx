@@ -210,6 +210,7 @@ vi.mock("../AddMFAOtpVerification", () => ({
     onBack,
     requestNewOtpCode,
     onUseDifferentPhoneNumber,
+    onSetupAlternateMFAMethod,
   }) => (
     <div data-testid="add-mfa-otp-verification">
       <button onClick={onNext} data-testid="add-mfa-otp-verification-next">
@@ -229,6 +230,12 @@ vi.mock("../AddMFAOtpVerification", () => ({
         data-testid="use-different-phone"
       >
         Use Different Phone
+      </button>
+      <button
+        onClick={onSetupAlternateMFAMethod}
+        data-testid="setup-alternate-method"
+      >
+        Setup alternate method
       </button>
     </div>
   ),
@@ -261,6 +268,7 @@ vi.mock(
           data-error-code={errorCode}
           data-error-message={errorMessage}
           data-language={language}
+          data-error-links={errorLinks ? JSON.stringify(errorLinks) : undefined}
         >
           Error Summary: {errorCode}
           {Object.entries(errorLinks || {}).map(([href, text]) => (
@@ -876,6 +884,159 @@ describe("AddMFAPage Unit Tests", () => {
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.verifyMFAOTP).toHaveBeenCalled();
       });
+    });
+
+    it("should return to add phone step when verifyMFAOtp hits phone change rate limit", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+
+      addMFAPhoneNumberApi.sendMFAOTP.mockResolvedValue({
+        data: { id: "txn-456" },
+      });
+
+      addMFAPhoneNumberApi.verifyMFAOTP.mockRejectedValue({
+        data: { message: "phone_mfa_change_rate_limit" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("add-mfa-otp-verification"),
+        ).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("add-mfa-otp-verification-next"));
+
+      await waitFor(() => {
+        expect(addMFAPhoneNumberApi.verifyMFAOTP).toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      expect(
+        screen.queryByTestId("add-mfa-otp-verification"),
+      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+        "data-error-code",
+        "phone_mfa_change_rate_limit",
+      );
+      const errorSummary = screen.getByTestId("error-summary-with-focus");
+      const errorLinks = JSON.parse(
+        errorSummary.getAttribute("data-error-links") ?? "{}",
+      );
+      expect(errorLinks["#mfa-phone-number"]).toBe(
+        errorSummary.getAttribute("data-error-message"),
+      );
+    });
+
+    it("should return to add phone step when switching methods hits phone change rate limit", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-voice-123" },
+      });
+
+      addMFAPhoneNumberApi.sendMFAOTP
+        .mockResolvedValueOnce({
+          data: { id: "txn-456" },
+        })
+        .mockRejectedValueOnce({
+          data: { message: "phone_mfa_change_rate_limit" },
+        });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("add-mfa-otp-verification"),
+        ).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("setup-alternate-method"));
+
+      await waitFor(() => {
+        expect(addMFAPhoneNumberApi.sendMFAOTP).toHaveBeenCalledTimes(2);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      expect(
+        screen.queryByTestId("add-mfa-otp-verification"),
+      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+        "data-error-code",
+        "phone_mfa_change_rate_limit",
+      );
     });
 
     it("should display remaining attempts message when verifyMFAOtp returns retries metadata", async () => {

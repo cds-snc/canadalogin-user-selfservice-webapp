@@ -5,13 +5,60 @@ from app.otp.schemas import (
     OtpType,
     OtpVerificationAttemptRequest,
 )
+from app.users.schemas import UserAuthFactorsIbmResponse
 from app.users.services.get_my_profile import get_my_profile
+from app.users.services.otp_factors import dispatch_user_auth_factors
 from app.utils.access_token import get_auth_request_headers
+from app.utils.phone_mfa_rate_limit import (
+    assert_phone_mfa_registration_rate_limit_not_exceeded,
+)
 from app.utils.schemas import ResponseModel
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status
 from httpx import AsyncClient
 
 logger = logging.getLogger(__name__)
+
+IBM_FACTOR_TYPE_TO_OTP_TYPE: dict[str, OtpType] = {
+    "smsotp": OtpType.SMS,
+    "voiceotp": OtpType.VOICE,
+    "emailotp": OtpType.EMAIL,
+}
+
+
+async def _resolve_factor_verification_context(
+    global_http_client: AsyncClient,
+    user_access_token: str,
+    factor_id: str,
+) -> tuple[OtpType, bool]:
+    """Resolve factor type and validation state from IBM Verify.
+
+    Returns:
+        tuple[OtpType, bool]: (resolved_otp_type, is_factor_validated)
+    """
+    factors_json = await dispatch_user_auth_factors(
+        global_http_client,
+        user_access_token,
+        validated=None,
+    )
+    factors_response = UserAuthFactorsIbmResponse(**factors_json)
+
+    factor = next(
+        (item for item in factors_response.factors if item.id == factor_id), None
+    )
+    if factor is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="invalidCode",
+        )
+
+    resolved_otp_type = IBM_FACTOR_TYPE_TO_OTP_TYPE.get(str(factor.type or "").lower())
+    if resolved_otp_type is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="invalidCode",
+        )
+
+    return resolved_otp_type, bool(factor.validated)
 
 
 async def _fetch_mfa_otp_status_snapshot(
@@ -65,6 +112,7 @@ async def handle_verify_mfa_otp(
     attempt_request: OtpVerificationAttemptRequest,
     user_access_token: str,
     otp_type: OtpType,
+    request: Request | None = None,
 ):
     """Verify MFA OTP for SMS, Voice, or Email."""
     # Verify user profile
@@ -75,15 +123,47 @@ async def handle_verify_mfa_otp(
             success=False, data=None, message="User verification failed"
         )
 
+    user_id = my_profile_response.data.id
+    resolved_otp_type, is_factor_validated = await _resolve_factor_verification_context(
+        global_http_client,
+        user_access_token,
+        attempt_request.id,
+    )
+
+    if attempt_request.otpType != resolved_otp_type:
+        logger.warning(
+            "Ignoring client otpType '%s' for factor '%s'; using server-resolved type '%s'",
+            attempt_request.otpType,
+            attempt_request.id,
+            resolved_otp_type,
+        )
+
+    # Apply phone-MFA registration limiter only for Add MFA verification.
+    # Add MFA verifies an unvalidated phone factor; other flows use validated factors.
+    should_enforce_phone_rate_limit = (
+        request is not None
+        and not is_factor_validated
+        and resolved_otp_type
+        in {
+            OtpType.SMS,
+            OtpType.VOICE,
+        }
+    )
+    if should_enforce_phone_rate_limit:
+        await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
+
     await dispatch_verify_mfa_otp(
-        global_http_client, attempt_request, otp_type, user_access_token
+        global_http_client,
+        attempt_request,
+        resolved_otp_type,
+        user_access_token,
     )
 
     # IBM Verify API returns 204 No Content on successful verification attempt
     return ResponseModel(
         success=True,
         data=None,
-        message=f"{otp_type.value} MFA OTP verification completed successfully",
+        message=f"{resolved_otp_type.value} MFA OTP verification completed successfully",
     )
 
 
