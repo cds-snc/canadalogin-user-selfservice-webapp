@@ -84,7 +84,7 @@ async def test_phone_mfa_and_contact_phone_events_use_different_redis_keys():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("environment", ["local", "dev", "test"])
-async def test_phone_mfa_rate_limit_window_is_five_minutes_in_non_prod_environments(
+async def test_phone_mfa_rate_limit_window_is_15_minutes_in_non_prod_environments(
     monkeypatch,
     environment,
 ):

@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock
 import app.otp.services.send_transient_otp as feature_module
 import pytest
 from fastapi import HTTPException
+from pydantic import ValidationError
 
 # Schemas
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
@@ -211,6 +212,91 @@ async def test_dispatch_posts_correct_request_for_email():
         )
         resp = await dispatch_otp(client, info, "USER_TOKEN")
     assert resp.status_code == 201
+
+
+def test_user_otp_info_requires_exactly_one_destination_source():
+    with pytest.raises(ValidationError):
+        UserOtpInfo(
+            otpType=OtpType.SMS,
+            user_id="user@example.com",
+        )
+
+    with pytest.raises(ValidationError):
+        UserOtpInfo(
+            otpType=OtpType.SMS,
+            user_id="user@example.com",
+            factor_id="factor-1",
+            destination="+14165551234",
+        )
+
+
+@pytest.mark.asyncio
+async def test_factor_based_send_uses_registered_factor_destination(monkeypatch):
+    payload = make_valid_payload(OtpType.SMS, trxn_id="factor-send-1")
+    mock_get_factor = AsyncMock(
+        return_value={
+            "id": "factor-1",
+            "type": "smsotp",
+            "destination": "+14165551234",
+        }
+    )
+    monkeypatch.setattr(feature_module, "get_user_otp_factor", mock_get_factor)
+
+    def handler(request: Request) -> Response:
+        assert json.loads(request.content.decode()) == {"phoneNumber": "+14165551234"}
+        return Response(201, json=payload)
+
+    async with AsyncClient(transport=build_transport(handler)) as client:
+        result = await handle_otp_send(
+            client,
+            UserOtpInfo(
+                otpType=OtpType.SMS,
+                user_id="user@example.com",
+                factor_id="factor-1",
+            ),
+            user_access_token="USER_TOKEN",
+        )
+
+    assert result.success is True
+    mock_get_factor.assert_awaited_once_with(client, "USER_TOKEN", "factor-1")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "factor, otp_type",
+    [
+        (None, OtpType.SMS),
+        (
+            {"id": "factor-1", "type": "voiceotp", "destination": "+14165551234"},
+            OtpType.SMS,
+        ),
+    ],
+)
+async def test_factor_based_send_rejects_invalid_factor(monkeypatch, factor, otp_type):
+    monkeypatch.setattr(
+        feature_module,
+        "get_user_otp_factor",
+        AsyncMock(return_value=factor),
+    )
+
+    async with AsyncClient(
+        transport=build_transport(
+            lambda _: pytest.fail("IBM Verify should not be called")
+        )
+    ) as client:
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_send(
+                client,
+                UserOtpInfo(
+                    otpType=otp_type,
+                    user_id="user@example.com",
+                    factor_id="factor-1",
+                ),
+                user_access_token="USER_TOKEN",
+            )
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "invalidCode"
 
 
 # --------------------------------
