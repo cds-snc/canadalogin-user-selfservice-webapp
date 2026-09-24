@@ -72,6 +72,8 @@ const ADD_MFA_PAGE_BY_STEP: Record<WizardStep, string> = {
   addSecondMFA: "AddPhoneNumberSecondMethod",
 };
 
+const PHONE_MFA_CHANGE_RATE_LIMIT_ERROR = "phone_mfa_change_rate_limit";
+
 export default function AddMFAPage() {
   const { language } = useParams();
   const { state } = useUser();
@@ -193,14 +195,26 @@ export default function AddMFAPage() {
     useState(false);
   const errorMessage =
     customErrorMessage || getErrorMessage(language, errorCode);
+  const errorLinks =
+    wizardStep === "addMFANumber" &&
+    errorCode === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR &&
+    errorMessage
+      ? { "#mfa-phone-number": errorMessage }
+      : undefined;
 
   const resetAttempts = () => {
     setIsMfaOtpMaxAttemptsReached(false);
   };
 
-  const goToAddPhoneEntryStep = () => {
-    setErrorCode("");
-    setCustomErrorMessage("");
+  const goToAddPhoneEntryStep = ({
+    clearErrorState = true,
+  }: {
+    clearErrorState?: boolean;
+  } = {}) => {
+    if (clearErrorState) {
+      setErrorCode("");
+      setCustomErrorMessage("");
+    }
     setIsMfaOtpMaxAttemptsReached(false);
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -342,7 +356,13 @@ export default function AddMFAPage() {
     } catch (error) {
       const err = error as { data?: { message?: string } };
       if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+        if (err.data.message === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR) {
+          setCustomErrorMessage("");
+          setErrorCode(err.data.message);
+          goToAddPhoneEntryStep({ clearErrorState: false });
+        } else {
+          setErrorCode(err.data.message);
+        }
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
@@ -417,6 +437,19 @@ export default function AddMFAPage() {
       const attemptsMessage = getOtpAttemptsErrorMessage(err?.data);
 
       if (message) {
+        if (message === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR) {
+          setCustomErrorMessage("");
+          setErrorCode(message);
+          goToAddPhoneEntryStep({ clearErrorState: false });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_END,
+            step: ADD_MFA_ANALYTICS.STEPS.SUCCESS,
+            type: phoneFormData.otpType,
+            error: message,
+          });
+          return;
+        }
+
         if (
           shouldDisplayOtpMaxAttempts({
             errorCode: message,
@@ -888,6 +921,7 @@ export default function AddMFAPage() {
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
       errorMessage={errorMessage}
+      errorLinks={errorLinks}
       language={language}
     />
   );

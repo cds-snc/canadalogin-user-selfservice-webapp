@@ -71,6 +71,8 @@ const CONTACT_PHONE_PAGE_BY_STEP: Record<ContactPhoneWizardStep, string> = {
   success: "PhoneChangeSuccess",
 };
 
+const PHONE_MFA_CHANGE_RATE_LIMIT_ERROR = "phone_mfa_change_rate_limit";
+
 export default function EditContactPhoneNumberPage() {
   const { language = "en" } = useParams<{ language: string }>();
   const { state, dispatch } = useUser();
@@ -173,7 +175,13 @@ export default function EditContactPhoneNumberPage() {
 
       const message = getApiErrorMessage(error);
       if (message) {
-        setErrorCode(message);
+        if (message === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR) {
+          setCustomErrorMessage("");
+          setErrorCode(message);
+          handleBackToEnterPhone({ clearErrorState: false });
+        } else {
+          setErrorCode(message);
+        }
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
@@ -317,6 +325,9 @@ export default function EditContactPhoneNumberPage() {
       }
     } catch (error) {
       const message = syncPhoneOtpErrorStateFromApi(error);
+      if (message === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR) {
+        handleBackToEnterPhone({ clearErrorState: false });
+      }
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: CONTACT_PHONE_ANALYTICS.STEPS.VERIFY_OTP,
@@ -372,6 +383,18 @@ export default function EditContactPhoneNumberPage() {
       const payloadMessage =
         authError.data?.message ?? authError.response?.data?.message;
       const message = syncPhoneOtpErrorStateFromApi(error);
+
+      if (message === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR) {
+        setPhoneOtpVerificationProofId("");
+        handleBackToEnterPhone({ clearErrorState: false });
+        trackEvent({
+          event: GA_FORM_EVENTS.FORM_STEP_END,
+          step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
+          error: message,
+        });
+        return;
+      }
+
       trackEvent({
         event: GA_FORM_EVENTS.FORM_STEP_END,
         step: CONTACT_PHONE_ANALYTICS.STEPS.CONFIRM_UPDATE,
@@ -404,11 +427,17 @@ export default function EditContactPhoneNumberPage() {
     navigate(backToProfile);
   };
 
-  const handleBackToEnterPhone = () => {
+  const handleBackToEnterPhone = ({
+    clearErrorState = true,
+  }: {
+    clearErrorState?: boolean;
+  } = {}) => {
     setPhoneOtpVerificationProofId("");
-    setCustomErrorMessage("");
     setIsPhoneOtpMaxAttemptsReached(false);
-    setErrorCode("");
+    if (clearErrorState) {
+      setCustomErrorMessage("");
+      setErrorCode("");
+    }
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
       step: CONTACT_PHONE_ANALYTICS.STEPS.ENTER_PHONE,
@@ -424,6 +453,12 @@ export default function EditContactPhoneNumberPage() {
     translatedErrorMessage = errorCode;
   }
   const errorMessage = customErrorMessage || translatedErrorMessage;
+  const errorLinks =
+    wizardStep === "enterPhone" &&
+    errorCode === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR &&
+    errorMessage
+      ? { "#cp-phone-number": errorMessage }
+      : undefined;
 
   const resetOtpAttemptState = () => {
     setIsPhoneOtpMaxAttemptsReached(false);
@@ -518,6 +553,7 @@ export default function EditContactPhoneNumberPage() {
       StepComponent={steps[wizardStep]}
       errorCode={wizardStep === "success" ? "" : errorCode}
       errorMessage={wizardStep === "success" ? "" : errorMessage}
+      errorLinks={wizardStep === "success" ? undefined : errorLinks}
       language={language}
     />
   );
