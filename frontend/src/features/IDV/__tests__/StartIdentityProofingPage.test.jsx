@@ -33,6 +33,7 @@ vi.mock("../../../utils/constants", () => ({
     return mockDevOnlyFeature;
   },
   IDV_TARGET_URL_KEY: "target_url",
+  AVAILABLE_LANGUAGES: { en: "en", fr: "fr" },
   PAGES: {
     idvOnlineVerificationInfoPage: "IdvOnlineVerificationInfoPage",
     idvProveIdentityOnlinePage: "IdvProveIdentityOnlinePage",
@@ -98,9 +99,28 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
   GcdsLink: ({ children, href }) => <a href={href}>{children}</a>,
   GcdsNotice: ({ children }) => <div data-testid="gcds-notice">{children}</div>,
-  GcdsRadios: ({ name, legend, options, onGcdsChange, hideLegend }) => (
-    <fieldset data-testid={`radios-${name}`}>
+  GcdsErrorSummary: ({ id, heading, errorLinks }) => (
+    <div id={id} data-testid="error-summary">
+      <h2>{heading}</h2>
+      {Object.entries(errorLinks ?? {}).map(([href, message], index) => (
+        <a key={index} href={href}>
+          {message}
+        </a>
+      ))}
+    </div>
+  ),
+  GcdsRadios: ({
+    name,
+    legend,
+    options,
+    onGcdsChange,
+    hideLegend,
+    id,
+    errorMessage,
+  }) => (
+    <fieldset id={id} data-testid={`radios-${name}`}>
       {!hideLegend && <legend>{legend}</legend>}
+      {errorMessage ? <div>{errorMessage}</div> : null}
       {options.map((opt) => (
         <label key={opt.id}>
           <input
@@ -293,33 +313,43 @@ describe("StartIdentityProofingPage", () => {
     expect(screen.getByTestId("continue-button")).toHaveTextContent("Continue");
   });
 
-  // ── Button disabled state ──────────────────────
-  it("disables Continue button when no method is selected", () => {
+  // ── Button never disabled / validation ─────────
+  it("never disables the Continue button", () => {
     render(<StartIdentityProofingPage />);
 
-    expect(screen.getByTestId("continue-button")).toBeDisabled();
-  });
+    expect(screen.getByTestId("continue-button")).not.toBeDisabled();
 
-  it("enables Continue button when an online method is selected", () => {
-    render(<StartIdentityProofingPage />);
-
-    const radio = screen.getByRole("radio", {
-      name: /Prove identity online and get instant access/,
-    });
-    fireEvent.click(radio);
+    fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(screen.getByTestId("continue-button")).not.toBeDisabled();
   });
 
-  it("enables Continue button when an in-person method is selected", () => {
+  it("shows an error message when Continue is clicked without selecting an option", () => {
     render(<StartIdentityProofingPage />);
 
-    const radio = screen.getByRole("radio", {
-      name: /Do it in person and sign back in when done/,
-    });
-    fireEvent.click(radio);
+    fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(screen.getByTestId("continue-button")).not.toBeDisabled();
+    expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+    expect(
+      screen.getAllByText("Select an option to continue.").length,
+    ).toBeGreaterThan(0);
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("clears the error message once an option is selected and submitted", () => {
+    render(<StartIdentityProofingPage />);
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+    expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("radio", {
+        name: /Prove identity online and get instant access/,
+      }),
+    );
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
   });
 
   // ── Continue button actions ────────────────────

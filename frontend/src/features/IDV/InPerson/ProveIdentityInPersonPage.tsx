@@ -9,11 +9,23 @@ import {
   GcdsContainer,
 } from "@gcds-core/components-react";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import {
+  AVAILABLE_LANGUAGES,
+  DEV_ONLY_FEATURE,
+  PAGES,
+} from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import InPersonRadioButtons from "../components/InPersonRadioButtons";
 import { IN_PERSON_METHOD, type InPersonMethod } from "../components/methods";
 import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
+import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
+import {
+  getSelectOptionRequiredMessage,
+  getValidationSummaryHeading,
+} from "./validation/ErrorsDefinition";
+
+const ERROR_SUMMARY_ID = "prove-identity-in-person-error-summary";
+const RADIOS_ID = "prove-identity-in-person-radios";
 
 export default function ProveIdentityInPersonPage() {
   const navigate = useNavigate();
@@ -21,8 +33,16 @@ export default function ProveIdentityInPersonPage() {
   const { t } = useTranslation("idv");
 
   const [selectedMethod, setSelectedMethod] = useState<InPersonMethod>();
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
 
   const { relyingPartyName: rpName } = useRelyingPartyInfo();
+  const currentLanguage =
+    language === AVAILABLE_LANGUAGES.fr
+      ? AVAILABLE_LANGUAGES.fr
+      : AVAILABLE_LANGUAGES.en;
+  const selectMethodErrorMessage =
+    hasSubmitted && !selectedMethod ? getSelectOptionRequiredMessage(t) : "";
 
   const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
     language,
@@ -38,6 +58,13 @@ export default function ProveIdentityInPersonPage() {
   });
 
   const handleContinue = () => {
+    setHasSubmitted(true);
+
+    if (!selectedMethod) {
+      setSummaryFocusTrigger((previous) => previous + 1);
+      return;
+    }
+
     switch (selectedMethod) {
       case IN_PERSON_METHOD.canadaPostLocations:
         navigate(visitCanadaPostPage);
@@ -68,9 +95,21 @@ export default function ProveIdentityInPersonPage() {
             })}
           </GcdsText>
 
+          {selectMethodErrorMessage ? (
+            <ErrorSummaryWithFocus
+              key={summaryFocusTrigger}
+              id={ERROR_SUMMARY_ID}
+              errorMessage={getValidationSummaryHeading(t)}
+              errorLinks={{ [`#${RADIOS_ID}`]: selectMethodErrorMessage }}
+              language={currentLanguage}
+            />
+          ) : null}
+
           <InPersonRadioButtons
+            id={RADIOS_ID}
             selectedMethod={selectedMethod}
             onMethodChange={setSelectedMethod}
+            errorMessage={selectMethodErrorMessage}
           />
         </GcdsContainer>
 
@@ -81,7 +120,6 @@ export default function ProveIdentityInPersonPage() {
         >
           <GcdsButton
             type="button"
-            disabled={!selectedMethod}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               handleContinue();

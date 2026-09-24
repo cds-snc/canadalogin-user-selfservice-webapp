@@ -11,8 +11,10 @@ import {
 } from "@gcds-core/components-react";
 
 import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
+import ErrorSummaryWithFocus from "../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 
 import {
+  AVAILABLE_LANGUAGES,
   DEV_ONLY_FEATURE,
   IDV_TARGET_URL_KEY,
   PAGES,
@@ -26,6 +28,13 @@ import {
 import { IDV_JOURNEY_TYPE } from "./constants";
 import { identityVerificationApi } from "./api/identityVerificationApi";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
+import {
+  getSelectOptionRequiredMessage,
+  getValidationSummaryHeading,
+} from "./InPerson/validation/ErrorsDefinition";
+
+const ERROR_SUMMARY_ID = "start-identity-proofing-error-summary";
+const RADIOS_ID = "start-identity-proofing-radios";
 
 function extractTargetUrl(searchParams: URLSearchParams): string | null {
   const structuredTarget = searchParams.get(IDV_TARGET_URL_KEY);
@@ -79,6 +88,14 @@ export default function StartIdentityProofingPage() {
   const pageTitle = titleByJourneyType[resolvedJourneyType];
   const { t: tLayout } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
+  const currentLanguage =
+    language === AVAILABLE_LANGUAGES.fr
+      ? AVAILABLE_LANGUAGES.fr
+      : AVAILABLE_LANGUAGES.en;
+  const selectOptionErrorMessage =
+    hasSubmitted && !selectedOption ? getSelectOptionRequiredMessage(t) : "";
   const onlineSelectionPage = path(PAGES.idvProveIdentityOnlinePage, {
     language,
     journeyType,
@@ -110,6 +127,13 @@ export default function StartIdentityProofingPage() {
 
   // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
+    setHasSubmitted(true);
+
+    if (!selectedOption) {
+      setSummaryFocusTrigger((previous) => previous + 1);
+      return;
+    }
+
     switch (selectedOption) {
       case START_IDENTITY_OPTION.online:
         navigate(onlineSelectionPage);
@@ -152,6 +176,15 @@ export default function StartIdentityProofingPage() {
             </GcdsText>
           </AccessibleNotice>
         )}
+        {selectOptionErrorMessage ? (
+          <ErrorSummaryWithFocus
+            key={summaryFocusTrigger}
+            id={ERROR_SUMMARY_ID}
+            errorMessage={getValidationSummaryHeading(t)}
+            errorLinks={{ [`#${RADIOS_ID}`]: selectOptionErrorMessage }}
+            language={currentLanguage}
+          />
+        ) : null}
         <GcdsContainer>
           <GcdsHeading tag="h1">{pageTitle}</GcdsHeading>
           <GcdsText>
@@ -173,16 +206,17 @@ export default function StartIdentityProofingPage() {
             {t("StartIdentityProofing.howToProveHeading")}
           </GcdsHeading>
           <IdentityProofingRadioButtons
+            id={RADIOS_ID}
             selectedOption={selectedOption}
             onOptionChange={setSelectedOption}
             rpName={rpName}
+            errorMessage={selectOptionErrorMessage}
           />
         </GcdsContainer>
 
         <GcdsGrid columns="1" columnsDesktop="max-content max-content">
           <GcdsButton
             type="button"
-            disabled={!selectedOption}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               handleContinue();
