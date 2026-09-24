@@ -48,8 +48,10 @@ class UserOtpInfo(BaseModel):
 
     @model_validator(mode="after")
     def validate(self):
-        if self.factor_id is None and self.destination is None:
-            raise ValueError("Must contain factor_id or destination")
+        has_factor_id = self.factor_id is not None
+        has_destination = self.destination is not None
+        if has_factor_id == has_destination:
+            raise ValueError("Provide either factor_id or destination")
 
         # Validate only phone numbers
         if self.otpType not in {OtpType.SMS, OtpType.VOICE} or self.destination is None:
