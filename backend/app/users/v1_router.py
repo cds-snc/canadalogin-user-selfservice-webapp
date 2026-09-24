@@ -10,6 +10,7 @@ from app.users.schemas import (
     UserPhoneAuthFactorsResponse,
     ProfileUpdateWithOtpRequest,
     ProfileUpdateWithOtpResponse,
+    ConnectedServicesResponse,
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.users.services.update_my_profile import update_my_profile
@@ -18,6 +19,7 @@ from app.users.services.otp_factors import get_user_otp_factors
 from app.users.services.update_profile_with_otp import (
     update_profile_with_otp_verification,
 )
+from app.users.services.connected_services import get_connected_services
 
 from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.validate_user_request_match import validate_user_id_matches_session
@@ -82,6 +84,19 @@ async def rp_info(
     if rp_data is None:
         return RelyingPartyResponse(success=True, message="No relying party", data=None)
     return rp_data
+
+
+@router.get(
+    "/connected-services",
+    response_model=ConnectedServicesResponse,
+    tags=["Users"],
+    summary="Get the authenticated user's connected services",
+)
+async def connected_services(
+    request: Request,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await get_connected_services(request, user_access_token)
 
 
 @router.get(
