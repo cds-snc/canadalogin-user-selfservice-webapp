@@ -20,6 +20,33 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+PHONE_MFA_SENT_FACTORS_SESSION_KEY = "phone_mfa_sent_factor_ids"
+
+
+def _get_sent_factor_ids_from_session(request: Request) -> set[str]:
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return set()
+
+    stored_value = session.get(PHONE_MFA_SENT_FACTORS_SESSION_KEY, [])
+    if not isinstance(stored_value, list):
+        return set()
+
+    return {factor_id for factor_id in stored_value if isinstance(factor_id, str)}
+
+
+def _mark_factor_id_as_sent(request: Request, factor_id: str) -> None:
+    if not factor_id:
+        return
+
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return
+
+    sent_factor_ids = _get_sent_factor_ids_from_session(request)
+    sent_factor_ids.add(factor_id)
+    session[PHONE_MFA_SENT_FACTORS_SESSION_KEY] = list(sent_factor_ids)
+
 
 async def dispatch_send_mfa_otp(
     global_http_client: AsyncClient,
@@ -74,18 +101,24 @@ async def handle_send_mfa_otp(
     user_language = my_profile_response.data.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
 
-    should_apply_phone_rate_limit = (
-        request is not None
-        and verification_request.countAsMfaAddition
-        and otp_type
-        in {
-            OtpType.SMS,
-            OtpType.VOICE,
-        }
-    )
+    should_enforce_phone_rate_limit = request is not None and otp_type in {
+        OtpType.SMS,
+        OtpType.VOICE,
+    }
 
-    if should_apply_phone_rate_limit:
+    if should_enforce_phone_rate_limit:
         await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
+
+    should_record_phone_rate_limit_event = False
+    if should_enforce_phone_rate_limit:
+        # Backend anti-bypass guard:
+        # if this is the first successful send for a factor in this session,
+        # count it even when countAsMfaAddition is false.
+        sent_factor_ids = _get_sent_factor_ids_from_session(request)
+        should_record_phone_rate_limit_event = (
+            verification_request.countAsMfaAddition
+            or verification_request.id not in sent_factor_ids
+        )
 
     http_client_response = await dispatch_send_mfa_otp(
         global_http_client,
@@ -95,7 +128,10 @@ async def handle_send_mfa_otp(
         user_language,
     )
 
-    if should_apply_phone_rate_limit:
+    if should_enforce_phone_rate_limit:
+        _mark_factor_id_as_sent(request, verification_request.id)
+
+    if should_record_phone_rate_limit_event:
         await record_phone_mfa_registration_event(request, user_id)
 
     response_json = http_client_response.json()

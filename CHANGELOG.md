@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.35.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.34.1...v1.35.0) (2026-09-24)
+
+
+### Features
+
+* implement csrf challenge ([#2209](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2209)) ([b0b9364](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b0b93648b5d09375f86c903040c323b10c8e3f8e))
+
+
+### Bug Fixes
+
+* error summary auto link to the phone input field ([#2237](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2237)) ([db3f320](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/db3f32081a74887e48acdd039c884f488bd729e3))
+* reject OTP verification if rate limit reached ([#2240](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2240)) ([8bf19bd](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/8bf19bdf40d61c0c4346876824696e8cf4d1ab86))
+
+
+### Code Refactoring
+
+* **identity-verification:** do not disable buttons ([#2205](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2205)) ([2488c2c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2488c2c207da93baa85ee426bf83376de6637bae))
+
+
+### Miscellaneous Chores
+
+* bump staging version to 1.34.1 ([#2235](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2235)) ([b116c11](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b116c1195e7468a06b9db1ae0163f24a080333b5))
+
 ## [1.34.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.34.0...v1.34.1) (2026-09-23)
 
 
