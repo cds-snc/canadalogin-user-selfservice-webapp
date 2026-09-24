@@ -271,6 +271,11 @@ vi.mock(
           data-error-links={errorLinks ? JSON.stringify(errorLinks) : undefined}
         >
           Error Summary: {errorCode}
+          {Object.entries(errorLinks || {}).map(([href, text]) => (
+            <a href={href} key={href} data-testid="error-link-0">
+              {text}
+            </a>
+          ))}
         </div>
       ) : null,
   }),
@@ -561,6 +566,10 @@ describe("AddMFAPage Unit Tests", () => {
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.enrollMFA).toHaveBeenCalled();
       });
+      expect(screen.getByTestId("error-link-0")).toHaveAttribute(
+        "href",
+        "#mfa-phone-number",
+      );
     });
 
     it("should display rate-limit error when MFA phone change limit is reached", async () => {
@@ -609,6 +618,10 @@ describe("AddMFAPage Unit Tests", () => {
           "phone_mfa_change_rate_limit",
         );
       });
+      expect(screen.getByTestId("error-link-0")).toHaveAttribute(
+        "href",
+        "#mfa-phone-number",
+      );
     });
 
     it("should handle enrollMFA error without data.message", async () => {

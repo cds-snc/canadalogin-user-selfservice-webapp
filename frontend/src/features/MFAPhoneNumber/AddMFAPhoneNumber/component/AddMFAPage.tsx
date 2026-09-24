@@ -196,9 +196,7 @@ export default function AddMFAPage() {
   const errorMessage =
     customErrorMessage || getErrorMessage(language, errorCode);
   const errorLinks =
-    wizardStep === "addMFANumber" &&
-    errorCode === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR &&
-    errorMessage
+    wizardStep === "addMFANumber" && errorCode && errorMessage
       ? { "#mfa-phone-number": errorMessage }
       : undefined;
 

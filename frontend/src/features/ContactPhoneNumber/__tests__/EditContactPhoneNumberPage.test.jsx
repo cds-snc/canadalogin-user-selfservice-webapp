@@ -295,6 +295,9 @@ describe("EditContactPhoneNumberPage Component", () => {
         "Invalid phone number",
       );
     });
+    expect(mockStepContent.mock.calls.at(-1)?.[0]?.errorLinks).toEqual({
+      "#cp-phone-number": expect.any(String),
+    });
   });
 
   it("shows confirm step after OTP verification", async () => {
@@ -440,7 +443,11 @@ describe("EditContactPhoneNumberPage Component", () => {
       expect(lastStepContentCall?.errorCode).toBe(
         "phone_mfa_change_rate_limit",
       );
+      expect(lastStepContentCall?.errorLinks).toEqual({
+        "#cp-phone-number": expect.any(String),
+      });
     });
+    expect(screen.getByTestId("enter-phone-number")).toBeInTheDocument();
   });
 
   it("handles back navigation from OTP verification", async () => {
