@@ -20,6 +20,9 @@ from httpx import AsyncClient, HTTPStatusError
 logger = logging.getLogger(__name__)
 
 CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY = "contact_phone_sent_destinations"
+CONTACT_PHONE_LAST_OTP_TYPE_BY_DESTINATION_SESSION_KEY = (
+    "contact_phone_last_otp_type_by_destination"
+)
 
 
 def _normalize_destination_for_session(destination: str | None) -> str:
@@ -59,6 +62,49 @@ def _mark_destination_as_sent(request: Request, destination: str | None) -> None
     session[CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY] = list(sent_destinations)
 
 
+def _get_last_otp_type_by_destination_from_session(request: Request) -> dict[str, str]:
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return {}
+
+    stored_value = session.get(
+        CONTACT_PHONE_LAST_OTP_TYPE_BY_DESTINATION_SESSION_KEY,
+        {},
+    )
+    if not isinstance(stored_value, dict):
+        return {}
+
+    return {
+        destination: otp_type
+        for destination, otp_type in stored_value.items()
+        if isinstance(destination, str)
+        and destination
+        and otp_type in {OtpType.SMS.value, OtpType.VOICE.value}
+    }
+
+
+def _set_last_otp_type_for_destination(
+    request: Request,
+    destination: str | None,
+    otp_type: OtpType,
+) -> None:
+    normalized_destination = _normalize_destination_for_session(destination)
+    if not normalized_destination:
+        return
+
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return
+
+    last_transport_by_destination = _get_last_otp_type_by_destination_from_session(
+        request
+    )
+    last_transport_by_destination[normalized_destination] = otp_type.value
+    session[CONTACT_PHONE_LAST_OTP_TYPE_BY_DESTINATION_SESSION_KEY] = (
+        last_transport_by_destination
+    )
+
+
 async def handle_otp_send(
     global_http_client: AsyncClient,
     user_otp_info: UserOtpInfo,
@@ -88,15 +134,24 @@ async def handle_otp_send(
     should_record_contact_phone_rate_limit_event = False
     if should_apply_contact_phone_rate_limit:
         # Backend anti-bypass guard:
-        # if this is the first successful send for a destination in this session,
-        # count it even when countAsContactPhoneUpdate is false.
+        # 1. Count first successful send for a destination even when flag is false.
+        # 2. Count transport switches (SMS <-> VOICE) so switch links cannot bypass.
         sent_destinations = _get_sent_destinations_from_session(request)
+        last_otp_type_by_destination = _get_last_otp_type_by_destination_from_session(
+            request
+        )
         normalized_destination = _normalize_destination_for_session(
             user_otp_info.destination
+        )
+        previous_otp_type = last_otp_type_by_destination.get(normalized_destination)
+        is_transport_switch = (
+            previous_otp_type is not None
+            and previous_otp_type != user_otp_info.otpType.value
         )
         should_record_contact_phone_rate_limit_event = (
             user_otp_info.countAsContactPhoneUpdate
             or normalized_destination not in sent_destinations
+            or is_transport_switch
         )
 
     if user_otp_info.factor_id is not None:
@@ -137,6 +192,11 @@ async def handle_otp_send(
 
     if should_apply_contact_phone_rate_limit:
         _mark_destination_as_sent(request, user_otp_info.destination)
+        _set_last_otp_type_for_destination(
+            request,
+            user_otp_info.destination,
+            user_otp_info.otpType,
+        )
 
     if should_record_contact_phone_rate_limit_event:
         await record_contact_phone_update_event(request, user_id)

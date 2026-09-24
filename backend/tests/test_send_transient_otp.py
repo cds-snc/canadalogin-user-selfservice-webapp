@@ -346,7 +346,10 @@ async def test_handle_contact_phone_update_resend_does_not_touch_rate_limit(
             session={
                 "contact_phone_sent_destinations": [
                     "14165551234",
-                ]
+                ],
+                "contact_phone_last_otp_type_by_destination": {
+                    "14165551234": "sms",
+                },
             },
             app=SimpleNamespace(state=SimpleNamespace(redis_client=None)),
         )
@@ -361,6 +364,64 @@ async def test_handle_contact_phone_update_resend_does_not_touch_rate_limit(
     assert result.success is True
     mock_assert_rate_limit.assert_awaited_once_with(request, "user@example.com")
     mock_record_rate_limit.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_handle_contact_phone_update_transport_switch_counts_rate_limit(
+    monkeypatch,
+):
+    payload = make_valid_payload(
+        OtpType.VOICE,
+        correlation_id="corr-rate-limit-switch",
+        trxn_id="switch-1",
+    )
+
+    mock_assert_rate_limit = AsyncMock()
+    mock_record_rate_limit = AsyncMock()
+    monkeypatch.setattr(
+        feature_module,
+        "assert_contact_phone_update_rate_limit_not_exceeded",
+        mock_assert_rate_limit,
+    )
+    monkeypatch.setattr(
+        feature_module,
+        "record_contact_phone_update_event",
+        mock_record_rate_limit,
+    )
+
+    def handler(request: Request) -> Response:
+        return Response(201, json=payload)
+
+    transport = build_transport(handler)
+    async with AsyncClient(transport=transport) as client:
+        info = UserOtpInfo(
+            otpType=OtpType.VOICE,
+            user_id="user@example.com",
+            destination="+14165551234",
+            countAsContactPhoneUpdate=False,
+        )
+        request = SimpleNamespace(
+            session={
+                "contact_phone_sent_destinations": [
+                    "14165551234",
+                ],
+                "contact_phone_last_otp_type_by_destination": {
+                    "14165551234": "sms",
+                },
+            },
+            app=SimpleNamespace(state=SimpleNamespace(redis_client=None)),
+        )
+
+        result = await handle_otp_send(
+            client,
+            info,
+            user_access_token="USER_TOKEN",
+            request=request,
+        )
+
+    assert result.success is True
+    mock_assert_rate_limit.assert_awaited_once_with(request, "user@example.com")
+    mock_record_rate_limit.assert_awaited_once_with(request, "user@example.com")
 
 
 @pytest.mark.asyncio
