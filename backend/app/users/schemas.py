@@ -72,7 +72,18 @@ class MetaDataTypeValue(BaseModel):
 
 class CustomAttribute(BaseModel):
     name: str
-    values: List[str]
+    values: List[Any]
+
+    @field_validator("values", mode="before")
+    @classmethod
+    def _wrap_single_value(cls, value: Any) -> Any:
+        # IBM Verify SCIM can return a bare scalar instead of a list when the
+        # multi-valued attribute currently has only a single value.
+        if value is None:
+            return []
+        if isinstance(value, list):
+            return value
+        return [value]
 
 
 class SCIMUserDetails(BaseModel):
@@ -83,6 +94,17 @@ class SCIMUserDetails(BaseModel):
     pwdChangedTime: Optional[str] = None
     customAttributes: Optional[List[CustomAttribute]] = None
     model_config = ConfigDict(extra="allow")
+
+    @field_validator("customAttributes", mode="before")
+    @classmethod
+    def _wrap_single_custom_attribute(cls, value: Any) -> Any:
+        # IBM Verify SCIM can return a bare object instead of a list when the
+        # user only has a single custom attribute entry.
+        if value is None:
+            return None
+        if isinstance(value, list):
+            return value
+        return [value]
 
 
 class Meta(BaseModel):
@@ -277,6 +299,16 @@ class IBMVerifyRelyingPartyUserApplicationsSchema(BaseModel):
 
 class RelyingPartyResponse(ResponseModel):
     data: Optional[RelyingPartyInfo] = None
+
+
+class ConnectedService(BaseModel):
+    clientId: str
+    name: str
+    sessionStatus: str
+
+
+class ConnectedServicesResponse(BaseModel):
+    services: List[ConnectedService]
 
 
 class Attributes(BaseModel):
