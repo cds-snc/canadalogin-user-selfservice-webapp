@@ -162,14 +162,8 @@ describe("ConfirmIdentityDetails", () => {
   it("shows the existing RP success notice when RP details are available", () => {
     render(<ConfirmIdentityDetails />);
 
-    expect(
-      screen.getByText("Your identity information was successfully proven."),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /You're almost done\. Review your details saved to CanadaLogin, then share the requested information with .+ to get access\./,
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Success")).toBeInTheDocument();
+    expect(screen.getByText("You proved your identity.")).toBeInTheDocument();
   });
 
   it("shows the new no-RP success notice when RP details are missing", () => {
