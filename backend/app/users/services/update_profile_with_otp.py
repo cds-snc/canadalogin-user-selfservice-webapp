@@ -140,6 +140,7 @@ async def update_profile_with_otp_verification(
     )
 
     _validate_new_email_address(profile_update_data.newEmailAddress)
+    _validate_email_update_otp_type(profile_update_data)
 
     verification_response = await _apply_profile_update_otp_action(
         request=request,
@@ -435,6 +436,7 @@ async def _apply_profile_update_otp_action(
             trxn_id=trxn_id,
             otp_type=otp_type,
             user_access_token=user_access_token,
+            expected_email_address=profile_update_data.newEmailAddress,
         )
 
         await enforce_contact_phone_rate_limit_if_needed()
@@ -581,6 +583,24 @@ def _build_profile_update_fingerprint(
         "newEmailAddress": _normalize_email(profile_update_data.newEmailAddress),
         "phoneNumbers": _normalize_phone_numbers(profile_update_data.phoneNumbers),
     }
+
+
+def _validate_email_update_otp_type(
+    profile_update_data: ProfileUpdateWithOtpRequest,
+) -> None:
+    if (
+        profile_update_data.newEmailAddress
+        and profile_update_data.action
+        in {
+            ProfileUpdateWithOtpAction.VERIFY,
+            ProfileUpdateWithOtpAction.COMMIT_WITH_OTP,
+        }
+        and profile_update_data.otpType != OtpType.EMAIL
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="invalidCode",
+        )
 
 
 def _get_profile_update_otp_proof_store(request: Request) -> dict[str, dict]:
@@ -733,6 +753,7 @@ async def _get_profile_update_otp_proof_ttl_seconds(
     trxn_id: str,
     otp_type: OtpType,
     user_access_token: str,
+    expected_email_address: str | None = None,
 ) -> int:
     """Derive proof TTL from the OTP transaction expiry.
 
@@ -752,6 +773,17 @@ async def _get_profile_update_otp_proof_ttl_seconds(
             )
 
         response_body = status_response.json()
+
+        if expected_email_address is not None:
+            transaction_email_address = response_body.get("emailAddress")
+            if _normalize_email(transaction_email_address) != _normalize_email(
+                expected_email_address
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="invalidCode",
+                )
+
         otp_expiry_datetime = _parse_iso_datetime(response_body.get("expiry"))
 
         if otp_expiry_datetime is None:

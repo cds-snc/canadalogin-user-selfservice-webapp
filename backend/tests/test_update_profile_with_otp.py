@@ -242,6 +242,7 @@ PREFLIGHT_EMAIL_CHECK_IMPORT_PATH = (
 VERIFY_ACTION_PREFLIGHT_IMPORT_PATH = "app.users.services.update_profile_with_otp._run_preflight_checks_for_verified_action"
 PROOF_TTL_IMPORT_PATH = "app.users.services.update_profile_with_otp._get_profile_update_otp_proof_ttl_seconds"
 CONTACT_PHONE_RATE_LIMIT_ASSERT_IMPORT_PATH = "app.users.services.update_profile_with_otp.assert_contact_phone_update_rate_limit_not_exceeded"
+OTP_STATUS_RETRIEVAL_IMPORT_PATH = "app.users.services.update_profile_with_otp.dispatch_otp_status_retrieval"
 
 
 class TestUpdateProfileWithOtpVerification:
@@ -373,6 +374,69 @@ class TestUpdateProfileWithOtpVerification:
         )
         mock_verify_otp.assert_called_once()
         mock_verify_action_preflight.assert_called_once()
+
+    @pytest.mark.asyncio
+    @patch(OTP_STATUS_RETRIEVAL_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_verify_action_rejects_email_different_from_otp_destination(
+        self,
+        mock_verify_otp,
+        mock_status_retrieval,
+    ):
+        mock_status_retrieval.return_value = Response(
+            200,
+            json={
+                "emailAddress": "controlled@example.com",
+                "expiry": "2999-01-01T00:00:00Z",
+            },
+        )
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {}
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp="123456",
+            trxnId="verify-trxn-id",
+            otpType=OtpType.EMAIL,
+            newEmailAddress="different@example.com",
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request, profile_update_data, "user-token"
+            )
+
+        assert exc.value.status_code == 400
+        assert exc.value.detail == "invalidCode"
+        mock_verify_otp.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_email_update_rejects_non_email_otp_type(self):
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {}
+
+        profile_update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT_WITH_OTP,
+            otp="123456",
+            trxnId="verify-trxn-id",
+            otpType=OtpType.SMS,
+            newEmailAddress="new@example.com",
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request, profile_update_data, "user-token"
+            )
+
+        assert exc.value.status_code == 400
+        assert exc.value.detail == "invalidCode"
 
     @pytest.mark.asyncio
     @patch(PROOF_TTL_IMPORT_PATH)
@@ -651,7 +715,7 @@ class TestUpdateProfileWithOtpVerification:
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
-            otpType=OtpType.SMS,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -669,7 +733,7 @@ class TestUpdateProfileWithOtpVerification:
             global_http_client=mock_request.app.state.request_client,
             otp="123456",
             trxn_id="test-trxn-id",
-            otp_type=OtpType.SMS,
+            otp_type=OtpType.EMAIL,
             user_access_token="user-token",
         )
         mock_get_profile.assert_called_once()
@@ -739,7 +803,7 @@ class TestUpdateProfileWithOtpVerification:
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
-            otpType=OtpType.SMS,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -856,7 +920,7 @@ class TestUpdateProfileWithOtpVerification:
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="wrong-code",
             trxnId="test-trxn-id",
-            otpType=OtpType.SMS,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -963,7 +1027,7 @@ class TestUpdateProfileWithOtpVerification:
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
-            otpType=OtpType.VOICE,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -1042,7 +1106,7 @@ class TestUpdateProfileWithOtpVerification:
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
-            otpType=OtpType.VOICE,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -1127,7 +1191,7 @@ class TestUpdateProfileWithOtpVerification:
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
-            otpType=OtpType.SMS,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 

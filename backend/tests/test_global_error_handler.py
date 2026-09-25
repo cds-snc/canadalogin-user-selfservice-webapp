@@ -2147,7 +2147,7 @@ class TestErrorHandlingUpdateProfileWithOtp:
         request_data = {
             "otp": "123456",
             "trxnId": "test-trxn-id",
-            "otpType": "sms",
+            "otpType": "email",
             "newEmailAddress": "new@example.com",
         }
 
