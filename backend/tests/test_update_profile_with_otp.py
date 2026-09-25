@@ -242,7 +242,9 @@ PREFLIGHT_EMAIL_CHECK_IMPORT_PATH = (
 VERIFY_ACTION_PREFLIGHT_IMPORT_PATH = "app.users.services.update_profile_with_otp._run_preflight_checks_for_verified_action"
 PROOF_TTL_IMPORT_PATH = "app.users.services.update_profile_with_otp._get_profile_update_otp_proof_ttl_seconds"
 CONTACT_PHONE_RATE_LIMIT_ASSERT_IMPORT_PATH = "app.users.services.update_profile_with_otp.assert_contact_phone_update_rate_limit_not_exceeded"
-OTP_STATUS_RETRIEVAL_IMPORT_PATH = "app.users.services.update_profile_with_otp.dispatch_otp_status_retrieval"
+OTP_STATUS_RETRIEVAL_IMPORT_PATH = (
+    "app.users.services.update_profile_with_otp.dispatch_otp_status_retrieval"
+)
 
 
 class TestUpdateProfileWithOtpVerification:
