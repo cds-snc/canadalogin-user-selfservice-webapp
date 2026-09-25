@@ -382,6 +382,23 @@ class ProfileUpdateWithOtpRequest(BaseModel):
             self.phoneNumbers,
         ]
 
+        if (
+            self.action == ProfileUpdateWithOtpAction.VERIFY
+            and self.otpType == OtpType.EMAIL
+            and self.newEmailAddress is not None
+        ):
+            raise ValueError(
+                "newEmailAddress must not be provided for email OTP verification"
+            )
+
+        if (
+            self.action == ProfileUpdateWithOtpAction.COMMIT
+            and self.newEmailAddress is not None
+        ):
+            raise ValueError(
+                "newEmailAddress must not be provided when committing a verified update"
+            )
+
         allows_server_resolved_email = (
             self.action == ProfileUpdateWithOtpAction.VERIFY
             and self.otpType == OtpType.EMAIL
@@ -432,6 +449,8 @@ class ProfileUpdateWithOtpRequest(BaseModel):
 
 
 class VerifyEmailOtpRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     action: Literal[ProfileUpdateWithOtpAction.VERIFY]
     otp: str
     trxnId: str
@@ -439,6 +458,8 @@ class VerifyEmailOtpRequest(BaseModel):
 
 
 class CommitEmailUpdateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     action: Literal[ProfileUpdateWithOtpAction.COMMIT]
     verificationProofId: str
 

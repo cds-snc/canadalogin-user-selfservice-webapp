@@ -359,7 +359,7 @@ class TestUpdateProfileWithOtpVerification:
             }
         }
 
-        profile_update_data = ProfileUpdateWithOtpRequest(
+        profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
             action=ProfileUpdateWithOtpAction.VERIFY,
             otp="123456",
             trxnId="verify-trxn-id",
@@ -419,13 +419,13 @@ class TestUpdateProfileWithOtpVerification:
             }
         }
 
-        profile_update_data = ProfileUpdateWithOtpRequest(
+        profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
             action=ProfileUpdateWithOtpAction.VERIFY,
             otp="123456",
             trxnId="verify-trxn-id",
             otpType=OtpType.EMAIL,
-            newEmailAddress="different@example.com",
         )
+        profile_update_data.newEmailAddress = "different@example.com"
 
         with pytest.raises(HTTPException) as exc:
             await update_profile_with_otp_verification(
@@ -550,13 +550,13 @@ class TestUpdateProfileWithOtpVerification:
             }
         }
 
-        profile_update_data = ProfileUpdateWithOtpRequest(
+        profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
             action=ProfileUpdateWithOtpAction.VERIFY,
             otp="123456",
             trxnId="verify-trxn-id",
             otpType=OtpType.EMAIL,
-            newEmailAddress="new@example.com",
         )
+        profile_update_data.newEmailAddress = "new@example.com"
 
         with pytest.raises(HTTPException) as exc:
             await update_profile_with_otp_verification(
@@ -649,11 +649,11 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
         mock_request.session = {}
 
-        profile_update_data = ProfileUpdateWithOtpRequest(
+        profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
             action=ProfileUpdateWithOtpAction.COMMIT,
             verificationProofId="missing-proof",
-            newEmailAddress="new@example.com",
         )
+        profile_update_data.newEmailAddress = "new@example.com"
 
         with pytest.raises(HTTPException) as exc:
             await update_profile_with_otp_verification(
