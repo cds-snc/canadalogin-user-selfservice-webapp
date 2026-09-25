@@ -10,6 +10,9 @@ from pydantic import ValidationError
 
 # Schemas
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
+from app.otp.services.email_otp_transaction_store import (
+    EMAIL_OTP_TRANSACTIONS_SESSION_KEY,
+)
 
 # Feature under test
 from app.otp.services.send_transient_otp import dispatch_otp, handle_otp_send
@@ -350,6 +353,7 @@ async def test_email_send_stores_destination_by_transaction_id():
         correlation_id="corr-email-store",
         trxn_id="email-store-1",
     )
+    payload["expiry"] = "2999-01-01T00:00:00Z"
 
     def handler(request: Request) -> Response:
         return Response(201, json=payload)
@@ -368,12 +372,90 @@ async def test_email_send_stores_destination_by_transaction_id():
         )
 
     assert result.success is True
-    assert request.session[feature_module.EMAIL_OTP_TRANSACTIONS_SESSION_KEY] == {
+    assert request.session[EMAIL_OTP_TRANSACTIONS_SESSION_KEY] == {
         "email-store-1": {
             "emailAddress": "newemail@example.com",
             "expiry": payload["expiry"],
         }
     }
+
+
+@pytest.mark.asyncio
+async def test_email_send_stores_destination_in_redis_when_available():
+    payload = make_valid_payload(
+        OtpType.EMAIL,
+        correlation_id="corr-email-redis",
+        trxn_id="email-redis-1",
+    )
+    payload["expiry"] = "2999-01-01T00:00:00Z"
+
+    redis_client = AsyncMock()
+    request = SimpleNamespace(
+        session={},
+        cookies={"gc-manage-app": "session-123"},
+        app=SimpleNamespace(state=SimpleNamespace(redis_client=redis_client)),
+    )
+
+    def handler(request: Request) -> Response:
+        return Response(201, json=payload)
+
+    async with AsyncClient(transport=build_transport(handler)) as client:
+        result = await handle_otp_send(
+            client,
+            UserOtpInfo(
+                otpType=OtpType.EMAIL,
+                user_id="user@example.com",
+                destination="NewEmail@Example.com",
+            ),
+            user_access_token="USER_TOKEN",
+            request=request,
+        )
+
+    assert result.success is True
+    redis_client.set.assert_awaited_once()
+    key, serialized_transaction = redis_client.set.call_args.args
+    assert key == "email_otp_transaction:email-redis-1"
+    assert json.loads(serialized_transaction)["emailAddress"] == "newemail@example.com"
+    assert redis_client.set.call_args.kwargs["ex"] > 0
+    assert request.session == {}
+
+
+@pytest.mark.asyncio
+async def test_email_send_stores_transaction_when_ibm_uses_id_field():
+    payload = make_valid_payload(
+        OtpType.EMAIL,
+        correlation_id="corr-email-id",
+        trxn_id="email-id-1",
+    )
+    payload["id"] = payload.pop("trxnId")
+    payload["expiry"] = "2999-01-01T00:00:00Z"
+
+    redis_client = AsyncMock()
+    request = SimpleNamespace(
+        session={},
+        cookies={"gc-manage-app": "session-123"},
+        app=SimpleNamespace(state=SimpleNamespace(redis_client=redis_client)),
+    )
+
+    def handler(request: Request) -> Response:
+        return Response(201, json=payload)
+
+    async with AsyncClient(transport=build_transport(handler)) as client:
+        result = await handle_otp_send(
+            client,
+            UserOtpInfo(
+                otpType=OtpType.EMAIL,
+                user_id="user@example.com",
+                destination="new@example.com",
+            ),
+            user_access_token="USER_TOKEN",
+            request=request,
+        )
+
+    assert result.success is True
+    redis_client.set.assert_awaited_once()
+    key, _ = redis_client.set.call_args.args
+    assert key == "email_otp_transaction:email-id-1"
 
 
 @pytest.mark.asyncio

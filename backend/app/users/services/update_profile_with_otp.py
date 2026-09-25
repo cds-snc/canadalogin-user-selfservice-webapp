@@ -22,7 +22,10 @@ from app.otp.services.enroll_mfa_otp import (
     dispatch_otp_factor_validation,
 )
 from app.otp.services.retrieve_transient_otp import dispatch_otp_status_retrieval
-from app.otp.services.send_transient_otp import EMAIL_OTP_TRANSACTIONS_SESSION_KEY
+from app.otp.services.email_otp_transaction_store import (
+    get_email_otp_transaction,
+    consume_email_otp_transaction,
+)
 from app.password.schemas import OtpType as FactorOtpType
 from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
@@ -140,7 +143,7 @@ async def update_profile_with_otp_verification(
         profile_update_data.action.value,
     )
 
-    profile_update_data = _resolve_server_stored_email_address(
+    profile_update_data = await _resolve_server_stored_email_address(
         request=request,
         profile_update_data=profile_update_data,
     )
@@ -480,7 +483,7 @@ async def _apply_profile_update_otp_action(
             otp_type,
             proof_ttl_seconds,
         )
-        _consume_email_otp_transaction(request, trxn_id)
+        await consume_email_otp_transaction(request, trxn_id)
         logger.info("Issued one-time profile update verification proof")
 
         return ProfileUpdateWithOtpResponse(
@@ -592,18 +595,11 @@ def _build_profile_update_fingerprint(
     }
 
 
-def _get_email_otp_transactions(request: Request) -> dict[str, dict]:
-    transactions = request.session.get(EMAIL_OTP_TRANSACTIONS_SESSION_KEY, {})
-    if isinstance(transactions, dict):
-        return transactions
-    return {}
-
-
-def _get_server_stored_email_address(
+async def _get_server_stored_email_address(
     request: Request,
     trxn_id: str,
 ) -> str | None:
-    transaction = _get_email_otp_transactions(request).get(trxn_id)
+    transaction = await get_email_otp_transaction(request, trxn_id)
     if not isinstance(transaction, dict):
         return None
 
@@ -617,15 +613,6 @@ def _get_server_stored_email_address(
         return None
 
     return email_address
-
-
-def _consume_email_otp_transaction(request: Request, trxn_id: str | None) -> None:
-    if not trxn_id:
-        return
-
-    transactions = _get_email_otp_transactions(request)
-    transactions.pop(trxn_id, None)
-    request.session[EMAIL_OTP_TRANSACTIONS_SESSION_KEY] = transactions
 
 
 def _get_email_from_profile_update_proof(
@@ -647,7 +634,7 @@ def _get_email_from_profile_update_proof(
     return email_address if isinstance(email_address, str) and email_address else None
 
 
-def _resolve_server_stored_email_address(
+async def _resolve_server_stored_email_address(
     request: Request,
     profile_update_data: ProfileUpdateWithOtpRequest,
 ) -> ProfileUpdateWithOtpRequest:
@@ -658,7 +645,7 @@ def _resolve_server_stored_email_address(
         ):
             return profile_update_data
 
-        stored_email = _get_server_stored_email_address(
+        stored_email = await _get_server_stored_email_address(
             request,
             profile_update_data.trxnId,
         )
