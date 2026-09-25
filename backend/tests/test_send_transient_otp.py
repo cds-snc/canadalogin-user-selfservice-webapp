@@ -344,6 +344,39 @@ async def test_handle_success_returns_data_and_message(otp_type):
 
 
 @pytest.mark.asyncio
+async def test_email_send_stores_destination_by_transaction_id():
+    payload = make_valid_payload(
+        OtpType.EMAIL,
+        correlation_id="corr-email-store",
+        trxn_id="email-store-1",
+    )
+
+    def handler(request: Request) -> Response:
+        return Response(201, json=payload)
+
+    request = SimpleNamespace(session={})
+    async with AsyncClient(transport=build_transport(handler)) as client:
+        result = await handle_otp_send(
+            client,
+            UserOtpInfo(
+                otpType=OtpType.EMAIL,
+                user_id="user@example.com",
+                destination="NewEmail@Example.com",
+            ),
+            user_access_token="USER_TOKEN",
+            request=request,
+        )
+
+    assert result.success is True
+    assert request.session[feature_module.EMAIL_OTP_TRANSACTIONS_SESSION_KEY] == {
+        "email-store-1": {
+            "emailAddress": "newemail@example.com",
+            "expiry": payload["expiry"],
+        }
+    }
+
+
+@pytest.mark.asyncio
 async def test_handle_contact_phone_update_counted_send_checks_and_records_rate_limit(
     monkeypatch,
 ):

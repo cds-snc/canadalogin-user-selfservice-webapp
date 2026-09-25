@@ -29,6 +29,7 @@ CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY = "contact_phone_sent_destinations"
 CONTACT_PHONE_LAST_OTP_TYPE_BY_DESTINATION_SESSION_KEY = (
     "contact_phone_last_otp_type_by_destination"
 )
+EMAIL_OTP_TRANSACTIONS_SESSION_KEY = "email_otp_transactions"
 
 
 def _normalize_destination_for_session(destination: str | None) -> str:
@@ -109,6 +110,30 @@ def _set_last_otp_type_for_destination(
     session[CONTACT_PHONE_LAST_OTP_TYPE_BY_DESTINATION_SESSION_KEY] = (
         last_transport_by_destination
     )
+
+
+def _store_email_otp_transaction(
+    request: Request | None,
+    response_json: dict,
+    destination: str | None,
+) -> None:
+    if request is None or not isinstance(request.session, dict):
+        return
+
+    transaction_id = response_json.get("trxnId")
+    normalized_destination = (destination or "").strip().lower()
+    if not transaction_id or not normalized_destination:
+        return
+
+    transactions = request.session.get(EMAIL_OTP_TRANSACTIONS_SESSION_KEY, {})
+    if not isinstance(transactions, dict):
+        transactions = {}
+
+    transactions[transaction_id] = {
+        "emailAddress": normalized_destination,
+        "expiry": response_json.get("expiry"),
+    }
+    request.session[EMAIL_OTP_TRANSACTIONS_SESSION_KEY] = transactions
 
 
 async def handle_otp_send(
@@ -233,6 +258,12 @@ async def handle_otp_send(
         logger.info(f"{user_otp_info.otpType} OTP created and sent")
 
         validated_data = OtpDataResponse(**response_json)
+        if user_otp_info.otpType == OtpType.EMAIL:
+            _store_email_otp_transaction(
+                request=request,
+                response_json=response_json,
+                destination=user_otp_info.destination,
+            )
 
         return ResponseModel(
             success=True,

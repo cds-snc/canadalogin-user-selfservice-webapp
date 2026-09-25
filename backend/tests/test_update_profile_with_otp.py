@@ -350,14 +350,20 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
-        mock_request.session = {}
+        mock_request.session = {
+            "email_otp_transactions": {
+                "verify-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             action=ProfileUpdateWithOtpAction.VERIFY,
             otp="123456",
             trxnId="verify-trxn-id",
             otpType=OtpType.EMAIL,
-            newEmailAddress="new@example.com",
         )
 
         response = await update_profile_with_otp_verification(
@@ -374,6 +380,13 @@ class TestUpdateProfileWithOtpVerification:
             response.data.verificationProofId
             in mock_request.session["profile_update_otp_proofs"]
         )
+        assert (
+            mock_request.session["profile_update_otp_proofs"][
+                response.data.verificationProofId
+            ]["fingerprint"]["newEmailAddress"]
+            == "new@example.com"
+        )
+        assert mock_request.session["email_otp_transactions"] == {}
         mock_verify_otp.assert_called_once()
         mock_verify_action_preflight.assert_called_once()
 
@@ -593,7 +606,6 @@ class TestUpdateProfileWithOtpVerification:
         profile_update_data = ProfileUpdateWithOtpRequest(
             action=ProfileUpdateWithOtpAction.COMMIT,
             verificationProofId="proof-123",
-            newEmailAddress="same@example.com",
         )
 
         response = await update_profile_with_otp_verification(

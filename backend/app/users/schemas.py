@@ -382,7 +382,21 @@ class ProfileUpdateWithOtpRequest(BaseModel):
             self.phoneNumbers,
         ]
 
-        if not any(field is not None for field in update_fields):
+        allows_server_resolved_email = (
+            self.action == ProfileUpdateWithOtpAction.VERIFY
+            and self.otpType == OtpType.EMAIL
+            and self.trxnId is not None
+        )
+        allows_proof_resolved_update = (
+            self.action == ProfileUpdateWithOtpAction.COMMIT
+            and self.verificationProofId is not None
+        )
+
+        if (
+            not any(field is not None for field in update_fields)
+            and not allows_server_resolved_email
+            and not allows_proof_resolved_update
+        ):
             raise ValueError(
                 "At least one sensitive profile field must be provided for update"
             )
