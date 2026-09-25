@@ -9,7 +9,7 @@
     "contactInfo": "Contact information",
     "email": "Email",
     "emailDescription": "This email is used for signing in and contacting you:",
-    "verified": "Verified",
+    "verified": "Verified on",
     "contactPhone": "Phone number",
     "phoneDescription": "This number is used for 2-step verification and contacting you:",
     "communication": "Communication",
@@ -20,7 +20,7 @@
     "serviceNotifications": "You may also receive notifications from services connected to your CanadaLogin. You can manage those preferences in each service's settings.",
     "noPhoneAdded": "No contact phone number has been added",
     "addPhoneNumber": "Add a phone number",
-    "provenInformation": "Proven information",
+    "provenInformation": "Identity details",
     "maintenanceTitle": "Maintenance",
     "maintenanceNoticeBody": "This page is under maintenance, editing your information will be available again shortly.",
     "successNoticeTitle": "Your information was successfully updated in CanadaLogin"
