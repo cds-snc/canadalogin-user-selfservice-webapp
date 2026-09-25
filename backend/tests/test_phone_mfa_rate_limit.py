@@ -8,6 +8,7 @@ import app.utils.phone_mfa_rate_limit as phone_mfa_rate_limit_module
 from app.utils.phone_mfa_rate_limit import (
     CONTACT_PHONE_UPDATE_REDIS_KEY_PREFIX,
     CONTACT_PHONE_UPDATE_SESSION_KEY,
+    PHONE_RATE_LIMIT,
     PHONE_RATE_LIMIT_WINDOW_SECONDS_NON_PROD,
     PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD,
     PHONE_MFA_REGISTRATION_REDIS_KEY_PREFIX,
@@ -30,13 +31,13 @@ async def test_phone_mfa_and_contact_phone_limits_are_independent_with_session_s
     request = _build_request_with_session(redis_client=None)
     user_id = "user-123"
 
-    for _ in range(3):
+    for _ in range(PHONE_RATE_LIMIT):
         await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
         await record_phone_mfa_registration_event(request, user_id)
 
     await assert_contact_phone_update_rate_limit_not_exceeded(request, user_id)
 
-    for _ in range(3):
+    for _ in range(PHONE_RATE_LIMIT):
         await assert_contact_phone_update_rate_limit_not_exceeded(request, user_id)
         await record_contact_phone_update_event(request, user_id)
 
@@ -50,8 +51,43 @@ async def test_phone_mfa_and_contact_phone_limits_are_independent_with_session_s
     assert mfa_limit_exc.value.status_code == 429
     assert mfa_limit_exc.value.detail == "phone_mfa_change_rate_limit"
 
-    assert len(request.session[PHONE_MFA_REGISTRATION_SESSION_KEY][user_id]) == 3
-    assert len(request.session[CONTACT_PHONE_UPDATE_SESSION_KEY][user_id]) == 3
+    assert (
+        len(request.session[PHONE_MFA_REGISTRATION_SESSION_KEY][user_id])
+        == PHONE_RATE_LIMIT
+    )
+    assert (
+        len(request.session[CONTACT_PHONE_UPDATE_SESSION_KEY][user_id])
+        == PHONE_RATE_LIMIT
+    )
+
+
+@pytest.mark.asyncio
+async def test_phone_mfa_verification_allows_limit_but_rejects_above_limit(
+    monkeypatch,
+):
+    request = _build_request_with_session(redis_client=None)
+    user_id = "user-123"
+    monkeypatch.setattr(phone_mfa_rate_limit_module.time, "time", lambda: 1000)
+    request.session[PHONE_MFA_REGISTRATION_SESSION_KEY] = {
+        user_id: [1000] * PHONE_RATE_LIMIT
+    }
+
+    await assert_phone_mfa_registration_rate_limit_not_exceeded(
+        request,
+        user_id,
+        allow_at_limit=True,
+    )
+
+    request.session[PHONE_MFA_REGISTRATION_SESSION_KEY][user_id].append(1000)
+
+    with pytest.raises(HTTPException) as exc_info:
+        await assert_phone_mfa_registration_rate_limit_not_exceeded(
+            request,
+            user_id,
+            allow_at_limit=True,
+        )
+
+    assert exc_info.value.status_code == 429
 
 
 @pytest.mark.asyncio
@@ -77,7 +113,7 @@ async def test_phone_mfa_and_contact_phone_events_use_different_redis_keys():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("environment", ["local", "dev", "test"])
-async def test_phone_mfa_rate_limit_window_is_five_minutes_in_non_prod_environments(
+async def test_phone_mfa_rate_limit_window_is_15_minutes_in_non_prod_environments(
     monkeypatch,
     environment,
 ):

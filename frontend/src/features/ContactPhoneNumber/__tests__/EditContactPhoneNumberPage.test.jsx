@@ -295,6 +295,9 @@ describe("EditContactPhoneNumberPage Component", () => {
         "Invalid phone number",
       );
     });
+    expect(mockStepContent.mock.calls.at(-1)?.[0]?.errorLinks).toEqual({
+      "#cp-phone-number": expect.any(String),
+    });
   });
 
   it("shows confirm step after OTP verification", async () => {
@@ -440,7 +443,11 @@ describe("EditContactPhoneNumberPage Component", () => {
       expect(lastStepContentCall?.errorCode).toBe(
         "phone_mfa_change_rate_limit",
       );
+      expect(lastStepContentCall?.errorLinks).toEqual({
+        "#cp-phone-number": expect.any(String),
+      });
     });
+    expect(screen.getByTestId("enter-phone-number")).toBeInTheDocument();
   });
 
   it("handles back navigation from OTP verification", async () => {
@@ -525,6 +532,48 @@ describe("EditContactPhoneNumberPage Component", () => {
         otpType: "sms",
       });
     });
+  });
+
+  it("returns to enter phone with phone input error link when resend hits phone change rate limit", async () => {
+    mockAuthService.transientOtpSend
+      .mockResolvedValueOnce({
+        data: { trxnId: "test-trxn-id" },
+      })
+      .mockRejectedValueOnce({
+        data: { message: "phone_mfa_change_rate_limit" },
+      });
+
+    render(
+      <TestWrapper>
+        <EditContactPhoneNumberPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.change(screen.getByTestId("phone-input"), {
+      target: { value: "+15551234567" },
+    });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("resend-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("enter-phone-number")).toBeInTheDocument();
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/profile/update-contact-phone",
+      { replace: true },
+    );
+
+    const lastStepContentCall = mockStepContent.mock.calls.at(-1)?.[0];
+    expect(lastStepContentCall?.errorCode).toBe("phone_mfa_change_rate_limit");
+    expect(lastStepContentCall?.errorLinks?.["#cp-phone-number"]).toBe(
+      lastStepContentCall?.errorMessage,
+    );
   });
 
   it("shows loading state when localLoading is true", async () => {

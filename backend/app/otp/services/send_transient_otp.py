@@ -19,6 +19,97 @@ from httpx import AsyncClient, HTTPStatusError
 
 logger = logging.getLogger(__name__)
 
+IBM_FACTOR_TYPE_TO_OTP_TYPE: dict[str, OtpType] = {
+    "smsotp": OtpType.SMS,
+    "voiceotp": OtpType.VOICE,
+    "emailotp": OtpType.EMAIL,
+}
+
+CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY = "contact_phone_sent_destinations"
+CONTACT_PHONE_LAST_OTP_TYPE_BY_DESTINATION_SESSION_KEY = (
+    "contact_phone_last_otp_type_by_destination"
+)
+
+
+def _normalize_destination_for_session(destination: str | None) -> str:
+    if destination is None:
+        return ""
+
+    return "".join(char for char in str(destination) if char.isdigit())
+
+
+def _get_sent_destinations_from_session(request: Request) -> set[str]:
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return set()
+
+    stored_value = session.get(CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY, [])
+    if not isinstance(stored_value, list):
+        return set()
+
+    return {
+        destination
+        for destination in stored_value
+        if isinstance(destination, str) and destination
+    }
+
+
+def _mark_destination_as_sent(request: Request, destination: str | None) -> None:
+    normalized_destination = _normalize_destination_for_session(destination)
+    if not normalized_destination:
+        return
+
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return
+
+    sent_destinations = _get_sent_destinations_from_session(request)
+    sent_destinations.add(normalized_destination)
+    session[CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY] = list(sent_destinations)
+
+
+def _get_last_otp_type_by_destination_from_session(request: Request) -> dict[str, str]:
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return {}
+
+    stored_value = session.get(
+        CONTACT_PHONE_LAST_OTP_TYPE_BY_DESTINATION_SESSION_KEY,
+        {},
+    )
+    if not isinstance(stored_value, dict):
+        return {}
+
+    return {
+        destination: otp_type
+        for destination, otp_type in stored_value.items()
+        if isinstance(destination, str)
+        and destination
+        and otp_type in {OtpType.SMS.value, OtpType.VOICE.value}
+    }
+
+
+def _set_last_otp_type_for_destination(
+    request: Request,
+    destination: str | None,
+    otp_type: OtpType,
+) -> None:
+    normalized_destination = _normalize_destination_for_session(destination)
+    if not normalized_destination:
+        return
+
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return
+
+    last_transport_by_destination = _get_last_otp_type_by_destination_from_session(
+        request
+    )
+    last_transport_by_destination[normalized_destination] = otp_type.value
+    session[CONTACT_PHONE_LAST_OTP_TYPE_BY_DESTINATION_SESSION_KEY] = (
+        last_transport_by_destination
+    )
+
 
 async def handle_otp_send(
     global_http_client: AsyncClient,
@@ -37,21 +128,66 @@ async def handle_otp_send(
     user_language = my_profile_response.data.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
 
+    is_factor_based_send = user_otp_info.factor_id is not None
+    if is_factor_based_send:
+        user_otp_factor = await get_user_otp_factor(
+            global_http_client, user_access_token, user_otp_info.factor_id
+        )
+
+        if user_otp_factor is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
+        factor_otp_type = IBM_FACTOR_TYPE_TO_OTP_TYPE.get(
+            str(user_otp_factor.get("type") or "").lower()
+        )
+        if factor_otp_type != user_otp_info.otpType:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
+        user_otp_info.destination = user_otp_factor.get("destination")
+        if not user_otp_info.destination:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
     should_apply_contact_phone_rate_limit = (
         request is not None
-        and user_otp_info.countAsContactPhoneUpdate
+        and not is_factor_based_send
         and user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}
+        and user_otp_info.destination is not None
     )
 
     if should_apply_contact_phone_rate_limit:
         await assert_contact_phone_update_rate_limit_not_exceeded(request, user_id)
 
-    if user_otp_info.factor_id is not None:
-        user_otp_factor = await get_user_otp_factor(
-            global_http_client, user_access_token, user_otp_info.factor_id
+    should_record_contact_phone_rate_limit_event = False
+    if should_apply_contact_phone_rate_limit:
+        # Backend anti-bypass guard:
+        # 1. Count first successful send for a destination even when flag is false.
+        # 2. Count transport switches (SMS <-> VOICE) so switch links cannot bypass.
+        sent_destinations = _get_sent_destinations_from_session(request)
+        last_otp_type_by_destination = _get_last_otp_type_by_destination_from_session(
+            request
         )
-
-        user_otp_info.destination = user_otp_factor.get("destination")
+        normalized_destination = _normalize_destination_for_session(
+            user_otp_info.destination
+        )
+        previous_otp_type = last_otp_type_by_destination.get(normalized_destination)
+        is_transport_switch = (
+            previous_otp_type is not None
+            and previous_otp_type != user_otp_info.otpType.value
+        )
+        should_record_contact_phone_rate_limit_event = (
+            user_otp_info.countAsContactPhoneUpdate
+            or normalized_destination not in sent_destinations
+            or is_transport_switch
+        )
 
     http_client_response = await dispatch_otp(
         global_http_client, user_otp_info, user_access_token, user_language
@@ -83,6 +219,14 @@ async def handle_otp_send(
     response_json = http_client_response.json()
 
     if should_apply_contact_phone_rate_limit:
+        _mark_destination_as_sent(request, user_otp_info.destination)
+        _set_last_otp_type_for_destination(
+            request,
+            user_otp_info.destination,
+            user_otp_info.otpType,
+        )
+
+    if should_record_contact_phone_rate_limit_event:
         await record_contact_phone_update_event(request, user_id)
 
     if http_client_response.status_code == 201:

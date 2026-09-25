@@ -61,3 +61,6 @@ export const getIdTypeRequiredMessage = (t: TranslateFn): string =>
 
 export const getIdExpiryRequiredMessage = (t: TranslateFn): string =>
   t("ErrorsDefinition.idExpiryRequired");
+
+export const getSelectOptionRequiredMessage = (t: TranslateFn): string =>
+  t("ErrorsDefinition.selectOptionRequired");

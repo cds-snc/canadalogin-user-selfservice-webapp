@@ -7,9 +7,9 @@ from fastapi import HTTPException, Request, status
 
 logger = logging.getLogger(__name__)
 
-PHONE_RATE_LIMIT = 3
+PHONE_RATE_LIMIT = 5
 PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD = 24 * 60 * 60
-PHONE_RATE_LIMIT_WINDOW_SECONDS_NON_PROD = 5 * 60
+PHONE_RATE_LIMIT_WINDOW_SECONDS_NON_PROD = 15 * 60
 PHONE_RATE_LIMIT_ERROR_CODE = "phone_mfa_change_rate_limit"
 
 PHONE_MFA_REGISTRATION_SESSION_KEY = "phone_mfa_registration_events"
@@ -76,6 +76,7 @@ def _assert_session_rate_limit_not_exceeded(
     request: Request,
     user_id: str,
     session_key: str,
+    allow_at_limit: bool = False,
 ) -> None:
     now = int(time.time())
     window_seconds = _get_rate_limit_window_seconds()
@@ -86,7 +87,9 @@ def _assert_session_rate_limit_not_exceeded(
     event_store[user_id] = user_events
     _store_session_event_store(request, session_key, event_store)
 
-    if len(user_events) >= PHONE_RATE_LIMIT:
+    if len(user_events) > PHONE_RATE_LIMIT or (
+        not allow_at_limit and len(user_events) >= PHONE_RATE_LIMIT
+    ):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail=PHONE_RATE_LIMIT_ERROR_CODE,
@@ -120,10 +123,13 @@ async def _assert_rate_limit_not_exceeded(
     user_id: str,
     session_key: str,
     redis_key_prefix: str,
+    allow_at_limit: bool = False,
 ) -> None:
     redis_client = _get_redis_client_from_request(request)
     if redis_client is None:
-        _assert_session_rate_limit_not_exceeded(request, user_id, session_key)
+        _assert_session_rate_limit_not_exceeded(
+            request, user_id, session_key, allow_at_limit
+        )
         return
 
     key = _build_rate_limit_key(redis_key_prefix, user_id)
@@ -138,7 +144,9 @@ async def _assert_rate_limit_not_exceeded(
         else:
             count = int(raw_count)
 
-        if count >= PHONE_RATE_LIMIT:
+        if count > PHONE_RATE_LIMIT or (
+            not allow_at_limit and count >= PHONE_RATE_LIMIT
+        ):
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 detail=PHONE_RATE_LIMIT_ERROR_CODE,
@@ -150,7 +158,9 @@ async def _assert_rate_limit_not_exceeded(
             "Phone rate-limit check failed, falling back to session: %s",
             str(exc),
         )
-        _assert_session_rate_limit_not_exceeded(request, user_id, session_key)
+        _assert_session_rate_limit_not_exceeded(
+            request, user_id, session_key, allow_at_limit
+        )
 
 
 async def _record_rate_limit_event(
@@ -182,12 +192,14 @@ async def _record_rate_limit_event(
 async def assert_phone_mfa_registration_rate_limit_not_exceeded(
     request: Request,
     user_id: str,
+    allow_at_limit: bool = False,
 ) -> None:
     await _assert_rate_limit_not_exceeded(
         request=request,
         user_id=user_id,
         session_key=PHONE_MFA_REGISTRATION_SESSION_KEY,
         redis_key_prefix=PHONE_MFA_REGISTRATION_REDIS_KEY_PREFIX,
+        allow_at_limit=allow_at_limit,
     )
 
 
