@@ -9,6 +9,9 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.helpers import (
     prepare_pydantic_phone_number_for_verify,
 )
+from app.utils.phone_mfa_rate_limit import (
+    assert_phone_mfa_registration_rate_limit_not_exceeded,
+)
 from app.utils.schemas import ResponseModel
 from fastapi import HTTPException, Request, status
 from httpx import AsyncClient
@@ -51,6 +54,9 @@ async def handle_otp_enrollment(
     logger.info(
         f"Enrolling {otp_type} OTP for user: {user_id}, language: {user_language}"
     )
+
+    if request is not None and otp_type in {OtpType.SMS, OtpType.VOICE}:
+        await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
 
     http_client_response = await dispatch_otp_enrollment(
         global_http_client,
