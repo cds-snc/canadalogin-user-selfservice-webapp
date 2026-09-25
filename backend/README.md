@@ -69,6 +69,7 @@ docker run -p 8000:8000 \
   --add-host host.docker.internal:host-gateway \
   --env-file ./.env \
   -e SESSION_REDIS_URL=redis://host.docker.internal:6379/0 \
+  -e OPENSSL_armcap=0 \
   gc-signin-backend
 ```
 
