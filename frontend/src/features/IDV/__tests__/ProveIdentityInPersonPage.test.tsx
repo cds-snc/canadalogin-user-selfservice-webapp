@@ -161,7 +161,6 @@ describe("ProveIdentityInPersonPage", () => {
     render(<ProveIdentityInPersonPage />);
 
     const continueButton = screen.getByRole("button", { name: "Continue" });
-    expect(continueButton).toBeDisabled();
 
     fireEvent.click(screen.getByRole("button", { name: "pick canada post" }));
     fireEvent.click(continueButton);

@@ -43,7 +43,8 @@
         "github.vscode-github-actions",
         "ms-vscode.makefile-tools",
         "jebbs.plantuml",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "vstirbu.vscode-mermaid-preview"
       ],
       "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",

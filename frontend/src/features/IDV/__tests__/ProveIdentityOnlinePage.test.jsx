@@ -24,6 +24,7 @@ vi.mock("../../../utils/constants", () => ({
   get DEV_ONLY_FEATURE() {
     return mockDevOnlyFeature;
   },
+  AVAILABLE_LANGUAGES: { en: "en", fr: "fr" },
   PAGES: {
     idvProveIdentityOnlinePage: "IdvProveIdentityOnlinePage",
     idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
@@ -54,8 +55,9 @@ vi.mock("../../../utils/routeHelpers", () => ({
 }));
 
 vi.mock("../components/OnlineRadioButtons", () => ({
-  default: ({ selectedMethod, onMethodChange }) => (
+  default: ({ selectedMethod, onMethodChange, errorMessage }) => (
     <div data-testid="online-radio-buttons">
+      {errorMessage ? <div role="alert">{errorMessage}</div> : null}
       <label>
         <input
           type="radio"
@@ -91,6 +93,16 @@ vi.mock("@gcds-core/components-react", () => ({
     const Tag = tag ?? "h2";
     return <Tag>{children}</Tag>;
   },
+  GcdsErrorSummary: ({ id, heading, errorLinks }) => (
+    <div id={id} data-testid="error-summary">
+      <h2>{heading}</h2>
+      {Object.entries(errorLinks ?? {}).map(([href, message], index) => (
+        <a key={index} href={href}>
+          {message}
+        </a>
+      ))}
+    </div>
+  ),
   GcdsButton: ({
     children,
     onClick,
@@ -138,12 +150,12 @@ describe("ProveIdentityOnlinePage", () => {
     expect(screen.getByTestId("online-radio-buttons")).toBeInTheDocument();
   });
 
-  it("renders Continue button (disabled by default)", () => {
+  it("renders Continue button (never disabled)", () => {
     render(<ProveIdentityOnlinePage />);
 
     const continueButton = screen.getByTestId("continue-button");
     expect(continueButton).toBeInTheDocument();
-    expect(continueButton).toBeDisabled();
+    expect(continueButton).not.toBeDisabled();
   });
 
   it("renders Back button", () => {
@@ -153,7 +165,17 @@ describe("ProveIdentityOnlinePage", () => {
     expect(backButton).toBeInTheDocument();
   });
 
-  it("enables Continue button when method is selected", () => {
+  it("shows an error message when Continue is clicked without selecting a method", () => {
+    render(<ProveIdentityOnlinePage />);
+
+    const continueButton = screen.getByTestId("continue-button");
+    fireEvent.click(continueButton);
+
+    expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("does not show an error message when method is selected", () => {
     render(<ProveIdentityOnlinePage />);
 
     const documentScanningRadio = screen.getByLabelText(
@@ -162,7 +184,9 @@ describe("ProveIdentityOnlinePage", () => {
     fireEvent.click(documentScanningRadio);
 
     const continueButton = screen.getByTestId("continue-button");
-    expect(continueButton).not.toBeDisabled();
+    fireEvent.click(continueButton);
+
+    expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
   });
 
   it("navigates to OnlineVerificationInfo when document scanning is selected and Continue is clicked", () => {
