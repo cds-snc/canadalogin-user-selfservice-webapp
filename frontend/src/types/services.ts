@@ -98,13 +98,11 @@ export type VerifyPhoneOtpForUpdatePayload = {
 
 export type UpdateEmailPayload = {
   action: "commit";
-  newEmailAddress: string;
   verificationProofId: string;
 };
 
 export type VerifyEmailOtpForUpdatePayload = {
   action: "verify";
-  newEmailAddress: string;
   otp: string;
   trxnId: string;
   otpType: "email";
@@ -143,11 +141,9 @@ export type AuthServiceContract = {
     editedProfile: ProfileUpdatePayload,
   ) => Promise<AuthServiceResponse | undefined>;
   update_email_with_otp: (
-    newEmailAddress: string,
     verificationProofId: string,
   ) => Promise<AuthServiceResponse | undefined>;
   verify_email_otp_for_update: (
-    newEmailAddress: string,
     otp: string,
     trxnId: string,
     otpType?: "email",

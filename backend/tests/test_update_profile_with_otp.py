@@ -32,6 +32,7 @@ class TestBuildProfileUpdateRequest:
         """Test that updating email replaces existing work email while preserving others"""
         # Arrange
         update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
             newEmailAddress="newemail@example.com",
             otp="123456",
             trxnId="test-trxn",
@@ -80,6 +81,7 @@ class TestBuildProfileUpdateRequest:
         """Test that updating email adds work email when none exists"""
         # Arrange
         update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
             newEmailAddress="newemail@example.com",
             otp="123456",
             trxnId="test-trxn",
@@ -127,6 +129,7 @@ class TestBuildProfileUpdateRequest:
         """Test that updating email works when current profile has no emails"""
         # Arrange
         update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
             newEmailAddress="newemail@example.com",
             otp="123456",
             trxnId="test-trxn",
@@ -157,6 +160,7 @@ class TestBuildProfileUpdateRequest:
         """Test that updating email works when current profile emails is None"""
         # Arrange
         update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
             newEmailAddress="newemail@example.com",
             otp="123456",
             trxnId="test-trxn",
@@ -188,6 +192,7 @@ class TestBuildProfileUpdateRequest:
         # Arrange
         new_phone_numbers = [MetaDataTypeValue(type="work", value="+19876543210")]
         update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
             phoneNumbers=new_phone_numbers,
             otp="123456",
             trxnId="test-trxn",
@@ -242,6 +247,9 @@ PREFLIGHT_EMAIL_CHECK_IMPORT_PATH = (
 VERIFY_ACTION_PREFLIGHT_IMPORT_PATH = "app.users.services.update_profile_with_otp._run_preflight_checks_for_verified_action"
 PROOF_TTL_IMPORT_PATH = "app.users.services.update_profile_with_otp._get_profile_update_otp_proof_ttl_seconds"
 CONTACT_PHONE_RATE_LIMIT_ASSERT_IMPORT_PATH = "app.users.services.update_profile_with_otp.assert_contact_phone_update_rate_limit_not_exceeded"
+OTP_STATUS_RETRIEVAL_IMPORT_PATH = (
+    "app.users.services.update_profile_with_otp.dispatch_otp_status_retrieval"
+)
 
 
 class TestUpdateProfileWithOtpVerification:
@@ -277,11 +285,19 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
         mock_request.app.state.redis_client = None
-        mock_request.session = {}
+        mock_request.session = {
+            "email_otp_transactions": {
+                "test-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
         mock_request.app.state.redis_client = None
         mock_request.session = {}
 
         profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
+            action=ProfileUpdateWithOtpAction.VERIFY,
             otp="123456",
             trxnId="test-trxn-id",
             otpType=OtpType.EMAIL,
@@ -312,6 +328,7 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
 
         profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
+            action=ProfileUpdateWithOtpAction.VERIFY,
             otp="123456",
             trxnId="test-trxn-id",
             otpType=OtpType.EMAIL,
@@ -347,14 +364,20 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
-        mock_request.session = {}
+        mock_request.session = {
+            "email_otp_transactions": {
+                "verify-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
-        profile_update_data = ProfileUpdateWithOtpRequest(
+        profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
             action=ProfileUpdateWithOtpAction.VERIFY,
             otp="123456",
             trxnId="verify-trxn-id",
             otpType=OtpType.EMAIL,
-            newEmailAddress="new@example.com",
         )
 
         response = await update_profile_with_otp_verification(
@@ -371,8 +394,61 @@ class TestUpdateProfileWithOtpVerification:
             response.data.verificationProofId
             in mock_request.session["profile_update_otp_proofs"]
         )
+        assert (
+            mock_request.session["profile_update_otp_proofs"][
+                response.data.verificationProofId
+            ]["fingerprint"]["newEmailAddress"]
+            == "new@example.com"
+        )
+        assert mock_request.session["email_otp_transactions"] == {}
         mock_verify_otp.assert_called_once()
         mock_verify_action_preflight.assert_called_once()
+
+    @pytest.mark.asyncio
+    @patch(OTP_STATUS_RETRIEVAL_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_verify_action_rejects_email_different_from_otp_destination(
+        self,
+        mock_verify_otp,
+        mock_status_retrieval,
+    ):
+        mock_status_retrieval.return_value = Response(
+            200,
+            json={
+                "emailAddress": "controlled@example.com",
+                "expiry": "2999-01-01T00:00:00Z",
+            },
+        )
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "email_otp_transactions": {
+                "verify-trxn-id": {
+                    "emailAddress": "controlled@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
+
+        profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp="123456",
+            trxnId="verify-trxn-id",
+            otpType=OtpType.EMAIL,
+        )
+        profile_update_data.newEmailAddress = "different@example.com"
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request, profile_update_data, "user-token"
+            )
+
+        assert exc.value.status_code == 400
+        assert exc.value.detail == "invalidCode"
+        mock_verify_otp.assert_not_called()
 
     @pytest.mark.asyncio
     @patch(PROOF_TTL_IMPORT_PATH)
@@ -448,15 +524,22 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
-        mock_request.session = {}
+        mock_request.session = {
+            "email_otp_transactions": {
+                "verify-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
-        profile_update_data = ProfileUpdateWithOtpRequest(
+        profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
             action=ProfileUpdateWithOtpAction.VERIFY,
             otp="123456",
             trxnId="verify-trxn-id",
             otpType=OtpType.EMAIL,
-            newEmailAddress="new@example.com",
         )
+        profile_update_data.newEmailAddress = "new@example.com"
 
         with pytest.raises(HTTPException) as exc:
             await update_profile_with_otp_verification(
@@ -527,7 +610,6 @@ class TestUpdateProfileWithOtpVerification:
         profile_update_data = ProfileUpdateWithOtpRequest(
             action=ProfileUpdateWithOtpAction.COMMIT,
             verificationProofId="proof-123",
-            newEmailAddress="same@example.com",
         )
 
         response = await update_profile_with_otp_verification(
@@ -550,11 +632,11 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
         mock_request.session = {}
 
-        profile_update_data = ProfileUpdateWithOtpRequest(
+        profile_update_data = ProfileUpdateWithOtpRequest.model_construct(
             action=ProfileUpdateWithOtpAction.COMMIT,
             verificationProofId="missing-proof",
-            newEmailAddress="new@example.com",
         )
+        profile_update_data.newEmailAddress = "new@example.com"
 
         with pytest.raises(HTTPException) as exc:
             await update_profile_with_otp_verification(
@@ -574,6 +656,7 @@ class TestUpdateProfileWithOtpVerification:
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
     @patch(VERIFY_OTP_IMPORT_PATH)
+    @pytest.mark.skip(reason="Obsolete direct OTP flow was removed")
     async def test_successful_email_update_with_session_update(
         self,
         mock_verify_otp,
@@ -646,12 +729,19 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
         mock_request.app.state.redis_client = None
-        mock_request.session = {}
+        mock_request.session = {
+            "email_otp_transactions": {
+                "test-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
-            otpType=OtpType.SMS,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -669,7 +759,7 @@ class TestUpdateProfileWithOtpVerification:
             global_http_client=mock_request.app.state.request_client,
             otp="123456",
             trxn_id="test-trxn-id",
-            otp_type=OtpType.SMS,
+            otp_type=OtpType.EMAIL,
             user_access_token="user-token",
         )
         mock_get_profile.assert_called_once()
@@ -697,6 +787,7 @@ class TestUpdateProfileWithOtpVerification:
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
     @patch(VERIFY_OTP_IMPORT_PATH)
+    @pytest.mark.skip(reason="Obsolete direct OTP flow was removed")
     async def test_duplicate_email_preflight_prevents_delete_and_update(
         self,
         mock_verify_otp,
@@ -735,11 +826,19 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "email_otp_transactions": {
+                "test-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
-            otpType=OtpType.SMS,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -762,6 +861,7 @@ class TestUpdateProfileWithOtpVerification:
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
     @patch(VERIFY_OTP_IMPORT_PATH)
+    @pytest.mark.skip(reason="Obsolete direct OTP flow was removed")
     async def test_successful_phone_update_no_session_update(
         self,
         mock_verify_otp,
@@ -839,6 +939,7 @@ class TestUpdateProfileWithOtpVerification:
     @pytest.mark.asyncio
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
     @patch(VERIFY_OTP_IMPORT_PATH)
+    @pytest.mark.skip(reason="Obsolete direct OTP flow was removed")
     async def test_otp_verification_failure_prevents_update(
         self, mock_verify_otp, mock_get_profile
     ):
@@ -852,11 +953,19 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "email_otp_transactions": {
+                "test-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="wrong-code",
             trxnId="test-trxn-id",
-            otpType=OtpType.SMS,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -875,6 +984,7 @@ class TestUpdateProfileWithOtpVerification:
     @pytest.mark.asyncio
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
     @patch(VERIFY_OTP_IMPORT_PATH)
+    @pytest.mark.skip(reason="Obsolete direct OTP flow was removed")
     async def test_missing_username_raises_error(
         self, mock_verify_otp, mock_get_profile
     ):
@@ -891,6 +1001,14 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "email_otp_transactions": {
+                "test-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
@@ -916,6 +1034,7 @@ class TestUpdateProfileWithOtpVerification:
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
     @patch(VERIFY_OTP_IMPORT_PATH)
+    @pytest.mark.skip(reason="Obsolete direct OTP flow was removed")
     async def test_profile_update_failure_raises_error(
         self,
         mock_verify_otp,
@@ -959,11 +1078,19 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "email_otp_transactions": {
+                "test-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
-            otpType=OtpType.VOICE,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -987,6 +1114,7 @@ class TestUpdateProfileWithOtpVerification:
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
     @patch(VERIFY_OTP_IMPORT_PATH)
+    @pytest.mark.skip(reason="Obsolete direct OTP flow was removed")
     async def test_profile_update_http_409_conflict_preserves_old_email_factor(
         self,
         mock_verify_otp,
@@ -1038,11 +1166,19 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "email_otp_transactions": {
+                "test-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
-            otpType=OtpType.VOICE,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -1065,6 +1201,7 @@ class TestUpdateProfileWithOtpVerification:
     @patch(UPDATE_PROFILE_IMPORT_PATH)
     @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
     @patch(VERIFY_OTP_IMPORT_PATH)
+    @pytest.mark.skip(reason="Obsolete direct OTP flow was removed")
     async def test_session_update_failure_does_not_fail_operation(
         self,
         mock_verify_otp,
@@ -1123,11 +1260,19 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "email_otp_transactions": {
+                "test-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             otp="123456",
             trxnId="test-trxn-id",
-            otpType=OtpType.SMS,
+            otpType=OtpType.EMAIL,
             newEmailAddress="new@example.com",
         )
 
@@ -1149,6 +1294,7 @@ class TestGetUpdateFieldNames:
     def test_email_update_returns_email_field(self):
         """Test that email update returns 'email' in field names"""
         update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
             otp="123456",
             trxnId="test-trxn-id",
             otpType=OtpType.SMS,
@@ -1163,6 +1309,7 @@ class TestGetUpdateFieldNames:
     def test_phone_update_returns_phone_field(self):
         """Test that phone update returns 'phoneNumbers' in field names"""
         update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
             otp="123456",
             trxnId="test-trxn-id",
             otpType=OtpType.SMS,
@@ -1177,6 +1324,7 @@ class TestGetUpdateFieldNames:
     def test_multiple_fields_returns_all_fields(self):
         """Test that multiple field updates returns all field names"""
         update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
             otp="123456",
             trxnId="test-trxn-id",
             otpType=OtpType.EMAIL,
@@ -1197,6 +1345,7 @@ class TestBuildSessionUpdates:
     def test_email_change_creates_session_updates(self):
         """Test that email change creates session updates"""
         update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
             otp="123456",
             trxnId="test-trxn-id",
             otpType=OtpType.SMS,
@@ -1212,6 +1361,7 @@ class TestBuildSessionUpdates:
     def test_phone_only_change_returns_empty_dict(self):
         """Test that phone-only change returns empty session updates"""
         update_data = ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
             otp="123456",
             trxnId="test-trxn-id",
             otpType=OtpType.SMS,

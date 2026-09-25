@@ -8,7 +8,7 @@ from app.users.schemas import (
     UserProfileUpdateRequest,
     RelyingPartyResponse,
     UserPhoneAuthFactorsResponse,
-    ProfileUpdateWithOtpRequest,
+    ProfileUpdateWithOtpApiRequest,
     ProfileUpdateWithOtpResponse,
     ConnectedServicesResponse,
 )
@@ -124,11 +124,11 @@ async def user_factors(
     response_model_by_alias=False,
     tags=["Users"],
     summary="Verify OTP or update profile with OTP verification",
-    description="Action-based endpoint for OTP-protected profile changes. Use action=verify to validate OTP and receive a short-lived verificationProofId. Use action=commit with that proof to apply the profile update atomically. Legacy action=commit_with_otp remains available for direct OTP+update in one request.",
+    description="Action-based endpoint for OTP-protected profile changes. Use action=verify to validate OTP and receive a short-lived verificationProofId. Use action=commit with that proof to apply the profile update atomically.",
 )
 async def update_user_profile_with_otp_verification(
     request: Request,
-    profile_update_data: ProfileUpdateWithOtpRequest,
+    profile_update_data: ProfileUpdateWithOtpApiRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
     """

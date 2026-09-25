@@ -3,6 +3,9 @@ from datetime import datetime
 
 from app.config import get_configuration
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
+from app.otp.services.email_otp_transaction_store import (
+    store_email_otp_transaction,
+)
 from app.users.services.otp_factors import get_user_otp_factor
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_auth_request_headers
@@ -233,6 +236,12 @@ async def handle_otp_send(
         logger.info(f"{user_otp_info.otpType} OTP created and sent")
 
         validated_data = OtpDataResponse(**response_json)
+        if user_otp_info.otpType == OtpType.EMAIL:
+            await store_email_otp_transaction(
+                request=request,
+                response_json=response_json,
+                destination=user_otp_info.destination,
+            )
 
         return ResponseModel(
             success=True,
