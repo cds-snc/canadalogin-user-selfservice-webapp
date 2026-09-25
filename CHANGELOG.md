@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.36.4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.3...v1.36.4) (2026-09-25)
+
+
+### Miscellaneous Chores
+
+* bump version to 1.36.3 for production and staging ([#2270](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2270)) ([6a68da1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6a68da1631be276701ac3496c901b7bcd58fda11))
+
 ## [1.36.3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.2...v1.36.3) (2026-09-25)
 
 
