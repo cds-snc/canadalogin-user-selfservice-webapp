@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.36.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.1...v1.36.2) (2026-09-25)
+
+
+### Bug Fixes
+
+* add rate limit check for SMS and voice MFA enrollment ([#2259](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2259)) ([496b83a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/496b83ad6a60fe8a13b7a5f3a33ae2ed903f2d17))
+
 ## [1.36.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.0...v1.36.1) (2026-09-25)
 
 
