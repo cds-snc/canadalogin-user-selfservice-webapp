@@ -258,8 +258,8 @@
     "phoneNumber": "Phone number",
     "communication": "Communication",
     "confirmAndContinue": "Continue",
-    "successNoticeTitle": "Your identity information was successfully proven.",
-    "successNoticeDescription": "You're almost done. Review your details saved to CanadaLogin, then share the requested information with {{appName}} to get access.",
+    "successNoticeTitle": "Success",
+    "successNoticeDescription": "You proved your identity.",
     "successNoticeTitleWithoutRp": "Your CanadaLogin has succesfully saved your changes",
     "successNoticeDescriptionWithoutRp": "Continue with accessing the service",
     "verifiedBadgeText": "Proven January 27, 2026"
