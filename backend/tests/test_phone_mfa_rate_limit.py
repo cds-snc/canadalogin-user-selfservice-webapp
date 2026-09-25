@@ -62,6 +62,35 @@ async def test_phone_mfa_and_contact_phone_limits_are_independent_with_session_s
 
 
 @pytest.mark.asyncio
+async def test_phone_mfa_verification_allows_limit_but_rejects_above_limit(
+    monkeypatch,
+):
+    request = _build_request_with_session(redis_client=None)
+    user_id = "user-123"
+    monkeypatch.setattr(phone_mfa_rate_limit_module.time, "time", lambda: 1000)
+    request.session[PHONE_MFA_REGISTRATION_SESSION_KEY] = {
+        user_id: [1000] * PHONE_RATE_LIMIT
+    }
+
+    await assert_phone_mfa_registration_rate_limit_not_exceeded(
+        request,
+        user_id,
+        allow_at_limit=True,
+    )
+
+    request.session[PHONE_MFA_REGISTRATION_SESSION_KEY][user_id].append(1000)
+
+    with pytest.raises(HTTPException) as exc_info:
+        await assert_phone_mfa_registration_rate_limit_not_exceeded(
+            request,
+            user_id,
+            allow_at_limit=True,
+        )
+
+    assert exc_info.value.status_code == 429
+
+
+@pytest.mark.asyncio
 async def test_phone_mfa_and_contact_phone_events_use_different_redis_keys():
     redis_client = AsyncMock()
     redis_client.incr.side_effect = [1, 1]
