@@ -123,7 +123,6 @@ async def handle_verify_mfa_otp(
             success=False, data=None, message="User verification failed"
         )
 
-    user_id = my_profile_response.data.id
     resolved_otp_type, is_factor_validated = await _resolve_factor_verification_context(
         global_http_client,
         user_access_token,
@@ -138,19 +137,16 @@ async def handle_verify_mfa_otp(
             resolved_otp_type,
         )
 
-    # Apply phone-MFA registration limiter only for Add MFA verification.
-    # Add MFA verifies an unvalidated phone factor; other flows use validated factors.
-    should_enforce_phone_rate_limit = (
+    if (
         request is not None
         and not is_factor_validated
-        and resolved_otp_type
-        in {
-            OtpType.SMS,
-            OtpType.VOICE,
-        }
-    )
-    if should_enforce_phone_rate_limit:
-        await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
+        and resolved_otp_type in {OtpType.SMS, OtpType.VOICE}
+    ):
+        await assert_phone_mfa_registration_rate_limit_not_exceeded(
+            request,
+            my_profile_response.data.id,
+            allow_at_limit=True,
+        )
 
     await dispatch_verify_mfa_otp(
         global_http_client,

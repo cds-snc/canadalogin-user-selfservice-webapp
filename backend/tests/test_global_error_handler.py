@@ -1881,57 +1881,12 @@ class TestErrorHandlingSendMfaOtp:
         assert response_json["message"] == "phone_mfa_change_rate_limit"
 
     @pytest.mark.asyncio
-    @patch.object(verify_mfa_otp_module, "_resolve_factor_verification_context")
-    @patch.object(
-        verify_mfa_otp_module, "assert_phone_mfa_registration_rate_limit_not_exceeded"
-    )
-    @patch.object(verify_mfa_otp_module, "get_my_profile")
-    async def test_verification_attempt_rate_limited_after_phone_mfa_limit_reached(
-        self,
-        mock_get_my_profile,
-        mock_resolve_factor_verification_context,
-        mock_assert_phone_mfa_registration_rate_limit_not_exceeded,
-        mock_test_client,
-    ):
-        mock_profile = MagicMock(success=True)
-        mock_profile.data = MagicMock(id="user-123")
-        mock_get_my_profile.return_value = mock_profile
-        mock_resolve_factor_verification_context.return_value = (OtpType.SMS, False)
-
-        mock_assert_phone_mfa_registration_rate_limit_not_exceeded.side_effect = (
-            HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="phone_mfa_change_rate_limit",
-            )
-        )
-
-        request_data = {
-            "id": "factor123",
-            "trxnId": "trxn456",
-            "otp": "123456",
-            "otpType": "sms",
-        }
-
-        client = mock_test_client(MagicMock())
-
-        response = client.request("POST", "/v1/otp/mfa/verify", json=request_data)
-        response_json = response.json()
-
-        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
-        assert not response_json["success"]
-        assert response_json["message"] == "phone_mfa_change_rate_limit"
-
-    @pytest.mark.asyncio
     @patch.object(verify_mfa_otp_module, "dispatch_verify_mfa_otp")
     @patch.object(verify_mfa_otp_module, "_resolve_factor_verification_context")
-    @patch.object(
-        verify_mfa_otp_module, "assert_phone_mfa_registration_rate_limit_not_exceeded"
-    )
     @patch.object(verify_mfa_otp_module, "get_my_profile")
-    async def test_verification_attempt_validated_factor_not_rate_limited(
+    async def test_verification_attempt_allowed_after_phone_mfa_limit_reached(
         self,
         mock_get_my_profile,
-        mock_assert_phone_mfa_registration_rate_limit_not_exceeded,
         mock_resolve_factor_verification_context,
         mock_dispatch_verify_mfa_otp,
         mock_test_client,
@@ -1939,7 +1894,7 @@ class TestErrorHandlingSendMfaOtp:
         mock_profile = MagicMock(success=True)
         mock_profile.data = MagicMock(id="user-123")
         mock_get_my_profile.return_value = mock_profile
-        mock_resolve_factor_verification_context.return_value = (OtpType.SMS, True)
+        mock_resolve_factor_verification_context.return_value = (OtpType.SMS, False)
         mock_dispatch_verify_mfa_otp.return_value = None
 
         request_data = {
@@ -1956,7 +1911,7 @@ class TestErrorHandlingSendMfaOtp:
 
         assert response.status_code == status.HTTP_200_OK
         assert response_json["success"]
-        mock_assert_phone_mfa_registration_rate_limit_not_exceeded.assert_not_called()
+        mock_dispatch_verify_mfa_otp.assert_awaited_once()
 
     @pytest.mark.asyncio
     @patch.object(send_mfa_otp_module, "get_my_profile")
