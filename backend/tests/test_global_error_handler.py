@@ -2145,13 +2145,29 @@ class TestErrorHandlingUpdateProfileWithOtp:
         )
 
         request_data = {
-            "otp": "123456",
-            "trxnId": "test-trxn-id",
-            "otpType": "email",
-            "newEmailAddress": "new@example.com",
+            "action": "commit",
+            "verificationProofId": "proof-1",
+            "phoneNumbers": [
+                {"type": "mobile", "value": "+14165551234"},
+            ],
         }
 
-        client = mock_test_client(MagicMock())
+        client = mock_test_client(
+            MagicMock(),
+            {
+                "profile_update_otp_proofs": {
+                    "proof-1": {
+                        "expiresAt": 4102444800,
+                        "fingerprint": {
+                            "newEmailAddress": "",
+                            "phoneNumbers": [
+                                {"type": "mobile", "value": "+14165551234"}
+                            ],
+                        },
+                    }
+                }
+            },
+        )
 
         response = client.request(
             "POST", "/v1/users/profile/update-with-otp", json=request_data

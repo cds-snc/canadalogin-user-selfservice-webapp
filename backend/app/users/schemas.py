@@ -256,7 +256,6 @@ class ProfileResponse(ResponseModel):
 class ProfileUpdateWithOtpAction(str, Enum):
     VERIFY = "verify"
     COMMIT = "commit"
-    COMMIT_WITH_OTP = "commit_with_otp"
 
 
 class ProfileUpdateOtpVerificationData(BaseModel):
@@ -362,90 +361,18 @@ class ProfileUpdateWithOtpRequest(BaseModel):
     For non-sensitive fields like name and language preference, use the regular profile update endpoint.
     """
 
-    # Sensitive profile fields that require OTP verification (all optional, at least one must be provided)
-    action: ProfileUpdateWithOtpAction = ProfileUpdateWithOtpAction.COMMIT_WITH_OTP
+    # Internal normalized update data used by the service layer.
+    action: ProfileUpdateWithOtpAction
     newEmailAddress: Optional[EmailStr] = None
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None
 
-    # OTP verification fields (required for verify and commit_with_otp actions)
+    # OTP verification fields.
     otp: Optional[str] = None
     trxnId: Optional[str] = None
     otpType: Optional[OtpType] = None
 
     # One-time server-issued proof from the verify action (required for commit action)
     verificationProofId: Optional[str] = None
-
-    def model_post_init(self, __context: Any) -> None:
-        """Validate profile update action payload shape."""
-        update_fields = [
-            self.newEmailAddress,
-            self.phoneNumbers,
-        ]
-
-        if (
-            self.action == ProfileUpdateWithOtpAction.VERIFY
-            and self.otpType == OtpType.EMAIL
-            and self.newEmailAddress is not None
-        ):
-            raise ValueError(
-                "newEmailAddress must not be provided for email OTP verification"
-            )
-
-        if (
-            self.action == ProfileUpdateWithOtpAction.COMMIT
-            and self.newEmailAddress is not None
-        ):
-            raise ValueError(
-                "newEmailAddress must not be provided when committing a verified update"
-            )
-
-        allows_server_resolved_email = (
-            self.action == ProfileUpdateWithOtpAction.VERIFY
-            and self.otpType == OtpType.EMAIL
-            and self.trxnId is not None
-        )
-        allows_proof_resolved_update = (
-            self.action == ProfileUpdateWithOtpAction.COMMIT
-            and self.verificationProofId is not None
-        )
-
-        if (
-            not any(field is not None for field in update_fields)
-            and not allows_server_resolved_email
-            and not allows_proof_resolved_update
-        ):
-            raise ValueError(
-                "At least one sensitive profile field must be provided for update"
-            )
-
-        otp_fields = (self.otp, self.trxnId, self.otpType)
-        has_any_otp_field = any(field is not None for field in otp_fields)
-        has_all_otp_fields = all(field is not None for field in otp_fields)
-
-        if self.action in {
-            ProfileUpdateWithOtpAction.VERIFY,
-            ProfileUpdateWithOtpAction.COMMIT_WITH_OTP,
-        }:
-            if not has_all_otp_fields:
-                raise ValueError(
-                    "otp, trxnId, and otpType are required for verify and commit_with_otp actions"
-                )
-
-            if self.verificationProofId is not None:
-                raise ValueError(
-                    "verificationProofId is not allowed for verify and commit_with_otp actions"
-                )
-
-        if self.action == ProfileUpdateWithOtpAction.COMMIT:
-            if not self.verificationProofId:
-                raise ValueError("verificationProofId is required for commit action")
-
-            if has_any_otp_field:
-                raise ValueError(
-                    "otp, trxnId, and otpType are not allowed for commit action"
-                )
-
-        return self
 
 
 class VerifyEmailOtpRequest(BaseModel):
@@ -464,11 +391,30 @@ class CommitEmailUpdateRequest(BaseModel):
     verificationProofId: str
 
 
+class VerifyPhoneOtpRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    action: Literal[ProfileUpdateWithOtpAction.VERIFY]
+    phoneNumbers: List[MetaDataTypeValue]
+    otp: str
+    trxnId: str
+    otpType: Literal[OtpType.SMS, OtpType.VOICE]
+
+
+class CommitPhoneUpdateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    action: Literal[ProfileUpdateWithOtpAction.COMMIT]
+    phoneNumbers: List[MetaDataTypeValue]
+    verificationProofId: str
+
+
 ProfileUpdateWithOtpApiRequest = Annotated[
     Union[
         VerifyEmailOtpRequest,
         CommitEmailUpdateRequest,
-        ProfileUpdateWithOtpRequest,
+        VerifyPhoneOtpRequest,
+        CommitPhoneUpdateRequest,
     ],
     Field(union_mode="left_to_right"),
 ]

@@ -31,6 +31,8 @@ from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
     VerifyEmailOtpRequest,
     CommitEmailUpdateRequest,
+    VerifyPhoneOtpRequest,
+    CommitPhoneUpdateRequest,
     ProfileUpdateWithOtpAction,
     ProfileUpdateWithOtpResponse,
     ProfileUpdateOtpVerificationData,
@@ -121,7 +123,11 @@ def _validate_new_email_address(new_email_address: str | None) -> None:
 async def update_profile_with_otp_verification(
     request: Request,
     profile_update_data: (
-        ProfileUpdateWithOtpRequest | VerifyEmailOtpRequest | CommitEmailUpdateRequest
+        ProfileUpdateWithOtpRequest
+        | VerifyEmailOtpRequest
+        | CommitEmailUpdateRequest
+        | VerifyPhoneOtpRequest
+        | CommitPhoneUpdateRequest
     ),
     user_access_token: str,
 ) -> ProfileUpdateWithOtpResponse:
@@ -148,6 +154,8 @@ async def update_profile_with_otp_verification(
         "Starting profile update with OTP verification workflow: action=%s",
         profile_update_data.action.value,
     )
+
+    _validate_new_email_address(profile_update_data.newEmailAddress)
 
     profile_update_data = await _resolve_server_stored_email_address(
         request=request,
@@ -190,6 +198,22 @@ def _normalize_profile_update_request(
     if isinstance(profile_update_data, CommitEmailUpdateRequest):
         return ProfileUpdateWithOtpRequest(
             action=ProfileUpdateWithOtpAction.COMMIT,
+            verificationProofId=profile_update_data.verificationProofId,
+        )
+
+    if isinstance(profile_update_data, VerifyPhoneOtpRequest):
+        return ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            phoneNumbers=profile_update_data.phoneNumbers,
+            otp=profile_update_data.otp,
+            trxnId=profile_update_data.trxnId,
+            otpType=profile_update_data.otpType,
+        )
+
+    if isinstance(profile_update_data, CommitPhoneUpdateRequest):
+        return ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
+            phoneNumbers=profile_update_data.phoneNumbers,
             verificationProofId=profile_update_data.verificationProofId,
         )
 
@@ -523,19 +547,6 @@ async def _apply_profile_update_otp_action(
             ),
         )
 
-    if profile_update_data.action == ProfileUpdateWithOtpAction.COMMIT_WITH_OTP:
-        # Legacy mode: verify OTP and commit in a single request.
-        await enforce_contact_phone_rate_limit_if_needed()
-
-        await verify_otp_before_operation(
-            global_http_client=request.app.state.request_client,
-            otp=profile_update_data.otp,
-            trxn_id=profile_update_data.trxnId,
-            otp_type=profile_update_data.otpType,
-            user_access_token=user_access_token,
-        )
-        logger.info("OTP verification successful")
-
     if profile_update_data.action == ProfileUpdateWithOtpAction.COMMIT:
         verification_proof_id = profile_update_data.verificationProofId
         if not verification_proof_id:
@@ -719,11 +730,7 @@ def _validate_email_update_otp_type(
 ) -> None:
     if (
         profile_update_data.newEmailAddress
-        and profile_update_data.action
-        in {
-            ProfileUpdateWithOtpAction.VERIFY,
-            ProfileUpdateWithOtpAction.COMMIT_WITH_OTP,
-        }
+        and profile_update_data.action == ProfileUpdateWithOtpAction.VERIFY
         and profile_update_data.otpType != OtpType.EMAIL
     ):
         raise HTTPException(
