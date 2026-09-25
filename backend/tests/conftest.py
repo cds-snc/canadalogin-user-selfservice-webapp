@@ -3,6 +3,11 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+# Works around a hypervisor/kernel bug on some ARM64 hosts that misreports SVE2
+# support without base SVE, crashing cryptography's OpenSSL CPU-feature probe
+# with "Illegal instruction" (see https://github.com/pyca/cryptography/issues/14733).
+os.environ.setdefault("OPENSSL_armcap", "0")
+
 
 def pytest_configure():
     os.environ["IBM_VERIFY_TENANT_URL"] = "https://example.com"
