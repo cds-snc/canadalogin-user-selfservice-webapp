@@ -678,8 +678,6 @@ async def _resolve_server_stored_email_address(
             profile_update_data.trxnId,
         )
         if not isinstance(stored_email, str) or not stored_email:
-            if profile_update_data.newEmailAddress:
-                return profile_update_data
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="otp_expired",

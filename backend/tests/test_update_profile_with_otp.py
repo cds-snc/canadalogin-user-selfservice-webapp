@@ -410,7 +410,14 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
-        mock_request.session = {}
+        mock_request.session = {
+            "email_otp_transactions": {
+                "verify-trxn-id": {
+                    "emailAddress": "controlled@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             action=ProfileUpdateWithOtpAction.VERIFY,
@@ -435,7 +442,14 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
-        mock_request.session = {}
+        mock_request.session = {
+            "email_otp_transactions": {
+                "verify-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             action=ProfileUpdateWithOtpAction.COMMIT_WITH_OTP,
@@ -527,7 +541,14 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
-        mock_request.session = {}
+        mock_request.session = {
+            "email_otp_transactions": {
+                "verify-trxn-id": {
+                    "emailAddress": "new@example.com",
+                    "expiry": "2999-01-01T00:00:00Z",
+                }
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             action=ProfileUpdateWithOtpAction.VERIFY,

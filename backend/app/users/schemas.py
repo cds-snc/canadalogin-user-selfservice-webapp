@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, List, Literal, Optional, Union
+from typing import Annotated, Any, List, Literal, Optional, Union
 
 from app.otp.schemas import OtpType
 from app.password.schemas import OtpType as PhoneOtpType
@@ -443,8 +443,11 @@ class CommitEmailUpdateRequest(BaseModel):
     verificationProofId: str
 
 
-ProfileUpdateWithOtpApiRequest = Union[
-    VerifyEmailOtpRequest,
-    CommitEmailUpdateRequest,
-    ProfileUpdateWithOtpRequest,
+ProfileUpdateWithOtpApiRequest = Annotated[
+    Union[
+        VerifyEmailOtpRequest,
+        CommitEmailUpdateRequest,
+        ProfileUpdateWithOtpRequest,
+    ],
+    Field(union_mode="left_to_right"),
 ]
