@@ -214,8 +214,8 @@ describe("ProfileHome", () => {
     await waitFor(() => {
       const badges = screen.getAllByTestId("verified-badge");
       expect(
-      badges.some((b) => b.textContent.match(/Verified on [\w\s,]+/))
-    ).toBe(true);
+        badges.some((b) => b.textContent.match(/Verified on [\w\s,]+/)),
+      ).toBe(true);
     });
   });
 
