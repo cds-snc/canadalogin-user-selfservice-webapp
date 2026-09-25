@@ -8,7 +8,7 @@ from app.users.schemas import (
     UserProfileUpdateRequest,
     RelyingPartyResponse,
     UserPhoneAuthFactorsResponse,
-    ProfileUpdateWithOtpRequest,
+    ProfileUpdateWithOtpApiRequest,
     ProfileUpdateWithOtpResponse,
     ConnectedServicesResponse,
 )
@@ -128,7 +128,7 @@ async def user_factors(
 )
 async def update_user_profile_with_otp_verification(
     request: Request,
-    profile_update_data: ProfileUpdateWithOtpRequest,
+    profile_update_data: ProfileUpdateWithOtpApiRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
     """

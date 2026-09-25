@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any, List, Literal, Optional, Union
 
 from app.otp.schemas import OtpType
 from app.password.schemas import OtpType as PhoneOtpType
@@ -429,3 +429,22 @@ class ProfileUpdateWithOtpRequest(BaseModel):
                 )
 
         return self
+
+
+class VerifyEmailOtpRequest(BaseModel):
+    action: Literal[ProfileUpdateWithOtpAction.VERIFY]
+    otp: str
+    trxnId: str
+    otpType: Literal[OtpType.EMAIL]
+
+
+class CommitEmailUpdateRequest(BaseModel):
+    action: Literal[ProfileUpdateWithOtpAction.COMMIT]
+    verificationProofId: str
+
+
+ProfileUpdateWithOtpApiRequest = Union[
+    VerifyEmailOtpRequest,
+    CommitEmailUpdateRequest,
+    ProfileUpdateWithOtpRequest,
+]

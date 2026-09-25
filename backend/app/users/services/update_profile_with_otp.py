@@ -29,6 +29,8 @@ from app.otp.services.email_otp_transaction_store import (
 from app.password.schemas import OtpType as FactorOtpType
 from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
+    VerifyEmailOtpRequest,
+    CommitEmailUpdateRequest,
     ProfileUpdateWithOtpAction,
     ProfileUpdateWithOtpResponse,
     ProfileUpdateOtpVerificationData,
@@ -118,7 +120,9 @@ def _validate_new_email_address(new_email_address: str | None) -> None:
 
 async def update_profile_with_otp_verification(
     request: Request,
-    profile_update_data: ProfileUpdateWithOtpRequest,
+    profile_update_data: (
+        ProfileUpdateWithOtpRequest | VerifyEmailOtpRequest | CommitEmailUpdateRequest
+    ),
     user_access_token: str,
 ) -> ProfileUpdateWithOtpResponse:
     """
@@ -138,6 +142,8 @@ async def update_profile_with_otp_verification(
     Raises:
         HTTPException: For OTP verification failures or profile update errors
     """
+    profile_update_data = _normalize_profile_update_request(profile_update_data)
+
     logger.info(
         "Starting profile update with OTP verification workflow: action=%s",
         profile_update_data.action.value,
@@ -166,6 +172,28 @@ async def update_profile_with_otp_verification(
         profile_update_data=profile_update_data,
         user_access_token=user_access_token,
     )
+
+
+def _normalize_profile_update_request(
+    profile_update_data: (
+        ProfileUpdateWithOtpRequest | VerifyEmailOtpRequest | CommitEmailUpdateRequest
+    ),
+) -> ProfileUpdateWithOtpRequest:
+    if isinstance(profile_update_data, VerifyEmailOtpRequest):
+        return ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp=profile_update_data.otp,
+            trxnId=profile_update_data.trxnId,
+            otpType=profile_update_data.otpType,
+        )
+
+    if isinstance(profile_update_data, CommitEmailUpdateRequest):
+        return ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
+            verificationProofId=profile_update_data.verificationProofId,
+        )
+
+    return profile_update_data
 
 
 async def _handle_profile_update_commit_after_verification(
