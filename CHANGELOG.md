@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.36.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.0...v1.36.1) (2026-09-25)
+
+
+### Bug Fixes
+
+* resolve rate limit edge case for phone MFA verification on fifth enrollment ([#2256](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2256)) ([5b095e3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5b095e38c6d27b7351876c4d5430f44ff369041f))
+
+
+### Miscellaneous Chores
+
+* bump staging version to 1.36.0 ([#2247](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2247)) ([93d7c54](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/93d7c5473dee5ee206026ad778403762a5cb89c0))
+
 ## [1.36.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.35.0...v1.36.0) (2026-09-24)
 
 
