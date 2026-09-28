@@ -3,6 +3,12 @@ on:
     branches:
       - main
   workflow_dispatch: # Added for ease of debugging for now.
+    inputs:
+      disable_old_code_protection:
+        description: "Disable protections against deploying old code"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -19,9 +25,26 @@ env:
 name: Release Pipeline - Frontend & Backend API
 
 jobs:
+  verify-current-main-sha:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify workflow SHA is current main
+        if: inputs.disable_old_code_protection != true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MAIN_SHA=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq '.object.sha')
+
+          if [ "$GITHUB_SHA" != "$MAIN_SHA" ]; then
+            echo "This workflow is running at $GITHUB_SHA, but main is now at $MAIN_SHA."
+            echo "Re-run from current main, or manually dispatch with old-code protection disabled."
+            exit 1
+          fi
+
   # Runs the release-please action. This manages the open release PR and
   # creates the release when the PR is merged.
   release-please:
+    needs: [verify-current-main-sha]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
@@ -36,6 +59,7 @@ jobs:
           token: ${{ steps.sre_app_token.outputs.token }}
 
   notify-slack-about-deploy:
+    needs: [verify-current-main-sha]
     runs-on: ubuntu-latest
     outputs:
       envs: ${{ steps.check-envs.outputs.envs }}
