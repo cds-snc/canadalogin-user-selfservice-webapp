@@ -4,13 +4,26 @@ import math
 from datetime import datetime, timezone
 from typing import Any
 
+from app.config import get_configuration
 from fastapi import Request
 from starsessions.session import get_session_id
 
 logger = logging.getLogger(__name__)
 
-EMAIL_OTP_TRANSACTIONS_SESSION_KEY = "email_otp_transactions"
+EMAIL_OTP_TRANSACTION_SESSION_KEY = "email_otp_transaction"
+LEGACY_EMAIL_OTP_TRANSACTIONS_SESSION_KEY = "email_otp_transactions"
 EMAIL_OTP_TRANSACTION_REDIS_KEY_PREFIX = "email_otp_transaction:"
+DELETE_IF_TRANSACTION_MATCHES_SCRIPT = """
+local raw = redis.call('GET', KEYS[1])
+if not raw then
+    return 0
+end
+local ok, transaction = pcall(cjson.decode, raw)
+if not ok or transaction['transactionId'] ~= ARGV[1] then
+    return 0
+end
+return redis.call('DEL', KEYS[1])
+"""
 
 
 def _get_transaction_id(response_json: dict) -> str | None:
@@ -31,15 +44,15 @@ def _get_session_id(request: Request) -> str | None:
         session_id = get_session_id(request)
     except (AttributeError, KeyError, RuntimeError, TypeError):
         cookies = getattr(request, "cookies", {})
-        try:
-            session_id = next(iter(cookies.values()), None)
-        except (AttributeError, TypeError):
-            session_id = None
+        session_cookie_name = get_configuration().session_config.SESSION_COOKIE_NAME
+        session_id = (
+            cookies.get(session_cookie_name) if hasattr(cookies, "get") else None
+        )
     return session_id if isinstance(session_id, str) and session_id else None
 
 
-def _build_redis_key(transaction_id: str) -> str:
-    return f"{EMAIL_OTP_TRANSACTION_REDIS_KEY_PREFIX}{transaction_id}"
+def _build_redis_key(session_id: str) -> str:
+    return f"{EMAIL_OTP_TRANSACTION_REDIS_KEY_PREFIX}{session_id}"
 
 
 def _get_expiry_ttl_seconds(expiry: Any) -> int | None:
@@ -68,13 +81,27 @@ def _get_expiry_ttl_seconds(expiry: Any) -> int | None:
     return math.ceil(remaining_seconds)
 
 
-def _get_fallback_transactions(request: Request) -> dict[str, dict]:
+def _get_fallback_transaction(
+    request: Request,
+    transaction_id: str | None = None,
+) -> dict | None:
     session = getattr(request, "session", None)
     if not isinstance(session, dict):
-        return {}
+        return None
 
-    transactions = session.get(EMAIL_OTP_TRANSACTIONS_SESSION_KEY, {})
-    return transactions if isinstance(transactions, dict) else {}
+    transaction = session.get(EMAIL_OTP_TRANSACTION_SESSION_KEY)
+    if transaction is None:
+        transaction = session.get(LEGACY_EMAIL_OTP_TRANSACTIONS_SESSION_KEY)
+    if not isinstance(transaction, dict):
+        return None
+    if "transactionId" in transaction:
+        return transaction
+    if transaction_id and isinstance(transaction.get(transaction_id), dict):
+        return {
+            **transaction[transaction_id],
+            "transactionId": transaction_id,
+        }
+    return None
 
 
 async def store_email_otp_transaction(
@@ -101,6 +128,7 @@ async def store_email_otp_transaction(
 
     session_id = _get_session_id(request)
     transaction = {
+        "transactionId": transaction_id,
         "emailAddress": normalized_destination,
         "expiry": response_json.get("expiry"),
     }
@@ -108,17 +136,15 @@ async def store_email_otp_transaction(
         transaction["sessionId"] = session_id
     redis_client = _get_redis_client(request)
     if redis_client is not None and session_id:
-        key = _build_redis_key(transaction_id)
+        key = _build_redis_key(session_id)
         try:
             await redis_client.set(key, json.dumps(transaction), ex=ttl_seconds)
             return
         except Exception as exc:  # noqa: BLE001 - preserve the fail-closed lookup
             logger.warning("Failed to store email OTP transaction in Redis: %s", exc)
 
-    transactions = _get_fallback_transactions(request)
     if isinstance(getattr(request, "session", None), dict):
-        transactions[transaction_id] = transaction
-        request.session[EMAIL_OTP_TRANSACTIONS_SESSION_KEY] = transactions
+        request.session[EMAIL_OTP_TRANSACTION_SESSION_KEY] = transaction
 
 
 async def get_email_otp_transaction(
@@ -128,7 +154,7 @@ async def get_email_otp_transaction(
     redis_client = _get_redis_client(request)
     session_id = _get_session_id(request)
     if redis_client is not None and session_id:
-        key = _build_redis_key(transaction_id)
+        key = _build_redis_key(session_id)
         try:
             raw_transaction = await redis_client.get(key)
             if raw_transaction is None:
@@ -138,7 +164,10 @@ async def get_email_otp_transaction(
             transaction = json.loads(raw_transaction)
             if not isinstance(transaction, dict):
                 return None
-            if transaction.get("sessionId") != session_id:
+            if (
+                transaction.get("sessionId") != session_id
+                or transaction.get("transactionId") != transaction_id
+            ):
                 return None
             return transaction
         except Exception as exc:  # noqa: BLE001 - fail closed on Redis errors
@@ -147,7 +176,10 @@ async def get_email_otp_transaction(
             )
             return None
 
-    return _get_fallback_transactions(request).get(transaction_id)
+    transaction = _get_fallback_transaction(request, transaction_id)
+    if transaction and transaction.get("transactionId") == transaction_id:
+        return transaction
+    return None
 
 
 async def consume_email_otp_transaction(
@@ -160,15 +192,32 @@ async def consume_email_otp_transaction(
     redis_client = _get_redis_client(request)
     session_id = _get_session_id(request)
     if redis_client is not None and session_id:
-        key = _build_redis_key(transaction_id)
+        key = _build_redis_key(session_id)
         try:
-            await redis_client.delete(key)
+            await redis_client.eval(
+                DELETE_IF_TRANSACTION_MATCHES_SCRIPT,
+                1,
+                key,
+                transaction_id,
+            )
             return
         except Exception as exc:  # noqa: BLE001 - preserve one-time semantics
             logger.warning("Failed to consume email OTP transaction in Redis: %s", exc)
             return
 
-    transactions = _get_fallback_transactions(request)
-    transactions.pop(transaction_id, None)
-    if isinstance(getattr(request, "session", None), dict):
-        request.session[EMAIL_OTP_TRANSACTIONS_SESSION_KEY] = transactions
+    transaction = _get_fallback_transaction(request, transaction_id)
+    if (
+        transaction
+        and transaction.get("transactionId") == transaction_id
+        and isinstance(getattr(request, "session", None), dict)
+    ):
+        session_key = EMAIL_OTP_TRANSACTION_SESSION_KEY
+        session_value = request.session.get(session_key)
+        if session_value is None:
+            session_key = LEGACY_EMAIL_OTP_TRANSACTIONS_SESSION_KEY
+            session_value = request.session.get(session_key)
+        if isinstance(session_value, dict) and "transactionId" not in session_value:
+            session_value.pop(transaction_id, None)
+            request.session[session_key] = session_value
+        else:
+            request.session.pop(session_key, None)
