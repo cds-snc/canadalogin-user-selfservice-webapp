@@ -11,6 +11,8 @@ from app.users.schemas import (
     EmailItem,
     MetaDataTypeValue,
     IBMVerifyUserProfileSchema,
+    VerifyEmailOtpRequest,
+    VerifyPhoneOtpRequest,
 )
 from app.users.services.update_profile_with_otp import (
     update_profile_with_otp_verification,
@@ -403,6 +405,84 @@ class TestUpdateProfileWithOtpVerification:
         assert mock_request.session["email_otp_transactions"] == {}
         mock_verify_otp.assert_called_once()
         mock_verify_action_preflight.assert_called_once()
+
+    @pytest.mark.asyncio
+    @patch(PROOF_TTL_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_invalid_otp_does_not_resolve_proof_ttl(
+        self,
+        mock_verify_otp,
+        mock_proof_ttl,
+    ):
+        mock_verify_otp.side_effect = HTTPException(
+            status_code=400,
+            detail={"message": "invalidCode", "attempts": 1, "retries": 5},
+        )
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "email_otp_transaction": {
+                "transactionId": "verify-trxn-id",
+                "emailAddress": "new@example.com",
+                "expiry": "2999-01-01T00:00:00Z",
+            }
+        }
+
+        profile_update_data = VerifyEmailOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp="wrong-code",
+            trxnId="verify-trxn-id",
+            otpType=OtpType.EMAIL,
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request,
+                profile_update_data,
+                "user-token",
+            )
+
+        assert exc.value.detail["attempts"] == 1
+        assert exc.value.detail["retries"] == 5
+        mock_proof_ttl.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    async def test_invalid_phone_otp_preserves_attempt_error_without_transaction(
+        self,
+        mock_verify_otp,
+    ):
+        mock_verify_otp.side_effect = HTTPException(
+            status_code=400,
+            detail={"message": "invalidCode", "attempts": 1, "retries": 5},
+        )
+
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {}
+
+        profile_update_data = VerifyPhoneOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp="wrong-code",
+            trxnId="missing-phone-transaction",
+            otpType=OtpType.SMS,
+        )
+
+        with pytest.raises(HTTPException) as exc:
+            await update_profile_with_otp_verification(
+                mock_request,
+                profile_update_data,
+                "user-token",
+            )
+
+        assert exc.value.detail["attempts"] == 1
+        assert exc.value.detail["retries"] == 5
+        mock_verify_otp.assert_awaited_once()
 
     @pytest.mark.asyncio
     @patch(OTP_STATUS_RETRIEVAL_IMPORT_PATH)

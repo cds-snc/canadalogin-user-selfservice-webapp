@@ -167,6 +167,7 @@ async def update_profile_with_otp_verification(
     profile_update_data = await _resolve_server_stored_phone_update(
         request=request,
         profile_update_data=profile_update_data,
+        require_transaction=False,
     )
 
     _validate_new_email_address(profile_update_data.newEmailAddress)
@@ -211,7 +212,6 @@ def _normalize_profile_update_request(
     if isinstance(profile_update_data, VerifyPhoneOtpRequest):
         return ProfileUpdateWithOtpRequest(
             action=ProfileUpdateWithOtpAction.VERIFY,
-            phoneNumbers=profile_update_data.phoneNumbers,
             otp=profile_update_data.otp,
             trxnId=profile_update_data.trxnId,
             otpType=profile_update_data.otpType,
@@ -220,7 +220,6 @@ def _normalize_profile_update_request(
     if isinstance(profile_update_data, CommitPhoneUpdateRequest):
         return ProfileUpdateWithOtpRequest(
             action=ProfileUpdateWithOtpAction.COMMIT,
-            phoneNumbers=profile_update_data.phoneNumbers,
             verificationProofId=profile_update_data.verificationProofId,
         )
 
@@ -498,15 +497,6 @@ async def _apply_profile_update_otp_action(
                 detail="email_already_associated",
             )
 
-        # Resolve proof TTL for this transaction before issuing a one-time proof.
-        proof_ttl_seconds = await _get_profile_update_otp_proof_ttl_seconds(
-            request=request,
-            trxn_id=trxn_id,
-            otp_type=otp_type,
-            user_access_token=user_access_token,
-            expected_email_address=profile_update_data.newEmailAddress,
-        )
-
         await enforce_contact_phone_rate_limit_if_needed()
 
         await verify_otp_before_operation(
@@ -517,6 +507,22 @@ async def _apply_profile_update_otp_action(
             user_access_token=user_access_token,
         )
         logger.info("OTP verification successful")
+
+        profile_update_data = await _resolve_server_stored_phone_update(
+            request=request,
+            profile_update_data=profile_update_data,
+            require_transaction=True,
+        )
+
+        # Resolve proof TTL only after OTP verification succeeds. Invalid OTPs
+        # must preserve IBM's attempts/retries error instead of becoming otp_expired.
+        proof_ttl_seconds = await _get_profile_update_otp_proof_ttl_seconds(
+            request=request,
+            trxn_id=trxn_id,
+            otp_type=otp_type,
+            user_access_token=user_access_token,
+            expected_email_address=profile_update_data.newEmailAddress,
+        )
 
         try:
             await _run_preflight_checks_for_verified_action(
@@ -782,6 +788,7 @@ async def _resolve_server_stored_email_address(
 async def _resolve_server_stored_phone_update(
     request: Request,
     profile_update_data: ProfileUpdateWithOtpRequest,
+    require_transaction: bool = True,
 ) -> ProfileUpdateWithOtpRequest:
     phone_otp_types = {OtpType.SMS, OtpType.VOICE}
 
@@ -797,6 +804,8 @@ async def _resolve_server_stored_phone_update(
             profile_update_data.trxnId,
         )
         if not stored_phone:
+            if not require_transaction:
+                return profile_update_data
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="otp_expired"
             )
