@@ -22,9 +22,11 @@ from app.otp.services.enroll_mfa_otp import (
     dispatch_otp_factor_validation,
 )
 from app.otp.services.retrieve_transient_otp import dispatch_otp_status_retrieval
-from app.otp.services.email_otp_transaction_store import (
+from app.otp.services.profile_otp_transaction_store import (
     get_email_otp_transaction,
     consume_email_otp_transaction,
+    get_phone_otp_transaction,
+    consume_phone_otp_transaction,
 )
 from app.password.schemas import OtpType as FactorOtpType
 from app.users.schemas import (
@@ -38,6 +40,7 @@ from app.users.schemas import (
     ProfileUpdateOtpVerificationData,
     UserProfileUpdateRequest,
     EmailItem,
+    MetaDataTypeValue,
 )
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.users.services.otp_factors import get_user_otp_factors
@@ -158,6 +161,10 @@ async def update_profile_with_otp_verification(
     _validate_new_email_address(profile_update_data.newEmailAddress)
 
     profile_update_data = await _resolve_server_stored_email_address(
+        request=request,
+        profile_update_data=profile_update_data,
+    )
+    profile_update_data = await _resolve_server_stored_phone_update(
         request=request,
         profile_update_data=profile_update_data,
     )
@@ -535,7 +542,10 @@ async def _apply_profile_update_otp_action(
             otp_type,
             proof_ttl_seconds,
         )
-        await consume_email_otp_transaction(request, trxn_id)
+        if otp_type == OtpType.EMAIL:
+            await consume_email_otp_transaction(request, trxn_id)
+        else:
+            await consume_phone_otp_transaction(request, trxn_id)
         logger.info("Issued one-time profile update verification proof")
 
         return ProfileUpdateWithOtpResponse(
@@ -617,7 +627,9 @@ def _normalize_phone_numbers(phone_numbers) -> list[dict[str, str]]:
         normalized.append(
             {
                 "type": str(phone.type or ""),
-                "value": str(phone.value or ""),
+                "value": "".join(
+                    char for char in str(phone.value or "") if char.isdigit()
+                ),
             }
         )
 
@@ -654,6 +666,26 @@ async def _get_server_stored_email_address(
     return email_address
 
 
+async def _get_server_stored_phone_number(
+    request: Request,
+    trxn_id: str,
+) -> str | None:
+    transaction = await get_phone_otp_transaction(request, trxn_id)
+    if not isinstance(transaction, dict):
+        return None
+
+    expiry_datetime = _parse_iso_datetime(
+        transaction.get("expiry")
+        if isinstance(transaction.get("expiry"), str)
+        else None
+    )
+    if expiry_datetime is None or expiry_datetime <= datetime.now(timezone.utc):
+        return None
+
+    phone_number = transaction.get("phoneNumber")
+    return phone_number if isinstance(phone_number, str) and phone_number else None
+
+
 def _get_email_from_profile_update_proof(
     request: Request,
     verification_proof_id: str | None,
@@ -671,6 +703,28 @@ def _get_email_from_profile_update_proof(
 
     email_address = fingerprint.get("newEmailAddress")
     return email_address if isinstance(email_address, str) and email_address else None
+
+
+def _get_phone_numbers_from_profile_update_proof(
+    request: Request,
+    verification_proof_id: str | None,
+) -> list[MetaDataTypeValue] | None:
+    if not verification_proof_id:
+        return None
+
+    proof_data = _get_profile_update_otp_proof_store(request).get(verification_proof_id)
+    fingerprint = (
+        proof_data.get("fingerprint") if isinstance(proof_data, dict) else None
+    )
+    phone_numbers = (
+        fingerprint.get("phoneNumbers") if isinstance(fingerprint, dict) else None
+    )
+    if not isinstance(phone_numbers, list):
+        return None
+
+    return [
+        MetaDataTypeValue(**phone) for phone in phone_numbers if isinstance(phone, dict)
+    ]
 
 
 async def _resolve_server_stored_email_address(
@@ -721,6 +775,62 @@ async def _resolve_server_stored_email_address(
             )
 
         return profile_update_data.model_copy(update={"newEmailAddress": stored_email})
+
+    return profile_update_data
+
+
+async def _resolve_server_stored_phone_update(
+    request: Request,
+    profile_update_data: ProfileUpdateWithOtpRequest,
+) -> ProfileUpdateWithOtpRequest:
+    phone_otp_types = {OtpType.SMS, OtpType.VOICE}
+
+    if profile_update_data.action == ProfileUpdateWithOtpAction.VERIFY:
+        if (
+            profile_update_data.otpType not in phone_otp_types
+            or not profile_update_data.trxnId
+        ):
+            return profile_update_data
+
+        stored_phone = await _get_server_stored_phone_number(
+            request,
+            profile_update_data.trxnId,
+        )
+        if not stored_phone:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="otp_expired"
+            )
+
+        resolved_phone_numbers = [MetaDataTypeValue(type="mobile", value=stored_phone)]
+        if profile_update_data.phoneNumbers and _normalize_phone_numbers(
+            profile_update_data.phoneNumbers
+        ) != _normalize_phone_numbers(resolved_phone_numbers):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="invalidCode"
+            )
+
+        return profile_update_data.model_copy(
+            update={"phoneNumbers": resolved_phone_numbers}
+        )
+
+    if profile_update_data.action == ProfileUpdateWithOtpAction.COMMIT:
+        stored_phone_numbers = _get_phone_numbers_from_profile_update_proof(
+            request,
+            profile_update_data.verificationProofId,
+        )
+        if not stored_phone_numbers:
+            return profile_update_data
+
+        if profile_update_data.phoneNumbers and _normalize_phone_numbers(
+            profile_update_data.phoneNumbers
+        ) != _normalize_phone_numbers(stored_phone_numbers):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="invalidCode"
+            )
+
+        return profile_update_data.model_copy(
+            update={"phoneNumbers": stored_phone_numbers}
+        )
 
     return profile_update_data
 

@@ -183,11 +183,10 @@ export const authService: AuthServiceContract = {
       handleApiError(error as AuthServiceError);
     }
   },
-  update_phone_with_otp: async (phoneNumber, verificationProofId) => {
+  update_phone_with_otp: async (_phoneNumber, verificationProofId) => {
     try {
       const updatePayload: UpdatePhonePayload = {
         action: "commit",
-        phoneNumbers: [{ value: phoneNumber, type: "mobile" }],
         verificationProofId,
       };
 
@@ -201,7 +200,7 @@ export const authService: AuthServiceContract = {
     }
   },
   verify_phone_otp_for_update: async (
-    phoneNumber,
+    _phoneNumber,
     otp,
     trxnId,
     otpType = "sms",
@@ -209,7 +208,6 @@ export const authService: AuthServiceContract = {
     try {
       const updatePayload: VerifyPhoneOtpForUpdatePayload = {
         action: "verify",
-        phoneNumbers: [{ value: phoneNumber, type: "mobile" }],
         otp,
         trxnId,
         otpType,

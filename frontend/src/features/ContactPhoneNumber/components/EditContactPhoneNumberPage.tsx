@@ -297,7 +297,6 @@ export default function EditContactPhoneNumberPage() {
       setIsPhoneOtpMaxAttemptsReached(false);
 
       const result = await authService.verify_phone_otp_for_update(
-        phoneFormData.phoneNumber,
         phoneFormData.otp.trim(),
         phoneFormData.trxnId,
         serverMapping[phoneFormData.otpType],
@@ -354,7 +353,6 @@ export default function EditContactPhoneNumberPage() {
       }
 
       const result = await authService.update_phone_with_otp(
-        phoneFormData.phoneNumber,
         phoneOtpVerificationProofId,
       );
       const response = result as AuthServiceResponse<UserProfile>;

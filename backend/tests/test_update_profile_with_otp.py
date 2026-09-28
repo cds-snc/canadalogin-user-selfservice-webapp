@@ -477,7 +477,14 @@ class TestUpdateProfileWithOtpVerification:
         mock_request.app = Mock()
         mock_request.app.state = Mock()
         mock_request.app.state.request_client = Mock(spec=AsyncClient)
-        mock_request.session = {}
+        mock_request.session = {
+            "phone_otp_transaction": {
+                "transactionId": "verify-phone-trxn-id",
+                "phoneNumber": "14165551234",
+                "otpType": "sms",
+                "expiry": "2999-01-01T00:00:00Z",
+            }
+        }
 
         profile_update_data = ProfileUpdateWithOtpRequest(
             action=ProfileUpdateWithOtpAction.VERIFY,
