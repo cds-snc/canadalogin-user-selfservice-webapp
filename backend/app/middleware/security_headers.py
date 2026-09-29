@@ -13,7 +13,7 @@ def _build_content_security_policy() -> str:
         "default-src 'self'",
         "script-src 'self'",
         "style-src 'self'",
-        "img-src 'self' data:",
+        "img-src 'self' data: https://www.canada.ca",
         "font-src 'self'",
         "connect-src 'self'",
         "frame-ancestors 'none'",
