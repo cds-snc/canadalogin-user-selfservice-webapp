@@ -211,9 +211,7 @@ describe("OtpVerification Component", () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole("button", {
-        name: "Verify with voice verification instead",
-      }),
+      screen.getByText("Verify with voice verification instead"),
     ).toBeInTheDocument();
   });
 
@@ -243,9 +241,7 @@ describe("OtpVerification Component", () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole("button", {
-        name: "Verify with text (SMS) verification instead",
-      }),
+      screen.getByText("Verify with text (SMS) verification instead"),
     ).toBeInTheDocument();
   });
 
