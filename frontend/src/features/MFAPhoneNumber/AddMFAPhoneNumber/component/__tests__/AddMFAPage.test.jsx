@@ -735,6 +735,125 @@ describe("AddMFAPage Unit Tests", () => {
         expect(addMFAPhoneNumberApi.sendMFAOTP).toHaveBeenCalled();
       });
     });
+
+    it("should render exact English message for otp_send_rate_limit in Add MFA send flow", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+
+      addMFAPhoneNumberApi.sendMFAOTP.mockRejectedValue({
+        data: { message: "otp_send_rate_limit" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+          "data-error-code",
+          "otp_send_rate_limit",
+        );
+      });
+
+      expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+        "data-error-message",
+        "You have reached the maximum number of verification code requests. Wait 5 minutes and try again.",
+      );
+    });
+
+    it("should render exact French message for otp_send_rate_limit in Add MFA send flow", async () => {
+      const mockUseParams = await import("react-router");
+      vi.mocked(mockUseParams.useParams).mockReturnValue({ language: "fr" });
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+
+      addMFAPhoneNumberApi.sendMFAOTP.mockRejectedValue({
+        data: { message: "otp_send_rate_limit" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+          "data-error-code",
+          "otp_send_rate_limit",
+        );
+      });
+
+      expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+        "data-error-message",
+        "Vous avez atteint la limite de demandes de code de vérification. Veuillez attendre 5 minutes et réessayer.",
+      );
+
+      vi.mocked(mockUseParams.useParams).mockReturnValue({ language: "en" });
+    });
   });
 
   describe("verifyMFAOtp Navigation Logic", () => {
@@ -1732,6 +1851,68 @@ describe("AddMFAPage Unit Tests", () => {
           otpType: "sms",
         });
       });
+    });
+
+    it("renders error summary when transient OTP resend hits otp_send_rate_limit in otpValidation step", async () => {
+      const requestOtpCode = vi
+        .fn()
+        .mockResolvedValueOnce(true)
+        .mockImplementationOnce(async () => {
+          const latestArgs = useOtpOperations.mock.calls.at(-1)?.[0];
+          latestArgs?.setErrorCode?.("otp_send_rate_limit");
+          return false;
+        });
+
+      useOtpOperations.mockImplementation(() => ({
+        userPhoneFactors: [{ id: "factor-1", type: "smsotp" }],
+        userSelectedMfaFactor: { id: "factor-1", type: "smsotp" },
+        userOtpValue: "",
+        otpSentResponse: { trxnId: "mock-trxn-id" },
+        otpLoading: false,
+        phoneFactorsMap: {},
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        setUserPhoneFactors: vi.fn(),
+        setUserSelectedMfaFactor: vi.fn(),
+        setOtpLoading: vi.fn(),
+        setOtpSentResponse: vi.fn(),
+        requestOtpCode,
+      }));
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("request-otp-code"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+          "data-error-code",
+          "otp_send_rate_limit",
+        );
+      });
+
+      expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+        "data-error-message",
+        "You have reached the maximum number of verification code requests. Wait 5 minutes and try again.",
+      );
+      expect(screen.getByTestId("error-link-0")).toHaveAttribute(
+        "href",
+        "#verificationCode",
+      );
+      expect(requestOtpCode).toHaveBeenCalledTimes(2);
     });
   });
 

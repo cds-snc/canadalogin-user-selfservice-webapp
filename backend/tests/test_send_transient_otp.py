@@ -827,3 +827,24 @@ async def test_handle_status_code_none_branch(monkeypatch):
 
         assert exc_info.value.status_code == 500
         assert "Unknown error" in str(exc_info.value.detail)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("message_id", ["CSIBN0081E", "CSIAP3512E"])
+async def test_handle_send_maps_ibm_send_rate_limit_to_error_code(message_id):
+    def handler(request: Request) -> Response:
+        return Response(429, json={"messageId": message_id})
+
+    transport = build_transport(handler)
+    async with AsyncClient(transport=transport) as client:
+        info = UserOtpInfo(
+            otpType=OtpType.SMS,
+            user_id="user@example.com",
+            destination="+14165551234",
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_send(client, info, user_access_token="USER_TOKEN")
+
+    assert exc_info.value.status_code == 429
+    assert exc_info.value.detail == "otp_send_rate_limit"

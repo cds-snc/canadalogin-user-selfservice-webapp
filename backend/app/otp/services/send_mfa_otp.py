@@ -5,6 +5,7 @@ from app.otp.schemas import (
     VerificationCreateResponseData,
 )
 from app.users.services.get_my_profile import get_my_profile
+from app.utils.global_error_handlers import extract_response_body
 from app.utils.access_token import get_auth_request_headers
 from app.utils.phone_mfa_rate_limit import (
     assert_phone_mfa_registration_rate_limit_not_exceeded,
@@ -13,14 +14,15 @@ from app.utils.phone_mfa_rate_limit import (
 from app.utils.schemas import ResponseModel
 from fastapi import HTTPException, Request, status
 
-
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 PHONE_MFA_SENT_FACTORS_SESSION_KEY = "phone_mfa_sent_factor_ids"
+IBM_VERIFY_OTP_SEND_RATE_LIMIT_MESSAGE_IDS = {"CSIBN0081E", "CSIAP3512E"}
+OTP_SEND_RATE_LIMIT_ERROR_CODE = "otp_send_rate_limit"
 
 
 def _get_sent_factor_ids_from_session(request: Request) -> set[str]:
@@ -72,7 +74,26 @@ async def dispatch_send_mfa_otp(
         )
 
     response = await global_http_client.post(verification_url, json={}, headers=headers)
-    response.raise_for_status()
+
+    try:
+        response.raise_for_status()
+    except HTTPStatusError as exc:
+        if (
+            exc.response
+            and exc.response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+        ):
+            body = extract_response_body(exc.response)
+            message_id = body.get("messageId")
+            if (
+                isinstance(message_id, str)
+                and message_id in IBM_VERIFY_OTP_SEND_RATE_LIMIT_MESSAGE_IDS
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail=OTP_SEND_RATE_LIMIT_ERROR_CODE,
+                ) from exc
+        raise
+
     return response
 
 

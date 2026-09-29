@@ -196,10 +196,17 @@ export default function AddMFAPage() {
     useState(false);
   const errorMessage =
     customErrorMessage || getErrorMessage(language, errorCode);
-  const errorLinks =
-    wizardStep === "addMFANumber" && errorCode && errorMessage
-      ? { "#mfa-phone-number": errorMessage }
-      : undefined;
+  let errorLinks: Record<string, string> | undefined;
+  if (errorCode && errorMessage) {
+    if (wizardStep === "addMFANumber") {
+      errorLinks = { "#mfa-phone-number": errorMessage };
+    } else if (
+      wizardStep === "otpValidation" ||
+      wizardStep === "addMFAValidation"
+    ) {
+      errorLinks = { "#verificationCode": errorMessage };
+    }
+  }
 
   const resetAttempts = () => {
     setIsMfaOtpMaxAttemptsReached(false);
