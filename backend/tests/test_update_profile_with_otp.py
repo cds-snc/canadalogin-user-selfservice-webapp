@@ -13,6 +13,7 @@ from app.users.schemas import (
     IBMVerifyUserProfileSchema,
     VerifyEmailOtpRequest,
     VerifyPhoneOtpRequest,
+    CommitPhoneUpdateRequest,
 )
 from app.users.services.update_profile_with_otp import (
     update_profile_with_otp_verification,
@@ -589,6 +590,81 @@ class TestUpdateProfileWithOtpVerification:
         )
         mock_verify_otp.assert_not_called()
         mock_verify_action_preflight.assert_not_called()
+
+    @pytest.mark.asyncio
+    @patch(UPDATE_PROFILE_IMPORT_PATH)
+    @patch(GET_PROFILE_FROM_IBM_IMPORT_PATH)
+    @patch(VERIFY_OTP_IMPORT_PATH)
+    @patch(PROOF_TTL_IMPORT_PATH)
+    async def test_phone_commit_resolves_phone_from_verification_proof(
+        self,
+        mock_proof_ttl,
+        mock_verify_otp,
+        mock_get_profile,
+        mock_update_profile,
+    ):
+        mock_verify_otp.return_value = None
+        mock_proof_ttl.return_value = 300
+        mock_get_profile.return_value = Mock(
+            id="user-123",
+            userName="user@example.com",
+            preferredLanguage="en",
+            emails=[],
+            phoneNumbers=[],
+        )
+        mock_request = Mock()
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.request_client = Mock(spec=AsyncClient)
+        mock_request.session = {
+            "phone_otp_transaction": {
+                "transactionId": "phone-trxn-id",
+                "phoneNumber": "14165551234",
+                "otpType": "sms",
+                "expiry": "2999-01-01T00:00:00Z",
+            }
+        }
+        mock_update_profile.return_value = Mock(
+            success=True,
+            data=IBMVerifyUserProfileSchema(
+                id="user-123",
+                userName="user@example.com",
+                preferredLanguage="en",
+                emails=[],
+                phoneNumbers=[MetaDataTypeValue(type="mobile", value="14165551234")],
+                active=True,
+                meta={
+                    "location": "https://example.com/users/user-123",
+                    "created": "2023-01-01T00:00:00Z",
+                    "lastModified": "2023-01-01T00:00:00Z",
+                    "resourceType": "User",
+                },
+            ),
+        )
+
+        verify_response = await update_profile_with_otp_verification(
+            mock_request,
+            VerifyPhoneOtpRequest(
+                action=ProfileUpdateWithOtpAction.VERIFY,
+                otp="123456",
+                trxnId="phone-trxn-id",
+                otpType=OtpType.SMS,
+            ),
+            "user-token",
+        )
+        proof_id = verify_response.data.verificationProofId
+
+        await update_profile_with_otp_verification(
+            mock_request,
+            CommitPhoneUpdateRequest(
+                action=ProfileUpdateWithOtpAction.COMMIT,
+                verificationProofId=proof_id,
+            ),
+            "user-token",
+        )
+
+        profile_update_request = mock_update_profile.call_args.args[1]
+        assert profile_update_request.phoneNumbers[0].value == "14165551234"
 
     @pytest.mark.asyncio
     @patch(PROOF_TTL_IMPORT_PATH)

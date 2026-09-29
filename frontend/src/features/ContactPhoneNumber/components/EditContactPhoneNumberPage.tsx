@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate, useParams } from "react-router";
 
@@ -87,6 +87,7 @@ export default function EditContactPhoneNumberPage() {
     useState(false);
   const [phoneOtpVerificationProofId, setPhoneOtpVerificationProofId] =
     useState("");
+  const phoneOtpVerificationProofIdRef = useRef("");
   const [phoneFormData, setPhoneFormData] =
     useState<ContactPhoneFormData>(initialPhoneFormData);
 
@@ -126,6 +127,7 @@ export default function EditContactPhoneNumberPage() {
         setLocalLoading(true);
       }
 
+      phoneOtpVerificationProofIdRef.current = "";
       setPhoneOtpVerificationProofId("");
       setCustomErrorMessage("");
       setIsPhoneOtpMaxAttemptsReached(false);
@@ -308,6 +310,7 @@ export default function EditContactPhoneNumberPage() {
       const verificationProofId = response?.data?.verificationProofId ?? "";
 
       if (response?.success && verificationProofId) {
+        phoneOtpVerificationProofIdRef.current = verificationProofId;
         setPhoneOtpVerificationProofId(verificationProofId);
         setWizardStep("confirmUpdate");
         trackEvent({
@@ -342,7 +345,9 @@ export default function EditContactPhoneNumberPage() {
       setLocalLoading(true);
       setErrorCode("");
 
-      if (!phoneOtpVerificationProofId) {
+      const verificationProofId =
+        phoneOtpVerificationProofIdRef.current || phoneOtpVerificationProofId;
+      if (!verificationProofId) {
         setErrorCode("otp_expired");
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
@@ -352,12 +357,12 @@ export default function EditContactPhoneNumberPage() {
         return;
       }
 
-      const result = await authService.update_phone_with_otp(
-        phoneOtpVerificationProofId,
-      );
+      const result =
+        await authService.update_phone_with_otp(verificationProofId);
       const response = result as AuthServiceResponse<UserProfile>;
 
       if (response?.success && response.data) {
+        phoneOtpVerificationProofIdRef.current = "";
         setPhoneOtpVerificationProofId("");
         setErrorCode("");
         setCustomErrorMessage("");
@@ -383,6 +388,7 @@ export default function EditContactPhoneNumberPage() {
       const message = syncPhoneOtpErrorStateFromApi(error);
 
       if (message === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR) {
+        phoneOtpVerificationProofIdRef.current = "";
         setPhoneOtpVerificationProofId("");
         handleBackToEnterPhone({ clearErrorState: false });
         trackEvent({
@@ -400,6 +406,7 @@ export default function EditContactPhoneNumberPage() {
       });
 
       if (message === "phone_mfa_change_rate_limit") {
+        phoneOtpVerificationProofIdRef.current = "";
         setPhoneOtpVerificationProofId("");
         setWizardStep("enterPhone");
         trackEvent({
@@ -416,6 +423,7 @@ export default function EditContactPhoneNumberPage() {
             payloadMessage as (typeof INVALID_OTP_ERROR_CODES)[number],
           ))
       ) {
+        phoneOtpVerificationProofIdRef.current = "";
         setPhoneOtpVerificationProofId("");
         setWizardStep("verifyOtp");
         trackEvent({
@@ -438,6 +446,7 @@ export default function EditContactPhoneNumberPage() {
   }: {
     clearErrorState?: boolean;
   } = {}) => {
+    phoneOtpVerificationProofIdRef.current = "";
     setPhoneOtpVerificationProofId("");
     setIsPhoneOtpMaxAttemptsReached(false);
     if (clearErrorState) {
