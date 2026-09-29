@@ -32,6 +32,19 @@ vi.mock("react-i18next", () => ({
         "sessions.activeSession": "Active session",
         "sessions.inactiveSession": "Inactive session",
         "sessions.unknownSession": "Connected",
+        "sessions.LAST_KNOWN_ACTIVE": "Last known active",
+        "columns.username": "Username",
+        "columns.userId": "User ID",
+        "columns.application": "Application / RP",
+        "columns.applicationId": "Application ID",
+        "columns.clientId": "OIDC client ID",
+        "columns.protocol": "Protocol",
+        "columns.lastLogin": "Last successful login",
+        "columns.lastLogout": "Last logout",
+        "columns.sessionId": "Session ID",
+        "columns.status": "Session status",
+        "columns.sessionExpires": "Session expires",
+        notAvailable: "Not available",
         loading: "Loading connected services.",
         error: "We could not load your connected services. Try again later.",
         empty: "You do not have any connected services.",
@@ -99,19 +112,30 @@ describe("ConnectedServicesPage", () => {
       {
         clientId: "client-1",
         name: "Service One",
-        sessionStatus: "unknownSession",
+        sessionStatus: "LAST_KNOWN_ACTIVE",
+        userId: "user-1",
+        username: "john@example.com",
+        applicationId: "application-1",
+        applicationName: "Service One",
+        protocol: "OIDC",
+        lastLogin: "2026-01-01T10:00:00Z",
+        lastLogout: null,
+        sessionId: "session-1",
+        sessionExpires: "2099-01-01T00:00:00Z",
       },
     ]);
     render(<ConnectedServicesPage />);
 
     expect(await screen.findByText("Service One")).toBeInTheDocument();
+    expect(screen.getByText("Jan 1, 2026, 5:00 AM")).toBeInTheDocument();
+    expect(screen.getByText("Last known active")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         level: 1,
         name: "Sign in to services to apply this update",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Connected")).toBeInTheDocument();
+    expect(screen.getByText("Last known active")).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Sign out everywhere" }),
     ).toHaveAttribute("data-button-role", "danger");

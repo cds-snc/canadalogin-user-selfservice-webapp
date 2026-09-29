@@ -10,10 +10,28 @@
   "loading": "Loading connected services.",
   "error": "We could not load your connected services. Try again later.",
   "empty": "You do not have any connected services.",
+  "notAvailable": "Non disponible",
+  "columns": {
+    "username": "Nom d'utilisateur",
+    "userId": "ID utilisateur",
+    "application": "Application / RP",
+    "applicationId": "ID de l'application",
+    "clientId": "ID client OIDC",
+    "protocol": "Protocole",
+    "lastLogin": "Dernière connexion réussie",
+    "lastLogout": "Dernière déconnexion",
+    "sessionId": "ID de session",
+    "status": "État de la session",
+    "sessionExpires": "Expiration de la session"
+  },
   "sessions": {
     "activeSession": "Active session",
     "inactiveSession": "Inactive session",
-    "unknownSession": "Connected"
+    "unknownSession": "Inconnue",
+    "LAST_KNOWN_ACTIVE": "Dernière activité connue",
+    "LOGGED_OUT": "Déconnectée",
+    "EXPIRED": "Expirée",
+    "UNKNOWN": "Inconnue"
   },
   "signOutEverywhere": "Sign out everywhere",
   "doThisLater": "I'll do this later",

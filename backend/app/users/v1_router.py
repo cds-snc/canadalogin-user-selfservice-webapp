@@ -20,6 +20,10 @@ from app.users.services.update_profile_with_otp import (
     update_profile_with_otp_verification,
 )
 from app.users.services.connected_services import get_connected_services
+from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
+from app.verify_activity.client import IBMVerifyActivityClient
+from app.verify_activity.schemas import ActivityResponse
+from app.verify_activity.service import get_user_activity
 
 from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.validate_user_request_match import validate_user_id_matches_session
@@ -97,6 +101,26 @@ async def connected_services(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await get_connected_services(request, user_access_token)
+
+
+@router.get(
+    "/activity",
+    response_model=ActivityResponse,
+    tags=["Users"],
+    summary="Get the authenticated user's IBM Verify activity by relying party",
+    description="Events identify the last known SSO/SLO activity. Verify user sessions are used only to enrich Verify session expiry and state; RP session state is not asserted.",
+)
+async def activity(
+    request: Request,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    profile = await dispatch_get_my_profile_from_ibm(
+        request.app.state.request_client, user_access_token
+    )
+    client = IBMVerifyActivityClient(
+        request.app.state.request_client, request.app.state.config
+    )
+    return await get_user_activity(client, profile.id, str(profile.userName))
 
 
 @router.get(

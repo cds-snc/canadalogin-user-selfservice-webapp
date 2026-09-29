@@ -303,7 +303,16 @@ class RelyingPartyResponse(ResponseModel):
 class ConnectedService(BaseModel):
     clientId: str
     name: str
-    sessionStatus: str
+    sessionStatus: str = "unknownSession"
+    userId: Optional[str] = None
+    username: Optional[str] = None
+    applicationId: Optional[str] = None
+    applicationName: Optional[str] = None
+    protocol: Optional[str] = None
+    lastLogin: Optional[datetime] = None
+    lastLogout: Optional[datetime] = None
+    sessionId: Optional[str] = None
+    sessionExpires: Optional[datetime] = None
 
 
 class ConnectedServicesResponse(BaseModel):
