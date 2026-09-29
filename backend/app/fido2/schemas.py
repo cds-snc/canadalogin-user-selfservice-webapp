@@ -108,6 +108,7 @@ class DeleteRegistrationRequest(BaseModel):
     otp: Optional[str] = None  # OTP code (for OTP-verified deletion)
     trxnId: Optional[str] = None  # Transaction ID from OTP request
     otpVerificationType: Optional[OtpType] = None  # OTP type (SMS/VOICE/EMAIL)
+    otpFactorId: Optional[str] = None  # OTP factor id for factor-based OTP flows
     verificationProofId: Optional[str] = None
 
     @model_validator(mode="after")

@@ -1199,6 +1199,14 @@ describe("DeleteMFAPage", () => {
       });
 
       await waitFor(() => {
+        expect(mockVerifyDeleteMFA).toHaveBeenCalledWith({
+          id: "factor-1",
+          otpType: "sms",
+          otp: "123456",
+          trxnId: "trxn-id",
+          otpFactorId: "factor-1",
+          otpVerificationType: "sms",
+        });
         expect(mockTrackEvent).toHaveBeenCalledWith({
           event: "form_step_start",
           step: "otp_validation",

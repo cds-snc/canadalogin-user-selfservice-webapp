@@ -299,6 +299,7 @@ export default function DeleteFIDO2PasskeyPage({
             userSelectedMfaFactor.type as keyof typeof serverMapping
           ]
         : undefined;
+    const otpFactorId = userSelectedMfaFactor?.id;
 
     const trxnId = otpSentResponse?.trxnId;
 
@@ -325,6 +326,7 @@ export default function DeleteFIDO2PasskeyPage({
           otp: otpValue,
           trxnId,
           otpVerificationType,
+          otpFactorId,
         },
       );
 

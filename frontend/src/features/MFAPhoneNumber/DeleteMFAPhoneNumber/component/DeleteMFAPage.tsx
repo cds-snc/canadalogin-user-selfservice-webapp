@@ -422,6 +422,7 @@ export default function DeleteMFAPage() {
 
     const singleFactor = getSingleDeleteFactorPayload();
     const verificationOtpType = getVerificationOtpType();
+    const otpFactorId = userSelectedMfaFactor?.id ?? singleFactor?.id;
     const trxnId = otpSentResponse?.trxnId;
 
     try {
@@ -439,6 +440,7 @@ export default function DeleteMFAPage() {
               factors: getDeleteFactorsPayload(),
               otp: otpValue,
               trxnId,
+              otpFactorId,
               otpVerificationType: verificationOtpType,
             })
           : await deleteMFAPhoneNumberApi.verifyDeleteMFA({
@@ -446,6 +448,7 @@ export default function DeleteMFAPage() {
               otpType: singleFactor.otpType,
               otp: otpValue,
               trxnId,
+              otpFactorId,
               otpVerificationType: verificationOtpType,
             });
 
