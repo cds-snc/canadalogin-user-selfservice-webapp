@@ -62,9 +62,6 @@ describe("IdentityProofingRadioButtons", () => {
     expect(
       screen.getByText("Do it in person and sign back in when done"),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText("Need more time, or a different way in"),
-    ).toBeInTheDocument();
   });
 
   it("renders hint text for all options", () => {
@@ -72,17 +69,12 @@ describe("IdentityProofingRadioButtons", () => {
 
     expect(
       screen.getByText(
-        "Do either a selfie and ID check with your phone or sign in with a provincial account (BC, AB, QC).",
+        "Do either a self-photo and ID check or sign in with a provincial account (BC, AB, QC).",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
         "Set up a visit to a Canada Post or Service Canada Centre with valid government-issued ID.",
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "Sign out and come back when you're ready, or find out about other ways to access RP Name.",
       ),
     ).toBeInTheDocument();
   });
