@@ -56,11 +56,9 @@ export default function ConnectedServicesPage() {
       ? new Intl.DateTimeFormat(language, {
           dateStyle: "medium",
           timeStyle: "short",
+          timeZone: "UTC",
         }).format(new Date(timestamp))
       : t("notAvailable");
-
-  const localizedStatus = (status: ConnectedService["sessionStatus"]) =>
-    t(`sessions.${status}`, { defaultValue: status });
 
   return (
     <GcdsContainer role="main">
@@ -93,17 +91,13 @@ export default function ConnectedServicesPage() {
                   <tr>
                     <th scope="col">{t("columns.application")}</th>
                     <th scope="col">{t("columns.lastLogin")}</th>
-                    <th scope="col">{t("columns.status")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {services.map((service) => (
                     <tr key={service.clientId}>
-                      <th scope="row">
-                        {service.applicationName ?? service.name}
-                      </th>
+                      <th scope="row">{service.name}</th>
                       <td>{formatTimestamp(service.lastLogin)}</td>
-                      <td>{localizedStatus(service.sessionStatus)}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -12,26 +12,14 @@
   "empty": "You do not have any connected services.",
   "notAvailable": "Not available",
   "columns": {
-    "username": "Username",
-    "userId": "User ID",
     "application": "Application / RP",
-    "applicationId": "Application ID",
-    "clientId": "OIDC client ID",
-    "protocol": "Protocol",
     "lastLogin": "Last successful login",
-    "lastLogout": "Last logout",
-    "sessionId": "Session ID",
-    "status": "Session status",
-    "sessionExpires": "Session expires"
+    "lastLogout": "Last logout"
   },
   "sessions": {
     "activeSession": "Active session",
     "inactiveSession": "Inactive session",
-    "unknownSession": "Unknown",
-    "LAST_KNOWN_ACTIVE": "Last known active",
-    "LOGGED_OUT": "Logged out",
-    "EXPIRED": "Expired",
-    "UNKNOWN": "Unknown"
+    "unknownSession": "Connected"
   },
   "signOutEverywhere": "Sign out everywhere",
   "doThisLater": "I'll do this later",

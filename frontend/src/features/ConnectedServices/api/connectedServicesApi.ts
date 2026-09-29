@@ -6,21 +6,8 @@ import type { ApiErrorLike } from "../../../types/utils";
 export type ConnectedService = {
   clientId: string;
   name: string;
-  sessionStatus:
-    | "LAST_KNOWN_ACTIVE"
-    | "LOGGED_OUT"
-    | "EXPIRED"
-    | "UNKNOWN"
-    | "unknownSession";
-  userId?: string | null;
-  username?: string | null;
-  applicationId?: string | null;
-  applicationName?: string | null;
-  protocol?: string | null;
   lastLogin?: string | null;
   lastLogout?: string | null;
-  sessionId?: string | null;
-  sessionExpires?: string | null;
 };
 
 type ConnectedServicesResponse = {
