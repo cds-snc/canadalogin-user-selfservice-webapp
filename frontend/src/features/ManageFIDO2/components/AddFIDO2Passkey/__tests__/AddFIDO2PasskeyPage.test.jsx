@@ -148,11 +148,12 @@ vi.mock("../../../../../hooks/usePasswordValidation", () => ({
 // ─── Services ──────────────────────────────────────────────────────────────
 
 const mockTransientOtpSend = vi.fn();
-const mockTransientOtpVerify = vi.fn();
+const mockOtpVerify = vi.fn();
 vi.mock("../../../../../services/authService", () => ({
   authService: {
     transientOtpSend: (...args) => mockTransientOtpSend(...args),
-    transientOtpVerify: (...args) => mockTransientOtpVerify(...args),
+    transientOtpVerify: vi.fn(),
+    otpVerify: (...args) => mockOtpVerify(...args),
   },
 }));
 
@@ -306,7 +307,7 @@ describe("AddFIDO2PasskeyPage", () => {
       success: true,
       data: { trxnId: "txn-123" },
     });
-    mockTransientOtpVerify.mockResolvedValue({ success: true });
+    mockOtpVerify.mockResolvedValue({ success: true });
   });
 
   // ── Initial render ────────────────────────────────────────────────────
@@ -322,6 +323,7 @@ describe("AddFIDO2PasskeyPage", () => {
     expect(mockUseOtpOperations).toHaveBeenCalledWith(
       expect.objectContaining({
         allowEmptyFactors: true,
+        otpEndpointMode: "mfa",
       }),
     );
   });
@@ -508,7 +510,7 @@ describe("AddFIDO2PasskeyPage", () => {
   });
 
   it("navigates to addFIDO2Passkey after successful OTP verification", async () => {
-    mockTransientOtpVerify.mockResolvedValueOnce({ success: true });
+    mockOtpVerify.mockResolvedValueOnce({ success: true });
     renderPage({ step: "otpValidation" });
     await userEvent.click(screen.getByTestId("otp-validate"));
     await waitFor(() =>
@@ -517,7 +519,7 @@ describe("AddFIDO2PasskeyPage", () => {
   });
 
   it("does not advance when OTP verification fails", async () => {
-    mockTransientOtpVerify.mockRejectedValueOnce({
+    mockOtpVerify.mockRejectedValueOnce({
       response: { data: { message: "INVALID_OTP" } },
     });
     renderPage({ step: "otpValidation" });
@@ -528,7 +530,7 @@ describe("AddFIDO2PasskeyPage", () => {
   });
 
   it("emits fallback form_step_end when OTP verification throws without error message", async () => {
-    mockTransientOtpVerify.mockRejectedValueOnce(new Error("network failure"));
+    mockOtpVerify.mockRejectedValueOnce(new Error("network failure"));
     renderPage({ step: "otpValidation" });
 
     await userEvent.click(screen.getByTestId("otp-validate"));

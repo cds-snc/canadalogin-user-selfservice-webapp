@@ -182,15 +182,16 @@ export default function OtpSelection({
                   </GcdsText>
                   <GcdsLink
                     size="regular"
-                    role="button"
                     style={actionLinkStyle}
                     aria-label={t("TransientOtpSelection.textMeEndingIn", {
                       digits: getLastFourDigits(factor.destination),
                     })}
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
                     onKeyDown={(event) =>
-                      handleLinkButtonKeyDown(event, () =>
-                        handlePhoneFactorSelect(factor.id),
+                      handleLinkButtonKeyDown(
+                        event,
+                        () => handlePhoneFactorSelect(factor.id),
+                        { keys: ["Enter"] },
                       )
                     }
                   >
@@ -234,15 +235,16 @@ export default function OtpSelection({
                   </GcdsText>
                   <GcdsLink
                     size="regular"
-                    role="button"
                     style={actionLinkStyle}
                     aria-label={t("TransientOtpSelection.callMeEndingIn", {
                       digits: getLastFourDigits(factor.destination),
                     })}
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
                     onKeyDown={(event) =>
-                      handleLinkButtonKeyDown(event, () =>
-                        handlePhoneFactorSelect(factor.id),
+                      handleLinkButtonKeyDown(
+                        event,
+                        () => handlePhoneFactorSelect(factor.id),
+                        { keys: ["Enter"] },
                       )
                     }
                   >
@@ -282,7 +284,6 @@ export default function OtpSelection({
                   </GcdsText>
                   <GcdsLink
                     size="regular"
-                    role="button"
                     style={actionLinkStyle}
                     aria-label={t("TransientOtpSelection.verifyWithPasskey", {
                       name: passkey.attributes?.nickname ?? passkey.id,
@@ -293,11 +294,15 @@ export default function OtpSelection({
                       }
                     }}
                     onKeyDown={(event) =>
-                      handleLinkButtonKeyDown(event, () => {
-                        if (onSelectFIDO2) {
-                          onSelectFIDO2(passkey);
-                        }
-                      })
+                      handleLinkButtonKeyDown(
+                        event,
+                        () => {
+                          if (onSelectFIDO2) {
+                            onSelectFIDO2(passkey);
+                          }
+                        },
+                        { keys: ["Enter"] },
+                      )
                     }
                   >
                     {t("TransientOtpSelection.verify")}
@@ -337,12 +342,13 @@ export default function OtpSelection({
                   <GcdsText marginBottom="0">{factor.destination}</GcdsText>
                   <GcdsLink
                     size="regular"
-                    role="button"
                     style={actionLinkStyle}
                     onGcdsClick={() => handlePhoneFactorSelect(factor.id)}
                     onKeyDown={(event) =>
-                      handleLinkButtonKeyDown(event, () =>
-                        handlePhoneFactorSelect(factor.id),
+                      handleLinkButtonKeyDown(
+                        event,
+                        () => handlePhoneFactorSelect(factor.id),
+                        { keys: ["Enter"] },
                       )
                     }
                   >

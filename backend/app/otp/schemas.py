@@ -219,6 +219,7 @@ class OtpDeletionRequest(BaseModel):
     action: OtpDeletionAction = OtpDeletionAction.COMMIT_WITH_VERIFICATION
     otp: Optional[str] = None
     trxnId: Optional[str] = None
+    otpFactorId: Optional[str] = None
     otpVerificationType: Optional[OtpType] = (
         None  # Type of OTP used for verification (can differ from otpType)
     )
@@ -291,6 +292,7 @@ class OtpBatchDeletionRequest(BaseModel):
     action: OtpDeletionAction = OtpDeletionAction.COMMIT_WITH_VERIFICATION
     otp: Optional[str] = None
     trxnId: Optional[str] = None
+    otpFactorId: Optional[str] = None
     otpVerificationType: Optional[OtpType] = None
     assertionResult: Optional[FIDO2AssertionResultRequest] = None
     verificationProofId: Optional[str] = None

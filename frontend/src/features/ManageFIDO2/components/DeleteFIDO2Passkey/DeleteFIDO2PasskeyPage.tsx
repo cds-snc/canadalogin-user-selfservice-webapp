@@ -108,6 +108,7 @@ export default function DeleteFIDO2PasskeyPage({
     setErrorCode,
     fallbackNavigationPath: backToManage2FAVerificationsPage,
     allowEmptyFactors: true,
+    otpEndpointMode: "mfa",
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
@@ -298,6 +299,7 @@ export default function DeleteFIDO2PasskeyPage({
             userSelectedMfaFactor.type as keyof typeof serverMapping
           ]
         : undefined;
+    const otpFactorId = userSelectedMfaFactor?.id;
 
     const trxnId = otpSentResponse?.trxnId;
 
@@ -324,6 +326,7 @@ export default function DeleteFIDO2PasskeyPage({
           otp: otpValue,
           trxnId,
           otpVerificationType,
+          otpFactorId,
         },
       );
 

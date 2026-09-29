@@ -12,6 +12,7 @@ interface DeleteMFAParams {
   action?: "verify" | "commit" | "commit_with_verification";
   otp?: string;
   trxnId?: string;
+  otpFactorId?: string;
   otpVerificationType?: string;
   assertionResult?: unknown;
   verificationProofId?: string;
@@ -27,6 +28,7 @@ interface DeleteMFABatchParams {
   action?: "verify" | "commit" | "commit_with_verification";
   otp?: string;
   trxnId?: string;
+  otpFactorId?: string;
   otpVerificationType?: string;
   assertionResult?: unknown;
   verificationProofId?: string;
@@ -50,6 +52,7 @@ export const deleteMFAPhoneNumberApi = {
     action,
     otp,
     trxnId,
+    otpFactorId,
     otpVerificationType,
     assertionResult,
     verificationProofId,
@@ -62,6 +65,7 @@ export const deleteMFAPhoneNumberApi = {
         ...(assertionResult ? { assertionResult } : {}),
         ...(otp !== undefined ? { otp } : {}),
         ...(trxnId !== undefined ? { trxnId } : {}),
+        ...(otpFactorId !== undefined ? { otpFactorId } : {}),
         ...(otpVerificationType !== undefined ? { otpVerificationType } : {}),
         ...(verificationProofId !== undefined ? { verificationProofId } : {}),
       };
@@ -84,6 +88,7 @@ export const deleteMFAPhoneNumberApi = {
     action,
     otp,
     trxnId,
+    otpFactorId,
     otpVerificationType,
     assertionResult,
     verificationProofId,
@@ -95,6 +100,7 @@ export const deleteMFAPhoneNumberApi = {
         ...(assertionResult ? { assertionResult } : {}),
         ...(otp !== undefined ? { otp } : {}),
         ...(trxnId !== undefined ? { trxnId } : {}),
+        ...(otpFactorId !== undefined ? { otpFactorId } : {}),
         ...(otpVerificationType !== undefined ? { otpVerificationType } : {}),
         ...(verificationProofId !== undefined ? { verificationProofId } : {}),
       };
