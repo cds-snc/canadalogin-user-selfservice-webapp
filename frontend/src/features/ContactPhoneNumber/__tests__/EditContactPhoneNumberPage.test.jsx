@@ -10,6 +10,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import EditContactPhoneNumberPage from "../components/EditContactPhoneNumberPage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
+import i18n from "../../../i18n/test";
 import "@testing-library/jest-dom/vitest";
 
 // Declare mock functions first
@@ -206,6 +207,7 @@ describe("EditContactPhoneNumberPage Component", () => {
 
     // Reset mockParams to default
     mockParams = { language: "en", step: undefined };
+    await i18n.changeLanguage("en");
 
     // Get the mocked auth service
     const { authService } = await import("../../../services/authService");
@@ -297,6 +299,54 @@ describe("EditContactPhoneNumberPage Component", () => {
     });
     expect(mockStepContent.mock.calls.at(-1)?.[0]?.errorLinks).toEqual({
       "#cp-phone-number": expect.any(String),
+    });
+  });
+
+  it("renders exact English otp_send_rate_limit message in OTP send flow", async () => {
+    mockAuthService.transientOtpSend.mockRejectedValue({
+      data: { message: "otp_send_rate_limit" },
+    });
+
+    render(
+      <TestWrapper>
+        <EditContactPhoneNumberPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.change(screen.getByTestId("phone-input"), {
+      target: { value: "+15551234567" },
+    });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error")).toHaveTextContent(
+        "You have reached the maximum number of verification code requests. Wait 5 minutes and try again.",
+      );
+    });
+  });
+
+  it("renders exact French otp_send_rate_limit message in OTP send flow", async () => {
+    mockParams = { language: "fr", step: undefined };
+    await i18n.changeLanguage("fr");
+    mockAuthService.transientOtpSend.mockRejectedValue({
+      data: { message: "otp_send_rate_limit" },
+    });
+
+    render(
+      <TestWrapper>
+        <EditContactPhoneNumberPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.change(screen.getByTestId("phone-input"), {
+      target: { value: "+15551234567" },
+    });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error")).toHaveTextContent(
+        "Vous avez atteint la limite de demandes de code de vérification. Veuillez attendre 5 minutes et réessayer.",
+      );
     });
   });
 

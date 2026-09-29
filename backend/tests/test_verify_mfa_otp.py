@@ -8,6 +8,8 @@ instead of having separate SMS and Voice functions.
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from fastapi import HTTPException
+from httpx import Request, Response
 from app.otp.schemas import (
     OtpType,
     OtpVerificationAttemptRequest,
@@ -204,6 +206,47 @@ class TestUnifiedMFAOTPDispatchFunctions:
                 assert mock_http_client.post.call_count >= 1
                 last_call_args = mock_http_client.post.call_args_list[-1]
                 assert "/v2.0/factors/emailotp/" in last_call_args[0][0]
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("message_id", ["CSIBN0081E", "CSIAP3512E"])
+    async def test_dispatch_mfa_verification_create_maps_ibm_send_rate_limit(
+        self, mock_sms_verification_create_request, message_id
+    ):
+        mock_http_client = AsyncMock()
+
+        with patch(
+            "app.otp.services.send_mfa_otp.get_auth_request_headers"
+        ) as mock_headers:
+            mock_headers.return_value = {"Authorization": "Bearer user_token"}
+
+            with patch(
+                "app.otp.services.send_mfa_otp.get_configuration"
+            ) as mock_config:
+                mock_config.return_value.ibm_verify_config.IBM_VERIFY_TENANT_URL = (
+                    "https://test.ibm.com"
+                )
+
+                request = Request(
+                    "POST",
+                    "https://test.ibm.com/v2.0/factors/smsotp/factor123/verifications",
+                )
+                mock_response = Response(
+                    429,
+                    request=request,
+                    json={"messageId": message_id},
+                )
+                mock_http_client.post.return_value = mock_response
+
+                with pytest.raises(HTTPException) as exc_info:
+                    await dispatch_send_mfa_otp(
+                        mock_http_client,
+                        mock_sms_verification_create_request,
+                        OtpType.SMS,
+                        "user_token",
+                    )
+
+                assert exc_info.value.status_code == 429
+                assert exc_info.value.detail == "otp_send_rate_limit"
 
 
 class TestIntegrationBasics:
