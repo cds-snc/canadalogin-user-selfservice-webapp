@@ -82,7 +82,7 @@ export default function ProvincialVerificationPage() {
       </section>
 
       <GcdsGrid columns="1fr">
-         <GcdsCard
+        <GcdsCard
           cardTitle={t("ProvincialVerification.bcServicesCard")}
           cardTitleTag="h3"
           href={bcPartnerLoginHref}
@@ -131,6 +131,6 @@ export default function ProvincialVerificationPage() {
           </GcdsLink>
         </AccessibleNotice>
       </GcdsGrid>
-    </GcdsContainer >
+    </GcdsContainer>
   );
 }
