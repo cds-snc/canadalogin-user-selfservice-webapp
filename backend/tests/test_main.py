@@ -65,12 +65,12 @@ def test_app_starts():
         "default-src 'self'; "
         "script-src 'self'; "
         "style-src 'self'; "
-        "img-src 'self' data: http: https:; "
+        "img-src 'self' data:; "
         "font-src 'self'; "
         "connect-src 'self'; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
-        "form-action 'self'; "
+        "form-action 'self';"
     )
     assert response.headers["cross-origin-opener-policy"] == "same-origin"
     assert response.headers["cross-origin-resource-policy"] == "same-site"
@@ -100,18 +100,17 @@ def test_create_app_adds_hsts_outside_local(monkeypatch):
     )
 
 
-def test_create_app_uses_https_only_csp_in_production(monkeypatch):
+def test_create_app_csp_img_src_is_environment_independent(monkeypatch):
     monkeypatch.setattr(main_module.configuration, "ENVIRONMENT", "prod")
 
     app = main_module.create_app()
     client = build_isolated_client(app)
     response = client.get("/health/health")
 
-    # Production CSP should use https only, not http
-    assert (
-        "img-src 'self' data: https:; " in response.headers["content-security-policy"]
-    )
+    # img-src does not allow http: or https: since all images are bundled locally
+    assert "img-src 'self' data:; " in response.headers["content-security-policy"]
     assert "http:" not in response.headers["content-security-policy"]
+    assert "https:" not in response.headers["content-security-policy"]
 
 
 def test_security_headers_middleware_skips_hsts_locally():
@@ -182,12 +181,12 @@ def test_create_app_docs_are_forced_to_use_strict_csp():
         "default-src 'self'; "
         "script-src 'self'; "
         "style-src 'self'; "
-        "img-src 'self' data: http: https:; "
+        "img-src 'self' data:; "
         "font-src 'self'; "
         "connect-src 'self'; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
-        "form-action 'self'; "
+        "form-action 'self';"
     )
 
 
