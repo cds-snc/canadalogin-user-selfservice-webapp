@@ -496,38 +496,29 @@ class TestHandleMFAOTPVerificationAttempt:
                 mock_resolve_factor_context.return_value = (OtpType.SMS, False)
 
                 with patch(
-                    "app.otp.services.verify_mfa_otp.assert_phone_mfa_registration_rate_limit_not_exceeded"
-                ) as mock_assert_rate_limit:
-                    with patch(
-                        "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
-                    ) as mock_dispatch:
-                        mock_dispatch.return_value = None  # 204 No Content
+                    "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
+                ) as mock_dispatch:
+                    mock_dispatch.return_value = None  # 204 No Content
 
-                        mock_request = MagicMock()
+                    result = await handle_verify_mfa_otp(
+                        mock_http_client,
+                        mock_sms_verification_attempt_request,
+                        "user_token",
+                        OtpType.SMS,
+                        request=MagicMock(),
+                    )
 
-                        result = await handle_verify_mfa_otp(
-                            mock_http_client,
-                            mock_sms_verification_attempt_request,
-                            "user_token",
-                            OtpType.SMS,
-                            request=mock_request,
-                        )
-
-                        assert result.success is True
-                        assert result.data is None
-                        assert (
-                            "sms MFA OTP verification completed successfully"
-                            in result.message
-                        )
-                        mock_resolve_factor_context.assert_awaited_once_with(
-                            mock_http_client,
-                            "user_token",
-                            "factor123",
-                        )
-                        mock_assert_rate_limit.assert_awaited_once_with(
-                            mock_request,
-                            "user123",
-                        )
+                    assert result.success is True
+                    assert result.data is None
+                    assert (
+                        "sms MFA OTP verification completed successfully"
+                        in result.message
+                    )
+                    mock_resolve_factor_context.assert_awaited_once_with(
+                        mock_http_client,
+                        "user_token",
+                        "factor123",
+                    )
 
     @pytest.mark.asyncio
     async def test_verification_attempt_success_voice(
@@ -545,38 +536,29 @@ class TestHandleMFAOTPVerificationAttempt:
                 mock_resolve_factor_context.return_value = (OtpType.VOICE, False)
 
                 with patch(
-                    "app.otp.services.verify_mfa_otp.assert_phone_mfa_registration_rate_limit_not_exceeded"
-                ) as mock_assert_rate_limit:
-                    with patch(
-                        "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
-                    ) as mock_dispatch:
-                        mock_dispatch.return_value = None  # 204 No Content
+                    "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
+                ) as mock_dispatch:
+                    mock_dispatch.return_value = None  # 204 No Content
 
-                        mock_request = MagicMock()
+                    result = await handle_verify_mfa_otp(
+                        mock_http_client,
+                        mock_voice_verification_attempt_request,
+                        "user_token",
+                        OtpType.VOICE,
+                        request=MagicMock(),
+                    )
 
-                        result = await handle_verify_mfa_otp(
-                            mock_http_client,
-                            mock_voice_verification_attempt_request,
-                            "user_token",
-                            OtpType.VOICE,
-                            request=mock_request,
-                        )
-
-                        assert result.success is True
-                        assert result.data is None
-                        assert (
-                            "voice MFA OTP verification completed successfully"
-                            in result.message
-                        )
-                        mock_resolve_factor_context.assert_awaited_once_with(
-                            mock_http_client,
-                            "user_token",
-                            "factor123",
-                        )
-                        mock_assert_rate_limit.assert_awaited_once_with(
-                            mock_request,
-                            "user123",
-                        )
+                    assert result.success is True
+                    assert result.data is None
+                    assert (
+                        "voice MFA OTP verification completed successfully"
+                        in result.message
+                    )
+                    mock_resolve_factor_context.assert_awaited_once_with(
+                        mock_http_client,
+                        "user_token",
+                        "factor123",
+                    )
 
     @pytest.mark.asyncio
     async def test_verification_attempt_does_not_enforce_phone_rate_limit_for_email(
@@ -594,30 +576,24 @@ class TestHandleMFAOTPVerificationAttempt:
                 mock_resolve_factor_context.return_value = (OtpType.EMAIL, False)
 
                 with patch(
-                    "app.otp.services.verify_mfa_otp.assert_phone_mfa_registration_rate_limit_not_exceeded"
-                ) as mock_assert_rate_limit:
-                    with patch(
-                        "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
-                    ) as mock_dispatch:
-                        mock_dispatch.return_value = None  # 204 No Content
+                    "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
+                ) as mock_dispatch:
+                    mock_dispatch.return_value = None  # 204 No Content
 
-                        mock_request = MagicMock()
+                    result = await handle_verify_mfa_otp(
+                        mock_http_client,
+                        mock_email_verification_attempt_request,
+                        "user_token",
+                        OtpType.EMAIL,
+                        request=MagicMock(),
+                    )
 
-                        result = await handle_verify_mfa_otp(
-                            mock_http_client,
-                            mock_email_verification_attempt_request,
-                            "user_token",
-                            OtpType.EMAIL,
-                            request=mock_request,
-                        )
-
-                        assert result.success is True
-                        mock_resolve_factor_context.assert_awaited_once_with(
-                            mock_http_client,
-                            "user_token",
-                            "factor123",
-                        )
-                        mock_assert_rate_limit.assert_not_awaited()
+                    assert result.success is True
+                    mock_resolve_factor_context.assert_awaited_once_with(
+                        mock_http_client,
+                        "user_token",
+                        "factor123",
+                    )
 
     @pytest.mark.asyncio
     async def test_verification_attempt_does_not_enforce_add_mfa_limit_for_validated_phone_factor(
@@ -635,31 +611,25 @@ class TestHandleMFAOTPVerificationAttempt:
                 mock_resolve_factor_context.return_value = (OtpType.SMS, True)
 
                 with patch(
-                    "app.otp.services.verify_mfa_otp.assert_phone_mfa_registration_rate_limit_not_exceeded"
-                ) as mock_assert_rate_limit:
-                    with patch(
-                        "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
-                    ) as mock_dispatch:
-                        mock_dispatch.return_value = None
+                    "app.otp.services.verify_mfa_otp.dispatch_verify_mfa_otp"
+                ) as mock_dispatch:
+                    mock_dispatch.return_value = None
 
-                        mock_request = MagicMock()
+                    result = await handle_verify_mfa_otp(
+                        mock_http_client,
+                        mock_sms_verification_attempt_request,
+                        "user_token",
+                        OtpType.SMS,
+                        request=MagicMock(),
+                    )
 
-                        result = await handle_verify_mfa_otp(
-                            mock_http_client,
-                            mock_sms_verification_attempt_request,
-                            "user_token",
-                            OtpType.SMS,
-                            request=mock_request,
-                        )
-
-                        assert result.success is True
-                        mock_assert_rate_limit.assert_not_awaited()
-                        mock_dispatch.assert_awaited_once_with(
-                            mock_http_client,
-                            mock_sms_verification_attempt_request,
-                            OtpType.SMS,
-                            "user_token",
-                        )
+                    assert result.success is True
+                    mock_dispatch.assert_awaited_once_with(
+                        mock_http_client,
+                        mock_sms_verification_attempt_request,
+                        OtpType.SMS,
+                        "user_token",
+                    )
 
     @pytest.mark.asyncio
     async def test_verification_attempt_profile_failure(

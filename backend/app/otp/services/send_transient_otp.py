@@ -3,6 +3,10 @@ from datetime import datetime
 
 from app.config import get_configuration
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
+from app.otp.services.profile_otp_transaction_store import (
+    store_phone_otp_transaction,
+    store_email_otp_transaction,
+)
 from app.users.services.otp_factors import get_user_otp_factor
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_auth_request_headers
@@ -18,6 +22,12 @@ from fastapi import HTTPException, Request, status
 from httpx import AsyncClient, HTTPStatusError
 
 logger = logging.getLogger(__name__)
+
+IBM_FACTOR_TYPE_TO_OTP_TYPE: dict[str, OtpType] = {
+    "smsotp": OtpType.SMS,
+    "voiceotp": OtpType.VOICE,
+    "emailotp": OtpType.EMAIL,
+}
 
 CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY = "contact_phone_sent_destinations"
 CONTACT_PHONE_LAST_OTP_TYPE_BY_DESTINATION_SESSION_KEY = (
@@ -122,8 +132,37 @@ async def handle_otp_send(
     user_language = my_profile_response.data.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
 
+    is_factor_based_send = user_otp_info.factor_id is not None
+    if is_factor_based_send:
+        user_otp_factor = await get_user_otp_factor(
+            global_http_client, user_access_token, user_otp_info.factor_id
+        )
+
+        if user_otp_factor is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
+        factor_otp_type = IBM_FACTOR_TYPE_TO_OTP_TYPE.get(
+            str(user_otp_factor.get("type") or "").lower()
+        )
+        if factor_otp_type != user_otp_info.otpType:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
+        user_otp_info.destination = user_otp_factor.get("destination")
+        if not user_otp_info.destination:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
     should_apply_contact_phone_rate_limit = (
         request is not None
+        and not is_factor_based_send
         and user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}
         and user_otp_info.destination is not None
     )
@@ -153,13 +192,6 @@ async def handle_otp_send(
             or normalized_destination not in sent_destinations
             or is_transport_switch
         )
-
-    if user_otp_info.factor_id is not None:
-        user_otp_factor = await get_user_otp_factor(
-            global_http_client, user_access_token, user_otp_info.factor_id
-        )
-
-        user_otp_info.destination = user_otp_factor.get("destination")
 
     http_client_response = await dispatch_otp(
         global_http_client, user_otp_info, user_access_token, user_language
@@ -205,6 +237,19 @@ async def handle_otp_send(
         logger.info(f"{user_otp_info.otpType} OTP created and sent")
 
         validated_data = OtpDataResponse(**response_json)
+        if user_otp_info.otpType == OtpType.EMAIL:
+            await store_email_otp_transaction(
+                request=request,
+                response_json=response_json,
+                destination=user_otp_info.destination,
+            )
+        elif user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}:
+            await store_phone_otp_transaction(
+                request=request,
+                response_json=response_json,
+                destination=user_otp_info.destination,
+                otp_type=user_otp_info.otpType.value,
+            )
 
         return ResponseModel(
             success=True,

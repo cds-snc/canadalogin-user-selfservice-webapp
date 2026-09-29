@@ -68,6 +68,42 @@ def mock_ibm_enrollment_response():
 
 class TestSMSEnrollment:
     @pytest.mark.asyncio
+    async def test_sms_enrollment_is_rejected_at_phone_mfa_limit(
+        self,
+        mock_sms_enrollment_request,
+        mock_user_profile_response,
+    ):
+        mock_http_client = AsyncMock()
+        mock_request = MagicMock()
+        rate_limit_error = HTTPException(
+            status_code=429,
+            detail="phone_mfa_change_rate_limit",
+        )
+
+        with patch(
+            "app.otp.services.enroll_mfa_otp.get_my_profile",
+            return_value=mock_user_profile_response,
+        ):
+            with patch(
+                "app.otp.services.enroll_mfa_otp.assert_phone_mfa_registration_rate_limit_not_exceeded",
+                side_effect=rate_limit_error,
+            ) as mock_assert_rate_limit:
+                with patch(
+                    "app.otp.services.enroll_mfa_otp.dispatch_otp_enrollment"
+                ) as mock_dispatch:
+                    with pytest.raises(HTTPException) as exc_info:
+                        await handle_otp_enrollment(
+                            mock_http_client,
+                            mock_sms_enrollment_request,
+                            "user_token_123",
+                            request=mock_request,
+                        )
+
+        assert exc_info.value.status_code == 429
+        mock_assert_rate_limit.assert_awaited_once_with(mock_request, "user123")
+        mock_dispatch.assert_not_called()
+
+    @pytest.mark.asyncio
     async def test_handle_sms_otp_enrollment_success(
         self,
         mock_sms_enrollment_request,

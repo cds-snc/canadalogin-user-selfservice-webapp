@@ -1,5 +1,49 @@
 # Changelog
 
+## [1.36.3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.2...v1.36.3) (2026-09-25)
+
+
+### Bug Fixes
+
+* handle mismatched email verification in edit email ([#2269](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2269)) ([aaeafab](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/aaeafabf9ad411032dfe7df569123978de000475))
+
+
+### Miscellaneous Chores
+
+* bump production version to 1.36.2 ([#2265](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2265)) ([132f92b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/132f92b752aa162425b7a9951299e9be94fb07dd))
+* bump staging version to 1.36.2 ([#2262](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2262)) ([ffd8367](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ffd836779e8c610c3af0014ca26136e7f9fe18d1))
+
+## [1.36.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.1...v1.36.2) (2026-09-25)
+
+
+### Bug Fixes
+
+* add rate limit check for SMS and voice MFA enrollment ([#2259](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2259)) ([496b83a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/496b83ad6a60fe8a13b7a5f3a33ae2ed903f2d17))
+
+## [1.36.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.0...v1.36.1) (2026-09-25)
+
+
+### Bug Fixes
+
+* resolve rate limit edge case for phone MFA verification on fifth enrollment ([#2256](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2256)) ([5b095e3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5b095e38c6d27b7351876c4d5430f44ff369041f))
+
+
+### Miscellaneous Chores
+
+* bump staging version to 1.36.0 ([#2247](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2247)) ([93d7c54](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/93d7c5473dee5ee206026ad778403762a5cb89c0))
+
+## [1.36.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.35.0...v1.36.0) (2026-09-24)
+
+
+### Features
+
+* **identity-verification:** [BE] GET Users Connected Services from IBM Verify ([#2224](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2224)) ([6932055](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6932055d776b5e1e2fa30f82dc791710432b0406))
+
+
+### Bug Fixes
+
+* check factor id against user profile and enforce single destination ([#2243](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2243)) ([ba69505](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ba69505e79805a3198be989a3ac506760aee1ee8))
+
 ## [1.35.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.34.1...v1.35.0) (2026-09-24)
 
 

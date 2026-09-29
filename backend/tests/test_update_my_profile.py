@@ -110,6 +110,58 @@ async def test_update_profile_success(
 
 
 @pytest.mark.asyncio
+@patch(MASK_PROFILE_DETAILS_IMPORT_PATH)
+@patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
+@patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
+@patch(SANITIZE_PROFILE_IMPORT_PATH)
+async def test_update_profile_ignores_email_changes(
+    mock_sanitize, mock_dispatch_get, mock_dispatch_update, mock_masked_profile
+):
+    profile_data = {
+        "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:ibm:2.0:User",
+        ],
+        "userName": "current@example.com",
+        "emails": [{"value": "current@example.com", "type": "work"}],
+        "meta": {
+            "location": "here",
+            "created": "2023-01-01T00:00:00Z",
+            "lastModified": "2023-01-01T00:00:00Z",
+            "resourceType": "User",
+        },
+        "active": True,
+        "id": "user-123",
+    }
+    mock_sanitize.return_value = {
+        "emails": [{"value": "attacker@example.com", "type": "work"}],
+        "preferredLanguage": "fr",
+    }
+    mock_dispatch_get.return_value = IBMVerifyUserProfileSchema(**profile_data)
+    mock_dispatch_update.return_value = Mock(json=Mock(return_value=profile_data))
+    mock_masked_profile.return_value = profile_data
+
+    mock_request = Mock()
+    mock_request.app = Mock()
+    mock_request.app.state = Mock()
+    mock_request.app.state.request_client = Mock(spec=AsyncClient)
+    mock_request.app.state.config = Mock()
+    mock_request.app.state.config.profile_api_endpoint = PROFILE_API_URL
+
+    await update_profile(
+        mock_request,
+        UserProfileUpdateRequest(
+            emails=[{"value": "attacker@example.com", "type": "work"}]
+        ),
+        user_access_token="token",
+    )
+
+    payload = json.loads(mock_dispatch_update.call_args.args[1])
+    assert payload["emails"] == profile_data["emails"]
+    assert payload["preferredLanguage"] == "fr"
+
+
+@pytest.mark.asyncio
 @patch(MASK_PHONE_IMPORT_PATH)
 @patch(DISPATCH_UPDATE_PROFILE_IMPORT_PATH)
 @patch(DISPATCH_GET_PROFILE_FROM_IBM_IMPORT_PATH)
