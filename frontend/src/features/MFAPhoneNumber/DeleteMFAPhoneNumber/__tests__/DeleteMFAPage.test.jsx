@@ -423,6 +423,18 @@ describe("DeleteMFAPage", () => {
   });
 
   describe("Initial Loading and Error Handling", () => {
+    it("configures OTP hook with MFA endpoint mode for identity OTP steps", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      expect(useOtpOperations).toHaveBeenCalledWith(
+        expect.objectContaining({
+          otpEndpointMode: "mfa",
+        }),
+      );
+    });
+
     it("shows loading state when localLoading is true", async () => {
       // Mock useOtpOperations to return loading state
       useOtpOperations.mockReturnValue({

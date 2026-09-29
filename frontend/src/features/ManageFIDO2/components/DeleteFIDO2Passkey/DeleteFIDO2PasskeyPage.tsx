@@ -108,6 +108,7 @@ export default function DeleteFIDO2PasskeyPage({
     setErrorCode,
     fallbackNavigationPath: backToManage2FAVerificationsPage,
     allowEmptyFactors: true,
+    otpEndpointMode: "mfa",
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({

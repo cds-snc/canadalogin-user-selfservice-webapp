@@ -159,6 +159,7 @@ export default function DeleteMFAPage() {
     userName,
     setErrorCode,
     fallbackNavigationPath: backToSecuritySettingsPage,
+    otpEndpointMode: "mfa",
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({

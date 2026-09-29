@@ -325,6 +325,7 @@ describe("DeleteFIDO2PasskeyPage", () => {
     expect(mockUseOtpOperations).toHaveBeenCalledWith(
       expect.objectContaining({
         allowEmptyFactors: true,
+        otpEndpointMode: "mfa",
       }),
     );
   });
