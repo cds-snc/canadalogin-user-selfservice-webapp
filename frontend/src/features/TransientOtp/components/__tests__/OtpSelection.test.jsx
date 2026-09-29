@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { BrowserRouter } from "react-router";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
 import OtpSelection from "../OtpSelection";
@@ -533,6 +533,57 @@ describe("OtpSelection Component", () => {
       const cancelButton = screen.getByTestId("cancel-button");
       await user.click(cancelButton);
 
+      expect(mockOnNext).not.toHaveBeenCalled();
+    });
+
+    it("pressing Enter on an SMS action link selects the factor", () => {
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "sms-factor-enter",
+            type: FLOW_TYPES.sms,
+            destination: "+15551234567",
+          },
+        ],
+      });
+
+      const selectLink = screen.getByText("Text me");
+      fireEvent.keyDown(selectLink, { key: "Enter" });
+
+      expect(mockOnChangeUserSelectedMfaFactor).toHaveBeenCalledWith(
+        "sms-factor-enter",
+      );
+      expect(mockOnNext).toHaveBeenCalledTimes(1);
+    });
+
+    it("pressing Enter on a passkey action link selects the passkey", () => {
+      const passkey = {
+        id: "passkey-enter",
+        attributes: { nickname: "Keyboard passkey" },
+      };
+      renderComponent({ fido2Data: [passkey] });
+
+      const selectLink = screen.getByText("Verify");
+      fireEvent.keyDown(selectLink, { key: "Enter" });
+
+      expect(mockOnSelectFIDO2).toHaveBeenCalledWith(passkey);
+    });
+
+    it("pressing Space on an SMS action link does not select the factor", () => {
+      renderComponent({
+        userPhoneFactors: [
+          {
+            id: "sms-factor-space",
+            type: FLOW_TYPES.sms,
+            destination: "+15551234567",
+          },
+        ],
+      });
+
+      const selectLink = screen.getByText("Text me");
+      fireEvent.keyDown(selectLink, { key: " " });
+
+      expect(mockOnChangeUserSelectedMfaFactor).not.toHaveBeenCalled();
       expect(mockOnNext).not.toHaveBeenCalled();
     });
 
