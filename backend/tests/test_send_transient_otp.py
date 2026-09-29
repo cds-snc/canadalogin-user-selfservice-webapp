@@ -10,8 +10,8 @@ from pydantic import ValidationError
 
 # Schemas
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
-from app.otp.services.email_otp_transaction_store import (
-    EMAIL_OTP_TRANSACTIONS_SESSION_KEY,
+from app.otp.services.profile_otp_transaction_store import (
+    EMAIL_OTP_TRANSACTION_SESSION_KEY,
 )
 
 # Feature under test
@@ -372,11 +372,10 @@ async def test_email_send_stores_destination_by_transaction_id():
         )
 
     assert result.success is True
-    assert request.session[EMAIL_OTP_TRANSACTIONS_SESSION_KEY] == {
-        "email-store-1": {
-            "emailAddress": "newemail@example.com",
-            "expiry": payload["expiry"],
-        }
+    assert request.session[EMAIL_OTP_TRANSACTION_SESSION_KEY] == {
+        "transactionId": "email-store-1",
+        "emailAddress": "newemail@example.com",
+        "expiry": payload["expiry"],
     }
 
 
@@ -414,7 +413,9 @@ async def test_email_send_stores_destination_in_redis_when_available():
     assert result.success is True
     redis_client.set.assert_awaited_once()
     key, serialized_transaction = redis_client.set.call_args.args
-    assert key == "email_otp_transaction:email-redis-1"
+    assert key == "email_otp_transaction:session-123"
+    assert json.loads(serialized_transaction)["transactionId"] == "email-redis-1"
+    assert json.loads(serialized_transaction)["sessionId"] == "session-123"
     assert json.loads(serialized_transaction)["emailAddress"] == "newemail@example.com"
     assert redis_client.set.call_args.kwargs["ex"] > 0
     assert request.session == {}
@@ -455,7 +456,95 @@ async def test_email_send_stores_transaction_when_ibm_uses_id_field():
     assert result.success is True
     redis_client.set.assert_awaited_once()
     key, _ = redis_client.set.call_args.args
-    assert key == "email_otp_transaction:email-id-1"
+    assert key == "email_otp_transaction:session-123"
+
+
+@pytest.mark.asyncio
+async def test_email_resend_overwrites_session_scoped_redis_key():
+    first_payload = make_valid_payload(
+        OtpType.EMAIL,
+        correlation_id="corr-email-resend-1",
+        trxn_id="email-resend-1",
+    )
+    second_payload = make_valid_payload(
+        OtpType.EMAIL,
+        correlation_id="corr-email-resend-2",
+        trxn_id="email-resend-2",
+    )
+    first_payload["expiry"] = "2999-01-01T00:00:00Z"
+    second_payload["expiry"] = "2999-01-01T00:00:00Z"
+
+    redis_client = AsyncMock()
+    request = SimpleNamespace(
+        session={},
+        cookies={"gc-manage-app": "session-123"},
+        app=SimpleNamespace(state=SimpleNamespace(redis_client=redis_client)),
+    )
+    response_payloads = iter([first_payload, second_payload])
+
+    def handler(request: Request) -> Response:
+        return Response(201, json=next(response_payloads))
+
+    async with AsyncClient(transport=build_transport(handler)) as client:
+        for destination in ("first@example.com", "second@example.com"):
+            result = await handle_otp_send(
+                client,
+                UserOtpInfo(
+                    otpType=OtpType.EMAIL,
+                    user_id="user@example.com",
+                    destination=destination,
+                ),
+                user_access_token="USER_TOKEN",
+                request=request,
+            )
+            assert result.success is True
+
+    assert [call.args[0] for call in redis_client.set.call_args_list] == [
+        "email_otp_transaction:session-123",
+        "email_otp_transaction:session-123",
+    ]
+    last_transaction = json.loads(redis_client.set.call_args.args[1])
+    assert last_transaction["transactionId"] == "email-resend-2"
+    assert last_transaction["emailAddress"] == "second@example.com"
+
+
+@pytest.mark.asyncio
+async def test_phone_send_stores_destination_in_session_scoped_redis_key():
+    payload = make_valid_payload(
+        OtpType.SMS,
+        correlation_id="corr-phone-redis",
+        trxn_id="phone-redis-1",
+    )
+    payload["expiry"] = "2999-01-01T00:00:00Z"
+
+    redis_client = AsyncMock()
+    request = SimpleNamespace(
+        session={},
+        cookies={"gc-manage-app": "session-123"},
+        app=SimpleNamespace(state=SimpleNamespace(redis_client=redis_client)),
+    )
+
+    def handler(request: Request) -> Response:
+        return Response(201, json=payload)
+
+    async with AsyncClient(transport=build_transport(handler)) as client:
+        result = await handle_otp_send(
+            client,
+            UserOtpInfo(
+                otpType=OtpType.SMS,
+                user_id="user@example.com",
+                destination="+14165551234",
+            ),
+            user_access_token="USER_TOKEN",
+            request=request,
+        )
+
+    assert result.success is True
+    key, serialized_transaction = redis_client.set.call_args.args
+    assert key == "phone_otp_transaction:session-123"
+    transaction = json.loads(serialized_transaction)
+    assert transaction["transactionId"] == "phone-redis-1"
+    assert transaction["phoneNumber"] == "14165551234"
 
 
 @pytest.mark.asyncio
