@@ -364,11 +364,12 @@ export default function OtpVerification({
           </span>
         ) : (
           <GcdsLink
-            role="button"
             style={{ textDecoration: "underline" }}
             onGcdsClick={requestNewCodeAction}
             onKeyDown={(event) =>
-              handleLinkButtonKeyDown(event, requestNewCodeAction)
+              handleLinkButtonKeyDown(event, requestNewCodeAction, {
+                keys: ["Enter"],
+              })
             }
           >
             {!isEmailFactor
