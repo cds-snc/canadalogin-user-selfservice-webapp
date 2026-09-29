@@ -325,6 +325,7 @@ describe("DeleteFIDO2PasskeyPage", () => {
     expect(mockUseOtpOperations).toHaveBeenCalledWith(
       expect.objectContaining({
         allowEmptyFactors: true,
+        otpEndpointMode: "mfa",
       }),
     );
   });
@@ -515,6 +516,20 @@ describe("DeleteFIDO2PasskeyPage", () => {
   it("navigates to deleteFIDO2PasskeyConfirmation after clicking validate OTP", async () => {
     renderPage({ step: "otpValidation" });
     await userEvent.click(screen.getByTestId("otp-validate"));
+
+    await waitFor(() => {
+      expect(mockVerifyDeleteRegistration).toHaveBeenCalledWith(
+        "passkey-42",
+        undefined,
+        {
+          otp: "123456",
+          trxnId: "txn-123",
+          otpVerificationType: "sms",
+          otpFactorId: "factor-1",
+        },
+      );
+    });
+
     await waitFor(() =>
       expect(
         getStep("step-deleteFIDO2PasskeyConfirmation"),

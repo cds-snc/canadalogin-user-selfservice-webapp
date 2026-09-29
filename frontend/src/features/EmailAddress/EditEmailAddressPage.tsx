@@ -285,6 +285,7 @@ export default function EditEmailAddressPage() {
     setErrorCode,
     fallbackNavigationPath: backToProfile,
     allowEmptyFactors: true,
+    otpEndpointMode: "mfa",
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({

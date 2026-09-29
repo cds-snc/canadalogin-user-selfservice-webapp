@@ -10,10 +10,12 @@ from app.otp.schemas import (
     OtpDeletionAction,
     OtpBatchDeletionRequest,
     OtpDeletionRequest,
+    OtpVerificationAttemptRequest,
     OtpType,
     RetrievalData,
 )
 from app.otp.services.retrieve_transient_otp import dispatch_otp_status_retrieval
+from app.otp.services.verify_mfa_otp import handle_verify_mfa_otp
 from app.users.services.get_my_profile import get_my_profile
 from app.users.services.mfa_delete_guard import (
     assert_remaining_mfa_factor_after_deletion,
@@ -180,15 +182,43 @@ async def _get_mfa_delete_otp_proof_ttl_seconds(
     trxn_id: str,
     otp_type: OtpType,
     user_access_token: str,
+    otp_factor_id: str | None = None,
 ) -> int:
+    status_response = None
+
     try:
-        status_response = await dispatch_otp_status_retrieval(
-            request.app.state.request_client,
-            RetrievalData(trxnId=trxn_id, otpType=otp_type),
-            user_access_token,
-        )
+        if otp_factor_id:
+            headers = get_auth_request_headers(user_access_token, True)
+            settings = get_configuration().ibm_verify_config
+
+            if otp_type == OtpType.SMS:
+                status_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/{otp_factor_id}/verifications/{trxn_id}"
+            elif otp_type == OtpType.VOICE:
+                status_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/{otp_factor_id}/verifications/{trxn_id}"
+            elif otp_type == OtpType.EMAIL:
+                status_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/{otp_factor_id}/verifications/{trxn_id}"
+            else:
+                status_url = ""
+
+            if status_url:
+                status_response = await request.app.state.request_client.get(
+                    status_url,
+                    headers=headers,
+                )
+        else:
+            status_response = await dispatch_otp_status_retrieval(
+                request.app.state.request_client,
+                RetrievalData(trxnId=trxn_id, otpType=otp_type),
+                user_access_token,
+            )
     except Exception as e:
         logger.warning("Unable to resolve OTP status for delete proof TTL: %s", str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="otp_expired",
+        )
+
+    if status_response is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="otp_expired",
@@ -306,19 +336,40 @@ async def handle_otp_deletion(
                 assertion_result=deletion_request.assertionResult,
             )
         else:
-            proof_ttl_seconds = await _get_mfa_delete_otp_proof_ttl_seconds(
-                request=request,
-                trxn_id=deletion_request.trxnId,
-                otp_type=deletion_request.otpVerificationType,
-                user_access_token=user_access_token,
-            )
-            await verify_otp_before_operation(
-                global_http_client=global_http_client,
-                user_access_token=user_access_token,
-                otp=deletion_request.otp,
-                trxn_id=deletion_request.trxnId,
-                otp_type=deletion_request.otpVerificationType,
-            )
+            if deletion_request.otpFactorId:
+                proof_ttl_seconds = await _get_mfa_delete_otp_proof_ttl_seconds(
+                    request=request,
+                    trxn_id=deletion_request.trxnId,
+                    otp_type=deletion_request.otpVerificationType,
+                    user_access_token=user_access_token,
+                    otp_factor_id=deletion_request.otpFactorId,
+                )
+                await handle_verify_mfa_otp(
+                    global_http_client=global_http_client,
+                    attempt_request=OtpVerificationAttemptRequest(
+                        id=deletion_request.otpFactorId,
+                        trxnId=deletion_request.trxnId,
+                        otp=deletion_request.otp,
+                        otpType=deletion_request.otpVerificationType,
+                    ),
+                    user_access_token=user_access_token,
+                    otp_type=deletion_request.otpVerificationType,
+                    request=request,
+                )
+            else:
+                proof_ttl_seconds = await _get_mfa_delete_otp_proof_ttl_seconds(
+                    request=request,
+                    trxn_id=deletion_request.trxnId,
+                    otp_type=deletion_request.otpVerificationType,
+                    user_access_token=user_access_token,
+                )
+                await verify_otp_before_operation(
+                    global_http_client=global_http_client,
+                    user_access_token=user_access_token,
+                    otp=deletion_request.otp,
+                    trxn_id=deletion_request.trxnId,
+                    otp_type=deletion_request.otpVerificationType,
+                )
 
         await assert_remaining_mfa_factor_after_deletion(
             http_client=global_http_client,
@@ -391,6 +442,25 @@ async def handle_otp_deletion(
                 global_http_client=global_http_client,
                 user_access_token=user_access_token,
                 assertion_result=deletion_request.assertionResult,
+            )
+        elif deletion_request.otpFactorId:
+            if request is None:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Request context required for verification",
+                )
+
+            await handle_verify_mfa_otp(
+                global_http_client=global_http_client,
+                attempt_request=OtpVerificationAttemptRequest(
+                    id=deletion_request.otpFactorId,
+                    trxnId=deletion_request.trxnId,
+                    otp=deletion_request.otp,
+                    otpType=deletion_request.otpVerificationType,
+                ),
+                user_access_token=user_access_token,
+                otp_type=deletion_request.otpVerificationType,
+                request=request,
             )
         else:
             # Validated factor deletion path — OTP verification required.
@@ -466,19 +536,40 @@ async def handle_otp_batch_deletion(
                 assertion_result=deletion_request.assertionResult,
             )
         else:
-            proof_ttl_seconds = await _get_mfa_delete_otp_proof_ttl_seconds(
-                request=request,
-                trxn_id=deletion_request.trxnId,
-                otp_type=deletion_request.otpVerificationType,
-                user_access_token=user_access_token,
-            )
-            await verify_otp_before_operation(
-                global_http_client=global_http_client,
-                user_access_token=user_access_token,
-                otp=deletion_request.otp,
-                trxn_id=deletion_request.trxnId,
-                otp_type=deletion_request.otpVerificationType,
-            )
+            if deletion_request.otpFactorId:
+                proof_ttl_seconds = await _get_mfa_delete_otp_proof_ttl_seconds(
+                    request=request,
+                    trxn_id=deletion_request.trxnId,
+                    otp_type=deletion_request.otpVerificationType,
+                    user_access_token=user_access_token,
+                    otp_factor_id=deletion_request.otpFactorId,
+                )
+                await handle_verify_mfa_otp(
+                    global_http_client=global_http_client,
+                    attempt_request=OtpVerificationAttemptRequest(
+                        id=deletion_request.otpFactorId,
+                        trxnId=deletion_request.trxnId,
+                        otp=deletion_request.otp,
+                        otpType=deletion_request.otpVerificationType,
+                    ),
+                    user_access_token=user_access_token,
+                    otp_type=deletion_request.otpVerificationType,
+                    request=request,
+                )
+            else:
+                proof_ttl_seconds = await _get_mfa_delete_otp_proof_ttl_seconds(
+                    request=request,
+                    trxn_id=deletion_request.trxnId,
+                    otp_type=deletion_request.otpVerificationType,
+                    user_access_token=user_access_token,
+                )
+                await verify_otp_before_operation(
+                    global_http_client=global_http_client,
+                    user_access_token=user_access_token,
+                    otp=deletion_request.otp,
+                    trxn_id=deletion_request.trxnId,
+                    otp_type=deletion_request.otpVerificationType,
+                )
 
         await assert_remaining_mfa_factor_after_deletion(
             http_client=global_http_client,
@@ -527,14 +618,34 @@ async def handle_otp_batch_deletion(
             assertion_result=deletion_request.assertionResult,
         )
     else:
-        # Verify OTP once for the entire batch
-        await verify_otp_before_operation(
-            global_http_client=global_http_client,
-            user_access_token=user_access_token,
-            otp=deletion_request.otp,
-            trxn_id=deletion_request.trxnId,
-            otp_type=deletion_request.otpVerificationType,
-        )
+        if deletion_request.otpFactorId:
+            if request is None:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Request context required for verification",
+                )
+
+            await handle_verify_mfa_otp(
+                global_http_client=global_http_client,
+                attempt_request=OtpVerificationAttemptRequest(
+                    id=deletion_request.otpFactorId,
+                    trxnId=deletion_request.trxnId,
+                    otp=deletion_request.otp,
+                    otpType=deletion_request.otpVerificationType,
+                ),
+                user_access_token=user_access_token,
+                otp_type=deletion_request.otpVerificationType,
+                request=request,
+            )
+        else:
+            # Verify OTP once for the entire batch
+            await verify_otp_before_operation(
+                global_http_client=global_http_client,
+                user_access_token=user_access_token,
+                otp=deletion_request.otp,
+                trxn_id=deletion_request.trxnId,
+                otp_type=deletion_request.otpVerificationType,
+            )
 
     await assert_remaining_mfa_factor_after_deletion(
         http_client=global_http_client,
