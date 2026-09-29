@@ -30,6 +30,8 @@ import type { AuthServiceError } from "../../../types/services";
 import type { PasswordUpdateTransactionData } from "../api/passwordUpdate";
 
 const defaultPasswordUpdateStep = "passwordVerification";
+const PASSWORD_OTP_SEND_RATE_LIMIT_MESSAGE_ID = "CSIAM0038E";
+const PASSWORD_OTP_SEND_RATE_LIMIT_ERROR_CODE = "otp_send_rate_limit_15";
 
 type PasswordUpdateStep =
   | "passwordVerification"
@@ -185,9 +187,12 @@ export default function ChangePasswordIndex() {
     } catch (err) {
       const message = getApiErrorMessage(err);
       if (message) {
-        const normalizedMessage = isOtpMaxAttemptsErrorCode(message)
-          ? "otp_max_attempts"
-          : message;
+        const normalizedMessage =
+          message === PASSWORD_OTP_SEND_RATE_LIMIT_MESSAGE_ID
+            ? PASSWORD_OTP_SEND_RATE_LIMIT_ERROR_CODE
+            : isOtpMaxAttemptsErrorCode(message)
+              ? "otp_max_attempts"
+              : message;
         setErrorCode(normalizedMessage);
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
