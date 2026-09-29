@@ -52,7 +52,12 @@ export default function ConnectedServicesPage() {
   }
 
   const formatTimestamp = (timestamp?: string | null) =>
-    timestamp ? new Intl.DateTimeFormat(language, { dateStyle: "medium", timeStyle: "short" }).format(new Date(timestamp)) : t("notAvailable");
+    timestamp
+      ? new Intl.DateTimeFormat(language, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(new Date(timestamp))
+      : t("notAvailable");
 
   const localizedStatus = (status: ConnectedService["sessionStatus"]) =>
     t(`sessions.${status}`, { defaultValue: status });
@@ -94,7 +99,9 @@ export default function ConnectedServicesPage() {
                 <tbody>
                   {services.map((service) => (
                     <tr key={service.clientId}>
-                      <th scope="row">{service.applicationName ?? service.name}</th>
+                      <th scope="row">
+                        {service.applicationName ?? service.name}
+                      </th>
                       <td>{formatTimestamp(service.lastLogin)}</td>
                       <td>{localizedStatus(service.sessionStatus)}</td>
                     </tr>
