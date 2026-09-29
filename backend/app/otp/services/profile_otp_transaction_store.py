@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 EMAIL_OTP_TRANSACTION_SESSION_KEY = "email_otp_transaction"
 LEGACY_EMAIL_OTP_TRANSACTIONS_SESSION_KEY = "email_otp_transactions"
 EMAIL_OTP_TRANSACTION_REDIS_KEY_PREFIX = "email_otp_transaction:"
+PHONE_OTP_TRANSACTION_SESSION_KEY = "phone_otp_transaction"
+PHONE_OTP_TRANSACTION_REDIS_KEY_PREFIX = "phone_otp_transaction:"
 DELETE_IF_TRANSACTION_MATCHES_SCRIPT = """
 local raw = redis.call('GET', KEYS[1])
 if not raw then
@@ -221,3 +223,116 @@ async def consume_email_otp_transaction(
             request.session[session_key] = session_value
         else:
             request.session.pop(session_key, None)
+
+
+def _build_phone_transaction(
+    request: Request, transaction_id: str, destination: str, otp_type: str, expiry: Any
+) -> dict:
+    transaction = {
+        "transactionId": transaction_id,
+        "phoneNumber": "".join(char for char in str(destination) if char.isdigit()),
+        "otpType": otp_type,
+        "expiry": expiry,
+    }
+    session_id = _get_session_id(request)
+    if session_id:
+        transaction["sessionId"] = session_id
+    return transaction
+
+
+async def store_phone_otp_transaction(
+    request: Request | None,
+    response_json: dict,
+    destination: str | None,
+    otp_type: str,
+) -> None:
+    if request is None:
+        return
+
+    transaction_id = _get_transaction_id(response_json)
+    normalized_destination = "".join(
+        char for char in str(destination or "") if char.isdigit()
+    )
+    ttl_seconds = _get_expiry_ttl_seconds(response_json.get("expiry"))
+    session_id = _get_session_id(request)
+    if not transaction_id or not normalized_destination or ttl_seconds is None:
+        logger.warning(
+            "Phone OTP transaction was not stored: missing transaction metadata"
+        )
+        return
+
+    transaction = _build_phone_transaction(
+        request,
+        transaction_id,
+        normalized_destination,
+        otp_type,
+        response_json.get("expiry"),
+    )
+    redis_client = _get_redis_client(request)
+    if redis_client is not None and session_id:
+        try:
+            await redis_client.set(
+                f"{PHONE_OTP_TRANSACTION_REDIS_KEY_PREFIX}{session_id}",
+                json.dumps(transaction),
+                ex=ttl_seconds,
+            )
+            return
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Failed to store phone OTP transaction in Redis: %s", exc)
+
+    if isinstance(getattr(request, "session", None), dict):
+        request.session[PHONE_OTP_TRANSACTION_SESSION_KEY] = transaction
+
+
+async def get_phone_otp_transaction(
+    request: Request, transaction_id: str
+) -> dict | None:
+    redis_client = _get_redis_client(request)
+    session_id = _get_session_id(request)
+    if redis_client is not None and session_id:
+        raw_transaction = await redis_client.get(
+            f"{PHONE_OTP_TRANSACTION_REDIS_KEY_PREFIX}{session_id}"
+        )
+        if raw_transaction is None:
+            return None
+        if isinstance(raw_transaction, bytes):
+            raw_transaction = raw_transaction.decode("utf-8")
+        transaction = json.loads(raw_transaction)
+        if (
+            not isinstance(transaction, dict)
+            or transaction.get("sessionId") != session_id
+            or transaction.get("transactionId") != transaction_id
+        ):
+            return None
+        return transaction
+
+    transaction = getattr(request, "session", {}).get(PHONE_OTP_TRANSACTION_SESSION_KEY)
+    if (
+        isinstance(transaction, dict)
+        and transaction.get("transactionId") == transaction_id
+    ):
+        return transaction
+    return None
+
+
+async def consume_phone_otp_transaction(
+    request: Request, transaction_id: str | None
+) -> None:
+    if not transaction_id:
+        return
+    redis_client = _get_redis_client(request)
+    session_id = _get_session_id(request)
+    if redis_client is not None and session_id:
+        await redis_client.eval(
+            DELETE_IF_TRANSACTION_MATCHES_SCRIPT,
+            1,
+            f"{PHONE_OTP_TRANSACTION_REDIS_KEY_PREFIX}{session_id}",
+            transaction_id,
+        )
+        return
+    transaction = getattr(request, "session", {}).get(PHONE_OTP_TRANSACTION_SESSION_KEY)
+    if (
+        isinstance(transaction, dict)
+        and transaction.get("transactionId") == transaction_id
+    ):
+        request.session.pop(PHONE_OTP_TRANSACTION_SESSION_KEY, None)

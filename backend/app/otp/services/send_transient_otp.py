@@ -3,7 +3,8 @@ from datetime import datetime
 
 from app.config import get_configuration
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
-from app.otp.services.email_otp_transaction_store import (
+from app.otp.services.profile_otp_transaction_store import (
+    store_phone_otp_transaction,
     store_email_otp_transaction,
 )
 from app.users.services.otp_factors import get_user_otp_factor
@@ -257,6 +258,13 @@ async def handle_otp_send(
                 request=request,
                 response_json=response_json,
                 destination=user_otp_info.destination,
+            )
+        elif user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}:
+            await store_phone_otp_transaction(
+                request=request,
+                response_json=response_json,
+                destination=user_otp_info.destination,
+                otp_type=user_otp_info.otpType.value,
             )
 
         return ResponseModel(

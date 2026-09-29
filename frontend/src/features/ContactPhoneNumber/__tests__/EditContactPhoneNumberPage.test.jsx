@@ -385,7 +385,6 @@ describe("EditContactPhoneNumberPage Component", () => {
 
     await waitFor(() => {
       expect(mockAuthService.verify_phone_otp_for_update).toHaveBeenCalledWith(
-        "+15551234567",
         "123456",
         "test-trxn-id",
         "sms",
@@ -440,7 +439,6 @@ describe("EditContactPhoneNumberPage Component", () => {
 
     await waitFor(() => {
       expect(mockAuthService.update_phone_with_otp).toHaveBeenCalledWith(
-        "+15551234567",
         "test-proof-id",
       );
     });
