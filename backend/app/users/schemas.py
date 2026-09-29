@@ -404,7 +404,6 @@ class VerifyPhoneOtpRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     action: Literal[ProfileUpdateWithOtpAction.VERIFY]
-    phoneNumbers: List[MetaDataTypeValue]
     otp: str
     trxnId: str
     otpType: Literal[OtpType.SMS, OtpType.VOICE]
@@ -414,7 +413,6 @@ class CommitPhoneUpdateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     action: Literal[ProfileUpdateWithOtpAction.COMMIT]
-    phoneNumbers: List[MetaDataTypeValue]
     verificationProofId: str
 
 

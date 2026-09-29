@@ -2147,9 +2147,6 @@ class TestErrorHandlingUpdateProfileWithOtp:
         request_data = {
             "action": "commit",
             "verificationProofId": "proof-1",
-            "phoneNumbers": [
-                {"type": "mobile", "value": "+14165551234"},
-            ],
         }
 
         client = mock_test_client(
@@ -2161,7 +2158,7 @@ class TestErrorHandlingUpdateProfileWithOtp:
                         "fingerprint": {
                             "newEmailAddress": "",
                             "phoneNumbers": [
-                                {"type": "mobile", "value": "+14165551234"}
+                                {"type": "mobile", "value": "14165551234"}
                             ],
                         },
                     }
