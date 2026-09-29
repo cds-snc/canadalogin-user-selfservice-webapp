@@ -111,9 +111,9 @@ async def get_connected_services(request: Request, user_access_token: str):
             None,
         )
         if matching_client_id:
-            activity = activity_by_application.get(application.id) or activity_by_client.get(
-                matching_client_id
-            )
+            activity = activity_by_application.get(
+                application.id
+            ) or activity_by_client.get(matching_client_id)
             services.append(
                 ConnectedService(
                     clientId=matching_client_id,

@@ -239,10 +239,8 @@ class Configuration(BaseSettings):
 
     @property
     def events_api_endpoint(self) -> str:
-        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.EVENTS.value}"
-
-    def user_sessions_api_endpoint(self, user_id: str) -> str:
-        return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.USER_SESSIONS.value}/{user_id}"
+        tenant_url = self.ibm_verify_config.IBM_VERIFY_TENANT_URL.rstrip("/")
+        return f"{tenant_url}{VerifyAPIEndpoint.EVENTS.value}"
 
     @property
     def idv_data_store_identity_verification_in_person_endpoint(self) -> str:

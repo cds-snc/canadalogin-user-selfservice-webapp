@@ -35,22 +35,35 @@ class IBMVerifyActivityClient:
             raise ValueError("IBM Verify token response did not contain access_token")
         return token
 
-    async def _get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
-        token = await self._access_token()
+    async def _get(
+        self, endpoint: str, token: str, params: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         response = await self.http_client.get(
-            f"{self.tenant_url}{path}",
+            endpoint,
             params=dict(params) if params else None,
             headers={"Authorization": f"Bearer {token}", "Accept": "application/json"},
         )
         response.raise_for_status()
         return response.json()
 
-    async def get_events(self, *, event_type: str, size: int = 1000) -> list[dict[str, Any]]:
+    async def get_events(
+        self,
+        *,
+        event_type: str,
+        user_id: str,
+        user_id_field: str,
+        size: int = 1000,
+    ) -> list[dict[str, Any]]:
         events: list[dict[str, Any]] = []
-        lookback_days = self.settings.ibm_verify_config.IBM_VERIFY_ACTIVITY_LOOKBACK_DAYS
+        lookback_days = (
+            self.settings.ibm_verify_config.IBM_VERIFY_ACTIVITY_LOOKBACK_DAYS
+        )
         from_time = datetime.now(timezone.utc) - timedelta(days=lookback_days)
+        token = await self._access_token()
         params: dict[str, Any] = {
             "event_type": event_type,
+            "filter_key": user_id_field,
+            "filter_value": f'"{user_id}"',
             "from": str(int(from_time.timestamp() * 1000)),
             "size": size,
             "sort_order": "desc",
@@ -58,7 +71,11 @@ class IBMVerifyActivityClient:
         seen_cursors: set[tuple[str, str]] = set()
 
         while True:
-            payload = await self._get("/v1.0/events", params)
+            payload = await self._get(
+                self.settings.events_api_endpoint,
+                token,
+                params,
+            )
             page = payload.get("response", {}).get("events", payload)
             page_events = page.get("events", [])
             if isinstance(page_events, list):
@@ -71,7 +88,9 @@ class IBMVerifyActivityClient:
                 break
             cursor_key = (str(after_id), str(after_time))
             if cursor_key in seen_cursors:
-                logger.error("IBM Verify Events API returned a repeated pagination cursor")
+                logger.error(
+                    "IBM Verify Events API returned a repeated pagination cursor"
+                )
                 break
             seen_cursors.add(cursor_key)
             if not page_events:
@@ -79,4 +98,8 @@ class IBMVerifyActivityClient:
             params.update({"after_id": after_id, "after_time": after_time})
 
         return events
+
+
+
+
 

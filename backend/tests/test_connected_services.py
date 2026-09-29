@@ -31,7 +31,9 @@ def make_profile(name, value):
 
 def make_request():
     return SimpleNamespace(
-        app=SimpleNamespace(state=SimpleNamespace(request_client=object(), config=object()))
+        app=SimpleNamespace(
+            state=SimpleNamespace(request_client=object(), config=object())
+        )
     )
 
 
@@ -141,12 +143,16 @@ async def test_returns_all_applications_matching_pairwise_client_ids():
         patch("app.users.services.connected_services.IBMVerifyActivityClient"),
         patch(
             "app.users.services.connected_services.get_user_activity",
-            new=AsyncMock(return_value=[RelyingPartyActivity(
-                application_id="verify-app-1",
-                client_id="client-1",
-                last_login=datetime(2026, 1, 1, 10, tzinfo=timezone.utc),
-                last_logout=datetime(2026, 1, 1, 11, tzinfo=timezone.utc),
-            )]),
+            new=AsyncMock(
+                return_value=[
+                    RelyingPartyActivity(
+                        application_id="verify-app-1",
+                        client_id="client-1",
+                        last_login=datetime(2026, 1, 1, 10, tzinfo=timezone.utc),
+                        last_logout=datetime(2026, 1, 1, 11, tzinfo=timezone.utc),
+                    )
+                ]
+            ),
         ) as get_activity,
     ):
         response = await get_connected_services(request, "user-token")
@@ -166,6 +172,53 @@ async def test_returns_all_applications_matching_pairwise_client_ids():
             "lastLogin": None,
             "lastLogout": None,
         },
+    ]
+
+
+@pytest.mark.asyncio
+async def test_activity_failure_keeps_connected_services_with_null_timestamps():
+    request = make_request()
+    profile = make_profile(
+        "pairwiseIdPerClient", [{"clientId": "client-1", "pai": "pai-1"}]
+    )
+    profile.id = "user-1"
+    applications = IBMVerifyRelyingPartyUserApplicationsSchema(
+        applications=[
+            IBMVerifyRelyingPartyInfoSchema(
+                id="verify-app-1",
+                name="Service One",
+                links=[],
+                description="client-1",
+                status=["ENABLED"],
+                category=[],
+            )
+        ]
+    )
+
+    with (
+        patch(
+            "app.users.services.connected_services.dispatch_get_my_profile_from_ibm",
+            new=AsyncMock(return_value=profile),
+        ),
+        patch(
+            "app.users.services.connected_services.dispatch_get_oidc_user_applications",
+            new=AsyncMock(return_value=applications),
+        ),
+        patch("app.users.services.connected_services.IBMVerifyActivityClient"),
+        patch(
+            "app.users.services.connected_services.get_user_activity",
+            new=AsyncMock(side_effect=RuntimeError("Events API unavailable")),
+        ),
+    ):
+        response = await get_connected_services(request, "user-token")
+
+    assert [service.model_dump() for service in response.services] == [
+        {
+            "clientId": "client-1",
+            "name": "Service One",
+            "lastLogin": None,
+            "lastLogout": None,
+        }
     ]
 
 
