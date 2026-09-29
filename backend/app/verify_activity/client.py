@@ -98,8 +98,3 @@ class IBMVerifyActivityClient:
             params.update({"after_id": after_id, "after_time": after_time})
 
         return events
-
-
-
-
-
