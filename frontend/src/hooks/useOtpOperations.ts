@@ -129,7 +129,17 @@ export const useOtpOperations = ({
           })
         : await authService.transientOtpSend(userData);
       if (response?.success) {
-        setOtpSentResponse((response.data ?? null) as OtpSentData | null);
+        const responseData = (response.data ?? null) as
+          | (OtpSentData & { id?: string })
+          | null;
+        const normalizedOtpData =
+          useMfaEndpoint && responseData && !responseData.trxnId
+            ? {
+                ...responseData,
+                trxnId: responseData.id ?? "",
+              }
+            : responseData;
+        setOtpSentResponse(normalizedOtpData);
         setErrorCode("");
         return true;
       }

@@ -502,6 +502,14 @@ describe("useOtpOperations", () => {
     });
 
     it("should use MFA send endpoint when otpEndpointMode is mfa", async () => {
+      mockAuthService.otpSend.mockResolvedValue({
+        success: true,
+        data: {
+          id: "mfa-trxn-001",
+          expiry: "2099-01-01T00:10:00.000Z",
+        },
+      });
+
       const { result } = renderHook(
         () =>
           useOtpOperations({
@@ -527,6 +535,11 @@ describe("useOtpOperations", () => {
         otpType: "sms",
       });
       expect(mockAuthService.transientOtpSend).not.toHaveBeenCalled();
+      expect(result.current.otpSentResponse).toEqual({
+        id: "mfa-trxn-001",
+        trxnId: "mfa-trxn-001",
+        expiry: "2099-01-01T00:10:00.000Z",
+      });
     });
 
     it("should still use transient send endpoint for override payloads in mfa mode", async () => {
