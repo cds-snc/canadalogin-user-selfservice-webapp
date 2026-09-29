@@ -90,7 +90,6 @@ vi.mock("@gcds-core/components-react", () => ({
     <button
       data-testid={
         buttonRole === "secondary" ? "back-button" : "continue-button"
-
       }
       disabled={disabled}
       onClick={(e) => onGcdsClick && onGcdsClick(e)}
