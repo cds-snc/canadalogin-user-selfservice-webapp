@@ -381,7 +381,7 @@ describe("AddMFAPage Unit Tests", () => {
       data: { trxnId: "trxn-123" },
     });
 
-    authService.transientOtpVerify = vi.fn().mockResolvedValue({
+    authService.otpVerify = vi.fn().mockResolvedValue({
       success: true,
     });
 
@@ -630,8 +630,8 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      // Mock the transientOtpVerify for this test
-      authService.transientOtpVerify = vi.fn().mockResolvedValue({
+      // Mock the otpVerify for this test
+      authService.otpVerify = vi.fn().mockResolvedValue({
         success: true,
       });
 
@@ -1830,7 +1830,7 @@ describe("AddMFAPage Unit Tests", () => {
           data: { message: "RESPONSE_ERROR" },
         },
       };
-      authService.transientOtpVerify.mockRejectedValue(responseError);
+      authService.otpVerify.mockRejectedValue(responseError);
 
       render(
         <TestWrapper>
@@ -1862,7 +1862,7 @@ describe("AddMFAPage Unit Tests", () => {
       fireEvent.click(otpNextButton);
 
       await waitFor(() => {
-        expect(authService.transientOtpVerify).toHaveBeenCalled();
+        expect(authService.otpVerify).toHaveBeenCalled();
       });
     });
 
@@ -3071,7 +3071,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
+      authService.otpVerify = vi
         .fn()
         .mockRejectedValue({ response: { data: { message: "INVALID_OTP" } } });
 
@@ -3116,9 +3116,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
 
       addMFAPhoneNumberApi.enrollMFA.mockRejectedValue({
         data: { message: "ENROLL_MFA_FAILED" },
@@ -3173,9 +3171,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
@@ -3234,9 +3230,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
@@ -3357,7 +3351,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
     });
 
-    it("fires form_submit_complete at otp_validation and form_step_change to enter_phone_number when transientOtpVerify succeeds", async () => {
+    it("fires form_submit_complete at otp_validation and form_step_change to enter_phone_number when otpVerify succeeds", async () => {
       navigatePastPassword();
 
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
@@ -3365,9 +3359,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
 
       render(
         <TestWrapper>
@@ -3413,9 +3405,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
       });
@@ -3477,9 +3467,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
       });
@@ -3541,9 +3529,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
       });

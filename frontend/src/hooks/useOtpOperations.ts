@@ -48,6 +48,7 @@ export const useOtpOperations = ({
   includeEmailFactors = false,
   mapType = null,
   mfaTrxnId = "",
+  otpEndpointMode = "transient",
 }: UseOtpOperationsOptions): UseOtpOperationsReturn => {
   const [userPhoneFactors, setUserPhoneFactors] = useState<OtpFactor[]>([]);
   const [userSelectedMfaFactor, setUserSelectedMfaFactor] =
@@ -116,8 +117,17 @@ export const useOtpOperations = ({
       return false;
     }
 
+    const factorId = currentFactor?.id;
+    const useMfaEndpoint =
+      otpEndpointMode === "mfa" && !override && Boolean(factorId);
+
     try {
-      const response = await authService.transientOtpSend(userData);
+      const response = useMfaEndpoint
+        ? await authService.otpSend({
+            id: factorId,
+            otpType: userData.otpType,
+          })
+        : await authService.transientOtpSend(userData);
       if (response?.success) {
         setOtpSentResponse((response.data ?? null) as OtpSentData | null);
         setErrorCode("");
@@ -170,8 +180,21 @@ export const useOtpOperations = ({
       otpType,
     };
 
+    const selectedFactorId = userSelectedMfaFactor?.id;
+    const shouldUseMfaEndpoint =
+      otpEndpointMode === "mfa" && Boolean(selectedFactorId);
+
+    const verificationRequest = shouldUseMfaEndpoint
+      ? {
+          ...userData,
+          id: selectedFactorId,
+        }
+      : userData;
+
     try {
-      const response = await authService.transientOtpVerify(userData);
+      const response = shouldUseMfaEndpoint
+        ? await authService.otpVerify(verificationRequest)
+        : await authService.transientOtpVerify(verificationRequest);
       if (response?.success) {
         setErrorCode("");
         onSuccess?.(response);
