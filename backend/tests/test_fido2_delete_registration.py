@@ -436,21 +436,23 @@ class TestDeleteRegistration:
 
     @pytest.mark.asyncio
     @patch.object(delete_module, "_get_fido2_delete_otp_proof_ttl_seconds")
+    @patch.object(delete_module, "handle_verify_mfa_otp")
     @patch.object(delete_module, "verify_registration_ownership")
     @patch.object(delete_module, "get_user_profile_info")
     @patch.object(delete_module, "verify_otp_before_operation")
     @patch.object(delete_module, "get_tenant_url")
-    async def test_verify_action_issues_proof(
+    async def test_verify_action_issues_proof_with_factor_id_uses_mfa_verify(
         self,
         mock_get_tenant_url,
         mock_verify_otp_before_operation,
         mock_get_user_profile_info,
         mock_verify_registration_ownership,
+        mock_handle_verify_mfa_otp,
         mock_get_fido2_delete_otp_proof_ttl_seconds,
         mock_http_client,
         mock_request,
     ):
-        """Verify action should issue a proof without deleting registration."""
+        """Verify action should issue a proof using factor-based MFA OTP verification when factor id is provided."""
         mock_get_tenant_url.return_value = "https://tenant.verify.ibm.com"
         mock_get_fido2_delete_otp_proof_ttl_seconds.return_value = 120
         mock_get_user_profile_info.return_value = (
@@ -459,7 +461,7 @@ class TestDeleteRegistration:
             "user-456",
         )
         mock_verify_registration_ownership.return_value = None
-        mock_verify_otp_before_operation.return_value = None
+        mock_handle_verify_mfa_otp.return_value = None
 
         request_data = DeleteRegistrationRequest(
             id="registration-123",
@@ -467,6 +469,7 @@ class TestDeleteRegistration:
             otp="123456",
             trxnId="txn-123",
             otpVerificationType="sms",
+            otpFactorId="factor-123",
         )
 
         result = await delete_registration(
@@ -481,6 +484,8 @@ class TestDeleteRegistration:
         assert isinstance(result.data.get("verificationProofId"), str)
         assert result.data.get("expiresIn") == 120
         mock_http_client.delete.assert_not_called()
+        mock_handle_verify_mfa_otp.assert_awaited_once()
+        mock_verify_otp_before_operation.assert_not_awaited()
 
     @pytest.mark.asyncio
     @patch.object(delete_module, "dispatch_get_my_profile_from_ibm")

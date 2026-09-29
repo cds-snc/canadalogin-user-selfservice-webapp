@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -10,6 +11,10 @@ import {
 } from "@gcds-core/components-react";
 
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
+import {
+  connectedServicesApi,
+  type ConnectedService,
+} from "../api/connectedServicesApi";
 
 import {
   DEV_ONLY_FEATURE,
@@ -17,14 +22,30 @@ import {
 } from "../../../utils/constants";
 import "./ConnectedServicesPage.css";
 
-const services = [
-  { name: "Service A", sessionStatus: "activeSession" },
-  { name: "Service B", sessionStatus: "inactiveSession" },
-];
-
 export default function ConnectedServicesPage() {
   const { language = "en" } = useParams<{ language: string }>();
   const { t } = useTranslation("connectedServices");
+  const [services, setServices] = useState<ConnectedService[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    if (!DEV_ONLY_FEATURE) {
+      return;
+    }
+
+    const loadServices = async () => {
+      try {
+        setServices(await connectedServicesApi.getConnectedServices());
+      } catch {
+        setHasError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadServices();
+  }, []);
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -54,16 +75,23 @@ export default function ConnectedServicesPage() {
         <GcdsGrid columns="1" gap="150">
           <GcdsHeading tag="h2">{t("servicesHeading")}</GcdsHeading>
           <GcdsText>{t("servicesDescription")}</GcdsText>
-          <table className="connected-services-table">
-            <tbody>
-              {servicesWithLocalizedStatus.map((service) => (
-                <tr key={service.name}>
-                  <th scope="row">{service.name}</th>
-                  <td>{service.sessionStatus}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {isLoading && <GcdsText>{t("loading")}</GcdsText>}
+          {!isLoading && hasError && <GcdsText>{t("error")}</GcdsText>}
+          {!isLoading && !hasError && services.length === 0 && (
+            <GcdsText>{t("empty")}</GcdsText>
+          )}
+          {!isLoading && !hasError && services.length > 0 && (
+            <table className="connected-services-table">
+              <tbody>
+                {servicesWithLocalizedStatus.map((service) => (
+                  <tr key={service.clientId}>
+                    <th scope="row">{service.name}</th>
+                    <td>{service.sessionStatus}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </GcdsGrid>
 
         <GcdsGrid

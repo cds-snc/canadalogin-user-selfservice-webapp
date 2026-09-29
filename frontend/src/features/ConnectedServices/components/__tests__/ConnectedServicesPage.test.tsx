@@ -4,6 +4,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import ConnectedServicesPage from "../ConnectedServicesPage";
 
+const mockGetConnectedServices = vi.fn();
+
+vi.mock("../../api/connectedServicesApi", () => ({
+  connectedServicesApi: {
+    getConnectedServices: () => mockGetConnectedServices(),
+  },
+}));
+
 let mockDevOnlyFeature = true;
 
 vi.mock("react-router", () => ({
@@ -23,6 +31,10 @@ vi.mock("react-i18next", () => ({
         servicesDescription: "Save your active progress.",
         "sessions.activeSession": "Active session",
         "sessions.inactiveSession": "Inactive session",
+        "sessions.unknownSession": "Connected",
+        loading: "Loading connected services.",
+        error: "We could not load your connected services. Try again later.",
+        empty: "You do not have any connected services.",
         signOutEverywhere: "Sign out everywhere",
         doThisLater: "I'll do this later",
         informationHeading: "This update only applies to connected services.",
@@ -78,22 +90,28 @@ vi.mock("@gcds-core/components-react", () => ({
 
 afterEach(() => {
   mockDevOnlyFeature = true;
+  mockGetConnectedServices.mockReset();
 });
 
 describe("ConnectedServicesPage", () => {
-  it("renders the success notice, service sessions, and actions in development", () => {
+  it("renders services returned by the backend in development", async () => {
+    mockGetConnectedServices.mockResolvedValue([
+      {
+        clientId: "client-1",
+        name: "Service One",
+        sessionStatus: "unknownSession",
+      },
+    ]);
     render(<ConnectedServicesPage />);
 
+    expect(await screen.findByText("Service One")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         level: 1,
         name: "Sign in to services to apply this update",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Service A")).toBeInTheDocument();
-    expect(screen.getByText("Active session")).toBeInTheDocument();
-    expect(screen.getByText("Service B")).toBeInTheDocument();
-    expect(screen.getByText("Inactive session")).toBeInTheDocument();
+    expect(screen.getByText("Connected")).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Sign out everywhere" }),
     ).toHaveAttribute("data-button-role", "danger");
@@ -108,6 +126,32 @@ describe("ConnectedServicesPage", () => {
       "href",
       "https://www.canada.ca/en/government/sign-in-online-account.html",
     );
+  });
+
+  it("renders loading, error, and empty states", async () => {
+    let rejectRequest: (error: Error) => void = () => undefined;
+    mockGetConnectedServices.mockImplementation(
+      () =>
+        new Promise((_, reject) => {
+          rejectRequest = reject;
+        }),
+    );
+    render(<ConnectedServicesPage />);
+    expect(screen.getByText("Loading connected services.")).toBeInTheDocument();
+
+    rejectRequest(new Error("request failed"));
+    expect(
+      await screen.findByText(
+        "We could not load your connected services. Try again later.",
+      ),
+    ).toBeInTheDocument();
+
+    mockGetConnectedServices.mockResolvedValue([]);
+    const { unmount } = render(<ConnectedServicesPage />);
+    expect(
+      await screen.findByText("You do not have any connected services."),
+    ).toBeInTheDocument();
+    unmount();
   });
 
   it("does not render outside the development environment", () => {

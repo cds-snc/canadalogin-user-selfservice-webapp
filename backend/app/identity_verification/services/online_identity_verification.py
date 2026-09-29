@@ -64,7 +64,14 @@ class OnlineIdentityVerificationClient(BaseIdvDataStoreService):
             )
 
         response_data = self.resolve_online_verification_url(response.json())
-        return CreateIdentityVerificationResponse(**response_data)
+        create_identity_verification_response = CreateIdentityVerificationResponse(
+            **response_data
+        )
+        logger.info(
+            "CreateIdentityVerificationResponse: %s",
+            create_identity_verification_response,
+        )
+        return create_identity_verification_response
 
     async def reissue_session(self, case_id: str) -> ReissueOnlineSessionResponse:
         response = await self._post(

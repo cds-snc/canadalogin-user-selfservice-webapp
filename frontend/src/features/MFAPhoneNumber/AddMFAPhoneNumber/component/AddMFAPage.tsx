@@ -183,6 +183,7 @@ export default function AddMFAPage() {
     allowEmptyFactors: true,
     mapType: MAP_TYPES.lastFourDigits,
     mfaTrxnId: phoneFormData?.trxnId,
+    otpEndpointMode: "mfa",
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
@@ -195,12 +196,17 @@ export default function AddMFAPage() {
     useState(false);
   const errorMessage =
     customErrorMessage || getErrorMessage(language, errorCode);
-  const errorLinks =
-    wizardStep === "addMFANumber" &&
-    errorCode === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR &&
-    errorMessage
-      ? { "#mfa-phone-number": errorMessage }
-      : undefined;
+  let errorLinks: Record<string, string> | undefined;
+  if (errorCode && errorMessage) {
+    if (wizardStep === "addMFANumber") {
+      errorLinks = { "#mfa-phone-number": errorMessage };
+    } else if (
+      wizardStep === "otpValidation" ||
+      wizardStep === "addMFAValidation"
+    ) {
+      errorLinks = { "#verificationCode": errorMessage };
+    }
+  }
 
   const resetAttempts = () => {
     setIsMfaOtpMaxAttemptsReached(false);
@@ -491,6 +497,7 @@ export default function AddMFAPage() {
 
   const validateOtpCode = async (userOtpValue: string) => {
     const userData = {
+      id: userSelectedMfaFactor!.id,
       otp: userOtpValue,
       trxnId: otpSentResponse?.trxnId ?? "",
       otpType:
@@ -499,7 +506,8 @@ export default function AddMFAPage() {
         ],
     };
     try {
-      const response = await authService.transientOtpVerify(userData);
+      const verifyOtp = authService.otpVerify ?? authService.transientOtpVerify;
+      const response = await verifyOtp(userData);
 
       if (response && response.success) {
         trackEvent({

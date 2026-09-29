@@ -48,8 +48,10 @@ class UserOtpInfo(BaseModel):
 
     @model_validator(mode="after")
     def validate(self):
-        if self.factor_id is None and self.destination is None:
-            raise ValueError("Must contain factor_id or destination")
+        has_factor_id = self.factor_id is not None
+        has_destination = self.destination is not None
+        if has_factor_id == has_destination:
+            raise ValueError("Provide either factor_id or destination")
 
         # Validate only phone numbers
         if self.otpType not in {OtpType.SMS, OtpType.VOICE} or self.destination is None:
@@ -217,6 +219,7 @@ class OtpDeletionRequest(BaseModel):
     action: OtpDeletionAction = OtpDeletionAction.COMMIT_WITH_VERIFICATION
     otp: Optional[str] = None
     trxnId: Optional[str] = None
+    otpFactorId: Optional[str] = None
     otpVerificationType: Optional[OtpType] = (
         None  # Type of OTP used for verification (can differ from otpType)
     )
@@ -289,6 +292,7 @@ class OtpBatchDeletionRequest(BaseModel):
     action: OtpDeletionAction = OtpDeletionAction.COMMIT_WITH_VERIFICATION
     otp: Optional[str] = None
     trxnId: Optional[str] = None
+    otpFactorId: Optional[str] = None
     otpVerificationType: Optional[OtpType] = None
     assertionResult: Optional[FIDO2AssertionResultRequest] = None
     verificationProofId: Optional[str] = None
