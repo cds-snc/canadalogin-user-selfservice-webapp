@@ -63,7 +63,7 @@ export default function ProvincialVerificationPage() {
     <GcdsContainer role="main">
       <GcdsHeading tag="h1">{t("ProvincialVerification.heading")}</GcdsHeading>
 
-      <section style={{ marginTop: "24px", marginBottom: "36px" }}>
+      <section>
         <GcdsText>
           <strong>{t("ProvincialVerification.followSteps")}</strong>
         </GcdsText>
@@ -81,8 +81,8 @@ export default function ProvincialVerificationPage() {
         </ol>
       </section>
 
-      <GcdsGrid columns="1" gap="400">
-        <GcdsCard
+      <GcdsGrid columns="1fr">
+         <GcdsCard
           cardTitle={t("ProvincialVerification.bcServicesCard")}
           cardTitleTag="h3"
           href={bcPartnerLoginHref}
@@ -103,9 +103,7 @@ export default function ProvincialVerificationPage() {
           imgSrc={imgQuebecAccount}
           imgAlt="Québec Logo"
         ></GcdsCard>
-      </GcdsGrid>
 
-      <section style={{ marginTop: "36px", marginBottom: "36px" }}>
         <GcdsButton
           type="button"
           buttonRole="secondary"
@@ -115,24 +113,24 @@ export default function ProvincialVerificationPage() {
         >
           {t("ProvincialVerification.chooseDifferentMethodButton")}
         </GcdsButton>
-      </section>
 
-      <AccessibleNotice
-        noticeRole="info"
-        noticeTitleTag="h2"
-        noticeTitle={t("ProvincialVerification.moreInfoTitle")}
-      >
-        {
-          // TODO: populate with real URL once available
-        }
-        <GcdsLink
-          href={"#"}
-          external={true}
-          style={{ textDecoration: "underline" }}
+        <AccessibleNotice
+          noticeRole="info"
+          noticeTitleTag="h2"
+          noticeTitle={t("ProvincialVerification.moreInfoTitle")}
         >
-          {t("ProvincialVerification.learnMoreLink")}
-        </GcdsLink>
-      </AccessibleNotice>
-    </GcdsContainer>
+          {
+            // TODO: populate with real URL once available
+          }
+          <GcdsLink
+            href={"#"}
+            external={true}
+            style={{ textDecoration: "underline" }}
+          >
+            {t("ProvincialVerification.learnMoreLink")}
+          </GcdsLink>
+        </AccessibleNotice>
+      </GcdsGrid>
+    </GcdsContainer >
   );
 }
