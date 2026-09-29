@@ -5,7 +5,7 @@ from typing import Any
 
 from app.config import Configuration
 from .client import IBMVerifyActivityClient
-from .schemas import ActivityResponse, ActivityStatus, RelyingPartyActivity
+from .schemas import RelyingPartyActivity
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ def _event_record(
             kind,
         )
         return None
-    if kind == "login" and record.get("result") != "success":
+    if record.get("result") != "success":
         return None
     record["kind"] = kind
     record["timestamp"] = _parse_time(record["timestamp"])
@@ -75,9 +75,7 @@ def _event_record(
 
 def calculate_activity(
     user_id: str,
-    username: str | None,
     events: list[dict[str, Any]],
-    sessions: list[dict[str, Any]],
     settings: Configuration,
 ) -> list[RelyingPartyActivity]:
     field_map = _configured_map(settings)
@@ -104,45 +102,22 @@ def calculate_activity(
             if kind == "logout" and (not current.get("logout_time") or record["timestamp"] > current["logout_time"]):
                 current.update({"logout_time": record["timestamp"], "logout": record})
 
-    session_by_id = {str(item.get("sessionId")): item for item in sessions if item.get("sessionId")}
     results: list[RelyingPartyActivity] = []
     for current in latest.values():
         login = current.get("login") or {}
         logout = current.get("logout") or {}
-        session_id = login.get("session_id") or logout.get("session_id")
-        session = session_by_id.get(str(session_id)) if session_id else None
-        expires = _parse_time(session.get("expiryTime")) if session else None
         login_time = current.get("login_time")
         logout_time = current.get("logout_time")
-        if logout_time and (not login_time or logout_time >= login_time):
-            status = ActivityStatus.LOGGED_OUT
-        elif expires and expires <= datetime.now(timezone.utc):
-            status = ActivityStatus.EXPIRED
-        elif login_time:
-            status = ActivityStatus.LAST_KNOWN_ACTIVE
-        else:
-            status = ActivityStatus.UNKNOWN
-
-        source = login or logout
         results.append(RelyingPartyActivity(
-            user_id=user_id,
-            username=username or source.get("username"),
-            rp={
-                "applicationId": str(current["application_id"]),
-                "applicationName": source.get("application_name"),
-                "clientId": source.get("client_id"),
-                "protocol": source.get("protocol"),
-            },
+            application_id=str(current["application_id"]),
+            client_id=login.get("client_id") or logout.get("client_id"),
             last_login=login_time,
             last_logout=logout_time,
-            session_id=str(session_id) if session_id else None,
-            status=status,
-            session_expires=expires,
         ))
-    return sorted(results, key=lambda item: item.rp["applicationId"] or "")
+    return sorted(results, key=lambda item: item.application_id)
 
 
-async def get_user_activity(client: IBMVerifyActivityClient, user_id: str, username: str | None) -> ActivityResponse:
+async def get_user_activity(client: IBMVerifyActivityClient, user_id: str) -> list[RelyingPartyActivity]:
     event_types = ",".join(
         f'"{event_type}"'
         for event_type in (
@@ -151,5 +126,4 @@ async def get_user_activity(client: IBMVerifyActivityClient, user_id: str, usern
         )
     )
     events = await client.get_events(event_type=event_types)
-    sessions = await client.get_user_sessions(user_id)
-    return ActivityResponse(user_id=user_id, username=username, activities=calculate_activity(user_id, username, events, sessions, client.settings))
+    return calculate_activity(user_id, events, client.settings)

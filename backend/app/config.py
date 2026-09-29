@@ -35,9 +35,7 @@ class IBMVerifyConfig(BaseSettings):
     IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: str
     IBM_VERIFY_ACTIVITY_EVENT_FIELD_MAP: str = (
         '{"event_type":"event_type","user_id":"data.userid",'
-        '"username":"data.username","application_id":"data.applicationid",'
-        '"application_name":"data.applicationname","client_id":"data.client_id",'
-        '"protocol":"data.subtype","session_id":"data.sessionid",'
+        '"application_id":"data.applicationid","client_id":"data.client_id",'
         '"result":"data.result","action":"data.action","timestamp":"time"}'
     )
     IBM_VERIFY_ACTIVITY_SSO_EVENT_TYPES: str = "sso"

@@ -80,7 +80,3 @@ class IBMVerifyActivityClient:
 
         return events
 
-    async def get_user_sessions(self, user_id: str) -> list[dict[str, Any]]:
-        response = await self._get(f"/v1.0/auth/sessions/{user_id}")
-        sessions = response.get("sessions", [])
-        return [session for session in sessions if isinstance(session, dict)] if isinstance(sessions, list) else []

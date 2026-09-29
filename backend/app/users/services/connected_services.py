@@ -21,7 +21,6 @@ from app.verify_activity.service import get_user_activity
 logger = logging.getLogger(__name__)
 
 PAIRWISE_ATTRIBUTE_NAME = "pairwiseIdPerClient"
-UNKNOWN_SESSION_STATUS = "UNKNOWN"
 
 
 def _parse_pairwise_values(value: Any) -> list[dict[str, Any]]:
@@ -88,17 +87,16 @@ async def get_connected_services(request: Request, user_access_token: str):
     activity_by_client: dict[str, Any] = {}
     if getattr(request.app.state, "config", None) and getattr(profile, "id", None):
         try:
-            activity_response = await get_user_activity(
+            activities = await get_user_activity(
                 IBMVerifyActivityClient(
                     request.app.state.request_client, request.app.state.config
                 ),
                 profile.id,
-                str(profile.userName) if getattr(profile, "userName", None) else None,
             )
-            for activity in activity_response.activities:
-                activity_by_application[activity.rp["applicationId"] or ""] = activity
-                if activity.rp.get("clientId"):
-                    activity_by_client[activity.rp["clientId"]] = activity
+            for activity in activities:
+                activity_by_application[activity.application_id] = activity
+                if activity.client_id:
+                    activity_by_client[activity.client_id] = activity
         except Exception:
             logger.exception("Unable to enrich connected services with activity")
 
@@ -120,18 +118,8 @@ async def get_connected_services(request: Request, user_access_token: str):
                 ConnectedService(
                     clientId=matching_client_id,
                     name=application.name,
-                    sessionStatus=(
-                        activity.status.value if activity else UNKNOWN_SESSION_STATUS
-                    ),
-                    userId=activity.user_id if activity else getattr(profile, "id", None),
-                    username=activity.username if activity else getattr(profile, "userName", None),
-                    applicationId=application.id,
-                    applicationName=application.name,
-                    protocol=activity.rp.get("protocol") if activity else None,
                     lastLogin=activity.last_login if activity else None,
                     lastLogout=activity.last_logout if activity else None,
-                    sessionId=activity.session_id if activity else None,
-                    sessionExpires=activity.session_expires if activity else None,
                 )
             )
 

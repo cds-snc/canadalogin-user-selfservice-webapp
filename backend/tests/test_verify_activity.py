@@ -4,19 +4,14 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from app.verify_activity.client import IBMVerifyActivityClient
-from app.verify_activity.schemas import ActivityStatus
-from app.verify_activity.service import calculate_activity
+from app.verify_activity.service import calculate_activity, get_user_activity
 
 
 FIELD_MAP = {
     "event_type": "type",
     "user_id": "data.userId",
-    "username": "data.username",
     "application_id": "data.applicationId",
-    "application_name": "data.applicationName",
     "client_id": "data.clientId",
-    "protocol": "data.protocol",
-    "session_id": "data.usersessionid",
     "result": "data.result",
     "action": "data.action",
     "timestamp": "time",
@@ -41,64 +36,66 @@ def settings(sso="sso.success", slo="slo.success"):
     )
 
 
-def event(event_type, application_id, time, session_id="session-1", name="App"):
+def event(event_type, application_id, time, user_id="user-1"):
     return {
         "type": event_type,
         "time": time,
         "data": {
-            "userId": "user-1",
-            "username": "john@example.com",
+            "userId": user_id,
             "applicationId": application_id,
-            "applicationName": name,
             "clientId": f"client-{application_id}",
-            "protocol": "OIDC",
-            "usersessionid": session_id,
             "result": "success",
             "action": "issued",
         },
     }
 
 
-def test_calculates_multiple_rps_and_logout_status():
+def test_calculates_latest_login_and_logout_per_application():
     result = calculate_activity(
         "user-1",
-        "john@example.com",
         [
-            event("sso.success", "salesforce", "2026-01-01T10:00:00Z", "session-salesforce"),
+            event("sso.success", "salesforce", "2026-01-01T10:00:00Z"),
             {
-                **event("slo.success", "salesforce", "2026-01-01T11:00:00Z", "session-salesforce"),
+                **event("slo.success", "salesforce", "2026-01-01T11:00:00Z"),
                 "data": {
-                    **event(
-                        "slo.success",
-                        "salesforce",
-                        "2026-01-01T11:00:00Z",
-                        "session-salesforce",
-                    )["data"],
+                    **event("slo.success", "salesforce", "2026-01-01T11:00:00Z")["data"],
                     "action": "sso_logout",
                 },
             },
-            event("sso.success", "servicenow", "2026-01-02T10:00:00Z", "session-servicenow", "ServiceNow"),
+            event("sso.success", "salesforce", "2026-01-02T10:00:00Z"),
+            event("sso.success", "servicenow", "2026-01-02T10:00:00Z"),
+            event("sso.success", "ignored", "2026-01-02T10:00:00Z", user_id="other"),
         ],
-        [{"sessionId": "session-servicenow", "expiryTime": "2099-01-01T00:00:00Z"}],
         settings(),
     )
 
-    assert [item.rp["applicationId"] for item in result] == ["salesforce", "servicenow"]
-    assert result[0].status == ActivityStatus.LOGGED_OUT
-    assert result[1].status == ActivityStatus.LAST_KNOWN_ACTIVE
+    assert [item.application_id for item in result] == ["salesforce", "servicenow"]
+    assert result[0].last_login.isoformat() == "2026-01-02T10:00:00+00:00"
+    assert result[0].last_logout.isoformat() == "2026-01-01T11:00:00+00:00"
+    assert result[1].last_logout is None
 
 
-def test_expired_and_unknown_statuses_are_conservative():
+def test_ignores_unsuccessful_and_malformed_events():
+    failure = event("slo.success", "app", "2026-01-02T10:00:00Z")
+    failure["data"]["result"] = "failure"
     result = calculate_activity(
         "user-1",
-        None,
-        [event("sso.success", "expired", "2026-01-01T10:00:00Z", "expired-session"), event("sso.success", "unknown", "2026-01-01T10:00:00Z", "missing-session")],
-        [{"sessionId": "expired-session", "expiryTime": "2020-01-01T00:00:00Z"}],
-        settings(slo="slo.success"),
+        [event("sso.success", "app", "2026-01-01T10:00:00Z"), failure,
+         event("sso.success", "bad", "not-a-date")],
+        settings(),
     )
 
-    assert result[0].status == ActivityStatus.EXPIRED
-    assert result[1].status == ActivityStatus.LAST_KNOWN_ACTIVE
+    assert len(result) == 1
+    assert result[0].last_logout is None
+
+
+@pytest.mark.asyncio
+async def test_get_user_activity_does_not_fetch_sessions():
+    client = Mock(settings=settings())
+    client.get_events = AsyncMock(return_value=[event("sso.success", "app", "2026-01-01T10:00:00Z")])
+    result = await get_user_activity(client, "user-1")
+    assert len(result) == 1
+    client.get_events.assert_awaited_once()
 
 
 @pytest.mark.asyncio
