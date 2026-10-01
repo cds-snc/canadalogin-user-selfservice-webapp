@@ -73,10 +73,10 @@ export const SelectVoiceCallLink = (() => {
       },
       {
         type: "post",
-        endpoint: `${SUBMIT_END_POINTS.transientOtpSend}`,
+        endpoint: `${SUBMIT_END_POINTS.otpSend}`,
         response: {
           success: true,
-          data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
+          data: { id: "txn-123", expiry: FUTURE_OTP_EXPIRY },
         },
       },
     ],
@@ -247,10 +247,10 @@ export const SelectTextMessageLink = (() => {
       },
       {
         type: "post",
-        endpoint: `${SUBMIT_END_POINTS.transientOtpSend}`,
+        endpoint: `${SUBMIT_END_POINTS.otpSend}`,
         response: {
           success: true,
-          data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
+          data: { id: "txn-123", expiry: FUTURE_OTP_EXPIRY },
         },
       },
     ],
@@ -406,15 +406,15 @@ export const CompleteAddMFAFlowSMS = (() => {
       },
       {
         type: "post",
-        endpoint: "/v1/otp/transient/send",
+        endpoint: "/v1/otp/mfa/send",
         response: {
           success: true,
-          data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
+          data: { id: "txn-123", expiry: FUTURE_OTP_EXPIRY },
         },
       },
       {
         type: "post",
-        endpoint: "/v1/otp/transient/verify",
+        endpoint: "/v1/otp/mfa/verify",
         response: {
           success: true,
         },
@@ -805,15 +805,15 @@ export const ResendOtpCode = (() => {
       },
       {
         type: "post",
-        endpoint: "/v1/otp/transient/send",
+        endpoint: "/v1/otp/mfa/send",
         response: {
           success: true,
-          data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
+          data: { id: "txn-123", expiry: FUTURE_OTP_EXPIRY },
         },
       },
       {
         type: "post",
-        endpoint: "/v1/otp/transient/verify",
+        endpoint: "/v1/otp/mfa/verify",
         response: {
           success: true,
         },
@@ -1047,15 +1047,15 @@ export const UseDifferentPhoneNumber = (() => {
       },
       {
         type: "post",
-        endpoint: "/v1/otp/transient/send",
+        endpoint: "/v1/otp/mfa/send",
         response: {
           success: true,
-          data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
+          data: { id: "txn-123", expiry: FUTURE_OTP_EXPIRY },
         },
       },
       {
         type: "post",
-        endpoint: "/v1/otp/transient/verify",
+        endpoint: "/v1/otp/mfa/verify",
         response: {
           success: true,
         },

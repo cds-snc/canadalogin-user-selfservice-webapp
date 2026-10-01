@@ -29,6 +29,10 @@ export const otpMapTypes = ["lastFourDigits", "fullPhoneNumber"] as const;
 
 export type OtpMapType = (typeof otpMapTypes)[number];
 
+export const otpEndpointModes = ["transient", "mfa"] as const;
+
+export type OtpEndpointMode = (typeof otpEndpointModes)[number];
+
 export type OtpFactor = {
   id: string;
   type: string;
@@ -64,6 +68,7 @@ export type UseOtpOperationsOptions = {
   includeEmailFactors?: boolean;
   mapType?: OtpMapType | null;
   mfaTrxnId?: string;
+  otpEndpointMode?: OtpEndpointMode;
 };
 
 export type UseOtpValidationSuccess = (response: unknown) => void;

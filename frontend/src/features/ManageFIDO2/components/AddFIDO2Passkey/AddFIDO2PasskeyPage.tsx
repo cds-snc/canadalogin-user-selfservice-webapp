@@ -108,6 +108,7 @@ export default function AddFIDO2PasskeyPage({
     setErrorCode,
     fallbackNavigationPath: backToSecuritySettingsPage,
     allowEmptyFactors: true,
+    otpEndpointMode: "mfa",
   });
 
   const { validatePassword, validatePasswordLoading } = usePasswordValidation(
@@ -304,6 +305,7 @@ export default function AddFIDO2PasskeyPage({
 
   const validateOtpCode = async (userOtpValue: string) => {
     const userData = {
+      id: userSelectedMfaFactor!.id,
       otp: userOtpValue,
       trxnId: otpSentResponse!.trxnId,
       otpType:
@@ -312,7 +314,8 @@ export default function AddFIDO2PasskeyPage({
         ],
     };
     try {
-      const response = await authService.transientOtpVerify(userData);
+      const verifyOtp = authService.otpVerify ?? authService.transientOtpVerify;
+      const response = await verifyOtp(userData);
       if (response && response.success) {
         trackEvent({
           event: GA_FORM_EVENTS.FORM_SUBMIT_COMPLETE,

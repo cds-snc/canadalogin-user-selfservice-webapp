@@ -307,6 +307,17 @@ describe("EditEmailAddressPage Integration Tests", () => {
     );
   };
 
+  it("configures OTP hook with MFA endpoint mode for identity OTP steps", () => {
+    renderComponent();
+
+    expect(useOtpOperations).toHaveBeenCalledWith(
+      expect.objectContaining({
+        allowEmptyFactors: true,
+        otpEndpointMode: "mfa",
+      }),
+    );
+  });
+
   describe("Real Function Execution", () => {
     it("executes handleFormChange with regular input event", async () => {
       renderComponent();
