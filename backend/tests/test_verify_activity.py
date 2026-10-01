@@ -30,6 +30,8 @@ def settings(sso="sso.success", slo="slo.success"):
             IBM_VERIFY_CLIENT_SECRET=None,
             IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID="client",
             IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET="secret",
+            IBM_VERIFY_ACTIVITY_CLIENT_ID="events-client",
+            IBM_VERIFY_ACTIVITY_CLIENT_SECRET="events-secret",
             IBM_VERIFY_ACTIVITY_EVENT_FIELD_MAP=__import__("json").dumps(FIELD_MAP),
             IBM_VERIFY_ACTIVITY_SSO_EVENT_TYPES=sso,
             IBM_VERIFY_ACTIVITY_SLO_EVENT_TYPES=slo,
@@ -165,7 +167,49 @@ async def test_events_client_uses_documented_after_cursor():
 
     assert result == [{"id": "one"}, {"id": "two"}]
     client.post.assert_awaited_once()
+    assert client.post.await_args.kwargs["data"]["client_id"] == "events-client"
+    assert client.post.await_args.kwargs["data"]["client_secret"] == "events-secret"
     assert client.get.await_args_list[0].kwargs["params"]["filter_key"] == "data.userId"
     assert client.get.await_args_list[0].kwargs["params"]["filter_value"] == '"user-1"'
     assert client.get.await_args_list[1].kwargs["params"]["after_id"] == "one"
     assert client.get.await_args_list[1].kwargs["params"]["after_time"] == "10"
+
+
+@pytest.mark.asyncio
+async def test_events_client_uses_dedicated_activity_credentials():
+    client = AsyncMock()
+    client.post.return_value = Mock(
+        json=Mock(return_value={"access_token": "activity-token"})
+    )
+    client.get.return_value = Mock(
+        json=Mock(return_value={"response": {"events": {"events": []}}})
+    )
+    config = settings()
+    config.ibm_verify_config.IBM_VERIFY_TENANT_URL += "/"
+    config.ibm_verify_config.IBM_VERIFY_ACTIVITY_CLIENT_ID = "events-client"
+    config.ibm_verify_config.IBM_VERIFY_ACTIVITY_CLIENT_SECRET = "events-secret"
+
+    await IBMVerifyActivityClient(client, config).get_events(
+        event_type='"sso"', user_id="user-1", user_id_field="data.userId"
+    )
+
+    assert client.post.await_args.args[0] == "https://tenant.example/oauth2/token"
+    assert client.post.await_args.kwargs["data"]["client_id"] == "events-client"
+    assert client.post.await_args.kwargs["data"]["client_secret"] == "events-secret"
+    assert (
+        client.get.await_args.kwargs["headers"]["Authorization"]
+        == "Bearer activity-token"
+    )
+
+
+@pytest.mark.parametrize(
+    "client_id,client_secret",
+    [(None, None), (None, "events-secret"), ("events-client", None)],
+)
+def test_events_client_rejects_missing_activity_credentials(client_id, client_secret):
+    config = settings()
+    config.ibm_verify_config.IBM_VERIFY_ACTIVITY_CLIENT_ID = client_id
+    config.ibm_verify_config.IBM_VERIFY_ACTIVITY_CLIENT_SECRET = client_secret
+
+    with pytest.raises(ValueError, match="Both IBM Verify activity credentials"):
+        IBMVerifyActivityClient(AsyncMock(), config)

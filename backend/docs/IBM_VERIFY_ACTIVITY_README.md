@@ -27,8 +27,9 @@ activity lookup fails, the connected-services list still returns with null
 timestamps.
 
 The activity client uses `POST {tenant}/oauth2/token` (client credentials) and
-`GET {tenant}/v1.0/events?event_type="sso","slo"&size=...`. The API client must
-have the report entitlements needed for Events API access. Pagination uses the
+`GET {tenant}/v1.0/events?event_type="sso","slo"&size=...`. The dedicated API
+client needs the `readReports` entitlement for Events API access (not
+`manageReports`). Pagination uses the
 returned `search_after.id` and `search_after.time` as `after_id` and `after_time`.
 
 References:
@@ -48,12 +49,14 @@ IBM_VERIFY_ACTIVITY_LOOKBACK_DAYS=30
 IBM_VERIFY_ACTIVITY_EVENT_FIELD_MAP={"event_type":"event_type","user_id":"data.userid","application_id":"data.applicationid","client_id":"data.client_id","result":"data.result","action":"data.action","timestamp":"time"}
 ```
 
-The client reuses `IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID` and
-`IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET` without logging secrets or tokens.
+Configure both `IBM_VERIFY_ACTIVITY_CLIENT_ID` and
+`IBM_VERIFY_ACTIVITY_CLIENT_SECRET` for the dedicated IBM Verify API client.
+Activity lookup does not fall back to profile-management credentials. If either
+activity credential is missing, activity lookup fails and connected services
+still returns without timestamps. Neither secrets nor tokens are logged.
 Event types and actions are comma-separated exact values; field-map values are
 dot-separated paths. The client sends the mapped user field and authenticated
 user ID as the Events API filter, so it does not download tenant-wide events.
 `user_id`, `application_id`, and `timestamp` must resolve, and `result` must
 equal `success`. The most recent event of each type supplies that application's
 timestamp. The default lookback is 30 days; increase it for older history.
-```

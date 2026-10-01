@@ -5,6 +5,7 @@ from typing import Any
 from httpx import AsyncClient
 
 from app.config import Configuration
+from app.utils.access_token import get_admin_token
 
 logger = logging.getLogger(__name__)
 
@@ -14,26 +15,10 @@ class IBMVerifyActivityClient:
         self.http_client = http_client
         self.settings = settings
         verify = settings.ibm_verify_config
-        self.tenant_url = verify.IBM_VERIFY_TENANT_URL.rstrip("/")
-        self.client_id = verify.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID
-        self.client_secret = verify.IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET
-
-    async def _access_token(self) -> str:
-        response = await self.http_client.post(
-            f"{self.tenant_url}/oauth2/token",
-            data={
-                "grant_type": "client_credentials",
-                "client_id": self.client_id,
-                "client_secret": self.client_secret,
-                "scope": "openid",
-            },
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-        )
-        response.raise_for_status()
-        token = response.json().get("access_token")
-        if not token:
-            raise ValueError("IBM Verify token response did not contain access_token")
-        return token
+        self.activity_client_id = verify.IBM_VERIFY_ACTIVITY_CLIENT_ID
+        self.activity_client_secret = verify.IBM_VERIFY_ACTIVITY_CLIENT_SECRET
+        if not self.activity_client_id or not self.activity_client_secret:
+            raise ValueError("Both IBM Verify activity credentials must be configured")
 
     async def _get(
         self, endpoint: str, token: str, params: dict[str, Any] | None = None
@@ -59,7 +44,12 @@ class IBMVerifyActivityClient:
             self.settings.ibm_verify_config.IBM_VERIFY_ACTIVITY_LOOKBACK_DAYS
         )
         from_time = datetime.now(timezone.utc) - timedelta(days=lookback_days)
-        token = await self._access_token()
+        token = await get_admin_token(
+            self.http_client,
+            verify_config=self.settings.ibm_verify_config,
+            client_id=self.activity_client_id,
+            client_secret=self.activity_client_secret,
+        )
         params: dict[str, Any] = {
             "event_type": event_type,
             "filter_key": user_id_field,
