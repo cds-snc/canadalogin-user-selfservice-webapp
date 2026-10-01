@@ -16,6 +16,11 @@
   border-collapse: collapse;
 }
 
+.connected-services-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .connected-services-table th,
 .connected-services-table td {
   padding: var(--gcds-spacing-150, 0.75rem);
@@ -24,5 +29,9 @@
 }
 
 .connected-services-table th {
-  width: 50%;
+  font-weight: 600;
+}
+
+.connected-services-table thead th {
+  background: var(--gcds-color-grayscale-100, #f5f5f5);
 }
