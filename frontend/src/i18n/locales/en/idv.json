@@ -162,19 +162,19 @@
   },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",
-    "heading": "Get ready for selfie and ID check",
+    "heading": "Get ready for self-photo and ID check",
     "followSteps": "Follow the steps to complete the process",
-    "step1": "You will need one government issued photo ID.",
+    "step1": "Use you phone camera and allow the camera permission when asked.",
     "expiredIdsAccepted": "Expired IDs are accepted if they expired less than 6 months ago",
     "listOfAcceptableIds": "List of acceptable IDs",
-    "step2": "Take a selfie and then a photo of your ID in a well lit room using a mobile phone camera when prompted.",
-    "step3": "Confirm your submission and get your proofing results to continue.",
-    "planForTime": "Plan for about <strong>{{duration}}</strong> to complete this process.",
-    "timeDuration": "5 minutes",
+    "step2": "Position yourself for a self-photo, it will be taken automatically.",
+    "step3": "Take a photo of a government issued photo ID, the photo will also be taken automatically,",
+    "planForTime": "This process will take a few minutes to complete and you will get your result instantly.",
+    "step4": "Confirm that your details were captured correctly and submit for verification.",
     "continueButton": "Continue",
     "chooseDifferentMethodButton": "Choose a different method",
     "moreInfoTitle": "For more information",
-    "learnMoreLink": "Learn more about how selfie and ID check works"
+    "learnMoreLink": "Learn more about how self-photo and ID check works"
   },
   "IdvStartIdentityProofingPage": {
     "pageTitle": "Identity Verification"

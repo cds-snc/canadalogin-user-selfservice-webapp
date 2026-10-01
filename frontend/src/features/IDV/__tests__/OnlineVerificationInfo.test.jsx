@@ -128,7 +128,7 @@ describe("OnlineVerificationInfo", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Get ready for selfie and ID check",
+        name: "Get ready for self-photo and ID check",
       }),
     ).toBeInTheDocument();
   });
@@ -141,20 +141,27 @@ describe("OnlineVerificationInfo", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders all three steps", () => {
+  it("renders all four steps", () => {
     render(<OnlineVerificationInfo />);
 
     expect(
-      screen.getByText("You will need one government issued photo ID."),
-    ).toBeInTheDocument();
-    expect(
       screen.getByText(
-        "Take a selfie and then a photo of your ID in a well lit room using a mobile phone camera when prompted.",
+        "Use you phone camera and allow the camera permission when asked.",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Confirm your submission and get your proofing results to continue.",
+        "Position yourself for a self-photo, it will be taken automatically.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Take a photo of a government issued photo ID, the photo will also be taken automatically,",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Confirm that your details were captured correctly and submit for verification.",
       ),
     ).toBeInTheDocument();
   });
@@ -163,12 +170,9 @@ describe("OnlineVerificationInfo", () => {
     render(<OnlineVerificationInfo />);
 
     expect(
-      screen.getByText((_, element) => {
-        return (
-          element?.textContent?.replace(/\s+/g, " ").trim() ===
-          "Plan for about 5 minutes to complete this process."
-        );
-      }),
+      screen.getByText(
+        "This process will take a few minutes to complete and you will get your result instantly.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -233,7 +237,7 @@ describe("OnlineVerificationInfo", () => {
     render(<OnlineVerificationInfo />);
 
     expect(
-      screen.getByText("Learn more about how selfie and ID check works"),
+      screen.getByText("Learn more about how self-photo and ID check works"),
     ).toBeInTheDocument();
   });
 
@@ -241,7 +245,7 @@ describe("OnlineVerificationInfo", () => {
     render(<OnlineVerificationInfo />);
 
     const link = screen.getByText(
-      "Learn more about how selfie and ID check works",
+      "Learn more about how self-photo and ID check works",
     );
     expect(link.closest("a")).toHaveAttribute("target", "_blank");
   });
