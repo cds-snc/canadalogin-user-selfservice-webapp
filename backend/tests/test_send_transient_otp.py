@@ -389,6 +389,7 @@ async def test_email_send_stores_destination_in_redis_when_available():
     payload["expiry"] = "2999-01-01T00:00:00Z"
 
     redis_client = AsyncMock()
+    redis_client.eval.return_value = [1, 1, 29]
     request = SimpleNamespace(
         session={},
         cookies={"gc-manage-app": "session-123"},
@@ -559,6 +560,7 @@ async def test_handle_contact_phone_update_counted_send_checks_and_records_rate_
 
     mock_assert_rate_limit = AsyncMock()
     mock_record_rate_limit = AsyncMock()
+    mock_daily_quota = AsyncMock()
     monkeypatch.setattr(
         feature_module,
         "assert_contact_phone_update_rate_limit_not_exceeded",
@@ -568,6 +570,11 @@ async def test_handle_contact_phone_update_counted_send_checks_and_records_rate_
         feature_module,
         "record_contact_phone_update_event",
         mock_record_rate_limit,
+    )
+    monkeypatch.setattr(
+        feature_module,
+        "consume_transient_send_daily_quota",
+        mock_daily_quota,
     )
 
     def handler(request: Request) -> Response:
@@ -595,6 +602,7 @@ async def test_handle_contact_phone_update_counted_send_checks_and_records_rate_
 
     assert result.success is True
     mock_assert_rate_limit.assert_awaited_once_with(request, "user@example.com")
+    mock_daily_quota.assert_awaited_once_with(request, "user@example.com")
     mock_record_rate_limit.assert_awaited_once_with(request, "user@example.com")
 
 

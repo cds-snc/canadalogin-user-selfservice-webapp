@@ -335,31 +335,38 @@ class TestHandleMFAOTPVerificationCreate:
                     "app.otp.services.send_mfa_otp.record_phone_mfa_registration_event"
                 ) as mock_record_rate_limit:
                     with patch(
-                        "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
-                    ) as mock_dispatch:
-                        mock_response = MagicMock()
-                        mock_response.json.return_value = (
-                            mock_successful_verification_response
-                        )
-                        mock_dispatch.return_value = mock_response
+                        "app.otp.services.send_mfa_otp.consume_mfa_send_daily_quota"
+                    ) as mock_daily_quota:
+                        with patch(
+                            "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
+                        ) as mock_dispatch:
+                            mock_response = MagicMock()
+                            mock_response.json.return_value = (
+                                mock_successful_verification_response
+                            )
+                            mock_dispatch.return_value = mock_response
 
-                        result = await handle_send_mfa_otp(
-                            mock_http_client,
-                            verification_request,
-                            "user_token",
-                            OtpType.SMS,
-                            request=mock_request,
-                        )
+                            result = await handle_send_mfa_otp(
+                                mock_http_client,
+                                verification_request,
+                                "user_token",
+                                OtpType.SMS,
+                                request=mock_request,
+                            )
 
-                        assert result.success is True
-                        mock_assert_rate_limit.assert_awaited_once_with(
-                            mock_request,
-                            "user123",
-                        )
-                        mock_record_rate_limit.assert_awaited_once_with(
-                            mock_request,
-                            "user123",
-                        )
+                            assert result.success is True
+                            mock_assert_rate_limit.assert_awaited_once_with(
+                                mock_request,
+                                "user123",
+                            )
+                            mock_daily_quota.assert_awaited_once_with(
+                                mock_request,
+                                "user123",
+                            )
+                            mock_record_rate_limit.assert_awaited_once_with(
+                                mock_request,
+                                "user123",
+                            )
 
     @pytest.mark.asyncio
     async def test_verification_create_does_not_count_rate_limit_for_resend(

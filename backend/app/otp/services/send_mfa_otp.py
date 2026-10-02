@@ -9,6 +9,7 @@ from app.utils.global_error_handlers import extract_response_body
 from app.utils.access_token import get_auth_request_headers
 from app.utils.phone_mfa_rate_limit import (
     assert_phone_mfa_registration_rate_limit_not_exceeded,
+    consume_mfa_send_daily_quota,
     record_phone_mfa_registration_event,
 )
 from app.utils.schemas import ResponseModel
@@ -129,6 +130,9 @@ async def handle_send_mfa_otp(
 
     if should_enforce_phone_rate_limit:
         await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
+
+    if request is not None:
+        await consume_mfa_send_daily_quota(request, user_id)
 
     should_record_phone_rate_limit_event = False
     if should_enforce_phone_rate_limit:

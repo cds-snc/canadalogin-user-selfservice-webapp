@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import logging
 import time
 from typing import Any
@@ -18,6 +20,44 @@ PHONE_MFA_REGISTRATION_REDIS_KEY_PREFIX = "rate_limit:phone_mfa_registration:"
 CONTACT_PHONE_UPDATE_SESSION_KEY = "contact_phone_update_events"
 CONTACT_PHONE_UPDATE_REDIS_KEY_PREFIX = "rate_limit:contact_phone_update:"
 
+OTP_SEND_DAILY_LIMIT = 30
+OTP_SEND_DAILY_WINDOW_SECONDS = 24 * 60 * 60
+OTP_SEND_DAILY_REDIS_KEY_PREFIX = "rate_limit:otp_send_daily:"
+OTP_SEND_DAILY_ERROR_CODE = "otp_send_daily_limit"
+OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE = "otp_send_limiter_unavailable"
+OTP_SEND_DAILY_SESSION_KEY = "otp_send_daily_events"
+
+OTP_SEND_MFA_FIELD = "mfa_send_count"
+OTP_SEND_TRANSIENT_FIELD = "transient_send_count"
+OTP_SEND_WINDOW_START_FIELD = "window_start"
+
+OTP_SEND_DAILY_CONSUME_SCRIPT = """
+local window_start = redis.call('HGET', KEYS[1], ARGV[1])
+local now = tonumber(ARGV[2])
+local window_seconds = tonumber(ARGV[3])
+local limit = tonumber(ARGV[4])
+local endpoint_field = ARGV[5]
+
+if not window_start or now - tonumber(window_start) >= window_seconds then
+    redis.call('HSET', KEYS[1], ARGV[1], now, 'mfa_send_count', 0, 'transient_send_count', 0)
+    window_start = tostring(now)
+end
+
+local count = tonumber(redis.call('HGET', KEYS[1], endpoint_field) or '0')
+if count >= limit then
+    local retry_after = window_seconds - (now - tonumber(window_start))
+    if retry_after < 1 then
+        retry_after = 1
+    end
+    redis.call('EXPIRE', KEYS[1], window_seconds + 3600)
+    return {0, count, retry_after}
+end
+
+count = redis.call('HINCRBY', KEYS[1], endpoint_field, 1)
+redis.call('EXPIRE', KEYS[1], window_seconds + 3600)
+return {1, count, limit - count}
+"""
+
 
 def _get_rate_limit_window_seconds() -> int:
     environment = get_configuration().ENVIRONMENT.strip().lower()
@@ -30,6 +70,154 @@ def _get_rate_limit_window_seconds() -> int:
 
     # Fail closed to production-level limits for unknown environments.
     return PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD
+
+
+def _hash_user_id_for_rate_limit(user_id: str) -> str:
+    configuration = get_configuration()
+    session_config = getattr(configuration, "session_config", None)
+    secret = getattr(session_config, "REDIS_AUTH_SECRET", "test-secret")
+    digest = hmac.new(
+        str(secret).encode("utf-8"),
+        str(user_id).encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    return digest[:40]
+
+
+def _build_otp_send_daily_key(user_id: str) -> str:
+    return f"{OTP_SEND_DAILY_REDIS_KEY_PREFIX}{_hash_user_id_for_rate_limit(user_id)}"
+
+
+def _is_otp_send_session_fallback_environment() -> bool:
+    environment = getattr(get_configuration(), "ENVIRONMENT", "local").strip().lower()
+    return environment in {"local", "dev", "test"}
+
+
+def _otp_send_retry_after(now: int, window_start: int) -> int:
+    return max(1, OTP_SEND_DAILY_WINDOW_SECONDS - (now - window_start))
+
+
+def _raise_otp_send_daily_limit(
+    endpoint_field: str,
+    user_hash: str,
+    retry_after: int,
+) -> None:
+    logger.warning(
+        "OTP send daily limit reached: endpoint_bucket=%s user_hash=%s retry_after=%s",
+        endpoint_field,
+        user_hash,
+        retry_after,
+    )
+    raise HTTPException(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        detail=OTP_SEND_DAILY_ERROR_CODE,
+        headers={"Retry-After": str(retry_after)},
+    )
+
+
+def _consume_otp_send_daily_quota_from_session(
+    request: Request,
+    user_id: str,
+    endpoint_field: str,
+) -> None:
+    now = int(time.time())
+    event_store = request.session.get(OTP_SEND_DAILY_SESSION_KEY, {})
+    if not isinstance(event_store, dict):
+        event_store = {}
+
+    user_key = _hash_user_id_for_rate_limit(user_id)
+    entry = event_store.get(user_key, {})
+    if not isinstance(entry, dict):
+        entry = {}
+
+    window_start = entry.get(OTP_SEND_WINDOW_START_FIELD)
+    if (
+        not isinstance(window_start, int)
+        or now - window_start >= OTP_SEND_DAILY_WINDOW_SECONDS
+    ):
+        window_start = now
+        entry = {
+            OTP_SEND_WINDOW_START_FIELD: window_start,
+            OTP_SEND_MFA_FIELD: 0,
+            OTP_SEND_TRANSIENT_FIELD: 0,
+        }
+
+    count = entry.get(endpoint_field, 0)
+    if not isinstance(count, int):
+        count = 0
+
+    if count >= OTP_SEND_DAILY_LIMIT:
+        _raise_otp_send_daily_limit(
+            endpoint_field,
+            user_key,
+            _otp_send_retry_after(now, window_start),
+        )
+
+    entry[endpoint_field] = count + 1
+    event_store[user_key] = entry
+    request.session[OTP_SEND_DAILY_SESSION_KEY] = event_store
+
+
+async def _consume_otp_send_daily_quota(
+    request: Request,
+    user_id: str,
+    endpoint_field: str,
+) -> None:
+    redis_client = _get_redis_client_from_request(request)
+    if redis_client is None:
+        if _is_otp_send_session_fallback_environment():
+            _consume_otp_send_daily_quota_from_session(request, user_id, endpoint_field)
+            return
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE,
+        )
+
+    now = int(time.time())
+    key = _build_otp_send_daily_key(user_id)
+    try:
+        result = await redis_client.eval(
+            OTP_SEND_DAILY_CONSUME_SCRIPT,
+            1,
+            key,
+            OTP_SEND_WINDOW_START_FIELD,
+            now,
+            OTP_SEND_DAILY_WINDOW_SECONDS,
+            OTP_SEND_DAILY_LIMIT,
+            endpoint_field,
+        )
+        if not isinstance(result, (list, tuple)) or len(result) < 3:
+            raise RuntimeError("Redis returned an invalid OTP send limiter result")
+
+        if int(result[0]) == 0:
+            _raise_otp_send_daily_limit(
+                endpoint_field,
+                _hash_user_id_for_rate_limit(user_id),
+                int(result[2]),
+            )
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001 - environment policy decides fallback
+        if _is_otp_send_session_fallback_environment():
+            logger.warning(
+                "OTP send limiter unavailable, falling back to session: %s", exc
+            )
+            _consume_otp_send_daily_quota_from_session(request, user_id, endpoint_field)
+            return
+
+        logger.error("OTP send limiter unavailable: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE,
+        ) from exc
+
+
+async def consume_mfa_send_daily_quota(request: Request, user_id: str) -> None:
+    await _consume_otp_send_daily_quota(request, user_id, OTP_SEND_MFA_FIELD)
+
+
+async def consume_transient_send_daily_quota(request: Request, user_id: str) -> None:
+    await _consume_otp_send_daily_quota(request, user_id, OTP_SEND_TRANSIENT_FIELD)
 
 
 def _build_rate_limit_key(redis_key_prefix: str, user_id: str) -> str:
