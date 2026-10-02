@@ -104,8 +104,7 @@ export default function StartIdentityProofingPage() {
     language,
     journeyType,
   });
-
-  const cantProveIdentity = path(PAGES.idvCompleteIdentityProofingPage, {
+  const profileHomePage = path(PAGES.ProfileHome, {
     language,
     journeyType,
   });
@@ -140,9 +139,6 @@ export default function StartIdentityProofingPage() {
         break;
       case START_IDENTITY_OPTION.inPerson:
         navigate(inPersonPage);
-        break;
-      case START_IDENTITY_OPTION.cantProveNow:
-        navigate(cantProveIdentity);
         break;
       default:
         break;
@@ -223,6 +219,15 @@ export default function StartIdentityProofingPage() {
             }}
           >
             {t("ServiceCanadaCentre.continueButton")}
+          </GcdsButton>
+          <GcdsButton
+            type="button"
+            buttonRole="secondary"
+            onClick={() => {
+              navigate(profileHomePage);
+            }}
+          >
+            {t("ProveIdentityOnline.backButton")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>
