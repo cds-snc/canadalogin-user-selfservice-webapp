@@ -773,36 +773,13 @@ async def test_handle_contact_phone_update_first_send_counts_even_without_flag(
     mock_record_rate_limit.assert_awaited_once_with(request, "user@example.com")
 
 
-@pytest.mark.asyncio
-async def test_handle_user_mismatch_returns_403(monkeypatch):
-    """
-    Test that user mismatch validation (which happens at route level)
-    properly raises 403 before handle_otp_send is called.
-    This test simulates the validation that occurs in the route.
-    """
-    from fastapi import HTTPException
-
-    # Mock validate_user_id_matches_session to raise 403 for user mismatch
-    async def mock_validation_failure(request, user_access_token, request_user_id):
-        # Simulate the validation logic that would happen at route level
-        raise HTTPException(
-            status_code=403, detail="User mismatch - cannot update profile"
-        )
-
-    # This test validates that the route-level validation would catch the mismatch
-    # In reality, this validation happens in the route before handle_otp_send is called
+def test_transient_otp_request_does_not_require_user_id():
     info = UserOtpInfo(
         otpType=OtpType.SMS,
-        user_id="user@example.com",
         destination="+14165551234",  # ✅ E.164
     )
 
-    # Simulate what would happen at the route level
-    with pytest.raises(HTTPException) as exc_info:
-        await mock_validation_failure(None, "USER_TOKEN", info.user_id)
-
-    assert exc_info.value.status_code == 403
-    assert "User mismatch" in str(exc_info.value.detail)
+    assert not hasattr(info, "user_id")
 
 
 @pytest.mark.asyncio
