@@ -146,7 +146,7 @@ describe("OnlineVerificationInfo", () => {
 
     expect(
       screen.getByText(
-        "Use you phone camera and allow the camera permission when asked.",
+        "Use your phone camera and allow the camera permission when asked.",
       ),
     ).toBeInTheDocument();
     expect(
