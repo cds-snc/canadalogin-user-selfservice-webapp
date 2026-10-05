@@ -22,7 +22,6 @@ interface IdentityProofingRadioButtonsProps {
 export default function IdentityProofingRadioButtons({
   selectedOption,
   onOptionChange,
-  rpName,
   errorMessage,
   id,
 }: IdentityProofingRadioButtonsProps): JSX.Element {
@@ -42,15 +41,6 @@ export default function IdentityProofingRadioButtons({
       value: START_IDENTITY_OPTION.inPerson,
       hint: t("StartIdentityProofing.inPersonSignBackInHint"),
       checked: selectedOption === START_IDENTITY_OPTION.inPerson,
-    },
-    {
-      label: t("StartIdentityProofing.cantProveNowOption"),
-      id: `radio-${START_IDENTITY_OPTION.cantProveNow}`,
-      value: START_IDENTITY_OPTION.cantProveNow,
-      hint: t("StartIdentityProofing.cantProveNowHint", {
-        rpName,
-      }),
-      checked: selectedOption === START_IDENTITY_OPTION.cantProveNow,
     },
   ];
 
