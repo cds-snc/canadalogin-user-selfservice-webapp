@@ -32,33 +32,6 @@ OTP_SEND_MFA_FIELD = "mfa_send_count"
 OTP_SEND_TRANSIENT_FIELD = "transient_send_count"
 OTP_SEND_WINDOW_START_FIELD = "window_start"
 
-OTP_SEND_DAILY_CONSUME_SCRIPT = """
-local window_start = redis.call('HGET', KEYS[1], ARGV[1])
-local now = tonumber(ARGV[2])
-local window_seconds = tonumber(ARGV[3])
-local limit = tonumber(ARGV[4])
-local endpoint_field = ARGV[5]
-
-if not window_start or now - tonumber(window_start) >= window_seconds then
-    redis.call('HSET', KEYS[1], ARGV[1], now, 'mfa_send_count', 0, 'transient_send_count', 0)
-    window_start = tostring(now)
-end
-
-local count = tonumber(redis.call('HGET', KEYS[1], endpoint_field) or '0')
-if count >= limit then
-    local retry_after = window_seconds - (now - tonumber(window_start))
-    if retry_after < 1 then
-        retry_after = 1
-    end
-    redis.call('EXPIRE', KEYS[1], window_seconds + 3600)
-    return {0, count, retry_after}
-end
-
-count = redis.call('HINCRBY', KEYS[1], endpoint_field, 1)
-redis.call('EXPIRE', KEYS[1], window_seconds + 3600)
-return {1, count, limit - count}
-"""
-
 
 def _get_rate_limit_window_seconds() -> int:
     environment = get_configuration().ENVIRONMENT.strip().lower()
@@ -95,8 +68,9 @@ def _hash_user_id_for_rate_limit(user_id: str) -> str:
     return digest[:40]
 
 
-def _build_otp_send_daily_key(user_id: str) -> str:
-    return f"{OTP_SEND_DAILY_REDIS_KEY_PREFIX}{_hash_user_id_for_rate_limit(user_id)}"
+def _build_otp_send_daily_key(user_id: str, endpoint_field: str) -> str:
+    user_hash = _hash_user_id_for_rate_limit(user_id)
+    return f"{OTP_SEND_DAILY_REDIS_KEY_PREFIX}{endpoint_field}:{user_hash}"
 
 
 def _is_otp_send_session_fallback_environment() -> bool:
@@ -185,28 +159,21 @@ async def _consume_otp_send_daily_quota(
             detail=OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE,
         )
 
-    now = int(time.time())
-    key = _build_otp_send_daily_key(user_id)
     window_seconds = _get_otp_send_daily_window_seconds()
+    key = _build_otp_send_daily_key(user_id, endpoint_field)
     try:
-        result = await redis_client.eval(
-            OTP_SEND_DAILY_CONSUME_SCRIPT,
-            1,
-            key,
-            OTP_SEND_WINDOW_START_FIELD,
-            now,
-            window_seconds,
-            OTP_SEND_DAILY_LIMIT,
-            endpoint_field,
-        )
-        if not isinstance(result, (list, tuple)) or len(result) < 3:
-            raise RuntimeError("Redis returned an invalid OTP send limiter result")
+        count = int(await redis_client.incr(key))
+        if count == 1:
+            await redis_client.expire(key, window_seconds)
 
-        if int(result[0]) == 0:
+        if count > OTP_SEND_DAILY_LIMIT:
+            retry_after = int(await redis_client.ttl(key))
+            if retry_after < 1:
+                retry_after = window_seconds
             _raise_otp_send_daily_limit(
                 endpoint_field,
                 _hash_user_id_for_rate_limit(user_id),
-                int(result[2]),
+                retry_after,
             )
     except HTTPException:
         raise

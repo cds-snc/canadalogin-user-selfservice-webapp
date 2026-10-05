@@ -243,15 +243,18 @@ def test_otp_send_daily_redis_key_is_hmac_derived(monkeypatch):
     )
 
     user_id = "user@example.com"
-    key = phone_mfa_rate_limit_module._build_otp_send_daily_key(user_id)
+    key = phone_mfa_rate_limit_module._build_otp_send_daily_key(
+        user_id, OTP_SEND_TRANSIENT_FIELD
+    )
 
     assert key.startswith(OTP_SEND_DAILY_REDIS_KEY_PREFIX)
     assert user_id not in key
+    assert OTP_SEND_TRANSIENT_FIELD in key
     assert len(key.rsplit(":", 1)[-1]) == 40
 
 
 @pytest.mark.asyncio
-async def test_otp_send_daily_redis_consume_uses_hashed_key_and_endpoint_field(
+async def test_otp_send_daily_redis_consume_uses_hashed_key_and_endpoint_key(
     monkeypatch,
 ):
     monkeypatch.setattr(
@@ -263,16 +266,18 @@ async def test_otp_send_daily_redis_consume_uses_hashed_key_and_endpoint_field(
         ),
     )
     redis_client = AsyncMock()
-    redis_client.eval.return_value = [1, 1, 29]
+    redis_client.incr.return_value = 1
     request = _build_request_with_session(redis_client=redis_client)
 
     await consume_transient_send_daily_quota(request, "user@example.com")
 
-    key = redis_client.eval.call_args.args[2]
+    key = redis_client.incr.call_args.args[0]
     assert key.startswith(OTP_SEND_DAILY_REDIS_KEY_PREFIX)
     assert "user@example.com" not in key
-    assert redis_client.eval.call_args.args[5] == OTP_SEND_DAILY_WINDOW_SECONDS_PROD
-    assert redis_client.eval.call_args.args[-1] == OTP_SEND_TRANSIENT_FIELD
+    assert OTP_SEND_TRANSIENT_FIELD in key
+    redis_client.expire.assert_awaited_once_with(
+        key, OTP_SEND_DAILY_WINDOW_SECONDS_PROD
+    )
 
 
 @pytest.mark.asyncio
@@ -290,12 +295,15 @@ async def test_otp_send_daily_redis_window_is_15_minutes_in_non_prod(
         ),
     )
     redis_client = AsyncMock()
-    redis_client.eval.return_value = [1, 1, 29]
+    redis_client.incr.return_value = 1
     request = _build_request_with_session(redis_client=redis_client)
 
     await consume_transient_send_daily_quota(request, "user@example.com")
 
-    assert redis_client.eval.call_args.args[5] == OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD
+    redis_client.expire.assert_awaited_once_with(
+        redis_client.incr.call_args.args[0],
+        OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD,
+    )
 
 
 @pytest.mark.asyncio
@@ -309,7 +317,8 @@ async def test_otp_send_daily_redis_block_includes_retry_after(monkeypatch):
         ),
     )
     redis_client = AsyncMock()
-    redis_client.eval.return_value = [0, OTP_SEND_DAILY_LIMIT, 120]
+    redis_client.incr.return_value = OTP_SEND_DAILY_LIMIT + 1
+    redis_client.ttl.return_value = 120
     request = _build_request_with_session(redis_client=redis_client)
 
     with pytest.raises(HTTPException) as exc_info:

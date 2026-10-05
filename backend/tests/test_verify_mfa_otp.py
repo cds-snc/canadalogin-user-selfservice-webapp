@@ -5,7 +5,9 @@ These tests verify the refactored unified functions that accept OTP type paramet
 instead of having separate SMS and Voice functions.
 """
 
+import json
 from unittest.mock import AsyncMock, MagicMock, patch
+from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
@@ -23,6 +25,9 @@ from app.otp.services.verify_mfa_otp import (
 from app.otp.services.send_mfa_otp import (
     dispatch_send_mfa_otp,
     handle_send_mfa_otp,
+)
+from app.otp.services.profile_otp_transaction_store import (
+    store_mfa_otp_transaction,
 )
 
 
@@ -277,6 +282,37 @@ class TestIntegrationBasics:
 
 class TestHandleMFAOTPVerificationCreate:
     """Test the main verification create handler function."""
+
+    @pytest.mark.asyncio
+    async def test_mfa_resend_replaces_session_transaction_key(self):
+        redis_client = AsyncMock()
+        request = SimpleNamespace(
+            session={},
+            cookies={"gc-manage-app": "session-123"},
+            app=SimpleNamespace(state=SimpleNamespace(redis_client=redis_client)),
+        )
+
+        for transaction_id, factor_id in (
+            ("mfa-1", "factor123"),
+            ("mfa-2", "factor456"),
+        ):
+            await store_mfa_otp_transaction(
+                request=request,
+                response_json={
+                    "id": transaction_id,
+                    "expiry": "2999-01-01T00:00:00Z",
+                },
+                factor_id=factor_id,
+                otp_type="sms",
+            )
+
+        assert [call.args[0] for call in redis_client.set.call_args_list] == [
+            "mfa_otp_transaction:session-123",
+            "mfa_otp_transaction:session-123",
+        ]
+        latest_transaction = json.loads(redis_client.set.call_args.args[1])
+        assert latest_transaction["transactionId"] == "mfa-2"
+        assert latest_transaction["factorId"] == "factor456"
 
     @pytest.mark.asyncio
     async def test_verification_create_success_sms(

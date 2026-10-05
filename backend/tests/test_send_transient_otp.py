@@ -11,7 +11,7 @@ from pydantic import ValidationError
 # Schemas
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
 from app.otp.services.profile_otp_transaction_store import (
-    EMAIL_OTP_TRANSACTION_SESSION_KEY,
+    TRANSIENT_OTP_TRANSACTION_SESSION_KEY,
 )
 
 # Feature under test
@@ -372,7 +372,7 @@ async def test_email_send_stores_destination_by_transaction_id():
         )
 
     assert result.success is True
-    assert request.session[EMAIL_OTP_TRANSACTION_SESSION_KEY] == {
+    assert request.session[TRANSIENT_OTP_TRANSACTION_SESSION_KEY] == {
         "transactionId": "email-store-1",
         "emailAddress": "newemail@example.com",
         "expiry": payload["expiry"],
@@ -414,7 +414,7 @@ async def test_email_send_stores_destination_in_redis_when_available():
     assert result.success is True
     redis_client.set.assert_awaited_once()
     key, serialized_transaction = redis_client.set.call_args.args
-    assert key == "email_otp_transaction:session-123"
+    assert key == "transient_otp_transaction:session-123"
     assert json.loads(serialized_transaction)["transactionId"] == "email-redis-1"
     assert json.loads(serialized_transaction)["sessionId"] == "session-123"
     assert json.loads(serialized_transaction)["emailAddress"] == "newemail@example.com"
@@ -457,7 +457,7 @@ async def test_email_send_stores_transaction_when_ibm_uses_id_field():
     assert result.success is True
     redis_client.set.assert_awaited_once()
     key, _ = redis_client.set.call_args.args
-    assert key == "email_otp_transaction:session-123"
+    assert key == "transient_otp_transaction:session-123"
 
 
 @pytest.mark.asyncio
@@ -501,8 +501,8 @@ async def test_email_resend_overwrites_session_scoped_redis_key():
             assert result.success is True
 
     assert [call.args[0] for call in redis_client.set.call_args_list] == [
-        "email_otp_transaction:session-123",
-        "email_otp_transaction:session-123",
+        "transient_otp_transaction:session-123",
+        "transient_otp_transaction:session-123",
     ]
     last_transaction = json.loads(redis_client.set.call_args.args[1])
     assert last_transaction["transactionId"] == "email-resend-2"
@@ -542,7 +542,7 @@ async def test_phone_send_stores_destination_in_session_scoped_redis_key():
 
     assert result.success is True
     key, serialized_transaction = redis_client.set.call_args.args
-    assert key == "phone_otp_transaction:session-123"
+    assert key == "transient_otp_transaction:session-123"
     transaction = json.loads(serialized_transaction)
     assert transaction["transactionId"] == "phone-redis-1"
     assert transaction["phoneNumber"] == "14165551234"
