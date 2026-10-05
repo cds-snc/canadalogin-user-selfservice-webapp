@@ -86,13 +86,11 @@ def _otp_send_retry_after(now: int, window_start: int) -> int:
 
 
 def _raise_otp_send_daily_limit(
-    endpoint_field: str,
     user_hash: str,
     retry_after: int,
 ) -> None:
     logger.warning(
-        "OTP send daily limit reached: endpoint_bucket=%s user_hash=%s retry_after=%s",
-        endpoint_field,
+        "OTP send daily limit reached: user_hash=%s retry_after=%s",
         user_hash,
         retry_after,
     )
@@ -134,7 +132,6 @@ def _consume_otp_send_daily_quota_from_session(
 
     if count >= OTP_SEND_DAILY_LIMIT:
         _raise_otp_send_daily_limit(
-            endpoint_field,
             user_key,
             _otp_send_retry_after(now, window_start),
         )
@@ -171,7 +168,6 @@ async def _consume_otp_send_daily_quota(
             if retry_after < 1:
                 retry_after = window_seconds
             _raise_otp_send_daily_limit(
-                endpoint_field,
                 _hash_user_id_for_rate_limit(user_id),
                 retry_after,
             )
