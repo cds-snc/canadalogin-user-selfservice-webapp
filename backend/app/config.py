@@ -35,11 +35,6 @@ class IBMVerifyConfig(BaseSettings):
     IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: str
     IBM_VERIFY_ACTIVITY_CLIENT_ID: Optional[str] = None
     IBM_VERIFY_ACTIVITY_CLIENT_SECRET: Optional[str] = None
-    IBM_VERIFY_ACTIVITY_EVENT_FIELD_MAP: str = (
-        '{"event_type":"event_type","user_id":"data.userid",'
-        '"application_id":"data.applicationid","client_id":"data.client_id",'
-        '"result":"data.result","action":"data.action","timestamp":"time"}'
-    )
     IBM_VERIFY_ACTIVITY_SSO_EVENT_TYPES: str = "sso"
     IBM_VERIFY_ACTIVITY_SLO_EVENT_TYPES: str = "slo"
     IBM_VERIFY_ACTIVITY_SSO_ACTIONS: str = "issued"

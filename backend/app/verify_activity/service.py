@@ -1,4 +1,3 @@
-import json
 import logging
 from datetime import datetime, timezone
 from typing import Any
@@ -8,6 +7,17 @@ from .client import IBMVerifyActivityClient
 from .schemas import RelyingPartyActivity
 
 logger = logging.getLogger(__name__)
+
+# IBM Verify Events API payload paths used to build connected-service activity.
+EVENT_FIELD_MAP = {
+    "event_type": "event_type",
+    "user_id": "data.userid",
+    "application_id": "data.applicationid",
+    "client_id": "data.client_id",
+    "result": "data.result",
+    "action": "data.action",
+    "timestamp": "time",
+}
 
 
 def _path_value(event: dict[str, Any], path: str) -> Any:
@@ -34,28 +44,6 @@ def _parse_time(value: Any) -> datetime | None:
     except ValueError:
         return None
     return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
-
-
-def _configured_map(settings: Configuration) -> dict[str, str]:
-    raw = settings.ibm_verify_config.IBM_VERIFY_ACTIVITY_EVENT_FIELD_MAP
-    try:
-        value = json.loads(raw)
-    except json.JSONDecodeError as exc:
-        raise ValueError(
-            "IBM_VERIFY_ACTIVITY_EVENT_FIELD_MAP must be valid JSON"
-        ) from exc
-    if not isinstance(value, dict) or not all(
-        isinstance(key, str) and isinstance(path, str) for key, path in value.items()
-    ):
-        raise ValueError(
-            "IBM_VERIFY_ACTIVITY_EVENT_FIELD_MAP must map names to dot-separated paths"
-        )
-    required_fields = {"event_type", "user_id", "application_id", "timestamp"}
-    if not required_fields.issubset(value):
-        raise ValueError(
-            "IBM_VERIFY_ACTIVITY_EVENT_FIELD_MAP is missing required fields"
-        )
-    return value
 
 
 def _event_type_set(raw: str) -> set[str]:
@@ -98,7 +86,7 @@ def calculate_activity(
     events: list[dict[str, Any]],
     settings: Configuration,
 ) -> list[RelyingPartyActivity]:
-    field_map = _configured_map(settings)
+    field_map = EVENT_FIELD_MAP
     sso_types = _event_type_set(
         settings.ibm_verify_config.IBM_VERIFY_ACTIVITY_SSO_EVENT_TYPES
     )
@@ -158,7 +146,7 @@ def calculate_activity(
 async def get_user_activity(
     client: IBMVerifyActivityClient, user_id: str
 ) -> list[RelyingPartyActivity]:
-    field_map = _configured_map(client.settings)
+    field_map = EVENT_FIELD_MAP
     event_types = ",".join(
         f'"{event_type}"'
         for event_type in sorted(

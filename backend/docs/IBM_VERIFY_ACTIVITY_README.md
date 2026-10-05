@@ -37,8 +37,11 @@ References:
 - https://docs.verify.ibm.com/verify/reference/getallevents.md
 - https://docs.verify.ibm.com/verify/reference/post_oauth2-token.md
 
-IBM's Events API does not publish a typed SSO/SLO event payload. Configure the
-paths observed in your tenant's payloads using these backend variables:
+IBM's Events API does not publish a typed SSO/SLO event payload. The payload
+paths used by the activity service are declared in `EVENT_FIELD_MAP` in
+`app/verify_activity/service.py`. Update that mapping in code if the tenant's
+event payload shape changes. Event categories, actions, and the lookback period
+remain configurable with these backend variables:
 
 ```text
 IBM_VERIFY_ACTIVITY_SSO_EVENT_TYPES=sso
@@ -46,7 +49,6 @@ IBM_VERIFY_ACTIVITY_SLO_EVENT_TYPES=slo
 IBM_VERIFY_ACTIVITY_SSO_ACTIONS=issued
 IBM_VERIFY_ACTIVITY_SLO_ACTIONS=sso_logout
 IBM_VERIFY_ACTIVITY_LOOKBACK_DAYS=30
-IBM_VERIFY_ACTIVITY_EVENT_FIELD_MAP={"event_type":"event_type","user_id":"data.userid","application_id":"data.applicationid","client_id":"data.client_id","result":"data.result","action":"data.action","timestamp":"time"}
 ```
 
 Configure both `IBM_VERIFY_ACTIVITY_CLIENT_ID` and
@@ -54,9 +56,9 @@ Configure both `IBM_VERIFY_ACTIVITY_CLIENT_ID` and
 Activity lookup does not fall back to profile-management credentials. If either
 activity credential is missing, activity lookup fails and connected services
 still returns without timestamps. Neither secrets nor tokens are logged.
-Event types and actions are comma-separated exact values; field-map values are
-dot-separated paths. The client sends the mapped user field and authenticated
-user ID as the Events API filter, so it does not download tenant-wide events.
+Event types and actions are comma-separated exact values. The client sends the
+mapped user field and authenticated user ID as the Events API filter, so it does
+not download tenant-wide events.
 `user_id`, `application_id`, and `timestamp` must resolve, and `result` must
 equal `success`. The most recent event of each type supplies that application's
 timestamp. The default lookback is 30 days; increase it for older history.

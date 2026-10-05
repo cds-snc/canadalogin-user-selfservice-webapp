@@ -10,17 +10,6 @@ from app.verify_activity.service import (
     get_user_activity,
 )
 
-FIELD_MAP = {
-    "event_type": "type",
-    "user_id": "data.userId",
-    "application_id": "data.applicationId",
-    "client_id": "data.clientId",
-    "result": "data.result",
-    "action": "data.action",
-    "timestamp": "time",
-}
-
-
 def settings(sso="sso.success", slo="slo.success"):
     return SimpleNamespace(
         events_api_endpoint="https://tenant.example/v1.0/events",
@@ -32,7 +21,6 @@ def settings(sso="sso.success", slo="slo.success"):
             IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET="secret",
             IBM_VERIFY_ACTIVITY_CLIENT_ID="events-client",
             IBM_VERIFY_ACTIVITY_CLIENT_SECRET="events-secret",
-            IBM_VERIFY_ACTIVITY_EVENT_FIELD_MAP=__import__("json").dumps(FIELD_MAP),
             IBM_VERIFY_ACTIVITY_SSO_EVENT_TYPES=sso,
             IBM_VERIFY_ACTIVITY_SLO_EVENT_TYPES=slo,
             IBM_VERIFY_ACTIVITY_SSO_ACTIONS="issued",
@@ -44,12 +32,12 @@ def settings(sso="sso.success", slo="slo.success"):
 
 def event(event_type, application_id, time, user_id="user-1"):
     return {
-        "type": event_type,
+        "event_type": event_type,
         "time": time,
         "data": {
-            "userId": user_id,
-            "applicationId": application_id,
-            "clientId": f"client-{application_id}",
+            "userid": user_id,
+            "applicationid": application_id,
+            "client_id": f"client-{application_id}",
             "result": "success",
             "action": "issued",
         },
@@ -116,7 +104,7 @@ async def test_get_user_activity_does_not_fetch_sessions():
     client.get_events.assert_awaited_once_with(
         event_type='"slo.success","sso.success"',
         user_id="user-1",
-        user_id_field="data.userId",
+        user_id_field="data.userid",
     )
 
 
@@ -162,14 +150,14 @@ async def test_events_client_uses_documented_after_cursor():
     activity_client = IBMVerifyActivityClient(client, settings())
 
     result = await activity_client.get_events(
-        event_type='"sso"', user_id="user-1", user_id_field="data.userId", size=2
+        event_type='"sso"', user_id="user-1", user_id_field="data.userid", size=2
     )
 
     assert result == [{"id": "one"}, {"id": "two"}]
     client.post.assert_awaited_once()
     assert client.post.await_args.kwargs["data"]["client_id"] == "events-client"
     assert client.post.await_args.kwargs["data"]["client_secret"] == "events-secret"
-    assert client.get.await_args_list[0].kwargs["params"]["filter_key"] == "data.userId"
+    assert client.get.await_args_list[0].kwargs["params"]["filter_key"] == "data.userid"
     assert client.get.await_args_list[0].kwargs["params"]["filter_value"] == '"user-1"'
     assert client.get.await_args_list[1].kwargs["params"]["after_id"] == "one"
     assert client.get.await_args_list[1].kwargs["params"]["after_time"] == "10"
@@ -190,7 +178,7 @@ async def test_events_client_uses_dedicated_activity_credentials():
     config.ibm_verify_config.IBM_VERIFY_ACTIVITY_CLIENT_SECRET = "events-secret"
 
     await IBMVerifyActivityClient(client, config).get_events(
-        event_type='"sso"', user_id="user-1", user_id_field="data.userId"
+        event_type='"sso"', user_id="user-1", user_id_field="data.userid"
     )
 
     assert client.post.await_args.args[0] == "https://tenant.example/oauth2/token"
