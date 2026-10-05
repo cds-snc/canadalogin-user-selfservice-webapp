@@ -12,7 +12,8 @@ from app.utils.phone_mfa_rate_limit import (
     OTP_SEND_DAILY_LIMIT,
     OTP_SEND_DAILY_REDIS_KEY_PREFIX,
     OTP_SEND_DAILY_SESSION_KEY,
-    OTP_SEND_DAILY_WINDOW_SECONDS,
+    OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD,
+    OTP_SEND_DAILY_WINDOW_SECONDS_PROD,
     OTP_SEND_MFA_FIELD,
     OTP_SEND_TRANSIENT_FIELD,
     PHONE_RATE_LIMIT,
@@ -194,11 +195,15 @@ async def test_otp_send_daily_buckets_are_independent_with_session_fallback(
 
     assert exc_info.value.status_code == 429
     assert exc_info.value.detail == OTP_SEND_DAILY_ERROR_CODE
-    assert exc_info.value.headers["Retry-After"] == str(OTP_SEND_DAILY_WINDOW_SECONDS)
+    assert exc_info.value.headers["Retry-After"] == str(
+        OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD
+    )
 
 
 @pytest.mark.asyncio
-async def test_otp_send_daily_session_window_resets_after_24_hours(monkeypatch):
+async def test_otp_send_daily_session_window_resets_after_15_minutes_in_non_prod(
+    monkeypatch,
+):
     monkeypatch.setattr(
         phone_mfa_rate_limit_module,
         "get_configuration",
@@ -216,7 +221,7 @@ async def test_otp_send_daily_session_window_resets_after_24_hours(monkeypatch):
     monkeypatch.setattr(
         phone_mfa_rate_limit_module.time,
         "time",
-        lambda: 1000 + OTP_SEND_DAILY_WINDOW_SECONDS,
+        lambda: 1000 + OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD,
     )
     await consume_mfa_send_daily_quota(request, "user@example.com")
 
@@ -266,7 +271,31 @@ async def test_otp_send_daily_redis_consume_uses_hashed_key_and_endpoint_field(
     key = redis_client.eval.call_args.args[2]
     assert key.startswith(OTP_SEND_DAILY_REDIS_KEY_PREFIX)
     assert "user@example.com" not in key
+    assert redis_client.eval.call_args.args[5] == OTP_SEND_DAILY_WINDOW_SECONDS_PROD
     assert redis_client.eval.call_args.args[-1] == OTP_SEND_TRANSIENT_FIELD
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("environment", ["local", "dev", "test"])
+async def test_otp_send_daily_redis_window_is_15_minutes_in_non_prod(
+    monkeypatch,
+    environment,
+):
+    monkeypatch.setattr(
+        phone_mfa_rate_limit_module,
+        "get_configuration",
+        lambda: SimpleNamespace(
+            ENVIRONMENT=environment,
+            session_config=SimpleNamespace(REDIS_AUTH_SECRET="rate-secret"),
+        ),
+    )
+    redis_client = AsyncMock()
+    redis_client.eval.return_value = [1, 1, 29]
+    request = _build_request_with_session(redis_client=redis_client)
+
+    await consume_transient_send_daily_quota(request, "user@example.com")
+
+    assert redis_client.eval.call_args.args[5] == OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD
 
 
 @pytest.mark.asyncio

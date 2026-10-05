@@ -1843,6 +1843,30 @@ class TestErrorHandlingEnrollMfaOtp:
 
 class TestErrorHandlingSendMfaOtp:
 
+    @pytest.fixture(autouse=True)
+    def mock_bound_mfa_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "trxn456",
+                "factorId": "factor123",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        async def consume_bound_transaction(**_kwargs):
+            return None
+
+        monkeypatch.setattr(
+            verify_mfa_otp_module,
+            "get_bound_otp_transaction",
+            get_bound_transaction,
+        )
+        monkeypatch.setattr(
+            verify_mfa_otp_module,
+            "consume_mfa_otp_transaction",
+            consume_bound_transaction,
+        )
+
     @pytest.mark.asyncio
     @patch.object(
         send_mfa_otp_module, "assert_phone_mfa_registration_rate_limit_not_exceeded"
@@ -2569,6 +2593,21 @@ class TestErrorHandlingAuthLogout:
 
 
 class TestErrorHandlingRetrieveTransientOtp:
+
+    @pytest.fixture(autouse=True)
+    def mock_bound_transient_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "bound-transaction",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        monkeypatch.setattr(
+            retrieve_transient_otp_module,
+            "get_transient_otp_transaction",
+            get_bound_transaction,
+        )
 
     @pytest.mark.asyncio
     @patch.object(retrieve_transient_otp_module, "dispatch_otp_status_retrieval")
@@ -3370,6 +3409,21 @@ class TestErrorHandlingVerifyPasswordStepup:
 
 
 class TestErrorHandlingVerifyTransientOtp:
+
+    @pytest.fixture(autouse=True)
+    def mock_bound_transient_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "bound-transaction",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        monkeypatch.setattr(
+            verify_transient_otp_module,
+            "get_transient_otp_transaction",
+            get_bound_transaction,
+        )
 
     @pytest.mark.asyncio
     @patch.object(verify_transient_otp_module, "get_auth_request_headers")

@@ -530,6 +530,28 @@ class TestHandleMFAOTPVerificationCreate:
 class TestHandleMFAOTPVerificationAttempt:
     """Test the main verification attempt handler function."""
 
+    @pytest.fixture(autouse=True)
+    def mock_bound_mfa_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "trxn456",
+                "factorId": "factor123",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        async def consume_bound_transaction(**_kwargs):
+            return None
+
+        monkeypatch.setattr(
+            "app.otp.services.verify_mfa_otp.get_bound_otp_transaction",
+            get_bound_transaction,
+        )
+        monkeypatch.setattr(
+            "app.otp.services.verify_mfa_otp.consume_mfa_otp_transaction",
+            consume_bound_transaction,
+        )
+
     @pytest.mark.asyncio
     async def test_verification_attempt_success_sms(
         self, mock_sms_verification_attempt_request, mock_profile_success_response
@@ -569,6 +591,39 @@ class TestHandleMFAOTPVerificationAttempt:
                         "user_token",
                         "factor123",
                     )
+
+    @pytest.mark.asyncio
+    async def test_rejects_transaction_not_bound_to_session(
+        self, mock_sms_verification_attempt_request, mock_profile_success_response
+    ):
+        mock_http_client = AsyncMock()
+
+        async def no_bound_transaction(**_kwargs):
+            return None
+
+        with patch(
+            "app.otp.services.verify_mfa_otp.get_bound_otp_transaction",
+            new=no_bound_transaction,
+        ):
+            with patch(
+                "app.otp.services.verify_mfa_otp.get_my_profile",
+                return_value=mock_profile_success_response,
+            ):
+                with patch(
+                    "app.otp.services.verify_mfa_otp._resolve_factor_verification_context",
+                    return_value=(OtpType.SMS, True),
+                ):
+                    with pytest.raises(HTTPException) as exc_info:
+                        await handle_verify_mfa_otp(
+                            mock_http_client,
+                            mock_sms_verification_attempt_request,
+                            "user_token",
+                            OtpType.SMS,
+                            request=MagicMock(),
+                        )
+
+        assert exc_info.value.status_code == 400
+        assert exc_info.value.detail == "invalidCode"
 
     @pytest.mark.asyncio
     async def test_verification_attempt_success_voice(

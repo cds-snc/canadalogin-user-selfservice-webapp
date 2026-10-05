@@ -21,7 +21,8 @@ CONTACT_PHONE_UPDATE_SESSION_KEY = "contact_phone_update_events"
 CONTACT_PHONE_UPDATE_REDIS_KEY_PREFIX = "rate_limit:contact_phone_update:"
 
 OTP_SEND_DAILY_LIMIT = 30
-OTP_SEND_DAILY_WINDOW_SECONDS = 24 * 60 * 60
+OTP_SEND_DAILY_WINDOW_SECONDS_PROD = 24 * 60 * 60
+OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD = 15 * 60
 OTP_SEND_DAILY_REDIS_KEY_PREFIX = "rate_limit:otp_send_daily:"
 OTP_SEND_DAILY_ERROR_CODE = "otp_send_daily_limit"
 OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE = "otp_send_limiter_unavailable"
@@ -72,6 +73,16 @@ def _get_rate_limit_window_seconds() -> int:
     return PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD
 
 
+def _get_otp_send_daily_window_seconds() -> int:
+    environment = getattr(get_configuration(), "ENVIRONMENT", "local").strip().lower()
+
+    if environment in {"local", "dev", "test"}:
+        return OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD
+
+    # Keep the daily quota at 24 hours for staging, production, and unknown environments.
+    return OTP_SEND_DAILY_WINDOW_SECONDS_PROD
+
+
 def _hash_user_id_for_rate_limit(user_id: str) -> str:
     configuration = get_configuration()
     session_config = getattr(configuration, "session_config", None)
@@ -94,7 +105,10 @@ def _is_otp_send_session_fallback_environment() -> bool:
 
 
 def _otp_send_retry_after(now: int, window_start: int) -> int:
-    return max(1, OTP_SEND_DAILY_WINDOW_SECONDS - (now - window_start))
+    return max(
+        1,
+        _get_otp_send_daily_window_seconds() - (now - window_start),
+    )
 
 
 def _raise_otp_send_daily_limit(
@@ -131,10 +145,8 @@ def _consume_otp_send_daily_quota_from_session(
         entry = {}
 
     window_start = entry.get(OTP_SEND_WINDOW_START_FIELD)
-    if (
-        not isinstance(window_start, int)
-        or now - window_start >= OTP_SEND_DAILY_WINDOW_SECONDS
-    ):
+    window_seconds = _get_otp_send_daily_window_seconds()
+    if not isinstance(window_start, int) or now - window_start >= window_seconds:
         window_start = now
         entry = {
             OTP_SEND_WINDOW_START_FIELD: window_start,
@@ -175,6 +187,7 @@ async def _consume_otp_send_daily_quota(
 
     now = int(time.time())
     key = _build_otp_send_daily_key(user_id)
+    window_seconds = _get_otp_send_daily_window_seconds()
     try:
         result = await redis_client.eval(
             OTP_SEND_DAILY_CONSUME_SCRIPT,
@@ -182,7 +195,7 @@ async def _consume_otp_send_daily_quota(
             key,
             OTP_SEND_WINDOW_START_FIELD,
             now,
-            OTP_SEND_DAILY_WINDOW_SECONDS,
+            window_seconds,
             OTP_SEND_DAILY_LIMIT,
             endpoint_field,
         )

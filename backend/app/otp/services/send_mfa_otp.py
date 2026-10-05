@@ -5,6 +5,7 @@ from app.otp.schemas import (
     VerificationCreateResponseData,
 )
 from app.users.services.get_my_profile import get_my_profile
+from app.otp.services.profile_otp_transaction_store import store_mfa_otp_transaction
 from app.utils.global_error_handlers import extract_response_body
 from app.utils.access_token import get_auth_request_headers
 from app.utils.phone_mfa_rate_limit import (
@@ -161,6 +162,13 @@ async def handle_send_mfa_otp(
 
     response_json = http_client_response.json()
     logger.info(f"IBM Verify MFA OTP response: {response_json}")
+
+    await store_mfa_otp_transaction(
+        request=request,
+        response_json=response_json,
+        factor_id=verification_request.id,
+        otp_type=otp_type.value,
+    )
 
     # Parse the verification response
     verification_data = VerificationCreateResponseData(**response_json)

@@ -67,7 +67,10 @@ async def verify_otp(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await handle_otp_verification(
-        request.app.state.request_client, verification_data, user_access_token
+        request.app.state.request_client,
+        verification_data,
+        user_access_token,
+        request=request,
     )
 
 
@@ -89,6 +92,7 @@ async def check_otp(
         request.app.state.request_client,
         RetrievalData(trxnId=trxn_id, otpType=otp_type),
         user_access_token,
+        request=request,
     )
 
 
