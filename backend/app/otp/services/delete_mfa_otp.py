@@ -15,6 +15,7 @@ from app.otp.schemas import (
     RetrievalData,
 )
 from app.otp.services.retrieve_transient_otp import dispatch_otp_status_retrieval
+from app.otp.services.profile_otp_transaction_store import get_bound_otp_transaction
 from app.otp.services.verify_mfa_otp import handle_verify_mfa_otp
 from app.users.services.get_my_profile import get_my_profile
 from app.users.services.mfa_delete_guard import (
@@ -187,6 +188,20 @@ async def _get_mfa_delete_otp_proof_ttl_seconds(
     status_response = None
 
     try:
+        if (
+            await get_bound_otp_transaction(
+                request=request,
+                transaction_id=trxn_id,
+                otp_type=otp_type.value,
+                factor_id=otp_factor_id,
+            )
+            is None
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
         if otp_factor_id:
             headers = get_auth_request_headers(user_access_token, True)
             settings = get_configuration().ibm_verify_config
@@ -369,6 +384,7 @@ async def handle_otp_deletion(
                     otp=deletion_request.otp,
                     trxn_id=deletion_request.trxnId,
                     otp_type=deletion_request.otpVerificationType,
+                    request=request,
                 )
 
         await assert_remaining_mfa_factor_after_deletion(
@@ -471,6 +487,7 @@ async def handle_otp_deletion(
                 otp=deletion_request.otp,
                 trxn_id=deletion_request.trxnId,
                 otp_type=deletion_request.otpVerificationType,
+                request=request,
             )
 
         await assert_remaining_mfa_factor_after_deletion(
@@ -569,6 +586,7 @@ async def handle_otp_batch_deletion(
                     otp=deletion_request.otp,
                     trxn_id=deletion_request.trxnId,
                     otp_type=deletion_request.otpVerificationType,
+                    request=request,
                 )
 
         await assert_remaining_mfa_factor_after_deletion(
@@ -645,6 +663,7 @@ async def handle_otp_batch_deletion(
                 otp=deletion_request.otp,
                 trxn_id=deletion_request.trxnId,
                 otp_type=deletion_request.otpVerificationType,
+                request=request,
             )
 
     await assert_remaining_mfa_factor_after_deletion(

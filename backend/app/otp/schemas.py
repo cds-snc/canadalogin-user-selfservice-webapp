@@ -41,7 +41,6 @@ class AuthenticatedUserResponse(ResponseModel):
 
 class UserOtpInfo(BaseModel):
     factor_id: Optional[str] = None
-    user_id: str
     otpType: OtpType
     destination: Optional[str] = None
     countAsContactPhoneUpdate: bool = False

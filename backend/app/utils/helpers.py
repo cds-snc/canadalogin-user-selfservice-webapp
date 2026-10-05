@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, TYPE_CHECKING
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from httpx import AsyncClient
 
@@ -64,6 +64,7 @@ async def verify_otp_before_operation(
     trxn_id: str,
     otp_type: "OtpType",
     user_access_token: str,
+    request: Request | None = None,
 ) -> None:
     """
     Verify OTP before performing a sensitive operation.
@@ -95,9 +96,19 @@ async def verify_otp_before_operation(
     )
 
     logger.info(f"Attempting OTP verification (type: {otp_type.value})")
-    otp_verification_response = await handle_otp_verification(
-        global_http_client, otp_verification_data, user_access_token
-    )
+    if request is None:
+        otp_verification_response = await handle_otp_verification(
+            global_http_client,
+            otp_verification_data,
+            user_access_token,
+        )
+    else:
+        otp_verification_response = await handle_otp_verification(
+            global_http_client,
+            otp_verification_data,
+            user_access_token,
+            request=request,
+        )
 
     if not otp_verification_response.success:
         logger.error("OTP verification failed")

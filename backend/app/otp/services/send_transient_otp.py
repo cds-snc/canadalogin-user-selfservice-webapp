@@ -13,6 +13,7 @@ from app.utils.access_token import get_auth_request_headers
 from app.utils.global_error_handlers import extract_response_body
 from app.utils.phone_mfa_rate_limit import (
     assert_contact_phone_update_rate_limit_not_exceeded,
+    consume_transient_send_daily_quota,
     record_contact_phone_update_event,
 )
 from app.utils.helpers import (
@@ -119,6 +120,121 @@ def _set_last_otp_type_for_destination(
     )
 
 
+async def _resolve_factor_based_send(
+    global_http_client: AsyncClient,
+    user_otp_info: UserOtpInfo,
+    user_access_token: str,
+) -> bool:
+    if user_otp_info.factor_id is None:
+        return False
+
+    user_otp_factor = await get_user_otp_factor(
+        global_http_client, user_access_token, user_otp_info.factor_id
+    )
+    factor_otp_type = IBM_FACTOR_TYPE_TO_OTP_TYPE.get(
+        str((user_otp_factor or {}).get("type") or "").lower()
+    )
+    if (
+        user_otp_factor is None
+        or factor_otp_type != user_otp_info.otpType
+        or not user_otp_factor.get("destination")
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="invalidCode",
+        )
+
+    user_otp_info.destination = user_otp_factor["destination"]
+    return True
+
+
+def _should_apply_contact_phone_rate_limit(
+    request: Request | None,
+    user_otp_info: UserOtpInfo,
+    is_factor_based_send: bool,
+) -> bool:
+    return (
+        request is not None
+        and not is_factor_based_send
+        and user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}
+        and user_otp_info.destination is not None
+    )
+
+
+def _should_record_contact_phone_rate_limit_event(
+    request: Request,
+    user_otp_info: UserOtpInfo,
+) -> bool:
+    sent_destinations = _get_sent_destinations_from_session(request)
+    last_otp_type_by_destination = _get_last_otp_type_by_destination_from_session(
+        request
+    )
+    normalized_destination = _normalize_destination_for_session(
+        user_otp_info.destination
+    )
+    previous_otp_type = last_otp_type_by_destination.get(normalized_destination)
+    is_transport_switch = (
+        previous_otp_type is not None
+        and previous_otp_type != user_otp_info.otpType.value
+    )
+    return (
+        user_otp_info.countAsContactPhoneUpdate
+        or normalized_destination not in sent_destinations
+        or is_transport_switch
+    )
+
+
+async def _validate_otp_send_response(response) -> dict:
+    if response.status_code is None:
+        logger.error("HTTP response status code is None")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unknown error",
+        )
+
+    if response.status_code == status.HTTP_429_TOO_MANY_REQUESTS:
+        response_body = extract_response_body(response)
+        message_id = response_body.get("messageId")
+        if (
+            isinstance(message_id, str)
+            and message_id in IBM_VERIFY_OTP_SEND_RATE_LIMIT_MESSAGE_IDS
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=OTP_SEND_RATE_LIMIT_ERROR_CODE,
+            )
+
+    if response.status_code != 201:
+        logger.error(f"Error while sending OTP: {response.json()}")
+        raise HTTPStatusError(
+            message=f"HTTP {response.status_code}",
+            request=response.request,
+            response=response,
+        )
+
+    return response.json()
+
+
+async def _store_otp_transaction(
+    request: Request | None,
+    user_otp_info: UserOtpInfo,
+    response_json: dict,
+) -> None:
+    if user_otp_info.otpType == OtpType.EMAIL:
+        await store_email_otp_transaction(
+            request=request,
+            response_json=response_json,
+            destination=user_otp_info.destination,
+        )
+    elif user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}:
+        await store_phone_otp_transaction(
+            request=request,
+            response_json=response_json,
+            destination=user_otp_info.destination,
+            otp_type=user_otp_info.otpType.value,
+        )
+
+
 async def handle_otp_send(
     global_http_client: AsyncClient,
     user_otp_info: UserOtpInfo,
@@ -136,66 +252,27 @@ async def handle_otp_send(
     user_language = my_profile_response.data.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
 
-    is_factor_based_send = user_otp_info.factor_id is not None
-    if is_factor_based_send:
-        user_otp_factor = await get_user_otp_factor(
-            global_http_client, user_access_token, user_otp_info.factor_id
-        )
-
-        if user_otp_factor is None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="invalidCode",
-            )
-
-        factor_otp_type = IBM_FACTOR_TYPE_TO_OTP_TYPE.get(
-            str(user_otp_factor.get("type") or "").lower()
-        )
-        if factor_otp_type != user_otp_info.otpType:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="invalidCode",
-            )
-
-        user_otp_info.destination = user_otp_factor.get("destination")
-        if not user_otp_info.destination:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="invalidCode",
-            )
-
-    should_apply_contact_phone_rate_limit = (
-        request is not None
-        and not is_factor_based_send
-        and user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}
-        and user_otp_info.destination is not None
+    is_factor_based_send = await _resolve_factor_based_send(
+        global_http_client,
+        user_otp_info,
+        user_access_token,
+    )
+    should_apply_contact_phone_rate_limit = _should_apply_contact_phone_rate_limit(
+        request,
+        user_otp_info,
+        is_factor_based_send,
     )
 
     if should_apply_contact_phone_rate_limit:
         await assert_contact_phone_update_rate_limit_not_exceeded(request, user_id)
 
-    should_record_contact_phone_rate_limit_event = False
-    if should_apply_contact_phone_rate_limit:
-        # Backend anti-bypass guard:
-        # 1. Count first successful send for a destination even when flag is false.
-        # 2. Count transport switches (SMS <-> VOICE) so switch links cannot bypass.
-        sent_destinations = _get_sent_destinations_from_session(request)
-        last_otp_type_by_destination = _get_last_otp_type_by_destination_from_session(
-            request
-        )
-        normalized_destination = _normalize_destination_for_session(
-            user_otp_info.destination
-        )
-        previous_otp_type = last_otp_type_by_destination.get(normalized_destination)
-        is_transport_switch = (
-            previous_otp_type is not None
-            and previous_otp_type != user_otp_info.otpType.value
-        )
-        should_record_contact_phone_rate_limit_event = (
-            user_otp_info.countAsContactPhoneUpdate
-            or normalized_destination not in sent_destinations
-            or is_transport_switch
-        )
+    if request is not None:
+        await consume_transient_send_daily_quota(request, user_id)
+
+    should_record_contact_phone_rate_limit_event = (
+        should_apply_contact_phone_rate_limit
+        and _should_record_contact_phone_rate_limit_event(request, user_otp_info)
+    )
 
     http_client_response = await dispatch_otp(
         global_http_client, user_otp_info, user_access_token, user_language
@@ -205,38 +282,7 @@ async def handle_otp_send(
         f"{user_otp_info.otpType} OTP send request response received in {duration:.2f} seconds"
     )
 
-    if http_client_response.status_code is None:
-        logger.error("HTTP response status code is None")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unknown error",
-        )
-
-    if http_client_response.status_code == status.HTTP_429_TOO_MANY_REQUESTS:
-        response_body = extract_response_body(http_client_response)
-        message_id = response_body.get("messageId")
-        if (
-            isinstance(message_id, str)
-            and message_id in IBM_VERIFY_OTP_SEND_RATE_LIMIT_MESSAGE_IDS
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail=OTP_SEND_RATE_LIMIT_ERROR_CODE,
-            )
-
-    if http_client_response.status_code != 201:
-        logger.error(
-            f"Error while sending {user_otp_info.otpType} OTP: {http_client_response.json()}"
-        )
-        # Use RequestErrorHandler to handle the error response consistently
-        # Create an HTTPStatusError to pass to the handler
-        raise HTTPStatusError(
-            message=f"HTTP {http_client_response.status_code}",
-            request=http_client_response.request,
-            response=http_client_response,
-        )
-
-    response_json = http_client_response.json()
+    response_json = await _validate_otp_send_response(http_client_response)
 
     if should_apply_contact_phone_rate_limit:
         _mark_destination_as_sent(request, user_otp_info.destination)
@@ -249,29 +295,15 @@ async def handle_otp_send(
     if should_record_contact_phone_rate_limit_event:
         await record_contact_phone_update_event(request, user_id)
 
-    if http_client_response.status_code == 201:
-        logger.info(f"{user_otp_info.otpType} OTP created and sent")
+    logger.info(f"{user_otp_info.otpType} OTP created and sent")
+    validated_data = OtpDataResponse(**response_json)
+    await _store_otp_transaction(request, user_otp_info, response_json)
 
-        validated_data = OtpDataResponse(**response_json)
-        if user_otp_info.otpType == OtpType.EMAIL:
-            await store_email_otp_transaction(
-                request=request,
-                response_json=response_json,
-                destination=user_otp_info.destination,
-            )
-        elif user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}:
-            await store_phone_otp_transaction(
-                request=request,
-                response_json=response_json,
-                destination=user_otp_info.destination,
-                otp_type=user_otp_info.otpType.value,
-            )
-
-        return ResponseModel(
-            success=True,
-            data=validated_data,
-            message=f"{user_otp_info.otpType.value} OTP sent successfully",
-        )
+    return ResponseModel(
+        success=True,
+        data=validated_data,
+        message=f"{user_otp_info.otpType.value} OTP sent successfully",
+    )
 
 
 async def dispatch_otp(

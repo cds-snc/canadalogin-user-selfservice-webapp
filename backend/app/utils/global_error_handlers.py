@@ -48,6 +48,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     response = JSONResponse(
         status_code=exc.status_code,
         content=content,
+        headers=exc.headers,
     )
 
     return await standard_logger.log(request, response)

@@ -11,7 +11,7 @@ from pydantic import ValidationError
 # Schemas
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
 from app.otp.services.profile_otp_transaction_store import (
-    EMAIL_OTP_TRANSACTION_SESSION_KEY,
+    TRANSIENT_OTP_TRANSACTION_SESSION_KEY,
 )
 
 # Feature under test
@@ -372,7 +372,7 @@ async def test_email_send_stores_destination_by_transaction_id():
         )
 
     assert result.success is True
-    assert request.session[EMAIL_OTP_TRANSACTION_SESSION_KEY] == {
+    assert request.session[TRANSIENT_OTP_TRANSACTION_SESSION_KEY] == {
         "transactionId": "email-store-1",
         "emailAddress": "newemail@example.com",
         "expiry": payload["expiry"],
@@ -389,6 +389,7 @@ async def test_email_send_stores_destination_in_redis_when_available():
     payload["expiry"] = "2999-01-01T00:00:00Z"
 
     redis_client = AsyncMock()
+    redis_client.eval.return_value = [1, 1, 29]
     request = SimpleNamespace(
         session={},
         cookies={"gc-manage-app": "session-123"},
@@ -413,7 +414,7 @@ async def test_email_send_stores_destination_in_redis_when_available():
     assert result.success is True
     redis_client.set.assert_awaited_once()
     key, serialized_transaction = redis_client.set.call_args.args
-    assert key == "email_otp_transaction:session-123"
+    assert key == "transient_otp_transaction:session-123"
     assert json.loads(serialized_transaction)["transactionId"] == "email-redis-1"
     assert json.loads(serialized_transaction)["sessionId"] == "session-123"
     assert json.loads(serialized_transaction)["emailAddress"] == "newemail@example.com"
@@ -456,7 +457,7 @@ async def test_email_send_stores_transaction_when_ibm_uses_id_field():
     assert result.success is True
     redis_client.set.assert_awaited_once()
     key, _ = redis_client.set.call_args.args
-    assert key == "email_otp_transaction:session-123"
+    assert key == "transient_otp_transaction:session-123"
 
 
 @pytest.mark.asyncio
@@ -500,8 +501,8 @@ async def test_email_resend_overwrites_session_scoped_redis_key():
             assert result.success is True
 
     assert [call.args[0] for call in redis_client.set.call_args_list] == [
-        "email_otp_transaction:session-123",
-        "email_otp_transaction:session-123",
+        "transient_otp_transaction:session-123",
+        "transient_otp_transaction:session-123",
     ]
     last_transaction = json.loads(redis_client.set.call_args.args[1])
     assert last_transaction["transactionId"] == "email-resend-2"
@@ -541,7 +542,7 @@ async def test_phone_send_stores_destination_in_session_scoped_redis_key():
 
     assert result.success is True
     key, serialized_transaction = redis_client.set.call_args.args
-    assert key == "phone_otp_transaction:session-123"
+    assert key == "transient_otp_transaction:session-123"
     transaction = json.loads(serialized_transaction)
     assert transaction["transactionId"] == "phone-redis-1"
     assert transaction["phoneNumber"] == "14165551234"
@@ -559,6 +560,7 @@ async def test_handle_contact_phone_update_counted_send_checks_and_records_rate_
 
     mock_assert_rate_limit = AsyncMock()
     mock_record_rate_limit = AsyncMock()
+    mock_daily_quota = AsyncMock()
     monkeypatch.setattr(
         feature_module,
         "assert_contact_phone_update_rate_limit_not_exceeded",
@@ -568,6 +570,11 @@ async def test_handle_contact_phone_update_counted_send_checks_and_records_rate_
         feature_module,
         "record_contact_phone_update_event",
         mock_record_rate_limit,
+    )
+    monkeypatch.setattr(
+        feature_module,
+        "consume_transient_send_daily_quota",
+        mock_daily_quota,
     )
 
     def handler(request: Request) -> Response:
@@ -595,6 +602,7 @@ async def test_handle_contact_phone_update_counted_send_checks_and_records_rate_
 
     assert result.success is True
     mock_assert_rate_limit.assert_awaited_once_with(request, "user@example.com")
+    mock_daily_quota.assert_awaited_once_with(request, "user@example.com")
     mock_record_rate_limit.assert_awaited_once_with(request, "user@example.com")
 
 
@@ -765,36 +773,13 @@ async def test_handle_contact_phone_update_first_send_counts_even_without_flag(
     mock_record_rate_limit.assert_awaited_once_with(request, "user@example.com")
 
 
-@pytest.mark.asyncio
-async def test_handle_user_mismatch_returns_403(monkeypatch):
-    """
-    Test that user mismatch validation (which happens at route level)
-    properly raises 403 before handle_otp_send is called.
-    This test simulates the validation that occurs in the route.
-    """
-    from fastapi import HTTPException
-
-    # Mock validate_user_id_matches_session to raise 403 for user mismatch
-    async def mock_validation_failure(request, user_access_token, request_user_id):
-        # Simulate the validation logic that would happen at route level
-        raise HTTPException(
-            status_code=403, detail="User mismatch - cannot update profile"
-        )
-
-    # This test validates that the route-level validation would catch the mismatch
-    # In reality, this validation happens in the route before handle_otp_send is called
+def test_transient_otp_request_does_not_require_user_id():
     info = UserOtpInfo(
         otpType=OtpType.SMS,
-        user_id="user@example.com",
         destination="+14165551234",  # ✅ E.164
     )
 
-    # Simulate what would happen at the route level
-    with pytest.raises(HTTPException) as exc_info:
-        await mock_validation_failure(None, "USER_TOKEN", info.user_id)
-
-    assert exc_info.value.status_code == 403
-    assert "User mismatch" in str(exc_info.value.detail)
+    assert not hasattr(info, "user_id")
 
 
 @pytest.mark.asyncio
