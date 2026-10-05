@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import logging
 import time
 from typing import Any
@@ -18,6 +20,18 @@ PHONE_MFA_REGISTRATION_REDIS_KEY_PREFIX = "rate_limit:phone_mfa_registration:"
 CONTACT_PHONE_UPDATE_SESSION_KEY = "contact_phone_update_events"
 CONTACT_PHONE_UPDATE_REDIS_KEY_PREFIX = "rate_limit:contact_phone_update:"
 
+OTP_SEND_DAILY_LIMIT = 30
+OTP_SEND_DAILY_WINDOW_SECONDS_PROD = 24 * 60 * 60
+OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD = 15 * 60
+OTP_SEND_DAILY_REDIS_KEY_PREFIX = "rate_limit:otp_send_daily:"
+OTP_SEND_DAILY_ERROR_CODE = "otp_send_daily_limit"
+OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE = "otp_send_limiter_unavailable"
+OTP_SEND_DAILY_SESSION_KEY = "otp_send_daily_events"
+
+OTP_SEND_MFA_FIELD = "mfa_send_count"
+OTP_SEND_TRANSIENT_FIELD = "transient_send_count"
+OTP_SEND_WINDOW_START_FIELD = "window_start"
+
 
 def _get_rate_limit_window_seconds() -> int:
     environment = get_configuration().ENVIRONMENT.strip().lower()
@@ -30,6 +44,156 @@ def _get_rate_limit_window_seconds() -> int:
 
     # Fail closed to production-level limits for unknown environments.
     return PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD
+
+
+def _get_otp_send_daily_window_seconds() -> int:
+    environment = getattr(get_configuration(), "ENVIRONMENT", "local").strip().lower()
+
+    if environment in {"local", "dev", "test"}:
+        return OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD
+
+    # Keep the daily quota at 24 hours for staging, production, and unknown environments.
+    return OTP_SEND_DAILY_WINDOW_SECONDS_PROD
+
+
+def _hash_user_id_for_rate_limit(user_id: str) -> str:
+    configuration = get_configuration()
+    session_config = getattr(configuration, "session_config", None)
+    secret = getattr(session_config, "REDIS_AUTH_SECRET", "test-secret")
+    digest = hmac.new(
+        str(secret).encode("utf-8"),
+        str(user_id).encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    return digest[:40]
+
+
+def _build_otp_send_daily_key(user_id: str, endpoint_field: str) -> str:
+    user_hash = _hash_user_id_for_rate_limit(user_id)
+    return f"{OTP_SEND_DAILY_REDIS_KEY_PREFIX}{endpoint_field}:{user_hash}"
+
+
+def _is_otp_send_session_fallback_environment() -> bool:
+    environment = getattr(get_configuration(), "ENVIRONMENT", "local").strip().lower()
+    return environment in {"local", "dev", "test"}
+
+
+def _otp_send_retry_after(now: int, window_start: int) -> int:
+    return max(
+        1,
+        _get_otp_send_daily_window_seconds() - (now - window_start),
+    )
+
+
+def _raise_otp_send_daily_limit(
+    user_hash: str,
+    retry_after: int,
+) -> None:
+    logger.warning(
+        "OTP send daily limit reached: user_hash=%s retry_after=%s",
+        user_hash,
+        retry_after,
+    )
+    raise HTTPException(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        detail=OTP_SEND_DAILY_ERROR_CODE,
+        headers={"Retry-After": str(retry_after)},
+    )
+
+
+def _consume_otp_send_daily_quota_from_session(
+    request: Request,
+    user_id: str,
+    endpoint_field: str,
+) -> None:
+    now = int(time.time())
+    event_store = request.session.get(OTP_SEND_DAILY_SESSION_KEY, {})
+    if not isinstance(event_store, dict):
+        event_store = {}
+
+    user_key = _hash_user_id_for_rate_limit(user_id)
+    entry = event_store.get(user_key, {})
+    if not isinstance(entry, dict):
+        entry = {}
+
+    window_start = entry.get(OTP_SEND_WINDOW_START_FIELD)
+    window_seconds = _get_otp_send_daily_window_seconds()
+    if not isinstance(window_start, int) or now - window_start >= window_seconds:
+        window_start = now
+        entry = {
+            OTP_SEND_WINDOW_START_FIELD: window_start,
+            OTP_SEND_MFA_FIELD: 0,
+            OTP_SEND_TRANSIENT_FIELD: 0,
+        }
+
+    count = entry.get(endpoint_field, 0)
+    if not isinstance(count, int):
+        count = 0
+
+    if count >= OTP_SEND_DAILY_LIMIT:
+        _raise_otp_send_daily_limit(
+            user_key,
+            _otp_send_retry_after(now, window_start),
+        )
+
+    entry[endpoint_field] = count + 1
+    event_store[user_key] = entry
+    request.session[OTP_SEND_DAILY_SESSION_KEY] = event_store
+
+
+async def _consume_otp_send_daily_quota(
+    request: Request,
+    user_id: str,
+    endpoint_field: str,
+) -> None:
+    redis_client = _get_redis_client_from_request(request)
+    if redis_client is None:
+        if _is_otp_send_session_fallback_environment():
+            _consume_otp_send_daily_quota_from_session(request, user_id, endpoint_field)
+            return
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE,
+        )
+
+    window_seconds = _get_otp_send_daily_window_seconds()
+    key = _build_otp_send_daily_key(user_id, endpoint_field)
+    try:
+        count = int(await redis_client.incr(key))
+        if count == 1:
+            await redis_client.expire(key, window_seconds)
+
+        if count > OTP_SEND_DAILY_LIMIT:
+            retry_after = int(await redis_client.ttl(key))
+            if retry_after < 1:
+                retry_after = window_seconds
+            _raise_otp_send_daily_limit(
+                _hash_user_id_for_rate_limit(user_id),
+                retry_after,
+            )
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001 - environment policy decides fallback
+        if _is_otp_send_session_fallback_environment():
+            logger.warning(
+                "OTP send limiter unavailable, falling back to session: %s", exc
+            )
+            _consume_otp_send_daily_quota_from_session(request, user_id, endpoint_field)
+            return
+
+        logger.error("OTP send limiter unavailable: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE,
+        ) from exc
+
+
+async def consume_mfa_send_daily_quota(request: Request, user_id: str) -> None:
+    await _consume_otp_send_daily_quota(request, user_id, OTP_SEND_MFA_FIELD)
+
+
+async def consume_transient_send_daily_quota(request: Request, user_id: str) -> None:
+    await _consume_otp_send_daily_quota(request, user_id, OTP_SEND_TRANSIENT_FIELD)
 
 
 def _build_rate_limit_key(redis_key_prefix: str, user_id: str) -> str:

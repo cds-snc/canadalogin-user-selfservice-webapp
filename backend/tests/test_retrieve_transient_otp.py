@@ -2,6 +2,8 @@
 # Also import the module so we can monkeypatch its names directly
 import app.otp.services.retrieve_transient_otp as feature_module
 import pytest
+from fastapi import HTTPException
+from unittest.mock import MagicMock
 
 # Import schemas you provided
 from app.otp.schemas import OtpDataResponse, OtpType, RetrievalData
@@ -136,3 +138,27 @@ async def test_handle_success_validates_into_OtpDataResponse(otp_type, monkeypat
         assert data.phoneNumber == "+1 (***) ***-1234"
         assert data.emailAddress in (None, "")
     assert expected_msg_fragment in (getattr(result, "message", "") or "")
+
+
+@pytest.mark.asyncio
+async def test_handle_status_rejects_unbound_transaction(monkeypatch):
+    async def no_bound_transaction(**_kwargs):
+        return None
+
+    monkeypatch.setattr(
+        feature_module,
+        "get_transient_otp_transaction",
+        no_bound_transaction,
+    )
+
+    async with AsyncClient() as client:
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_status_retrieval(
+                client,
+                RetrievalData(otpType=OtpType.SMS, trxnId="unbound-transaction"),
+                "USER_TOKEN",
+                request=MagicMock(),
+            )
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "invalidCode"
