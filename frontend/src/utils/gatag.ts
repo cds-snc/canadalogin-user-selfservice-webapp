@@ -194,6 +194,7 @@ export function trackAnalyticsEvent(
     "type",
     "flow",
     "error",
+    "error_id",
     "duration_ms",
   ]);
   const params: GA4EventParams = {
@@ -207,7 +208,7 @@ export function trackAnalyticsEvent(
     params.type = normalizedType;
   }
   if (error !== undefined) {
-    params.error = error;
+    params.error_id = error;
   }
   if (duration_ms !== undefined) {
     params.duration_ms = duration_ms;

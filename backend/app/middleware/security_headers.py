@@ -9,21 +9,20 @@ configuration = get_configuration()
 
 def _build_content_security_policy() -> str:
     """Build CSP dynamically based on current environment to allow testing."""
-    img_src = (
-        "img-src 'self' data: http: https:; "
-        if configuration.ENVIRONMENT == "local"
-        else "img-src 'self' data: https:; "
-    )
-    return (
-        "default-src 'self'; "
-        "script-src 'self'; "
-        "style-src 'self'; " + img_src + "font-src 'self'; "
-        "connect-src 'self'; "
-        "frame-ancestors 'none'; "
-        "base-uri 'self'; "
-        "form-action 'self'; "
-        + ("upgrade-insecure-requests" if configuration.ENVIRONMENT != "local" else "")
-    )
+    directives = [
+        "default-src 'self'",
+        "script-src 'self'",
+        "style-src 'self'",
+        "img-src 'self' data:",
+        "font-src 'self'",
+        "connect-src 'self'",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+    ]
+    if configuration.ENVIRONMENT != "local":
+        directives.append("upgrade-insecure-requests")
+    return "; ".join(directives) + ";"
 
 
 # Restrict browser execution and reduce attack surface by blocking most active content

@@ -22,14 +22,25 @@ from app.otp.services.enroll_mfa_otp import (
     dispatch_otp_factor_validation,
 )
 from app.otp.services.retrieve_transient_otp import dispatch_otp_status_retrieval
+from app.otp.services.profile_otp_transaction_store import (
+    get_email_otp_transaction,
+    consume_email_otp_transaction,
+    get_phone_otp_transaction,
+    consume_phone_otp_transaction,
+)
 from app.password.schemas import OtpType as FactorOtpType
 from app.users.schemas import (
     ProfileUpdateWithOtpRequest,
+    VerifyEmailOtpRequest,
+    CommitEmailUpdateRequest,
+    VerifyPhoneOtpRequest,
+    CommitPhoneUpdateRequest,
     ProfileUpdateWithOtpAction,
     ProfileUpdateWithOtpResponse,
     ProfileUpdateOtpVerificationData,
     UserProfileUpdateRequest,
     EmailItem,
+    MetaDataTypeValue,
 )
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.users.services.otp_factors import get_user_otp_factors
@@ -114,7 +125,13 @@ def _validate_new_email_address(new_email_address: str | None) -> None:
 
 async def update_profile_with_otp_verification(
     request: Request,
-    profile_update_data: ProfileUpdateWithOtpRequest,
+    profile_update_data: (
+        ProfileUpdateWithOtpRequest
+        | VerifyEmailOtpRequest
+        | CommitEmailUpdateRequest
+        | VerifyPhoneOtpRequest
+        | CommitPhoneUpdateRequest
+    ),
     user_access_token: str,
 ) -> ProfileUpdateWithOtpResponse:
     """
@@ -134,12 +151,27 @@ async def update_profile_with_otp_verification(
     Raises:
         HTTPException: For OTP verification failures or profile update errors
     """
+    profile_update_data = _normalize_profile_update_request(profile_update_data)
+
     logger.info(
         "Starting profile update with OTP verification workflow: action=%s",
         profile_update_data.action.value,
     )
 
     _validate_new_email_address(profile_update_data.newEmailAddress)
+
+    profile_update_data = await _resolve_server_stored_email_address(
+        request=request,
+        profile_update_data=profile_update_data,
+    )
+    profile_update_data = await _resolve_server_stored_phone_update(
+        request=request,
+        profile_update_data=profile_update_data,
+        require_transaction=False,
+    )
+
+    _validate_new_email_address(profile_update_data.newEmailAddress)
+    _validate_email_update_otp_type(profile_update_data)
 
     verification_response = await _apply_profile_update_otp_action(
         request=request,
@@ -156,6 +188,42 @@ async def update_profile_with_otp_verification(
         profile_update_data=profile_update_data,
         user_access_token=user_access_token,
     )
+
+
+def _normalize_profile_update_request(
+    profile_update_data: (
+        ProfileUpdateWithOtpRequest | VerifyEmailOtpRequest | CommitEmailUpdateRequest
+    ),
+) -> ProfileUpdateWithOtpRequest:
+    if isinstance(profile_update_data, VerifyEmailOtpRequest):
+        return ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp=profile_update_data.otp,
+            trxnId=profile_update_data.trxnId,
+            otpType=profile_update_data.otpType,
+        )
+
+    if isinstance(profile_update_data, CommitEmailUpdateRequest):
+        return ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
+            verificationProofId=profile_update_data.verificationProofId,
+        )
+
+    if isinstance(profile_update_data, VerifyPhoneOtpRequest):
+        return ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.VERIFY,
+            otp=profile_update_data.otp,
+            trxnId=profile_update_data.trxnId,
+            otpType=profile_update_data.otpType,
+        )
+
+    if isinstance(profile_update_data, CommitPhoneUpdateRequest):
+        return ProfileUpdateWithOtpRequest(
+            action=ProfileUpdateWithOtpAction.COMMIT,
+            verificationProofId=profile_update_data.verificationProofId,
+        )
+
+    return profile_update_data
 
 
 async def _handle_profile_update_commit_after_verification(
@@ -429,14 +497,6 @@ async def _apply_profile_update_otp_action(
                 detail="email_already_associated",
             )
 
-        # Resolve proof TTL for this transaction before issuing a one-time proof.
-        proof_ttl_seconds = await _get_profile_update_otp_proof_ttl_seconds(
-            request=request,
-            trxn_id=trxn_id,
-            otp_type=otp_type,
-            user_access_token=user_access_token,
-        )
-
         await enforce_contact_phone_rate_limit_if_needed()
 
         await verify_otp_before_operation(
@@ -447,6 +507,22 @@ async def _apply_profile_update_otp_action(
             user_access_token=user_access_token,
         )
         logger.info("OTP verification successful")
+
+        profile_update_data = await _resolve_server_stored_phone_update(
+            request=request,
+            profile_update_data=profile_update_data,
+            require_transaction=True,
+        )
+
+        # Resolve proof TTL only after OTP verification succeeds. Invalid OTPs
+        # must preserve IBM's attempts/retries error instead of becoming otp_expired.
+        proof_ttl_seconds = await _get_profile_update_otp_proof_ttl_seconds(
+            request=request,
+            trxn_id=trxn_id,
+            otp_type=otp_type,
+            user_access_token=user_access_token,
+            expected_email_address=profile_update_data.newEmailAddress,
+        )
 
         try:
             await _run_preflight_checks_for_verified_action(
@@ -472,6 +548,10 @@ async def _apply_profile_update_otp_action(
             otp_type,
             proof_ttl_seconds,
         )
+        if otp_type == OtpType.EMAIL:
+            await consume_email_otp_transaction(request, trxn_id)
+        else:
+            await consume_phone_otp_transaction(request, trxn_id)
         logger.info("Issued one-time profile update verification proof")
 
         return ProfileUpdateWithOtpResponse(
@@ -482,19 +562,6 @@ async def _apply_profile_update_otp_action(
                 expiresIn=proof_ttl_seconds,
             ),
         )
-
-    if profile_update_data.action == ProfileUpdateWithOtpAction.COMMIT_WITH_OTP:
-        # Legacy mode: verify OTP and commit in a single request.
-        await enforce_contact_phone_rate_limit_if_needed()
-
-        await verify_otp_before_operation(
-            global_http_client=request.app.state.request_client,
-            otp=profile_update_data.otp,
-            trxn_id=profile_update_data.trxnId,
-            otp_type=profile_update_data.otpType,
-            user_access_token=user_access_token,
-        )
-        logger.info("OTP verification successful")
 
     if profile_update_data.action == ProfileUpdateWithOtpAction.COMMIT:
         verification_proof_id = profile_update_data.verificationProofId
@@ -566,7 +633,9 @@ def _normalize_phone_numbers(phone_numbers) -> list[dict[str, str]]:
         normalized.append(
             {
                 "type": str(phone.type or ""),
-                "value": str(phone.value or ""),
+                "value": "".join(
+                    char for char in str(phone.value or "") if char.isdigit()
+                ),
             }
         )
 
@@ -581,6 +650,212 @@ def _build_profile_update_fingerprint(
         "newEmailAddress": _normalize_email(profile_update_data.newEmailAddress),
         "phoneNumbers": _normalize_phone_numbers(profile_update_data.phoneNumbers),
     }
+
+
+async def _get_server_stored_email_address(
+    request: Request,
+    trxn_id: str,
+) -> str | None:
+    transaction = await get_email_otp_transaction(request, trxn_id)
+    if not isinstance(transaction, dict):
+        return None
+
+    expiry = transaction.get("expiry")
+    expiry_datetime = _parse_iso_datetime(expiry if isinstance(expiry, str) else None)
+    if expiry_datetime is None or expiry_datetime <= datetime.now(timezone.utc):
+        return None
+
+    email_address = transaction.get("emailAddress")
+    if not isinstance(email_address, str) or not email_address:
+        return None
+
+    return email_address
+
+
+async def _get_server_stored_phone_number(
+    request: Request,
+    trxn_id: str,
+) -> str | None:
+    transaction = await get_phone_otp_transaction(request, trxn_id)
+    if not isinstance(transaction, dict):
+        return None
+
+    expiry_datetime = _parse_iso_datetime(
+        transaction.get("expiry")
+        if isinstance(transaction.get("expiry"), str)
+        else None
+    )
+    if expiry_datetime is None or expiry_datetime <= datetime.now(timezone.utc):
+        return None
+
+    phone_number = transaction.get("phoneNumber")
+    return phone_number if isinstance(phone_number, str) and phone_number else None
+
+
+def _get_email_from_profile_update_proof(
+    request: Request,
+    verification_proof_id: str | None,
+) -> str | None:
+    if not verification_proof_id:
+        return None
+
+    proof_data = _get_profile_update_otp_proof_store(request).get(verification_proof_id)
+    if not isinstance(proof_data, dict):
+        return None
+
+    fingerprint = proof_data.get("fingerprint")
+    if not isinstance(fingerprint, dict):
+        return None
+
+    email_address = fingerprint.get("newEmailAddress")
+    return email_address if isinstance(email_address, str) and email_address else None
+
+
+def _get_phone_numbers_from_profile_update_proof(
+    request: Request,
+    verification_proof_id: str | None,
+) -> list[MetaDataTypeValue] | None:
+    if not verification_proof_id:
+        return None
+
+    proof_data = _get_profile_update_otp_proof_store(request).get(verification_proof_id)
+    fingerprint = (
+        proof_data.get("fingerprint") if isinstance(proof_data, dict) else None
+    )
+    phone_numbers = (
+        fingerprint.get("phoneNumbers") if isinstance(fingerprint, dict) else None
+    )
+    if not isinstance(phone_numbers, list):
+        return None
+
+    return [
+        MetaDataTypeValue(**phone) for phone in phone_numbers if isinstance(phone, dict)
+    ]
+
+
+async def _resolve_server_stored_email_address(
+    request: Request,
+    profile_update_data: ProfileUpdateWithOtpRequest,
+) -> ProfileUpdateWithOtpRequest:
+    if profile_update_data.action == ProfileUpdateWithOtpAction.VERIFY:
+        if (
+            profile_update_data.otpType != OtpType.EMAIL
+            or not profile_update_data.trxnId
+        ):
+            return profile_update_data
+
+        stored_email = await _get_server_stored_email_address(
+            request,
+            profile_update_data.trxnId,
+        )
+        if not isinstance(stored_email, str) or not stored_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="otp_expired",
+            )
+
+        if profile_update_data.newEmailAddress and _normalize_email(
+            profile_update_data.newEmailAddress
+        ) != _normalize_email(stored_email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
+        return profile_update_data.model_copy(update={"newEmailAddress": stored_email})
+
+    if profile_update_data.action == ProfileUpdateWithOtpAction.COMMIT:
+        stored_email = _get_email_from_profile_update_proof(
+            request,
+            profile_update_data.verificationProofId,
+        )
+        if not stored_email:
+            return profile_update_data
+
+        if profile_update_data.newEmailAddress and _normalize_email(
+            profile_update_data.newEmailAddress
+        ) != _normalize_email(stored_email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
+        return profile_update_data.model_copy(update={"newEmailAddress": stored_email})
+
+    return profile_update_data
+
+
+async def _resolve_server_stored_phone_update(
+    request: Request,
+    profile_update_data: ProfileUpdateWithOtpRequest,
+    require_transaction: bool = True,
+) -> ProfileUpdateWithOtpRequest:
+    phone_otp_types = {OtpType.SMS, OtpType.VOICE}
+
+    if profile_update_data.action == ProfileUpdateWithOtpAction.VERIFY:
+        if (
+            profile_update_data.otpType not in phone_otp_types
+            or not profile_update_data.trxnId
+        ):
+            return profile_update_data
+
+        stored_phone = await _get_server_stored_phone_number(
+            request,
+            profile_update_data.trxnId,
+        )
+        if not stored_phone:
+            if not require_transaction:
+                return profile_update_data
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="otp_expired"
+            )
+
+        resolved_phone_numbers = [MetaDataTypeValue(type="mobile", value=stored_phone)]
+        if profile_update_data.phoneNumbers and _normalize_phone_numbers(
+            profile_update_data.phoneNumbers
+        ) != _normalize_phone_numbers(resolved_phone_numbers):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="invalidCode"
+            )
+
+        return profile_update_data.model_copy(
+            update={"phoneNumbers": resolved_phone_numbers}
+        )
+
+    if profile_update_data.action == ProfileUpdateWithOtpAction.COMMIT:
+        stored_phone_numbers = _get_phone_numbers_from_profile_update_proof(
+            request,
+            profile_update_data.verificationProofId,
+        )
+        if not stored_phone_numbers:
+            return profile_update_data
+
+        if profile_update_data.phoneNumbers and _normalize_phone_numbers(
+            profile_update_data.phoneNumbers
+        ) != _normalize_phone_numbers(stored_phone_numbers):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="invalidCode"
+            )
+
+        return profile_update_data.model_copy(
+            update={"phoneNumbers": stored_phone_numbers}
+        )
+
+    return profile_update_data
+
+
+def _validate_email_update_otp_type(
+    profile_update_data: ProfileUpdateWithOtpRequest,
+) -> None:
+    if (
+        profile_update_data.newEmailAddress
+        and profile_update_data.action == ProfileUpdateWithOtpAction.VERIFY
+        and profile_update_data.otpType != OtpType.EMAIL
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="invalidCode",
+        )
 
 
 def _get_profile_update_otp_proof_store(request: Request) -> dict[str, dict]:
@@ -733,6 +1008,7 @@ async def _get_profile_update_otp_proof_ttl_seconds(
     trxn_id: str,
     otp_type: OtpType,
     user_access_token: str,
+    expected_email_address: str | None = None,
 ) -> int:
     """Derive proof TTL from the OTP transaction expiry.
 
@@ -752,6 +1028,17 @@ async def _get_profile_update_otp_proof_ttl_seconds(
             )
 
         response_body = status_response.json()
+
+        if expected_email_address is not None:
+            transaction_email_address = response_body.get("emailAddress")
+            if _normalize_email(transaction_email_address) != _normalize_email(
+                expected_email_address
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="invalidCode",
+                )
+
         otp_expiry_datetime = _parse_iso_datetime(response_body.get("expiry"))
 
         if otp_expiry_datetime is None:

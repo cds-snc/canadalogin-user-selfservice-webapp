@@ -203,10 +203,11 @@ async def update_my_profile(
     )
     ibm_user_profile = ibm_user_profile_response.model_dump()
 
-    # Remove userName and emails from update to prevent any accidental changes
+    # Remove identity and email fields to prevent accidental unverified changes
     # Email changes must go through the secure OTP-verified endpoint
     updated_user_data_dict.pop(USERNAME_FIELD, None)
     updated_user_data_dict.pop(USER_ID_FIELD, None)
+    updated_user_data_dict.pop("emails", None)
 
     merged_profile = merge_profile_updates(ibm_user_profile, updated_user_data_dict)
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.36.3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.2...v1.36.3) (2026-09-25)
+
+
+### Bug Fixes
+
+* handle mismatched email verification in edit email ([#2269](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2269)) ([aaeafab](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/aaeafabf9ad411032dfe7df569123978de000475))
+
+
+### Miscellaneous Chores
+
+* bump production version to 1.36.2 ([#2265](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2265)) ([132f92b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/132f92b752aa162425b7a9951299e9be94fb07dd))
+* bump staging version to 1.36.2 ([#2262](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2262)) ([ffd8367](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ffd836779e8c610c3af0014ca26136e7f9fe18d1))
+
 ## [1.36.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.1...v1.36.2) (2026-09-25)
 
 

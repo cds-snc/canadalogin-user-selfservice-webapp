@@ -381,7 +381,7 @@ describe("AddMFAPage Unit Tests", () => {
       data: { trxnId: "trxn-123" },
     });
 
-    authService.transientOtpVerify = vi.fn().mockResolvedValue({
+    authService.otpVerify = vi.fn().mockResolvedValue({
       success: true,
     });
 
@@ -630,8 +630,8 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      // Mock the transientOtpVerify for this test
-      authService.transientOtpVerify = vi.fn().mockResolvedValue({
+      // Mock the otpVerify for this test
+      authService.otpVerify = vi.fn().mockResolvedValue({
         success: true,
       });
 
@@ -734,6 +734,125 @@ describe("AddMFAPage Unit Tests", () => {
       await waitFor(() => {
         expect(addMFAPhoneNumberApi.sendMFAOTP).toHaveBeenCalled();
       });
+    });
+
+    it("should render exact English message for otp_send_rate_limit in Add MFA send flow", async () => {
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+
+      addMFAPhoneNumberApi.sendMFAOTP.mockRejectedValue({
+        data: { message: "otp_send_rate_limit" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+          "data-error-code",
+          "otp_send_rate_limit",
+        );
+      });
+
+      expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+        "data-error-message",
+        "You have reached the maximum number of verification code requests. Wait 5 minutes and try again.",
+      );
+    });
+
+    it("should render exact French message for otp_send_rate_limit in Add MFA send flow", async () => {
+      const mockUseParams = await import("react-router");
+      vi.mocked(mockUseParams.useParams).mockReturnValue({ language: "fr" });
+
+      otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
+        success: true,
+        data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
+      });
+
+      addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
+        data: { id: "mfa-123" },
+      });
+
+      addMFAPhoneNumberApi.sendMFAOTP.mockRejectedValue({
+        data: { message: "otp_send_rate_limit" },
+      });
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-selection")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-selection-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("otp-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("add-mfa-phone-number")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("add-mfa-phone-number-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+          "data-error-code",
+          "otp_send_rate_limit",
+        );
+      });
+
+      expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+        "data-error-message",
+        "Vous avez atteint la limite de demandes de code de vérification. Veuillez attendre 5 minutes et réessayer.",
+      );
+
+      vi.mocked(mockUseParams.useParams).mockReturnValue({ language: "en" });
     });
   });
 
@@ -1733,6 +1852,68 @@ describe("AddMFAPage Unit Tests", () => {
         });
       });
     });
+
+    it("renders error summary when transient OTP resend hits otp_send_rate_limit in otpValidation step", async () => {
+      const requestOtpCode = vi
+        .fn()
+        .mockResolvedValueOnce(true)
+        .mockImplementationOnce(async () => {
+          const latestArgs = useOtpOperations.mock.calls.at(-1)?.[0];
+          latestArgs?.setErrorCode?.("otp_send_rate_limit");
+          return false;
+        });
+
+      useOtpOperations.mockImplementation(() => ({
+        userPhoneFactors: [{ id: "factor-1", type: "smsotp" }],
+        userSelectedMfaFactor: { id: "factor-1", type: "smsotp" },
+        userOtpValue: "",
+        otpSentResponse: { trxnId: "mock-trxn-id" },
+        otpLoading: false,
+        phoneFactorsMap: {},
+        handleChangeUserMfaSelection: vi.fn(),
+        handleSetUserOtpValue: vi.fn(),
+        setUserPhoneFactors: vi.fn(),
+        setUserSelectedMfaFactor: vi.fn(),
+        setOtpLoading: vi.fn(),
+        setOtpSentResponse: vi.fn(),
+        requestOtpCode,
+      }));
+
+      render(
+        <TestWrapper>
+          <AddMFAPage />
+        </TestWrapper>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId("password-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("password-verification-next"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId("request-otp-code"));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+          "data-error-code",
+          "otp_send_rate_limit",
+        );
+      });
+
+      expect(screen.getByTestId("error-summary-with-focus")).toHaveAttribute(
+        "data-error-message",
+        "You have reached the maximum number of verification code requests. Wait 5 minutes and try again.",
+      );
+      expect(screen.getByTestId("error-link-0")).toHaveAttribute(
+        "href",
+        "#verificationCode",
+      );
+      expect(requestOtpCode).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe("Add Second MFA Flow", () => {
@@ -1830,7 +2011,7 @@ describe("AddMFAPage Unit Tests", () => {
           data: { message: "RESPONSE_ERROR" },
         },
       };
-      authService.transientOtpVerify.mockRejectedValue(responseError);
+      authService.otpVerify.mockRejectedValue(responseError);
 
       render(
         <TestWrapper>
@@ -1862,7 +2043,7 @@ describe("AddMFAPage Unit Tests", () => {
       fireEvent.click(otpNextButton);
 
       await waitFor(() => {
-        expect(authService.transientOtpVerify).toHaveBeenCalled();
+        expect(authService.otpVerify).toHaveBeenCalled();
       });
     });
 
@@ -3071,7 +3252,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
+      authService.otpVerify = vi
         .fn()
         .mockRejectedValue({ response: { data: { message: "INVALID_OTP" } } });
 
@@ -3116,9 +3297,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
 
       addMFAPhoneNumberApi.enrollMFA.mockRejectedValue({
         data: { message: "ENROLL_MFA_FAILED" },
@@ -3173,9 +3352,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
@@ -3234,9 +3411,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
 
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
@@ -3357,7 +3532,7 @@ describe("AddMFAPage Unit Tests", () => {
       });
     });
 
-    it("fires form_submit_complete at otp_validation and form_step_change to enter_phone_number when transientOtpVerify succeeds", async () => {
+    it("fires form_submit_complete at otp_validation and form_step_change to enter_phone_number when otpVerify succeeds", async () => {
       navigatePastPassword();
 
       otpFactors.getUserOtpPhoneFactors.mockResolvedValue({
@@ -3365,9 +3540,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
 
       render(
         <TestWrapper>
@@ -3413,9 +3586,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
       });
@@ -3477,9 +3648,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
       });
@@ -3541,9 +3710,7 @@ describe("AddMFAPage Unit Tests", () => {
         data: [{ id: "factor-1", type: "smsotp", destination: "+15551234567" }],
       });
 
-      authService.transientOtpVerify = vi
-        .fn()
-        .mockResolvedValue({ success: true });
+      authService.otpVerify = vi.fn().mockResolvedValue({ success: true });
       addMFAPhoneNumberApi.enrollMFA.mockResolvedValue({
         data: { id: "mfa-123" },
       });

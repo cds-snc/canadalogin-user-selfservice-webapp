@@ -285,6 +285,7 @@ export default function EditEmailAddressPage() {
     setErrorCode,
     fallbackNavigationPath: backToProfile,
     allowEmptyFactors: true,
+    otpEndpointMode: "mfa",
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
@@ -504,7 +505,6 @@ export default function EditEmailAddressPage() {
       setIsEmailOtpMaxAttemptsReached(false);
 
       const response = await authService.verify_email_otp_for_update(
-        normalizedNewEmail,
         normalizedOtp,
         otpSentResponse.trxnId,
         FLOW_TYPES.email,
@@ -576,7 +576,6 @@ export default function EditEmailAddressPage() {
       }
 
       const response = await authService.update_email_with_otp(
-        normalizedNewEmail,
         emailOtpVerificationProofId,
       );
 

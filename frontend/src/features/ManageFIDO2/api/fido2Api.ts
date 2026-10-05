@@ -16,6 +16,7 @@ type OtpVerificationPayload = {
   otp: string;
   trxnId: string;
   otpVerificationType: string;
+  otpFactorId?: string;
 };
 
 type DeleteRegistrationVerificationData = {

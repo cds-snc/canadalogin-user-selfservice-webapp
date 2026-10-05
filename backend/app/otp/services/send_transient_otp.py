@@ -3,9 +3,14 @@ from datetime import datetime
 
 from app.config import get_configuration
 from app.otp.schemas import OtpDataResponse, OtpType, UserOtpInfo
+from app.otp.services.profile_otp_transaction_store import (
+    store_phone_otp_transaction,
+    store_email_otp_transaction,
+)
 from app.users.services.otp_factors import get_user_otp_factor
 from app.users.services.get_my_profile import get_my_profile
 from app.utils.access_token import get_auth_request_headers
+from app.utils.global_error_handlers import extract_response_body
 from app.utils.phone_mfa_rate_limit import (
     assert_contact_phone_update_rate_limit_not_exceeded,
     record_contact_phone_update_event,
@@ -24,6 +29,9 @@ IBM_FACTOR_TYPE_TO_OTP_TYPE: dict[str, OtpType] = {
     "voiceotp": OtpType.VOICE,
     "emailotp": OtpType.EMAIL,
 }
+
+IBM_VERIFY_OTP_SEND_RATE_LIMIT_MESSAGE_IDS = {"CSIBN0081E", "CSIAP3512E"}
+OTP_SEND_RATE_LIMIT_ERROR_CODE = "otp_send_rate_limit"
 
 CONTACT_PHONE_SENT_DESTINATIONS_SESSION_KEY = "contact_phone_sent_destinations"
 CONTACT_PHONE_LAST_OTP_TYPE_BY_DESTINATION_SESSION_KEY = (
@@ -204,6 +212,18 @@ async def handle_otp_send(
             detail="Unknown error",
         )
 
+    if http_client_response.status_code == status.HTTP_429_TOO_MANY_REQUESTS:
+        response_body = extract_response_body(http_client_response)
+        message_id = response_body.get("messageId")
+        if (
+            isinstance(message_id, str)
+            and message_id in IBM_VERIFY_OTP_SEND_RATE_LIMIT_MESSAGE_IDS
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=OTP_SEND_RATE_LIMIT_ERROR_CODE,
+            )
+
     if http_client_response.status_code != 201:
         logger.error(
             f"Error while sending {user_otp_info.otpType} OTP: {http_client_response.json()}"
@@ -233,6 +253,19 @@ async def handle_otp_send(
         logger.info(f"{user_otp_info.otpType} OTP created and sent")
 
         validated_data = OtpDataResponse(**response_json)
+        if user_otp_info.otpType == OtpType.EMAIL:
+            await store_email_otp_transaction(
+                request=request,
+                response_json=response_json,
+                destination=user_otp_info.destination,
+            )
+        elif user_otp_info.otpType in {OtpType.SMS, OtpType.VOICE}:
+            await store_phone_otp_transaction(
+                request=request,
+                response_json=response_json,
+                destination=user_otp_info.destination,
+                otp_type=user_otp_info.otpType.value,
+            )
 
         return ResponseModel(
             success=True,
