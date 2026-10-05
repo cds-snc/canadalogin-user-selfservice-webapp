@@ -10,6 +10,7 @@ from app.verify_activity.service import (
     get_user_activity,
 )
 
+
 def settings(sso="sso.success", slo="slo.success"):
     return SimpleNamespace(
         events_api_endpoint="https://tenant.example/v1.0/events",
