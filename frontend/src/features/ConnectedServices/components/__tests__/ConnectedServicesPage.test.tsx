@@ -310,19 +310,19 @@ describe("ConnectedServicesTable", () => {
     },
   );
 
-  it.each([
-    null,
-    "not a URL",
-  ])("does not link a missing or invalid URL: %s", async (url) => {
-    mockGetConnectedServices.mockResolvedValue([
-      { clientId: "client-no-link", name: "Unlinked service", url },
-    ]);
+  it.each([null, "not a URL"])(
+    "does not link a missing or invalid URL: %s",
+    async (url) => {
+      mockGetConnectedServices.mockResolvedValue([
+        { clientId: "client-no-link", name: "Unlinked service", url },
+      ]);
 
-    render(<ConnectedServicesTable />);
+      render(<ConnectedServicesTable />);
 
-    expect(await screen.findByText("Unlinked service")).toBeInTheDocument();
-    expect(screen.queryByRole("link")).not.toBeInTheDocument();
-  });
+      expect(await screen.findByText("Unlinked service")).toBeInTheDocument();
+      expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    },
+  );
 
   it("can be rendered independently and formats timestamps for the route language", async () => {
     mockLanguage = "fr";
