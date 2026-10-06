@@ -14,7 +14,10 @@ function safeServiceUrl(value?: string | null): string | undefined {
     return undefined;
   }
   try {
-    return new URL(value).href;
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:"
+      ? url.href
+      : undefined;
   } catch {
     // Missing or invalid destinations remain plain text, not broken links.
   }
