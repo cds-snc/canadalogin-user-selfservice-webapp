@@ -164,12 +164,12 @@ describe("ConfirmIdentityDetails", () => {
 
     expect(
       screen.getByText(
-        "Your identity information was successfully verified and proofing is complete.",
+        "Your identity information was successfully proven.",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with CRA to get access.",
+        "You're almost done. Review your details saved to CanadaLogin, then share the requested information with Localhost - Simple Relying Party Simulator EN to get access.",
       ),
     ).toBeInTheDocument();
   });

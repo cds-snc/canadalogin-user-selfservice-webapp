@@ -1,9 +1,9 @@
 import {
-  GcdsButton,
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
   GcdsText,
+  GcdsLink
 } from "@gcds-core/components-react";
 
 import { Fragment } from "react";
@@ -74,20 +74,16 @@ export default function ProvenInformationCard({
         </GcdsText>
       </GcdsContainer>
     ) : null,
-    <GcdsGrid columns="1fr auto" className="gridInline">
-      <GcdsText marginBottom="300">
+    <GcdsContainer>
+      <GcdsText>
         {t("ProvenInformationCard.updateInfo")}
       </GcdsText>
-      <GcdsButton
-        buttonRole="secondary"
-        type="button"
-        onGcdsClick={() => {
-          navigate(startIdentityVerificationFlow);
-        }}
-      >
-        {t("ProvenInformationCard.updateButton")}
-      </GcdsButton>
-    </GcdsGrid>,
+      <GcdsText>
+        <GcdsLink href={startIdentityVerificationFlow}>
+          {t("ProvenInformationCard.updateButton")}
+        </GcdsLink>
+      </GcdsText>
+      </GcdsContainer>,
   ].filter(Boolean);
 
   return (
