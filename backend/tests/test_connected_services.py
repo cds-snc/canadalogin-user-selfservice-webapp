@@ -107,7 +107,14 @@ async def test_returns_all_applications_matching_pairwise_client_ids():
             IBMVerifyRelyingPartyInfoSchema(
                 id="verify-app-1",
                 name="Service One",
-                links=[],
+                links=[
+                    {
+                        "id": "link-1",
+                        "icon": "",
+                        "linkName": "Service One",
+                        "url": "https://service-one.example.com/sign-in",
+                    }
+                ],
                 description="client-1",
                 status=["ENABLED"],
                 category=[],
@@ -116,7 +123,20 @@ async def test_returns_all_applications_matching_pairwise_client_ids():
                 id="verify-app-2",
                 name="Service Two",
                 links=[],
-                description="client-2",
+                description=json.dumps(
+                    {
+                        "client-2": {
+                            "en": {
+                                "name": "Service Two",
+                                "url": "https://service-two.example.com/en",
+                            },
+                            "fr": {
+                                "name": "Service Deux",
+                                "url": "https://service-two.example.com/fr",
+                            },
+                        }
+                    }
+                ),
                 status=["ENABLED"],
                 category=[],
             ),
@@ -163,12 +183,19 @@ async def test_returns_all_applications_matching_pairwise_client_ids():
         {
             "clientId": "client-1",
             "name": "Service One",
+            "url": "https://service-one.example.com/sign-in",
+            "localizedUrls": None,
             "lastLogin": datetime(2026, 1, 1, 10, tzinfo=timezone.utc),
             "lastLogout": datetime(2026, 1, 1, 11, tzinfo=timezone.utc),
         },
         {
             "clientId": "client-2",
             "name": "Service Two",
+            "url": None,
+            "localizedUrls": {
+                "en": "https://service-two.example.com/en",
+                "fr": "https://service-two.example.com/fr",
+            },
             "lastLogin": None,
             "lastLogout": None,
         },
@@ -216,10 +243,61 @@ async def test_activity_failure_keeps_connected_services_with_null_timestamps():
         {
             "clientId": "client-1",
             "name": "Service One",
+            "url": None,
+            "localizedUrls": None,
             "lastLogin": None,
             "lastLogout": None,
         }
     ]
+
+
+@pytest.mark.asyncio
+async def test_returns_localized_urls_from_application_link():
+    request = make_request()
+    profile = make_profile(
+        "pairwiseIdPerClient", [{"clientId": "client-1", "pai": "pai-1"}]
+    )
+    applications = IBMVerifyRelyingPartyUserApplicationsSchema(
+        applications=[
+            IBMVerifyRelyingPartyInfoSchema(
+                id="client-1",
+                name="Service One",
+                links=[
+                    {
+                        "id": "link-1",
+                        "icon": "",
+                        "linkName": "Service One",
+                        "url": "https://service.example.com",
+                        "localized": {
+                            "fr": {
+                                "name": "Service Un",
+                                "url": "https://service.example.com/fr",
+                            }
+                        },
+                    }
+                ],
+                status=["ENABLED"],
+                category=[],
+            )
+        ]
+    )
+
+    with (
+        patch(
+            "app.users.services.connected_services.dispatch_get_my_profile_from_ibm",
+            new=AsyncMock(return_value=profile),
+        ),
+        patch(
+            "app.users.services.connected_services.dispatch_get_oidc_user_applications",
+            new=AsyncMock(return_value=applications),
+        ),
+    ):
+        response = await get_connected_services(request, "user-token")
+
+    assert response.services[0].url == "https://service.example.com"
+    assert response.services[0].localizedUrls == {
+        "fr": "https://service.example.com/fr"
+    }
 
 
 @pytest.mark.asyncio

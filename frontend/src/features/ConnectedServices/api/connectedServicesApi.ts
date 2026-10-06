@@ -6,6 +6,8 @@ import type { ApiErrorLike } from "../../../types/utils";
 export type ConnectedService = {
   clientId: string;
   name: string;
+  url?: string | null;
+  localizedUrls?: Record<string, string> | null;
   lastLogin?: string | null;
   lastLogout?: string | null;
 };
