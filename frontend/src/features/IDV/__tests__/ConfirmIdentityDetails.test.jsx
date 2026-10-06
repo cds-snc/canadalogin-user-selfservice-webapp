@@ -163,7 +163,9 @@ describe("ConfirmIdentityDetails", () => {
     render(<ConfirmIdentityDetails />);
 
     expect(screen.getByText("Success")).toBeInTheDocument();
-    expect(screen.getByText("You proved your identity.")).toBeInTheDocument();
+    expect(
+      screen.getByText(/^You proved your identity with .+\.$/),
+    ).toBeInTheDocument();
   });
 
   it("shows the new no-RP success notice when RP details are missing", () => {
