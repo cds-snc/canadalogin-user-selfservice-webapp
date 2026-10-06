@@ -5,10 +5,12 @@ from app.otp.schemas import (
     VerificationCreateResponseData,
 )
 from app.users.services.get_my_profile import get_my_profile
+from app.otp.services.profile_otp_transaction_store import store_mfa_otp_transaction
 from app.utils.global_error_handlers import extract_response_body
 from app.utils.access_token import get_auth_request_headers
 from app.utils.phone_mfa_rate_limit import (
     assert_phone_mfa_registration_rate_limit_not_exceeded,
+    consume_mfa_send_daily_quota,
     record_phone_mfa_registration_event,
 )
 from app.utils.schemas import ResponseModel
@@ -130,6 +132,9 @@ async def handle_send_mfa_otp(
     if should_enforce_phone_rate_limit:
         await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
 
+    if request is not None:
+        await consume_mfa_send_daily_quota(request, user_id)
+
     should_record_phone_rate_limit_event = False
     if should_enforce_phone_rate_limit:
         # Backend anti-bypass guard:
@@ -157,6 +162,13 @@ async def handle_send_mfa_otp(
 
     response_json = http_client_response.json()
     logger.info(f"IBM Verify MFA OTP response: {response_json}")
+
+    await store_mfa_otp_transaction(
+        request=request,
+        response_json=response_json,
+        factor_id=verification_request.id,
+        otp_type=otp_type.value,
+    )
 
     # Parse the verification response
     verification_data = VerificationCreateResponseData(**response_json)

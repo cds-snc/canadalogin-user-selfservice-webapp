@@ -8,7 +8,8 @@ The connected-services endpoint is `GET /v1/users/connected-services`. It requir
     {
       "clientId": "client-id",
       "name": "Example Service",
-      "sessionStatus": "unknownSession"
+      "lastLogin": "2026-01-01T10:00:00Z",
+      "lastLogout": "2026-01-02T11:00:00Z"
     }
   ]
 }
@@ -25,8 +26,13 @@ The authenticated user's access token is used for both IBM Verify calls. Since `
 
 The existing server-side client credentials remain available for administrative application lookups used by the legacy RP-info route. Connected Services uses the authenticated user token for the user-entitlements lookup. No new browser credentials or environment variables are required.
 
-## Session status
+## Login and logout activity
 
-IBM Verify's entitled-application response does not provide an authoritative per-application session status, and this repository has no separate endpoint that establishes one. The API therefore returns `unknownSession`, displayed as `Connected`. It does not claim that a connected service has an active or inactive session.
+Login and logout timestamps are derived from the authenticated user's successful
+IBM Verify SSO/SLO events; the implementation does not query or capture RP
+sessions. Either timestamp is `null` when no corresponding event is available.
+The API retains both timestamps, but the page currently displays only the last
+login. These event timestamps do not establish whether an RP session is active.
 
-The existing `Sign out everywhere` button remains presentational. Logout and revocation are outside this implementation until a supported backend operation is available.
+The existing `Sign out everywhere` button remains presentational; it does not
+revoke sessions.

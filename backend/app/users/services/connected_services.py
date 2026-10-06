@@ -15,11 +15,12 @@ from app.users.services.rp_info import (
     _parse_localized_description,
     dispatch_get_oidc_user_applications,
 )
+from app.verify_activity.client import IBMVerifyActivityClient
+from app.verify_activity.service import get_user_activity
 
 logger = logging.getLogger(__name__)
 
 PAIRWISE_ATTRIBUTE_NAME = "pairwiseIdPerClient"
-UNKNOWN_SESSION_STATUS = "unknownSession"
 
 
 def _parse_pairwise_values(value: Any) -> list[dict[str, Any]]:
@@ -82,6 +83,23 @@ async def get_connected_services(request: Request, user_access_token: str):
     applications = await dispatch_get_oidc_user_applications(
         request, user_access_token=user_access_token
     )
+    activity_by_application: dict[str, Any] = {}
+    activity_by_client: dict[str, Any] = {}
+    if getattr(request.app.state, "config", None) and getattr(profile, "id", None):
+        try:
+            activities = await get_user_activity(
+                IBMVerifyActivityClient(
+                    request.app.state.request_client, request.app.state.config
+                ),
+                profile.id,
+            )
+            for activity in activities:
+                activity_by_application[activity.application_id] = activity
+                if activity.client_id:
+                    activity_by_client[activity.client_id] = activity
+        except Exception:
+            logger.exception("Unable to enrich connected services with activity")
+
     services = []
     for application in applications.applications:
         matching_client_id = next(
@@ -93,11 +111,15 @@ async def get_connected_services(request: Request, user_access_token: str):
             None,
         )
         if matching_client_id:
+            activity = activity_by_application.get(
+                application.id
+            ) or activity_by_client.get(matching_client_id)
             services.append(
                 ConnectedService(
                     clientId=matching_client_id,
                     name=application.name,
-                    sessionStatus=UNKNOWN_SESSION_STATUS,
+                    lastLogin=activity.last_login if activity else None,
+                    lastLogout=activity.last_logout if activity else None,
                 )
             )
 

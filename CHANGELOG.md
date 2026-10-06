@@ -1,5 +1,39 @@
 # Changelog
 
+## [1.37.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.3...v1.37.0) (2026-10-05)
+
+
+### Features
+
+* implement total otp limit per user per day ([#2300](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2300)) ([d6f20b0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d6f20b05a838ffbcaccc498af68023d57f2dfa2e))
+
+
+### Bug Fixes
+
+* add error handling for OTP send rate limit and update localization messages ([#2289](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2289)) ([4a29fc0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4a29fc0d9f0d5f723f0bd19f559865f027f92297))
+* handle SMS OTP send rate limit and improve error messaging ([#2283](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2283)) ([0386fa3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0386fa32552acb7050f02620d0a8fd56a1ac49bc))
+* improve email OTP transaction handling and Redis storage ([#2275](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2275)) ([fbeba58](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fbeba58d711c98198145a22ec8f1e281d8ccf01a))
+* prevent stale release pipeline reruns ([#2276](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2276)) ([c599d81](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/c599d81bbd2b92c7852e2d660c17e03af88619a0))
+* send GA error codes as error_id ([#2274](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2274)) ([fe17bee](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/fe17beef5703da7c6e693ff83724ecaec376b7a1))
+* update accessibility handling for link buttons and improve keyboard interaction ([#2288](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2288)) ([431c651](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/431c6515b8acd0839d98dc2d9e7092aff176cca7))
+* update contact phone number sendverify otp account binding ([#2278](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2278)) ([c6ec23a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/c6ec23ad52a304a547a5b5e4448d0fe226a5ad0c))
+
+
+### Code Refactoring
+
+* **identity-verification:** [FE Content] Get ready for provincial verification page - replace Grid components ([#2241](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2241)) ([01d6e1f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/01d6e1f964b6dec552641f9cd6043fca689743c8))
+* **identity-verification:** [FE Content] In person options content update ([#2293](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2293)) ([12b4571](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/12b457154136e3ba08eebf85c187a02229a7a17f))
+* **identity-verification:** [FE Content] Prove your identity page ([#2292](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2292)) ([0566fbc](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0566fbcf19d415dfe3879493a7084d43e9208629))
+* **identity-verification:** [FE Content] update Get ready for self-photo and ID check page ([#2296](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2296)) ([18768f5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/18768f55087722e98e5985dfe506b60e703cae10))
+* implement MFA endpoint for OTP send and verify operations ([#2284](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2284)) ([68bd27c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/68bd27c0ada8d9b06793b3350f9bd8234f97616c))
+* log online verification url ([#2287](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2287)) ([4ebab78](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4ebab782ea53043fd0d5a0ecba36b9879b5fe19b))
+* update idv data store url ([#2260](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2260)) ([2ae4791](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2ae4791923ce4358cd9bcc71b4d5444a5f88002d))
+
+
+### Miscellaneous Chores
+
+* bump version to 1.36.3 for production and staging ([#2270](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2270)) ([6a68da1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6a68da1631be276701ac3496c901b7bcd58fda11))
+
 ## [1.36.3](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.2...v1.36.3) (2026-09-25)
 
 
