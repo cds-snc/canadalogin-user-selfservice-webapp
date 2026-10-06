@@ -72,6 +72,8 @@ const ADD_MFA_PAGE_BY_STEP: Record<WizardStep, string> = {
   addSecondMFA: "AddPhoneNumberSecondMethod",
 };
 
+const PHONE_MFA_CHANGE_RATE_LIMIT_ERROR = "phone_mfa_change_rate_limit";
+
 export default function AddMFAPage() {
   const { language } = useParams();
   const { state } = useUser();
@@ -181,6 +183,7 @@ export default function AddMFAPage() {
     allowEmptyFactors: true,
     mapType: MAP_TYPES.lastFourDigits,
     mfaTrxnId: phoneFormData?.trxnId,
+    otpEndpointMode: "mfa",
   });
 
   const { fido2Data, loading: passkeyLoading } = usePasskeyOperations({
@@ -193,14 +196,31 @@ export default function AddMFAPage() {
     useState(false);
   const errorMessage =
     customErrorMessage || getErrorMessage(language, errorCode);
+  let errorLinks: Record<string, string> | undefined;
+  if (errorCode && errorMessage) {
+    if (wizardStep === "addMFANumber") {
+      errorLinks = { "#mfa-phone-number": errorMessage };
+    } else if (
+      wizardStep === "otpValidation" ||
+      wizardStep === "addMFAValidation"
+    ) {
+      errorLinks = { "#verificationCode": errorMessage };
+    }
+  }
 
   const resetAttempts = () => {
     setIsMfaOtpMaxAttemptsReached(false);
   };
 
-  const goToAddPhoneEntryStep = () => {
-    setErrorCode("");
-    setCustomErrorMessage("");
+  const goToAddPhoneEntryStep = ({
+    clearErrorState = true,
+  }: {
+    clearErrorState?: boolean;
+  } = {}) => {
+    if (clearErrorState) {
+      setErrorCode("");
+      setCustomErrorMessage("");
+    }
     setIsMfaOtpMaxAttemptsReached(false);
     trackEvent({
       event: GA_FORM_EVENTS.FORM_STEP_CHANGE,
@@ -293,10 +313,12 @@ export default function AddMFAPage() {
     reSendOtpCode = false,
     mfaId,
     otpType,
+    countAsMfaAddition = false,
   }: {
     reSendOtpCode?: boolean;
     mfaId?: string;
     otpType?: string;
+    countAsMfaAddition?: boolean;
   } = {}): Promise<boolean> => {
     setErrorCode("");
     setCustomErrorMessage("");
@@ -309,6 +331,7 @@ export default function AddMFAPage() {
           serverMapping[
             (otpType ?? phoneFormData.otpType) as keyof typeof serverMapping
           ],
+        ...(countAsMfaAddition ? { countAsMfaAddition: true } : {}),
       };
 
       const response = await addMFAPhoneNumberApi.sendMFAOTP(payload);
@@ -339,7 +362,13 @@ export default function AddMFAPage() {
     } catch (error) {
       const err = error as { data?: { message?: string } };
       if (err && err.data && err.data.message) {
-        setErrorCode(err.data.message);
+        if (err.data.message === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR) {
+          setCustomErrorMessage("");
+          setErrorCode(err.data.message);
+          goToAddPhoneEntryStep({ clearErrorState: false });
+        } else {
+          setErrorCode(err.data.message);
+        }
         trackEvent({
           event: GA_FORM_EVENTS.FORM_STEP_END,
           step: ADD_MFA_ANALYTICS.STEPS.MFA_OTP,
@@ -414,6 +443,19 @@ export default function AddMFAPage() {
       const attemptsMessage = getOtpAttemptsErrorMessage(err?.data);
 
       if (message) {
+        if (message === PHONE_MFA_CHANGE_RATE_LIMIT_ERROR) {
+          setCustomErrorMessage("");
+          setErrorCode(message);
+          goToAddPhoneEntryStep({ clearErrorState: false });
+          trackEvent({
+            event: GA_FORM_EVENTS.FORM_STEP_END,
+            step: ADD_MFA_ANALYTICS.STEPS.SUCCESS,
+            type: phoneFormData.otpType,
+            error: message,
+          });
+          return;
+        }
+
         if (
           shouldDisplayOtpMaxAttempts({
             errorCode: message,
@@ -455,6 +497,7 @@ export default function AddMFAPage() {
 
   const validateOtpCode = async (userOtpValue: string) => {
     const userData = {
+      id: userSelectedMfaFactor!.id,
       otp: userOtpValue,
       trxnId: otpSentResponse?.trxnId ?? "",
       otpType:
@@ -463,7 +506,8 @@ export default function AddMFAPage() {
         ],
     };
     try {
-      const response = await authService.transientOtpVerify(userData);
+      const verifyOtp = authService.otpVerify ?? authService.transientOtpVerify;
+      const response = await verifyOtp(userData);
 
       if (response && response.success) {
         trackEvent({
@@ -608,6 +652,7 @@ export default function AddMFAPage() {
         navigateToValidation = await sendMFAOtp({
           reSendOtpCode: false,
           mfaId,
+          countAsMfaAddition: true,
         });
       }
     } finally {
@@ -658,6 +703,7 @@ export default function AddMFAPage() {
         reSendOtpCode: false,
         mfaId,
         otpType: secondMFAOtpType,
+        countAsMfaAddition: true,
       });
     }
     return false;
@@ -805,9 +851,7 @@ export default function AddMFAPage() {
           });
           await verifyMFAOtp();
         }}
-        onCancel={async () => {
-          navigate(backToManage2FAVerificationsPage);
-        }}
+        onCancel={async () => navigate(backToManage2FAVerificationsPage)}
         requestNewOtpCode={async () => {
           trackEvent({
             event: GA_FORM_EVENTS.FORM_STEP_START,
@@ -885,6 +929,7 @@ export default function AddMFAPage() {
       StepComponent={steps[wizardStep]}
       errorCode={errorCode}
       errorMessage={errorMessage}
+      errorLinks={errorLinks}
       language={language}
     />
   );

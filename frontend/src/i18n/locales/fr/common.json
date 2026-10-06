@@ -52,7 +52,11 @@
     "password_invalid_attempts_one": "Mot de passe incorrect. Il vous reste {{count}} tentative.",
     "password_invalid_attempts_other": "Mot de passe incorrect. Il vous reste {{count}} tentatives.",
     "password_max_attempts": "Vous avez atteint la limite de tentatives de vérification. Attendez 15 minutes et réessayez.",
-    "otp_expired": "Votre code a expiré. Demandez un nouveau code ci-dessous."
+    "otp_send_rate_limit": "Vous avez atteint la limite de demandes de code de vérification. Veuillez attendre 5 minutes et réessayer.",
+    "otp_send_rate_limit_15": "Vous avez atteint la limite de demandes de code de vérification. Veuillez attendre 15 minutes et réessayer.",
+    "otp_send_daily_limit": "Vous avez atteint la limite de demandes de code de vérification. Veuillez attendre 24 heures et réessayer.",
+    "otp_expired": "Votre code a expiré. Demandez un nouveau code ci-dessous.",
+    "phone_mfa_change_rate_limit": "Vous avez atteint la limite d’enregistrements de numéro de téléphone pour aujourd’hui."
   },
   "RelyingParty": {
     "canadaLogin": "CanadaLogin"

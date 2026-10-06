@@ -289,3 +289,15 @@ body,
 .passkey-steps li::marker {
   font-weight: bold;
 }
+
+gcds-notice.notice-focus-no-ring:focus,
+gcds-notice.notice-focus-no-ring:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+gcds-error-summary.error-summary-focus-no-ring:focus,
+gcds-error-summary.error-summary-focus-no-ring:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

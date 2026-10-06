@@ -25,6 +25,8 @@ vi.mock("../../services/authService", () => ({
   authService: {
     transientOtpSend: vi.fn(),
     transientOtpVerify: vi.fn(),
+    otpSend: vi.fn(),
+    otpVerify: vi.fn(),
   },
 }));
 
@@ -384,6 +386,13 @@ describe("useOtpOperations", () => {
           expiry: "2099-01-01T00:10:00.000Z",
         },
       });
+      mockAuthService.otpSend.mockResolvedValue({
+        success: true,
+        data: {
+          trxnId: "test-transaction-id",
+          expiry: "2099-01-01T00:10:00.000Z",
+        },
+      });
     });
 
     it("should send OTP request successfully", async () => {
@@ -409,7 +418,6 @@ describe("useOtpOperations", () => {
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
         otpType: "sms",
         factor_id: "factor-1",
-        user_id: "test-user-123",
       });
       expect(result.current.otpSentResponse).toEqual({
         trxnId: "test-transaction-id",
@@ -491,6 +499,78 @@ describe("useOtpOperations", () => {
 
       expect(defaultProps.setErrorCode).toHaveBeenCalledWith("OTP_SEND_ERROR");
     });
+
+    it("should use MFA send endpoint when otpEndpointMode is mfa", async () => {
+      mockAuthService.otpSend.mockResolvedValue({
+        success: true,
+        data: {
+          id: "mfa-trxn-001",
+          expiry: "2099-01-01T00:10:00.000Z",
+        },
+      });
+
+      const { result } = renderHook(
+        () =>
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+            otpEndpointMode: "mfa",
+          }),
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(result.current.userSelectedMfaFactor).toBeTruthy();
+      });
+
+      await act(async () => {
+        await result.current.requestOtpCode();
+      });
+
+      expect(mockAuthService.otpSend).toHaveBeenCalledWith({
+        id: "factor-1",
+        otpType: "sms",
+      });
+      expect(mockAuthService.transientOtpSend).not.toHaveBeenCalled();
+      expect(result.current.otpSentResponse).toEqual({
+        id: "mfa-trxn-001",
+        trxnId: "mfa-trxn-001",
+        expiry: "2099-01-01T00:10:00.000Z",
+      });
+    });
+
+    it("should still use transient send endpoint for override payloads in mfa mode", async () => {
+      const { result } = renderHook(
+        () =>
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+            otpEndpointMode: "mfa",
+          }),
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(result.current.userSelectedMfaFactor).toBeTruthy();
+      });
+
+      await act(async () => {
+        await result.current.requestOtpCode({
+          otpType: "email",
+          destination: "test@example.com",
+        });
+      });
+
+      expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
+        otpType: "email",
+        destination: "test@example.com",
+      });
+      expect(mockAuthService.otpSend).not.toHaveBeenCalled();
+    });
   });
 
   describe("validateOtpCode", () => {
@@ -498,6 +578,10 @@ describe("useOtpOperations", () => {
 
     beforeEach(() => {
       mockAuthService.transientOtpVerify.mockResolvedValue({
+        success: true,
+        data: { verified: true },
+      });
+      mockAuthService.otpVerify.mockResolvedValue({
         success: true,
         data: { verified: true },
       });
@@ -702,6 +786,40 @@ describe("useOtpOperations", () => {
       expect(mockAuthService.transientOtpVerify).toHaveBeenCalled();
       expect(defaultProps.setErrorCode).toHaveBeenCalledWith("");
     });
+
+    it("should use MFA verify endpoint when otpEndpointMode is mfa", async () => {
+      const { result } = renderHook(
+        () =>
+          useOtpOperations({
+            userId: defaultProps.userId,
+            userName: defaultProps.userName,
+            setErrorCode: defaultProps.setErrorCode,
+            fallbackNavigationPath: defaultProps.fallbackNavigationPath,
+            otpEndpointMode: "mfa",
+          }),
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(result.current.userSelectedMfaFactor).toBeTruthy();
+      });
+
+      act(() => {
+        result.current.setOtpSentResponse({ trxnId: "test-transaction-id" });
+      });
+
+      await act(async () => {
+        await result.current.validateOtpCode("123456", mockOnSuccess);
+      });
+
+      expect(mockAuthService.otpVerify).toHaveBeenCalledWith({
+        id: "factor-1",
+        otp: "123456",
+        trxnId: "test-transaction-id",
+        otpType: "sms",
+      });
+      expect(mockAuthService.transientOtpVerify).not.toHaveBeenCalled();
+    });
   });
 
   describe("Setters", () => {
@@ -777,7 +895,6 @@ describe("useOtpOperations", () => {
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
         otpType: "voice",
         factor_id: "factor-2",
-        user_id: "test-user-123",
       });
     });
 

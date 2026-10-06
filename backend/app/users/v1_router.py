@@ -8,8 +8,9 @@ from app.users.schemas import (
     UserProfileUpdateRequest,
     RelyingPartyResponse,
     UserPhoneAuthFactorsResponse,
-    ProfileUpdateWithOtpRequest,
+    ProfileUpdateWithOtpApiRequest,
     ProfileUpdateWithOtpResponse,
+    ConnectedServicesResponse,
 )
 from app.users.services.get_my_profile import get_my_profile
 from app.users.services.update_my_profile import update_my_profile
@@ -18,6 +19,7 @@ from app.users.services.otp_factors import get_user_otp_factors
 from app.users.services.update_profile_with_otp import (
     update_profile_with_otp_verification,
 )
+from app.users.services.connected_services import get_connected_services
 
 from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.validate_user_request_match import validate_user_id_matches_session
@@ -85,6 +87,19 @@ async def rp_info(
 
 
 @router.get(
+    "/connected-services",
+    response_model=ConnectedServicesResponse,
+    tags=["Users"],
+    summary="Get the authenticated user's connected services",
+)
+async def connected_services(
+    request: Request,
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await get_connected_services(request, user_access_token)
+
+
+@router.get(
     "/otp_factors",
     response_model=UserPhoneAuthFactorsResponse,
     tags=["Users"],
@@ -109,11 +124,11 @@ async def user_factors(
     response_model_by_alias=False,
     tags=["Users"],
     summary="Verify OTP or update profile with OTP verification",
-    description="Action-based endpoint for OTP-protected profile changes. Use action=verify to validate OTP and receive a short-lived verificationProofId. Use action=commit with that proof to apply the profile update atomically. Legacy action=commit_with_otp remains available for direct OTP+update in one request.",
+    description="Action-based endpoint for OTP-protected profile changes. Use action=verify to validate OTP and receive a short-lived verificationProofId. Use action=commit with that proof to apply the profile update atomically.",
 )
 async def update_user_profile_with_otp_verification(
     request: Request,
-    profile_update_data: ProfileUpdateWithOtpRequest,
+    profile_update_data: ProfileUpdateWithOtpApiRequest,
     user_access_token: str = Depends(get_users_current_session),
 ):
     """

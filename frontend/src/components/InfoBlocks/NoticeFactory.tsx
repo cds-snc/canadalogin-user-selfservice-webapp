@@ -38,6 +38,7 @@ export default function NoticeFactory({
     mfaDeleted: ({ phoneNumber: currentPhoneNumber }) => (
       <GcdsText>
         <AccessibleNotice
+          focusOnMount
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={" "}
@@ -60,6 +61,7 @@ export default function NoticeFactory({
     }) => (
       <GcdsText>
         <AccessibleNotice
+          focusOnMount
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={" "}
@@ -79,6 +81,7 @@ export default function NoticeFactory({
     passkeyAdded: () => (
       <GcdsText>
         <AccessibleNotice
+          focusOnMount
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("NoticeFactory.notice_title_success")}
@@ -94,6 +97,7 @@ export default function NoticeFactory({
     passkeyDeleted: ({ passkeyName: currentPasskeyName }) => (
       <GcdsText>
         <AccessibleNotice
+          focusOnMount
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("NoticeFactory.notice_title_success")}

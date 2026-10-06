@@ -15,6 +15,8 @@ from pydantic import ValidationError
 
 from app.config import get_configuration
 from app.constants.redis_keys import RedisKeys
+from app.middleware.security_headers import SecurityHeadersMiddleware
+from app.middleware.csrf import CSRFMiddleware
 
 from .routers import health
 from app.users import v1_router as v1_users_router
@@ -158,6 +160,11 @@ def create_app():
     cookie_secure = False if configuration.ENVIRONMENT == "local" else True
     logger.info(f"Cookie Secure: {cookie_secure}")
 
+    # CSRF protection. Registered first so it ends up innermost (closest to the
+    # routes, but still wrapped by CORS/session middlewares added below) and can
+    # rely on the session having been loaded by SessionAutoloadMiddleware.
+    app.add_middleware(CSRFMiddleware)
+
     # CORS
     app.add_middleware(
         CORSMiddleware,
@@ -180,6 +187,8 @@ def create_app():
         cookie_domain=configuration.ROOT_DOMAIN,
         cookie_name=configuration.session_config.SESSION_COOKIE_NAME,
     )
+
+    app.add_middleware(SecurityHeadersMiddleware)
 
     app.include_router(health.router, prefix="/health")
 

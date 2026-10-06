@@ -15,12 +15,15 @@ interface IdentityProofingRadioButtonsProps {
   selectedOption: StartIdentityOption | undefined;
   onOptionChange: (option: StartIdentityOption) => void;
   rpName: string;
+  errorMessage?: string;
+  id?: string;
 }
 
 export default function IdentityProofingRadioButtons({
   selectedOption,
   onOptionChange,
-  rpName,
+  errorMessage,
+  id,
 }: IdentityProofingRadioButtonsProps): JSX.Element {
   const { t } = useTranslation("idv");
 
@@ -39,24 +42,17 @@ export default function IdentityProofingRadioButtons({
       hint: t("StartIdentityProofing.inPersonSignBackInHint"),
       checked: selectedOption === START_IDENTITY_OPTION.inPerson,
     },
-    {
-      label: t("StartIdentityProofing.cantProveNowOption"),
-      id: `radio-${START_IDENTITY_OPTION.cantProveNow}`,
-      value: START_IDENTITY_OPTION.cantProveNow,
-      hint: t("StartIdentityProofing.cantProveNowHint", {
-        rpName,
-      }),
-      checked: selectedOption === START_IDENTITY_OPTION.cantProveNow,
-    },
   ];
 
   return (
     <GcdsRadios
+      id={id}
       name="start-identity-proofing-method"
       legend={t("StartIdentityProofing.howToProveHeading")}
       hideLegend
       options={radioOptions}
       value={selectedOption ?? ""}
+      errorMessage={errorMessage}
       onGcdsChange={(e: CustomEvent<string>) => {
         onOptionChange(
           (e.target as HTMLInputElement).value as StartIdentityOption,

@@ -26,7 +26,6 @@ from app.utils.schemas import ResponseModel
 from fastapi import APIRouter, Depends, Request, status
 
 from app.otp.services.send_mfa_otp import handle_send_mfa_otp
-from app.utils.validate_user_request_match import validate_user_id_matches_session
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -45,15 +44,12 @@ async def send_otp(
     user_otp_info: UserOtpInfo,
     user_access_token: str = Depends(get_users_current_session),
 ):
-    await validate_user_id_matches_session(
-        request, user_access_token, user_otp_info.user_id
-    )
-
     # Get user's preferred language from their profile instead of payload
     return await handle_otp_send(
         request.app.state.request_client,
         user_otp_info,
         user_access_token,
+        request=request,
     )
 
 
@@ -71,7 +67,10 @@ async def verify_otp(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await handle_otp_verification(
-        request.app.state.request_client, verification_data, user_access_token
+        request.app.state.request_client,
+        verification_data,
+        user_access_token,
+        request=request,
     )
 
 
@@ -93,6 +92,7 @@ async def check_otp(
         request.app.state.request_client,
         RetrievalData(trxnId=trxn_id, otpType=otp_type),
         user_access_token,
+        request=request,
     )
 
 
@@ -110,7 +110,10 @@ async def enroll_otp(
     user_access_token: str = Depends(get_users_current_session),
 ):
     return await handle_otp_enrollment(
-        request.app.state.request_client, enrollment_request, user_access_token
+        request.app.state.request_client,
+        enrollment_request,
+        user_access_token,
+        request=request,
     )
 
 
@@ -133,6 +136,7 @@ async def create_mfa_otp_verification(
         verification_request,
         user_access_token,
         verification_request.otpType,
+        request=request,
     )
 
 
@@ -154,6 +158,7 @@ async def attempt_mfa_otp_verification(
         attempt_request,
         user_access_token,
         attempt_request.otpType,
+        request=request,
     )
 
 

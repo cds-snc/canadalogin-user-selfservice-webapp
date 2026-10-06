@@ -147,11 +147,14 @@ export const authService: AuthServiceContract = {
       handleApiError(error as AuthServiceError);
     }
   },
-  update_email_with_otp: async (newEmailAddress, verificationProofId) => {
+  update_email_with_otp: async (verificationProofId) => {
     try {
+      if (!verificationProofId) {
+        throw new Error("Email update verification proof is missing");
+      }
+
       const updatePayload: UpdateEmailPayload = {
         action: "commit",
-        newEmailAddress,
         verificationProofId,
       };
 
@@ -164,16 +167,10 @@ export const authService: AuthServiceContract = {
       handleApiError(error as AuthServiceError);
     }
   },
-  verify_email_otp_for_update: async (
-    newEmailAddress,
-    otp,
-    trxnId,
-    otpType = "email",
-  ) => {
+  verify_email_otp_for_update: async (otp, trxnId, otpType = "email") => {
     try {
       const updatePayload: VerifyEmailOtpForUpdatePayload = {
         action: "verify",
-        newEmailAddress,
         otp,
         trxnId,
         otpType,
@@ -190,11 +187,14 @@ export const authService: AuthServiceContract = {
       handleApiError(error as AuthServiceError);
     }
   },
-  update_phone_with_otp: async (phoneNumber, verificationProofId) => {
+  update_phone_with_otp: async (verificationProofId) => {
     try {
+      if (!verificationProofId) {
+        throw new Error("Phone update verification proof is missing");
+      }
+
       const updatePayload: UpdatePhonePayload = {
         action: "commit",
-        phoneNumbers: [{ value: phoneNumber, type: "mobile" }],
         verificationProofId,
       };
 
@@ -207,16 +207,10 @@ export const authService: AuthServiceContract = {
       handleApiError(error as AuthServiceError);
     }
   },
-  verify_phone_otp_for_update: async (
-    phoneNumber,
-    otp,
-    trxnId,
-    otpType = "sms",
-  ) => {
+  verify_phone_otp_for_update: async (otp, trxnId, otpType = "sms") => {
     try {
       const updatePayload: VerifyPhoneOtpForUpdatePayload = {
         action: "verify",
-        phoneNumbers: [{ value: phoneNumber, type: "mobile" }],
         otp,
         trxnId,
         otpType,

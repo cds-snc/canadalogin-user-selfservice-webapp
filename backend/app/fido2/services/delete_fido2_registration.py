@@ -18,8 +18,10 @@ from app.config import get_configuration
 from app.fido2.schemas import (
     DeleteRegistrationRequest,
 )
-from app.otp.schemas import RetrievalData
+from app.otp.schemas import OtpType, OtpVerificationAttemptRequest, RetrievalData
 from app.otp.services.retrieve_transient_otp import dispatch_otp_status_retrieval
+from app.otp.services.profile_otp_transaction_store import get_bound_otp_transaction
+from app.otp.services.verify_mfa_otp import handle_verify_mfa_otp
 from app.fido2.services.helper_utils import (
     get_tenant_url,
     get_user_profile_info,
@@ -138,17 +140,59 @@ async def _get_fido2_delete_otp_proof_ttl_seconds(
     trxn_id: str,
     otp_type,
     user_access_token: str,
+    otp_factor_id: str | None = None,
 ) -> int:
+    status_response = None
+
     try:
-        status_response = await dispatch_otp_status_retrieval(
-            request.app.state.request_client,
-            RetrievalData(trxnId=trxn_id, otpType=otp_type),
-            user_access_token,
-        )
+        if (
+            await get_bound_otp_transaction(
+                request=request,
+                transaction_id=trxn_id,
+                otp_type=otp_type.value,
+                factor_id=otp_factor_id,
+            )
+            is None
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
+        if otp_factor_id:
+            headers = get_auth_request_headers(user_access_token, True)
+            settings = get_configuration().ibm_verify_config
+
+            if otp_type == OtpType.SMS:
+                status_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/smsotp/{otp_factor_id}/verifications/{trxn_id}"
+            elif otp_type == OtpType.VOICE:
+                status_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/voiceotp/{otp_factor_id}/verifications/{trxn_id}"
+            elif otp_type == OtpType.EMAIL:
+                status_url = f"{settings.IBM_VERIFY_TENANT_URL}/v2.0/factors/emailotp/{otp_factor_id}/verifications/{trxn_id}"
+            else:
+                status_url = ""
+
+            if status_url:
+                status_response = await request.app.state.request_client.get(
+                    status_url,
+                    headers=headers,
+                )
+        else:
+            status_response = await dispatch_otp_status_retrieval(
+                request.app.state.request_client,
+                RetrievalData(trxnId=trxn_id, otpType=otp_type),
+                user_access_token,
+            )
     except Exception as e:
         logger.warning(
             "Unable to resolve OTP status for passkey delete TTL: %s", str(e)
         )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="otp_expired",
+        )
+
+    if status_response is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="otp_expired",
@@ -254,15 +298,31 @@ async def delete_registration(
                 trxn_id=request_data.trxnId,
                 otp_type=request_data.otpVerificationType,
                 user_access_token=user_access_token,
+                otp_factor_id=request_data.otpFactorId,
             )
             logger.info("Verifying OTP before deletion")
-            await verify_otp_before_operation(
-                global_http_client=http_client,
-                otp=request_data.otp,
-                trxn_id=request_data.trxnId,
-                otp_type=request_data.otpVerificationType,
-                user_access_token=user_access_token,
-            )
+            if request_data.otpFactorId:
+                await handle_verify_mfa_otp(
+                    global_http_client=http_client,
+                    attempt_request=OtpVerificationAttemptRequest(
+                        id=request_data.otpFactorId,
+                        trxnId=request_data.trxnId,
+                        otp=request_data.otp,
+                        otpType=request_data.otpVerificationType,
+                    ),
+                    user_access_token=user_access_token,
+                    otp_type=request_data.otpVerificationType,
+                    request=request,
+                )
+            else:
+                await verify_otp_before_operation(
+                    global_http_client=http_client,
+                    otp=request_data.otp,
+                    trxn_id=request_data.trxnId,
+                    otp_type=request_data.otpVerificationType,
+                    user_access_token=user_access_token,
+                    request=request,
+                )
             logger.info("OTP verified successfully")
 
         # Get user ID from token and verify ownership before issuing proof.
@@ -315,13 +375,28 @@ async def delete_registration(
         and request_data.otpVerificationType is not None
     ):
         logger.info("Verifying OTP before deletion")
-        await verify_otp_before_operation(
-            global_http_client=http_client,
-            otp=request_data.otp,
-            trxn_id=request_data.trxnId,
-            otp_type=request_data.otpVerificationType,
-            user_access_token=user_access_token,
-        )
+        if request_data.otpFactorId:
+            await handle_verify_mfa_otp(
+                global_http_client=http_client,
+                attempt_request=OtpVerificationAttemptRequest(
+                    id=request_data.otpFactorId,
+                    trxnId=request_data.trxnId,
+                    otp=request_data.otp,
+                    otpType=request_data.otpVerificationType,
+                ),
+                user_access_token=user_access_token,
+                otp_type=request_data.otpVerificationType,
+                request=request,
+            )
+        else:
+            await verify_otp_before_operation(
+                global_http_client=http_client,
+                otp=request_data.otp,
+                trxn_id=request_data.trxnId,
+                otp_type=request_data.otpVerificationType,
+                user_access_token=user_access_token,
+                request=request,
+            )
         logger.info("OTP verified successfully")
     else:
         logger.info(

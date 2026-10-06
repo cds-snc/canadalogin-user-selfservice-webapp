@@ -207,15 +207,15 @@ function coreEndpoints(fido2Data = [], numPhoneFactors = 2) {
     },
     {
       type: "post",
-      endpoint: SUBMIT_END_POINTS.transientOtpSend,
+      endpoint: SUBMIT_END_POINTS.otpSend,
       response: {
         success: true,
-        data: { trxnId: "txn-123", expiry: FUTURE_OTP_EXPIRY },
+        data: { id: "txn-123", expiry: FUTURE_OTP_EXPIRY },
       },
     },
     {
       type: "post",
-      endpoint: SUBMIT_END_POINTS.transientOtpVerify,
+      endpoint: SUBMIT_END_POINTS.otpVerify,
       response: { success: true },
     },
     {

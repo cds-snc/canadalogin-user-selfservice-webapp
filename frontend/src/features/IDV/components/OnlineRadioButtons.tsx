@@ -13,11 +13,15 @@ interface RadioOption {
 interface OnlineRadioButtonsProps {
   selectedMethod: IdvMethod | undefined;
   onMethodChange: (method: IdvMethod) => void;
+  errorMessage?: string;
+  id?: string;
 }
 
 export default function OnlineRadioButtons({
   selectedMethod,
   onMethodChange,
+  errorMessage,
+  id,
 }: OnlineRadioButtonsProps): JSX.Element {
   const { t } = useTranslation("idv");
 
@@ -40,11 +44,13 @@ export default function OnlineRadioButtons({
 
   return (
     <GcdsRadios
+      id={id}
       name="online-idv-method"
       legend={t("StartIdentityProofing.radioOnlineLabel")}
       hideLegend
       options={radioOptions}
       value={selectedMethod ?? ""}
+      errorMessage={errorMessage}
       onGcdsChange={(e: CustomEvent<string>) => {
         onMethodChange((e.target as HTMLInputElement).value as IdvMethod);
       }}

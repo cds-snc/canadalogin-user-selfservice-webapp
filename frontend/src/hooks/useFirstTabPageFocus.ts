@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 // Matches elements that participate in normal keyboard navigation.
 const FOCUSABLE_SELECTOR =
@@ -115,7 +115,7 @@ export const useFirstTabPageFocus = ({
     }
   }, [enabled, hash, mainContentId]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!enabled) {
       shouldHandleFirstTabRef.current = false;
       forceInterceptNextTabRef.current = false;
@@ -227,7 +227,7 @@ export const useFirstTabPageFocus = ({
     };
   }, [enabled, mainContentId]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Capture Tab key presses before native tabbing so we can redirect only once.
     const onKeyDown = (event: KeyboardEvent) => {
       if (

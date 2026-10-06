@@ -61,66 +61,58 @@ export default function ProvincialVerificationPage() {
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="450">
-        <GcdsContainer>
-          <GcdsHeading tag="h1">
-            {t("ProvincialVerification.heading")}
-          </GcdsHeading>
-        </GcdsContainer>
+      <GcdsHeading tag="h1">{t("ProvincialVerification.heading")}</GcdsHeading>
 
-        <GcdsContainer>
-          <GcdsText>
-            <strong>{t("ProvincialVerification.followSteps")}</strong>
-          </GcdsText>
-          <ol>
-            <li>
-              <GcdsText marginBottom="0">
-                {t("ProvincialVerification.step1")}
-              </GcdsText>
-            </li>
-            <li>
-              <GcdsText marginBottom="0">
-                {t("ProvincialVerification.step2")}
-              </GcdsText>
-            </li>
-          </ol>
-        </GcdsContainer>
+      <section>
+        <GcdsText>
+          <strong>{t("ProvincialVerification.followSteps")}</strong>
+        </GcdsText>
+        <ol>
+          <li>
+            <GcdsText marginBottom="0">
+              {t("ProvincialVerification.step1")}
+            </GcdsText>
+          </li>
+          <li>
+            <GcdsText marginBottom="0">
+              {t("ProvincialVerification.step2")}
+            </GcdsText>
+          </li>
+        </ol>
+      </section>
 
-        <GcdsGrid columns="1" gap="300">
-          <GcdsCard
-            cardTitle={t("ProvincialVerification.bcServicesCard")}
-            cardTitleTag="h3"
-            href={bcPartnerLoginHref}
-            imgSrc={imgBcServicesCard}
-            imgAlt="British Columbia Logo"
-          ></GcdsCard>
-          <GcdsCard
-            cardTitle={t("ProvincialVerification.albertaAccount")}
-            cardTitleTag="h3"
-            href={abPartnerLoginHref}
-            imgSrc={imgAlbertaAccount}
-            imgAlt="Alberta Logo"
-          ></GcdsCard>
-          <GcdsCard
-            cardTitle={t("ProvincialVerification.quebecAccount")}
-            cardTitleTag="h3"
-            href={quebecPartnerLoginHref}
-            imgSrc={imgQuebecAccount}
-            imgAlt="Québec Logo"
-          ></GcdsCard>
-        </GcdsGrid>
+      <GcdsGrid columns="1fr">
+        <GcdsCard
+          cardTitle={t("ProvincialVerification.bcServicesCard")}
+          cardTitleTag="h3"
+          href={bcPartnerLoginHref}
+          imgSrc={imgBcServicesCard}
+          imgAlt="British Columbia Logo"
+        ></GcdsCard>
+        <GcdsCard
+          cardTitle={t("ProvincialVerification.albertaAccount")}
+          cardTitleTag="h3"
+          href={abPartnerLoginHref}
+          imgSrc={imgAlbertaAccount}
+          imgAlt="Alberta Logo"
+        ></GcdsCard>
+        <GcdsCard
+          cardTitle={t("ProvincialVerification.quebecAccount")}
+          cardTitleTag="h3"
+          href={quebecPartnerLoginHref}
+          imgSrc={imgQuebecAccount}
+          imgAlt="Québec Logo"
+        ></GcdsCard>
 
-        <GcdsGrid columns="max-content" gap="200">
-          <GcdsButton
-            type="button"
-            buttonRole="secondary"
-            onClick={() => {
-              navigate(-1);
-            }}
-          >
-            {t("ProvincialVerification.chooseDifferentMethodButton")}
-          </GcdsButton>
-        </GcdsGrid>
+        <GcdsButton
+          type="button"
+          buttonRole="secondary"
+          onClick={() => {
+            navigate(-1);
+          }}
+        >
+          {t("ProvincialVerification.chooseDifferentMethodButton")}
+        </GcdsButton>
 
         <AccessibleNotice
           noticeRole="info"

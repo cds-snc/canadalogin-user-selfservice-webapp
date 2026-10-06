@@ -32,8 +32,8 @@ export type UserPayload = {
 export type OtpTransportType = "sms" | "voice" | "email";
 
 export type OtpRequestPayload = {
-  user_id?: string | null;
   otpType: string;
+  countAsContactPhoneUpdate?: boolean;
   factor_id?: string;
   destination?: string;
   phoneNumber?: string;
@@ -83,13 +83,11 @@ export type PhoneNumberEntry = {
 
 export type UpdatePhonePayload = {
   action: "commit";
-  phoneNumbers: PhoneNumberEntry[];
   verificationProofId: string;
 };
 
 export type VerifyPhoneOtpForUpdatePayload = {
   action: "verify";
-  phoneNumbers: PhoneNumberEntry[];
   otp: string;
   trxnId: string;
   otpType: Extract<OtpTransportType, "sms" | "voice">;
@@ -97,13 +95,11 @@ export type VerifyPhoneOtpForUpdatePayload = {
 
 export type UpdateEmailPayload = {
   action: "commit";
-  newEmailAddress: string;
   verificationProofId: string;
 };
 
 export type VerifyEmailOtpForUpdatePayload = {
   action: "verify";
-  newEmailAddress: string;
   otp: string;
   trxnId: string;
   otpType: "email";
@@ -142,21 +138,17 @@ export type AuthServiceContract = {
     editedProfile: ProfileUpdatePayload,
   ) => Promise<AuthServiceResponse | undefined>;
   update_email_with_otp: (
-    newEmailAddress: string,
     verificationProofId: string,
   ) => Promise<AuthServiceResponse | undefined>;
   verify_email_otp_for_update: (
-    newEmailAddress: string,
     otp: string,
     trxnId: string,
     otpType?: "email",
   ) => Promise<AuthServiceResponse<OtpVerificationProofData> | undefined>;
   update_phone_with_otp: (
-    phoneNumber: string,
     verificationProofId: string,
   ) => Promise<AuthServiceResponse | undefined>;
   verify_phone_otp_for_update: (
-    phoneNumber: string,
     otp: string,
     trxnId: string,
     otpType?: Extract<OtpTransportType, "sms" | "voice">,

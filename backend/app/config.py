@@ -33,6 +33,13 @@ class IBMVerifyConfig(BaseSettings):
     IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET: str
     IBM_VERIFY_PROFILE_MANAGEMENT_CLIENT_ID: str
     IBM_VERIFY_PROFILE_MANAGEMENT_SECRET: str
+    IBM_VERIFY_ACTIVITY_CLIENT_ID: Optional[str] = None
+    IBM_VERIFY_ACTIVITY_CLIENT_SECRET: Optional[str] = None
+    IBM_VERIFY_ACTIVITY_SSO_EVENT_TYPES: str = "sso"
+    IBM_VERIFY_ACTIVITY_SLO_EVENT_TYPES: str = "slo"
+    IBM_VERIFY_ACTIVITY_SSO_ACTIONS: str = "issued"
+    IBM_VERIFY_ACTIVITY_SLO_ACTIONS: str = "sso_logout"
+    IBM_VERIFY_ACTIVITY_LOOKBACK_DAYS: int = 30
     IBM_VERIFY_PROVINCIAL_PARTNERS_IDENTITY_SOURCE_ID: Optional[str] = None
     EMAIL_MFA_THEME: Optional[str] = None
     model_config = SettingsConfigDict(
@@ -108,7 +115,7 @@ class IdvDataStoreConfig(BaseSettings):
     delegated-user endpoints.
     """
 
-    IDV_DATA_STORE_BASE_URL: str = "https://idv.dev2.login-connexion.alpha.canada.ca"
+    IDV_DATA_STORE_BASE_URL: str = "https://idv.dev.login-connexion.alpha.canada.ca"
     IDV_DATA_STORE_STS_CLIENT_ID: str = ""
     IDV_DATA_STORE_STS_CLIENT_SECRET: str = ""
     IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES: str = Field(
@@ -226,6 +233,11 @@ class Configuration(BaseSettings):
         """IBM Verify's OAuth2 token endpoint, used for the RFC 8693 Token
         Exchange performed against idv-data-store's dedicated STS client."""
         return f"{self.ibm_verify_config.IBM_VERIFY_TENANT_URL}{VerifyAPIEndpoint.GET_ACCESS_TOKEN.value}"
+
+    @property
+    def events_api_endpoint(self) -> str:
+        tenant_url = self.ibm_verify_config.IBM_VERIFY_TENANT_URL.rstrip("/")
+        return f"{tenant_url}{VerifyAPIEndpoint.EVENTS.value}"
 
     @property
     def idv_data_store_identity_verification_in_person_endpoint(self) -> str:

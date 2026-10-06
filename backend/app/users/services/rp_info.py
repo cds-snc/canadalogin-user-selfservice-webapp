@@ -75,9 +75,12 @@ def get_rp_info_from_applications(
 
 async def dispatch_get_oidc_user_applications(
     request: Request,
+    user_access_token: Optional[str] = None,
 ) -> IBMVerifyRelyingPartyUserApplicationsSchema:
     logger.info("dispatch_get_oidc_user_applications")
-    access_token = await get_admin_token(request.app.state.request_client)
+    access_token = user_access_token or await get_admin_token(
+        request.app.state.request_client
+    )
     headers = get_auth_request_headers(access_token, True)
     response = await request.app.state.request_client.get(
         request.app.state.config.rp_user_applications_api_endpoint, headers=headers

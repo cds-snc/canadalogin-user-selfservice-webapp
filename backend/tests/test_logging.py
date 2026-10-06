@@ -3,16 +3,51 @@ import logging
 import json
 
 from app.auth.services.auth_user_session import get_users_current_session
-from app.main import app
+import app.main as main_module
 from fastapi.testclient import TestClient
 from fastapi import HTTPException, status
 
-client = TestClient(app, raise_server_exceptions=False)
+from starsessions import SessionAutoloadMiddleware, SessionMiddleware
+from app.middleware.csrf import CSRF_HEADER_NAME, CSRF_TOKEN_KEY
+
+
+class InjectSessionMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http":
+            scope["session"] = {CSRF_TOKEN_KEY: "test-csrf-token"}
+        await self.app(scope, receive, send)
+
+
+def build_test_client():
+    app = main_module.create_app()
+    app.user_middleware = [
+        middleware
+        for middleware in app.user_middleware
+        if middleware.cls not in {SessionMiddleware, SessionAutoloadMiddleware}
+    ]
+    app.add_middleware(InjectSessionMiddleware)
+    app.middleware_stack = app.build_middleware_stack()
+    return app, TestClient(app, raise_server_exceptions=False)
+
+
+def get_logged_response(caplog):
+    for record in reversed(caplog.records):
+        try:
+            log_json = json.loads(record.message)
+        except json.JSONDecodeError:
+            continue
+        if "context" in log_json and "response" in log_json["context"]:
+            return log_json
+    raise AssertionError("No structured response log record was emitted")
 
 
 @pytest.mark.asyncio
 async def test_log_status_400(monkeypatch, caplog):
     caplog.set_level(logging.WARNING)
+    app, client = build_test_client()
 
     def mock_auth_user_session():
         return {}
@@ -28,8 +63,7 @@ async def test_log_status_400(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info")
 
-    record = caplog.records[1]
-    log_json = json.loads(record.message)
+    log_json = get_logged_response(caplog)
     assert log_json["level"] == "WARNING"
     assert log_json["context"]["response"]["status_code"] == 400
 
@@ -37,6 +71,7 @@ async def test_log_status_400(monkeypatch, caplog):
 @pytest.mark.asyncio
 async def test_log_status_500(monkeypatch, caplog):
     caplog.set_level(logging.WARNING)
+    app, client = build_test_client()
 
     def mock_auth_user_session():
         return {}
@@ -53,8 +88,7 @@ async def test_log_status_500(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info")
 
-    record = caplog.records[1]
-    log_json = json.loads(record.message)
+    log_json = get_logged_response(caplog)
     assert log_json["level"] == "ERROR"
     assert log_json["context"]["response"]["status_code"] == 500
 
@@ -62,6 +96,7 @@ async def test_log_status_500(monkeypatch, caplog):
 @pytest.mark.asyncio
 async def test_log_request_get(monkeypatch, caplog):
     caplog.set_level(logging.WARNING)
+    app, client = build_test_client()
 
     def mock_auth_user_session():
         return {}
@@ -78,8 +113,7 @@ async def test_log_request_get(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info")
 
-    record = caplog.records[1]
-    log_json = json.loads(record.message)
+    log_json = get_logged_response(caplog)
     assert log_json["context"]["request"]["method"] == "GET"
     assert log_json["context"]["request"]["path"] == "/v1/users/rp_info"
 
@@ -87,6 +121,7 @@ async def test_log_request_get(monkeypatch, caplog):
 @pytest.mark.asyncio
 async def test_log_request_post(monkeypatch, caplog):
     caplog.set_level(logging.WARNING)
+    app, client = build_test_client()
 
     def mock_auth_user_session():
         return {}
@@ -109,10 +144,13 @@ async def test_log_request_post(monkeypatch, caplog):
         "name": {"givenName": "John", "familyName": "Doe"},
     }
 
-    client.post("/v1/users/profile", json=payload)
+    client.post(
+        "/v1/users/profile",
+        json=payload,
+        headers={CSRF_HEADER_NAME: "test-csrf-token"},
+    )
 
-    record = caplog.records[1]
-    log_json = json.loads(record.message)
+    log_json = get_logged_response(caplog)
     assert log_json["context"]["request"]["method"] == "POST"
     assert log_json["context"]["request"]["path"] == "/v1/users/profile"
 
@@ -120,6 +158,7 @@ async def test_log_request_post(monkeypatch, caplog):
 @pytest.mark.asyncio
 async def test_log_request_query_string(monkeypatch, caplog):
     caplog.set_level(logging.WARNING)
+    app, client = build_test_client()
 
     def mock_auth_user_session():
         return {}
@@ -136,14 +175,14 @@ async def test_log_request_query_string(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info?test=data")
 
-    record = caplog.records[1]
-    log_json = json.loads(record.message)
+    log_json = get_logged_response(caplog)
     assert log_json["context"]["request"]["query_string"] == "test=data"
 
 
 @pytest.mark.asyncio
 async def test_log_request_query_string_blacklist(monkeypatch, caplog):
     caplog.set_level(logging.WARNING)
+    app, client = build_test_client()
 
     def mock_auth_user_session():
         return {}
@@ -160,8 +199,7 @@ async def test_log_request_query_string_blacklist(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info?test=data&secret=password")
 
-    record = caplog.records[1]
-    log_json = json.loads(record.message)
+    log_json = get_logged_response(caplog)
     assert (
         log_json["context"]["request"]["query_string"]
         == "test=data&secret=5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
@@ -171,6 +209,7 @@ async def test_log_request_query_string_blacklist(monkeypatch, caplog):
 @pytest.mark.asyncio
 async def test_log_signed_in(monkeypatch, caplog):
     caplog.set_level(logging.WARNING)
+    app, client = build_test_client()
 
     def mock_auth_user_session():
         return {}
@@ -194,8 +233,7 @@ async def test_log_signed_in(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info")
 
-    record = caplog.records[1]
-    log_json = json.loads(record.message)
+    log_json = get_logged_response(caplog)
     assert "user" in log_json["context"]
     assert (
         log_json["context"]["user"]["id"]
@@ -207,6 +245,7 @@ async def test_log_signed_in(monkeypatch, caplog):
 @pytest.mark.asyncio
 async def test_log_signed_out(monkeypatch, caplog):
     caplog.set_level(logging.WARNING)
+    app, client = build_test_client()
 
     def mock_auth_user_session():
         return {}
@@ -223,6 +262,5 @@ async def test_log_signed_out(monkeypatch, caplog):
 
     client.get("/v1/users/rp_info")
 
-    record = caplog.records[1]
-    log_json = json.loads(record.message)
+    log_json = get_logged_response(caplog)
     assert "user" not in log_json["context"]

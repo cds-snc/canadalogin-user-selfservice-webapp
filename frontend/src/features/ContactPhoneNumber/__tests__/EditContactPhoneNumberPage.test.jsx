@@ -10,6 +10,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import EditContactPhoneNumberPage from "../components/EditContactPhoneNumberPage";
 import { UserProvider } from "../../../components/Providers/UserProvider";
 import { LanguageProvider } from "../../../components/Providers/LanguageProvider";
+import i18n from "../../../i18n/test";
 import "@testing-library/jest-dom/vitest";
 
 // Declare mock functions first
@@ -206,6 +207,7 @@ describe("EditContactPhoneNumberPage Component", () => {
 
     // Reset mockParams to default
     mockParams = { language: "en", step: undefined };
+    await i18n.changeLanguage("en");
 
     // Get the mocked auth service
     const { authService } = await import("../../../services/authService");
@@ -264,6 +266,7 @@ describe("EditContactPhoneNumberPage Component", () => {
         destination: "+15551234567",
         user_id: "test-user-123",
         otpType: "sms",
+        countAsContactPhoneUpdate: true,
       });
     });
 
@@ -292,6 +295,57 @@ describe("EditContactPhoneNumberPage Component", () => {
     await waitFor(() => {
       expect(screen.getByTestId("error")).toHaveTextContent(
         "Invalid phone number",
+      );
+    });
+    expect(mockStepContent.mock.calls.at(-1)?.[0]?.errorLinks).toEqual({
+      "#cp-phone-number": expect.any(String),
+    });
+  });
+
+  it("renders exact English otp_send_rate_limit message in OTP send flow", async () => {
+    mockAuthService.transientOtpSend.mockRejectedValue({
+      data: { message: "otp_send_rate_limit" },
+    });
+
+    render(
+      <TestWrapper>
+        <EditContactPhoneNumberPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.change(screen.getByTestId("phone-input"), {
+      target: { value: "+15551234567" },
+    });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error")).toHaveTextContent(
+        "You have reached the maximum number of verification code requests. Wait 5 minutes and try again.",
+      );
+    });
+  });
+
+  it("renders exact French otp_send_rate_limit message in OTP send flow", async () => {
+    mockParams = { language: "fr", step: undefined };
+    await i18n.changeLanguage("fr");
+    mockAuthService.transientOtpSend.mockRejectedValue({
+      data: { message: "otp_send_rate_limit" },
+    });
+
+    render(
+      <TestWrapper>
+        <EditContactPhoneNumberPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.change(screen.getByTestId("phone-input"), {
+      target: { value: "+15551234567" },
+    });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error")).toHaveTextContent(
+        "Vous avez atteint la limite de demandes de code de vérification. Veuillez attendre 5 minutes et réessayer.",
       );
     });
   });
@@ -331,7 +385,6 @@ describe("EditContactPhoneNumberPage Component", () => {
 
     await waitFor(() => {
       expect(mockAuthService.verify_phone_otp_for_update).toHaveBeenCalledWith(
-        "+15551234567",
         "123456",
         "test-trxn-id",
         "sms",
@@ -386,7 +439,6 @@ describe("EditContactPhoneNumberPage Component", () => {
 
     await waitFor(() => {
       expect(mockAuthService.update_phone_with_otp).toHaveBeenCalledWith(
-        "+15551234567",
         "test-proof-id",
       );
     });
@@ -394,6 +446,56 @@ describe("EditContactPhoneNumberPage Component", () => {
     await waitFor(() => {
       expect(screen.getByTestId("successfully-updated")).toBeInTheDocument();
     });
+  });
+
+  it("shows rate-limit error when phone verification change limit is reached", async () => {
+    mockAuthService.transientOtpSend.mockResolvedValue({
+      data: { trxnId: "test-trxn-id" },
+    });
+    mockAuthService.verify_phone_otp_for_update.mockResolvedValue({
+      success: true,
+      data: { verificationProofId: "test-proof-id" },
+    });
+    mockAuthService.update_phone_with_otp.mockRejectedValue({
+      data: { message: "phone_mfa_change_rate_limit" },
+    });
+
+    render(
+      <TestWrapper>
+        <EditContactPhoneNumberPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.change(screen.getByTestId("phone-input"), {
+      target: { value: "+15551234567" },
+    });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByTestId("otp-input"), {
+      target: { value: "123456" },
+    });
+    fireEvent.click(screen.getByTestId("verify-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("confirm-update")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("confirm-btn"));
+
+    await waitFor(() => {
+      const lastStepContentCall = mockStepContent.mock.calls.at(-1)?.[0];
+      expect(lastStepContentCall?.errorCode).toBe(
+        "phone_mfa_change_rate_limit",
+      );
+      expect(lastStepContentCall?.errorLinks).toEqual({
+        "#cp-phone-number": expect.any(String),
+      });
+    });
+    expect(screen.getByTestId("enter-phone-number")).toBeInTheDocument();
   });
 
   it("handles back navigation from OTP verification", async () => {
@@ -478,6 +580,48 @@ describe("EditContactPhoneNumberPage Component", () => {
         otpType: "sms",
       });
     });
+  });
+
+  it("returns to enter phone with phone input error link when resend hits phone change rate limit", async () => {
+    mockAuthService.transientOtpSend
+      .mockResolvedValueOnce({
+        data: { trxnId: "test-trxn-id" },
+      })
+      .mockRejectedValueOnce({
+        data: { message: "phone_mfa_change_rate_limit" },
+      });
+
+    render(
+      <TestWrapper>
+        <EditContactPhoneNumberPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.change(screen.getByTestId("phone-input"), {
+      target: { value: "+15551234567" },
+    });
+    fireEvent.click(screen.getByTestId("next-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("otp-verification")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("resend-btn"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("enter-phone-number")).toBeInTheDocument();
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/profile/update-contact-phone",
+      { replace: true },
+    );
+
+    const lastStepContentCall = mockStepContent.mock.calls.at(-1)?.[0];
+    expect(lastStepContentCall?.errorCode).toBe("phone_mfa_change_rate_limit");
+    expect(lastStepContentCall?.errorLinks?.["#cp-phone-number"]).toBe(
+      lastStepContentCall?.errorMessage,
+    );
   });
 
   it("shows loading state when localLoading is true", async () => {

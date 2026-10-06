@@ -8,10 +8,22 @@ import {
   GcdsContainer,
 } from "@gcds-core/components-react";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import {
+  AVAILABLE_LANGUAGES,
+  DEV_ONLY_FEATURE,
+  PAGES,
+} from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import OnlineRadioButtons from "../components/OnlineRadioButtons";
 import { ONLINE_IDV_METHOD, type IdvMethod } from "../components/methods";
+import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
+import {
+  getSelectOptionRequiredMessage,
+  getValidationSummaryHeading,
+} from "../InPerson/validation/ErrorsDefinition";
+
+const ERROR_SUMMARY_ID = "prove-identity-online-error-summary";
+const RADIOS_ID = "prove-identity-online-radios";
 
 export default function ProveIdentityOnlinePage() {
   const navigate = useNavigate();
@@ -19,6 +31,14 @@ export default function ProveIdentityOnlinePage() {
   const { t } = useTranslation("idv");
 
   const [selectedMethod, setSelectedMethod] = useState<IdvMethod>();
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
+  const currentLanguage =
+    language === AVAILABLE_LANGUAGES.fr
+      ? AVAILABLE_LANGUAGES.fr
+      : AVAILABLE_LANGUAGES.en;
+  const selectMethodErrorMessage =
+    hasSubmitted && !selectedMethod ? getSelectOptionRequiredMessage(t) : "";
 
   const onlineVerificationInfoPage = path(PAGES.idvOnlineVerificationInfoPage, {
     language,
@@ -34,6 +54,13 @@ export default function ProveIdentityOnlinePage() {
   });
 
   const handleContinue = () => {
+    setHasSubmitted(true);
+
+    if (!selectedMethod) {
+      setSummaryFocusTrigger((previous) => previous + 1);
+      return;
+    }
+
     switch (selectedMethod) {
       case ONLINE_IDV_METHOD.documentScanning:
         navigate(onlineVerificationInfoPage);
@@ -60,10 +87,22 @@ export default function ProveIdentityOnlinePage() {
       <GcdsGrid columns="1" gap="450">
         <GcdsHeading tag="h1">{t("ProveIdentityOnline.heading")}</GcdsHeading>
 
+        {selectMethodErrorMessage ? (
+          <ErrorSummaryWithFocus
+            key={summaryFocusTrigger}
+            id={ERROR_SUMMARY_ID}
+            errorMessage={getValidationSummaryHeading(t)}
+            errorLinks={{ [`#${RADIOS_ID}`]: selectMethodErrorMessage }}
+            language={currentLanguage}
+          />
+        ) : null}
+
         <form onSubmit={handleSubmit}>
           <OnlineRadioButtons
+            id={RADIOS_ID}
             selectedMethod={selectedMethod}
             onMethodChange={setSelectedMethod}
+            errorMessage={selectMethodErrorMessage}
           />
 
           <GcdsGrid
@@ -71,7 +110,7 @@ export default function ProveIdentityOnlinePage() {
             columnsDesktop="max-content max-content"
             gap="200"
           >
-            <GcdsButton type="submit" disabled={!selectedMethod}>
+            <GcdsButton type="submit">
               {t("ProveIdentityOnline.continueButton")}
             </GcdsButton>
             <GcdsButton

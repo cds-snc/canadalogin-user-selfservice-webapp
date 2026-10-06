@@ -7,8 +7,12 @@ from httpx import AsyncClient
 from app.config import get_configuration
 from app.otp.schemas import OtpType, RetrievalData, UserOtpVerificationInfo
 from app.otp.services.retrieve_transient_otp import dispatch_otp_status_retrieval
+from app.otp.services.profile_otp_transaction_store import (
+    get_transient_otp_transaction,
+)
 from app.utils.access_token import get_auth_request_headers
 from app.utils.schemas import ResponseModel
+from fastapi import Request
 
 logger = logging.getLogger(__name__)
 
@@ -54,11 +58,24 @@ async def handle_otp_verification(
     global_http_client: AsyncClient,
     user_verification_data: UserOtpVerificationInfo,
     user_access_token: str,
+    request: Request | None = None,
 ):
     """The global_http_client is a httpx AsyncClient connection pool, created at startup time. It can be found in main.py
     Use it for ALL API calls."""
     logger.info(f"Attempting to verify {user_verification_data.otpType} OTP")
     start_time = datetime.now()
+    if request is not None:
+        transaction = await get_transient_otp_transaction(
+            request=request,
+            transaction_id=user_verification_data.trxnId,
+            otp_type=user_verification_data.otpType.value,
+        )
+        if transaction is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
     await verify_otp(global_http_client, user_verification_data, user_access_token)
     duration = (datetime.now() - start_time).total_seconds()
     logger.info(

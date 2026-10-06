@@ -13,11 +13,15 @@ interface RadioOption {
 interface InPersonRadioButtonsProps {
   selectedMethod: InPersonMethod | undefined;
   onMethodChange: (method: InPersonMethod) => void;
+  errorMessage?: string;
+  id?: string;
 }
 
 export default function InPersonRadioButtons({
   selectedMethod,
   onMethodChange,
+  errorMessage,
+  id,
 }: InPersonRadioButtonsProps): JSX.Element {
   const { t } = useTranslation("idv");
 
@@ -40,11 +44,13 @@ export default function InPersonRadioButtons({
 
   return (
     <GcdsRadios
+      id={id}
       name="in-person-idv-method"
       legend={t("StartIdentityProofing.inPersonOption")} // legend is still required for accessibility even if we choose to hide it visually
       hideLegend
       options={radioOptions}
       value={selectedMethod ?? ""}
+      errorMessage={errorMessage}
       style={
         // Custom styles to meet design requirements for in-person option
         {

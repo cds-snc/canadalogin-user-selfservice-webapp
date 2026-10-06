@@ -285,11 +285,12 @@ export default function OtpVerification({
 
       <GcdsText>
         <GcdsLink
-          role="button"
           style={{ textDecoration: "underline" }}
           onGcdsClick={switchVerificationMethod}
           onKeyDown={(event) =>
-            handleLinkButtonKeyDown(event, switchVerificationMethod)
+            handleLinkButtonKeyDown(event, switchVerificationMethod, {
+              keys: ["Enter"],
+            })
           }
         >
           {userMfaType === FLOW_TYPES.sms
@@ -309,11 +310,12 @@ export default function OtpVerification({
           </span>
         ) : (
           <GcdsLink
-            role="button"
             style={{ textDecoration: "underline" }}
             onGcdsClick={requestNewCodeAction}
             onKeyDown={(event) =>
-              handleLinkButtonKeyDown(event, requestNewCodeAction)
+              handleLinkButtonKeyDown(event, requestNewCodeAction, {
+                keys: ["Enter"],
+              })
             }
           >
             {t("Verification.requestNewCode")}
@@ -323,11 +325,12 @@ export default function OtpVerification({
 
       <GcdsText>
         <GcdsLink
-          role="button"
           style={{ textDecoration: "underline" }}
           onGcdsClick={tryAnotherWayAction}
           onKeyDown={(event) =>
-            handleLinkButtonKeyDown(event, tryAnotherWayAction)
+            handleLinkButtonKeyDown(event, tryAnotherWayAction, {
+              keys: ["Enter"],
+            })
           }
         >
           {t("Verification.differentPhoneNumber")}

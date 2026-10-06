@@ -5,16 +5,51 @@ from app.otp.schemas import (
     VerificationCreateResponseData,
 )
 from app.users.services.get_my_profile import get_my_profile
+from app.otp.services.profile_otp_transaction_store import store_mfa_otp_transaction
+from app.utils.global_error_handlers import extract_response_body
 from app.utils.access_token import get_auth_request_headers
+from app.utils.phone_mfa_rate_limit import (
+    assert_phone_mfa_registration_rate_limit_not_exceeded,
+    consume_mfa_send_daily_quota,
+    record_phone_mfa_registration_event,
+)
 from app.utils.schemas import ResponseModel
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status
 
-
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+PHONE_MFA_SENT_FACTORS_SESSION_KEY = "phone_mfa_sent_factor_ids"
+IBM_VERIFY_OTP_SEND_RATE_LIMIT_MESSAGE_IDS = {"CSIBN0081E", "CSIAP3512E"}
+OTP_SEND_RATE_LIMIT_ERROR_CODE = "otp_send_rate_limit"
+
+
+def _get_sent_factor_ids_from_session(request: Request) -> set[str]:
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return set()
+
+    stored_value = session.get(PHONE_MFA_SENT_FACTORS_SESSION_KEY, [])
+    if not isinstance(stored_value, list):
+        return set()
+
+    return {factor_id for factor_id in stored_value if isinstance(factor_id, str)}
+
+
+def _mark_factor_id_as_sent(request: Request, factor_id: str) -> None:
+    if not factor_id:
+        return
+
+    session = getattr(request, "session", None)
+    if not isinstance(session, dict):
+        return
+
+    sent_factor_ids = _get_sent_factor_ids_from_session(request)
+    sent_factor_ids.add(factor_id)
+    session[PHONE_MFA_SENT_FACTORS_SESSION_KEY] = list(sent_factor_ids)
 
 
 async def dispatch_send_mfa_otp(
@@ -41,7 +76,26 @@ async def dispatch_send_mfa_otp(
         )
 
     response = await global_http_client.post(verification_url, json={}, headers=headers)
-    response.raise_for_status()
+
+    try:
+        response.raise_for_status()
+    except HTTPStatusError as exc:
+        if (
+            exc.response
+            and exc.response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+        ):
+            body = extract_response_body(exc.response)
+            message_id = body.get("messageId")
+            if (
+                isinstance(message_id, str)
+                and message_id in IBM_VERIFY_OTP_SEND_RATE_LIMIT_MESSAGE_IDS
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail=OTP_SEND_RATE_LIMIT_ERROR_CODE,
+                ) from exc
+        raise
+
     return response
 
 
@@ -50,6 +104,7 @@ async def handle_send_mfa_otp(
     verification_request: OtpVerificationCreateRequest,
     user_access_token: str,
     otp_type: OtpType,
+    request: Request | None = None,
 ):
     """Send an MFA OTP for SMS, Voice, or Email."""
 
@@ -65,8 +120,31 @@ async def handle_send_mfa_otp(
         )
 
     # Get user's preferred language from profile
+    user_id = my_profile_response.data.id
     user_language = my_profile_response.data.preferredLanguage or "en"
     logger.info(f"Using user's preferred language: {user_language}")
+
+    should_enforce_phone_rate_limit = request is not None and otp_type in {
+        OtpType.SMS,
+        OtpType.VOICE,
+    }
+
+    if should_enforce_phone_rate_limit:
+        await assert_phone_mfa_registration_rate_limit_not_exceeded(request, user_id)
+
+    if request is not None:
+        await consume_mfa_send_daily_quota(request, user_id)
+
+    should_record_phone_rate_limit_event = False
+    if should_enforce_phone_rate_limit:
+        # Backend anti-bypass guard:
+        # if this is the first successful send for a factor in this session,
+        # count it even when countAsMfaAddition is false.
+        sent_factor_ids = _get_sent_factor_ids_from_session(request)
+        should_record_phone_rate_limit_event = (
+            verification_request.countAsMfaAddition
+            or verification_request.id not in sent_factor_ids
+        )
 
     http_client_response = await dispatch_send_mfa_otp(
         global_http_client,
@@ -76,8 +154,21 @@ async def handle_send_mfa_otp(
         user_language,
     )
 
+    if should_enforce_phone_rate_limit:
+        _mark_factor_id_as_sent(request, verification_request.id)
+
+    if should_record_phone_rate_limit_event:
+        await record_phone_mfa_registration_event(request, user_id)
+
     response_json = http_client_response.json()
     logger.info(f"IBM Verify MFA OTP response: {response_json}")
+
+    await store_mfa_otp_transaction(
+        request=request,
+        response_json=response_json,
+        factor_id=verification_request.id,
+        otp_type=otp_type.value,
+    )
 
     # Parse the verification response
     verification_data = VerificationCreateResponseData(**response_json)

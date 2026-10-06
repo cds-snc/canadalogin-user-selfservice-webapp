@@ -91,7 +91,7 @@ async def test_handle_otp_deletion_sms_success(monkeypatch, mock_delete_guard):
 
     # Mock verify_otp_before_operation to succeed
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None  # Success means no exception
 
@@ -171,7 +171,7 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
 
     # Mock verify_otp_before_operation to succeed
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None  # Success means no exception
 
@@ -281,7 +281,7 @@ async def test_handle_otp_deletion_last_factor_protection(
 
     # Mock verify_otp_before_operation to succeed
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None  # Success means no exception
 
@@ -732,7 +732,7 @@ async def test_handle_otp_deletion_verify_action_issues_proof(monkeypatch):
     """Verify action should validate OTP and issue a one-time proof."""
 
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None
 
@@ -803,6 +803,101 @@ async def test_handle_otp_deletion_verify_action_issues_proof(monkeypatch):
     assert isinstance(result.data.get("verificationProofId"), str)
     assert result.data["verificationProofId"]
     assert "mfa_delete_verification_proofs" in mock_request.session
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_deletion_verify_action_with_factor_id_uses_mfa_verify(
+    monkeypatch,
+):
+    """Verify action should use factor-based MFA verify when otpFactorId is provided."""
+
+    calls = {"mfa": 0, "transient": 0, "otp_factor_id": None}
+
+    async def mock_verify_otp(*args, **kwargs):
+        calls["transient"] += 1
+        return None
+
+    async def mock_handle_verify_mfa_otp(*args, **kwargs):
+        calls["mfa"] += 1
+        return ResponseModel(success=True, data=None, message="ok")
+
+    async def mock_get_my_profile(client, token):
+        return ProfileResponse(
+            success=True,
+            message="Profile retrieved successfully",
+            data=IBMVerifyUserProfileSchema(
+                id="user123",
+                userName="testuser@example.com",
+                active=True,
+                meta={
+                    "created": datetime.now().isoformat(),
+                    "lastModified": datetime.now().isoformat(),
+                    "location": "https://example.com/scim/v2/Users/user123",
+                    "resourceType": "User",
+                },
+                emails=[
+                    {"value": "testuser@example.com", "primary": True, "type": "work"}
+                ],
+                name={
+                    "formatted": "Test User",
+                    "givenName": "Test",
+                    "familyName": "User",
+                },
+                contactNumber="+12345678901",
+            ),
+        )
+
+    async def mock_get_proof_ttl(
+        request,
+        trxn_id,
+        otp_type,
+        user_access_token,
+        otp_factor_id=None,
+    ):
+        calls["otp_factor_id"] = otp_factor_id
+        return 120
+
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.handle_verify_mfa_otp",
+        mock_handle_verify_mfa_otp,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.get_my_profile",
+        mock_get_my_profile,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp._get_mfa_delete_otp_proof_ttl_seconds",
+        mock_get_proof_ttl,
+    )
+
+    deletion_request = OtpDeletionRequest(
+        id="factor123",
+        otpType=OtpType.SMS,
+        action=OtpDeletionAction.VERIFY,
+        otp="123456",
+        trxnId="txn123",
+        otpFactorId="factor123",
+        otpVerificationType=OtpType.SMS,
+    )
+    mock_request = MagicMock()
+    mock_request.session = {}
+    mock_request.app = MagicMock()
+    mock_request.app.state = MagicMock()
+    mock_request.app.state.request_client = MagicMock()
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        result = await handle_otp_deletion(
+            global_http_client=client,
+            deletion_request=deletion_request,
+            user_access_token="fake-token",
+            request=mock_request,
+        )
+
+    assert result.success is True
+    assert calls["mfa"] == 1
+    assert calls["transient"] == 0
+    assert calls["otp_factor_id"] == "factor123"
 
 
 @pytest.mark.asyncio
@@ -913,7 +1008,7 @@ async def test_handle_otp_batch_deletion_success(monkeypatch, mock_delete_guard)
     """Test successful batch deletion of multiple OTP factors"""
 
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None
 
@@ -956,13 +1051,80 @@ async def test_handle_otp_batch_deletion_success(monkeypatch, mock_delete_guard)
 
 
 @pytest.mark.asyncio
+async def test_handle_otp_batch_deletion_verify_action_with_factor_id_uses_mfa_verify(
+    monkeypatch,
+):
+    """Batch verify action should use factor-based MFA verify when otpFactorId is provided."""
+
+    calls = {"mfa": 0, "transient": 0, "otp_factor_id": None}
+
+    async def mock_verify_otp(*args, **kwargs):
+        calls["transient"] += 1
+        return None
+
+    async def mock_handle_verify_mfa_otp(*args, **kwargs):
+        calls["mfa"] += 1
+        return ResponseModel(success=True, data=None, message="ok")
+
+    async def mock_get_proof_ttl(
+        request,
+        trxn_id,
+        otp_type,
+        user_access_token,
+        otp_factor_id=None,
+    ):
+        calls["otp_factor_id"] = otp_factor_id
+        return 120
+
+    monkeypatch.setattr(verify_otp_import_path, mock_verify_otp)
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp.handle_verify_mfa_otp",
+        mock_handle_verify_mfa_otp,
+    )
+    monkeypatch.setattr(
+        "app.otp.services.delete_mfa_otp._get_mfa_delete_otp_proof_ttl_seconds",
+        mock_get_proof_ttl,
+    )
+
+    batch_request = OtpBatchDeletionRequest(
+        factors=[
+            OtpFactorItem(id="factor1", otpType=OtpType.SMS),
+            OtpFactorItem(id="factor2", otpType=OtpType.VOICE),
+        ],
+        action=OtpDeletionAction.VERIFY,
+        otp="123456",
+        trxnId="txn123",
+        otpFactorId="factor1",
+        otpVerificationType=OtpType.SMS,
+    )
+    mock_request = MagicMock()
+    mock_request.session = {}
+    mock_request.app = MagicMock()
+    mock_request.app.state = MagicMock()
+    mock_request.app.state.request_client = MagicMock()
+
+    async with AsyncClient(base_url="http://localhost") as client:
+        result = await handle_otp_batch_deletion(
+            request=mock_request,
+            global_http_client=client,
+            deletion_request=batch_request,
+            user_access_token="fake-token",
+        )
+
+    assert result.success is True
+    assert calls["mfa"] == 1
+    assert calls["transient"] == 0
+    assert calls["otp_factor_id"] == "factor1"
+
+
+@pytest.mark.asyncio
 async def test_handle_otp_batch_deletion_last_factor_protection(
     monkeypatch, mock_delete_guard
 ):
     """Test that batch deletion is prevented when it would remove the last factor"""
 
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None
 
@@ -997,7 +1159,7 @@ async def test_handle_otp_batch_deletion_otp_failure(monkeypatch):
     """Test that batch deletion is aborted when OTP verification fails"""
 
     async def mock_verify_otp_fail(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

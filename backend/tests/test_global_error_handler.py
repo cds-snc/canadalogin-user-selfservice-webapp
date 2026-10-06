@@ -14,6 +14,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starsessions import SessionMiddleware
 from authlib.integrations.starlette_client import OAuthError
 
+from app.middleware.csrf import CSRF_HEADER_NAME, CSRF_TOKEN_KEY
+
 from app.auth.services.auth_user_session import (
     get_users_current_session,
     get_user_info,
@@ -115,10 +117,12 @@ def mock_test_client():
 
     clients_to_close = []
 
-    def _make_client(request_client, session_data={}, disable_overrides=False):
+    def _make_client(request_client, session_data=None, disable_overrides=False):
         from app.main import create_app
 
         app = create_app()
+        session_data = dict(session_data or {})
+        session_data.setdefault(CSRF_TOKEN_KEY, "test-csrf-token")
 
         if not disable_overrides:
             """A factory fixture to create a TestClient with custom state."""
@@ -140,6 +144,7 @@ def mock_test_client():
         app.middleware_stack = app.build_middleware_stack()
 
         client = TestClient(app, raise_server_exceptions=False)
+        client.headers[CSRF_HEADER_NAME] = session_data[CSRF_TOKEN_KEY]
         clients_to_close.append(client)
         return client
 
@@ -1776,9 +1781,11 @@ class TestErrorHandlingEnrollMfaOtp:
     @patch.object(enroll_mfa_otp_module, "get_my_profile")
     @patch.object(enroll_mfa_otp_module, "dispatch_otp_enrollment")
     async def test_handle_sms_otp_enrollment_ibm_error(
-        self, mock_dispatch_otp_enrollment, mock_get_my_profile, mock_test_client
+        self,
+        mock_dispatch_otp_enrollment,
+        mock_get_my_profile,
+        mock_test_client,
     ):
-
         mock_get_my_profile.return_value = MagicMock(success=True)
 
         mock_response = MagicMock(status_code=400)
@@ -1803,9 +1810,11 @@ class TestErrorHandlingEnrollMfaOtp:
     @patch.object(enroll_mfa_otp_module, "get_my_profile")
     @patch.object(enroll_mfa_otp_module, "dispatch_otp_enrollment")
     async def test_handle_voice_otp_enrollment_ibm_error(
-        self, mock_dispatch_otp_enrollment, mock_get_my_profile, mock_test_client
+        self,
+        mock_dispatch_otp_enrollment,
+        mock_get_my_profile,
+        mock_test_client,
     ):
-
         mock_get_my_profile.return_value = MagicMock(success=True)
 
         mock_response = MagicMock(status_code=400)
@@ -1833,6 +1842,100 @@ class TestErrorHandlingEnrollMfaOtp:
 
 
 class TestErrorHandlingSendMfaOtp:
+
+    @pytest.fixture(autouse=True)
+    def mock_bound_mfa_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "trxn456",
+                "factorId": "factor123",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        async def consume_bound_transaction(**_kwargs):
+            return None
+
+        monkeypatch.setattr(
+            verify_mfa_otp_module,
+            "get_bound_otp_transaction",
+            get_bound_transaction,
+        )
+        monkeypatch.setattr(
+            verify_mfa_otp_module,
+            "consume_mfa_otp_transaction",
+            consume_bound_transaction,
+        )
+
+    @pytest.mark.asyncio
+    @patch.object(
+        send_mfa_otp_module, "assert_phone_mfa_registration_rate_limit_not_exceeded"
+    )
+    @patch.object(send_mfa_otp_module, "get_my_profile")
+    async def test_verification_create_rate_limited_for_counted_add_mfa_send(
+        self,
+        mock_get_my_profile,
+        mock_assert_phone_mfa_registration_rate_limit_not_exceeded,
+        mock_test_client,
+    ):
+        mock_profile = MagicMock(success=True)
+        mock_profile.data = MagicMock(id="user-123", preferredLanguage="en")
+        mock_get_my_profile.return_value = mock_profile
+
+        mock_assert_phone_mfa_registration_rate_limit_not_exceeded.side_effect = (
+            HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="phone_mfa_change_rate_limit",
+            )
+        )
+
+        request_data = {
+            "id": "factor123",
+            "otpType": "sms",
+            "countAsMfaAddition": True,
+        }
+
+        client = mock_test_client(MagicMock())
+
+        response = client.request("POST", "/v1/otp/mfa/send", json=request_data)
+        response_json = response.json()
+
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+        assert not response_json["success"]
+        assert response_json["message"] == "phone_mfa_change_rate_limit"
+
+    @pytest.mark.asyncio
+    @patch.object(verify_mfa_otp_module, "dispatch_verify_mfa_otp")
+    @patch.object(verify_mfa_otp_module, "_resolve_factor_verification_context")
+    @patch.object(verify_mfa_otp_module, "get_my_profile")
+    async def test_verification_attempt_allowed_after_phone_mfa_limit_reached(
+        self,
+        mock_get_my_profile,
+        mock_resolve_factor_verification_context,
+        mock_dispatch_verify_mfa_otp,
+        mock_test_client,
+    ):
+        mock_profile = MagicMock(success=True)
+        mock_profile.data = MagicMock(id="user-123")
+        mock_get_my_profile.return_value = mock_profile
+        mock_resolve_factor_verification_context.return_value = (OtpType.SMS, False)
+        mock_dispatch_verify_mfa_otp.return_value = None
+
+        request_data = {
+            "id": "factor123",
+            "trxnId": "trxn456",
+            "otp": "123456",
+            "otpType": "sms",
+        }
+
+        client = mock_test_client(MagicMock())
+
+        response = client.request("POST", "/v1/otp/mfa/verify", json=request_data)
+        response_json = response.json()
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response_json["success"]
+        mock_dispatch_verify_mfa_otp.assert_awaited_once()
 
     @pytest.mark.asyncio
     @patch.object(send_mfa_otp_module, "get_my_profile")
@@ -1879,16 +1982,19 @@ class TestErrorHandlingSendMfaOtp:
         assert "Network error" in caplog.text
 
     @pytest.mark.asyncio
+    @patch.object(verify_mfa_otp_module, "_resolve_factor_verification_context")
     @patch.object(verify_mfa_otp_module, "get_my_profile")
     @patch.object(verify_mfa_otp_module, "dispatch_verify_mfa_otp")
     async def test_verification_attempt_general_exception(
         self,
         mock_dispatch_verify_mfa_otp,
         mock_get_my_profile,
+        mock_resolve_factor_verification_context,
         mock_test_client,
         caplog,
     ):
         mock_get_my_profile.return_value = MagicMock(success=True)
+        mock_resolve_factor_verification_context.return_value = (OtpType.SMS, False)
         mock_dispatch_verify_mfa_otp.side_effect = Exception("Network error")
 
         request_data = {
@@ -1978,6 +2084,7 @@ class TestErrorHandlingSendMfaOtp:
         assert response_json["message"] == "The provided data is not valid."
 
     @pytest.mark.asyncio
+    @patch.object(verify_mfa_otp_module, "_resolve_factor_verification_context")
     @patch.object(verify_mfa_otp_module, "get_my_profile")
     @patch.object(verify_mfa_otp_module, "get_auth_request_headers")
     @patch.object(verify_mfa_otp_module, "get_configuration")
@@ -1986,9 +2093,11 @@ class TestErrorHandlingSendMfaOtp:
         mock_get_configuration,
         mock_get_auth_request_headers,
         mock_get_my_profile,
+        mock_resolve_factor_verification_context,
         mock_test_client,
     ):
         mock_get_my_profile.return_value = MagicMock(success=True)
+        mock_resolve_factor_verification_context.return_value = (OtpType.SMS, False)
         mock_get_auth_request_headers.return_value = {
             "Authorization": "Bearer admin_token"
         }
@@ -2060,13 +2169,26 @@ class TestErrorHandlingUpdateProfileWithOtp:
         )
 
         request_data = {
-            "otp": "123456",
-            "trxnId": "test-trxn-id",
-            "otpType": "sms",
-            "newEmailAddress": "new@example.com",
+            "action": "commit",
+            "verificationProofId": "proof-1",
         }
 
-        client = mock_test_client(MagicMock())
+        client = mock_test_client(
+            MagicMock(),
+            {
+                "profile_update_otp_proofs": {
+                    "proof-1": {
+                        "expiresAt": 4102444800,
+                        "fingerprint": {
+                            "newEmailAddress": "",
+                            "phoneNumbers": [
+                                {"type": "mobile", "value": "14165551234"}
+                            ],
+                        },
+                    }
+                }
+            },
+        )
 
         response = client.request(
             "POST", "/v1/users/profile/update-with-otp", json=request_data
@@ -2472,6 +2594,21 @@ class TestErrorHandlingAuthLogout:
 
 class TestErrorHandlingRetrieveTransientOtp:
 
+    @pytest.fixture(autouse=True)
+    def mock_bound_transient_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "bound-transaction",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        monkeypatch.setattr(
+            retrieve_transient_otp_module,
+            "get_transient_otp_transaction",
+            get_bound_transaction,
+        )
+
     @pytest.mark.asyncio
     @patch.object(retrieve_transient_otp_module, "dispatch_otp_status_retrieval")
     async def test_handle_non_200_returns_error_model(
@@ -2541,17 +2678,88 @@ class TestErrorHandlingRetrieveTransientOtp:
 class TestErrorHandlingSendTransientOtp:
 
     @pytest.mark.asyncio
-    @patch.object(otp_router, "validate_user_id_matches_session")
+    @patch.object(
+        send_transient_otp_module,
+        "assert_contact_phone_update_rate_limit_not_exceeded",
+    )
+    @patch.object(send_transient_otp_module, "get_my_profile")
+    async def test_handle_contact_phone_counted_send_rate_limit(
+        self,
+        mock_get_my_profile,
+        mock_assert_contact_phone_update_rate_limit_not_exceeded,
+        mock_test_client,
+    ):
+        mock_profile = MagicMock()
+        mock_profile.data = MagicMock(id="user-123", preferredLanguage="en")
+        mock_get_my_profile.return_value = mock_profile
+        mock_assert_contact_phone_update_rate_limit_not_exceeded.side_effect = (
+            HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="phone_mfa_change_rate_limit",
+            )
+        )
+
+        request_data = {
+            "otpType": "sms",
+            "destination": "+14165551234",
+            "countAsContactPhoneUpdate": True,
+        }
+
+        client = mock_test_client(MagicMock())
+
+        response = client.request("POST", "/v1/otp/transient/send", json=request_data)
+        response_json = response.json()
+
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+        assert not response_json["success"]
+        assert response_json["message"] == "phone_mfa_change_rate_limit"
+
+    @pytest.mark.asyncio
+    @patch.object(
+        send_transient_otp_module,
+        "assert_contact_phone_update_rate_limit_not_exceeded",
+    )
+    @patch.object(send_transient_otp_module, "get_my_profile")
+    async def test_handle_contact_phone_first_send_rate_limit_without_count_flag(
+        self,
+        mock_get_my_profile,
+        mock_assert_contact_phone_update_rate_limit_not_exceeded,
+        mock_test_client,
+    ):
+        mock_profile = MagicMock()
+        mock_profile.data = MagicMock(id="user-123", preferredLanguage="en")
+        mock_get_my_profile.return_value = mock_profile
+        mock_assert_contact_phone_update_rate_limit_not_exceeded.side_effect = (
+            HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="phone_mfa_change_rate_limit",
+            )
+        )
+
+        request_data = {
+            "otpType": "sms",
+            "destination": "+14165551234",
+            "countAsContactPhoneUpdate": False,
+        }
+
+        client = mock_test_client(MagicMock())
+
+        response = client.request("POST", "/v1/otp/transient/send", json=request_data)
+        response_json = response.json()
+
+        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+        assert not response_json["success"]
+        assert response_json["message"] == "phone_mfa_change_rate_limit"
+
+    @pytest.mark.asyncio
     @patch.object(send_transient_otp_module, "get_my_profile")
     @patch.object(send_transient_otp_module, "dispatch_otp")
     async def test_handle_non_201_returns_error_model(
         self,
         mock_dispatch_otp,
         mock_get_my_profile,
-        mock_validate_user_id_matches_session,
         mock_test_client,
     ):
-        mock_validate_user_id_matches_session.return_value = MagicMock()
         mock_get_my_profile.return_value = MagicMock()
         mock_dispatch_otp.return_value = Response(
             400, json={"error": "Bad Request"}, request=MagicMock()
@@ -2559,7 +2767,6 @@ class TestErrorHandlingSendTransientOtp:
 
         request_data = {
             "otpType": "email",
-            "user_id": "user@example.com",
             "destination": "user@example.com",
         }
 
@@ -2576,17 +2783,14 @@ class TestErrorHandlingSendTransientOtp:
         )
 
     @pytest.mark.asyncio
-    @patch.object(otp_router, "validate_user_id_matches_session")
     @patch.object(send_transient_otp_module, "get_my_profile")
     @patch.object(send_transient_otp_module, "dispatch_otp")
     async def test_handle_validation_error_due_to_incomplete_payload(
         self,
         mock_dispatch_otp,
         mock_get_my_profile,
-        mock_validate_user_id_matches_session,
         mock_test_client,
     ):
-        mock_validate_user_id_matches_session.return_value = MagicMock()
         mock_get_my_profile.return_value = MagicMock()
         mock_dispatch_otp.return_value = Response(
             201, json={"trxnId": "only-id"}, request=MagicMock()
@@ -2594,7 +2798,6 @@ class TestErrorHandlingSendTransientOtp:
 
         request_data = {
             "otpType": "email",
-            "user_id": "user@example.com",
             "destination": "user@example.com",
         }
 
@@ -2608,24 +2811,20 @@ class TestErrorHandlingSendTransientOtp:
         assert response_json["message"] == "The provided data is not valid."
 
     @pytest.mark.asyncio
-    @patch.object(otp_router, "validate_user_id_matches_session")
     @patch.object(send_transient_otp_module, "get_my_profile")
     @patch.object(send_transient_otp_module, "dispatch_otp")
     async def test_handle_transport_exception_is_captured_in_message(
         self,
         mock_dispatch_otp,
         mock_get_my_profile,
-        mock_validate_user_id_matches_session,
         mock_test_client,
         caplog,
     ):
-        mock_validate_user_id_matches_session.return_value = MagicMock()
         mock_get_my_profile.return_value = MagicMock()
         mock_dispatch_otp.side_effect = RuntimeError("simulated network failure")
 
         request_data = {
             "otpType": "email",
-            "user_id": "user@example.com",
             "destination": "user@example.com",
         }
 
@@ -3210,6 +3409,21 @@ class TestErrorHandlingVerifyPasswordStepup:
 
 
 class TestErrorHandlingVerifyTransientOtp:
+
+    @pytest.fixture(autouse=True)
+    def mock_bound_transient_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "bound-transaction",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        monkeypatch.setattr(
+            verify_transient_otp_module,
+            "get_transient_otp_transaction",
+            get_bound_transaction,
+        )
 
     @pytest.mark.asyncio
     @patch.object(verify_transient_otp_module, "get_auth_request_headers")
