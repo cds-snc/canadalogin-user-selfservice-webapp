@@ -20,6 +20,7 @@ from app.fido2.schemas import (
 )
 from app.otp.schemas import OtpType, OtpVerificationAttemptRequest, RetrievalData
 from app.otp.services.retrieve_transient_otp import dispatch_otp_status_retrieval
+from app.otp.services.profile_otp_transaction_store import get_bound_otp_transaction
 from app.otp.services.verify_mfa_otp import handle_verify_mfa_otp
 from app.fido2.services.helper_utils import (
     get_tenant_url,
@@ -144,6 +145,20 @@ async def _get_fido2_delete_otp_proof_ttl_seconds(
     status_response = None
 
     try:
+        if (
+            await get_bound_otp_transaction(
+                request=request,
+                transaction_id=trxn_id,
+                otp_type=otp_type.value,
+                factor_id=otp_factor_id,
+            )
+            is None
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
         if otp_factor_id:
             headers = get_auth_request_headers(user_access_token, True)
             settings = get_configuration().ibm_verify_config
@@ -306,6 +321,7 @@ async def delete_registration(
                     trxn_id=request_data.trxnId,
                     otp_type=request_data.otpVerificationType,
                     user_access_token=user_access_token,
+                    request=request,
                 )
             logger.info("OTP verified successfully")
 
@@ -379,6 +395,7 @@ async def delete_registration(
                 trxn_id=request_data.trxnId,
                 otp_type=request_data.otpVerificationType,
                 user_access_token=user_access_token,
+                request=request,
             )
         logger.info("OTP verified successfully")
     else:

@@ -34,7 +34,8 @@ describe("connectedServicesApi.getConnectedServices", () => {
       {
         clientId: "client-123",
         name: "Example Service",
-        sessionStatus: "unknownSession",
+        lastLogin: "2026-01-01T10:00:00Z",
+        lastLogout: null,
       },
     ];
     mockedAxios.get.mockResolvedValue({ data: { services } });

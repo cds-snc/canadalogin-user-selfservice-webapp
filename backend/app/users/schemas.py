@@ -303,7 +303,8 @@ class RelyingPartyResponse(ResponseModel):
 class ConnectedService(BaseModel):
     clientId: str
     name: str
-    sessionStatus: str
+    lastLogin: Optional[datetime] = None
+    lastLogout: Optional[datetime] = None
 
 
 class ConnectedServicesResponse(BaseModel):

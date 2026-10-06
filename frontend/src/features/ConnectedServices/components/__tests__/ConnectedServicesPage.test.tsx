@@ -32,6 +32,10 @@ vi.mock("react-i18next", () => ({
         "sessions.activeSession": "Active session",
         "sessions.inactiveSession": "Inactive session",
         "sessions.unknownSession": "Connected",
+        "columns.application": "Application / RP",
+        "columns.lastLogin": "Last successful login",
+        "columns.lastLogout": "Last logout",
+        notAvailable: "Not available",
         loading: "Loading connected services.",
         error: "We could not load your connected services. Try again later.",
         empty: "You do not have any connected services.",
@@ -99,19 +103,25 @@ describe("ConnectedServicesPage", () => {
       {
         clientId: "client-1",
         name: "Service One",
-        sessionStatus: "unknownSession",
+        lastLogin: "2026-01-01T10:00:00Z",
+        lastLogout: "2026-01-02T11:00:00Z",
       },
     ]);
     render(<ConnectedServicesPage />);
 
     expect(await screen.findByText("Service One")).toBeInTheDocument();
+    expect(screen.getByText("Jan 1, 2026, 10:00 AM")).toBeInTheDocument();
+    expect(screen.getAllByRole("columnheader")).toHaveLength(2);
+    expect(
+      screen.queryByRole("columnheader", { name: "Last logout" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Jan 2, 2026, 11:00 AM")).not.toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         level: 1,
         name: "Sign in to services to apply this update",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Connected")).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Sign out everywhere" }),
     ).toHaveAttribute("data-button-role", "danger");
@@ -126,6 +136,20 @@ describe("ConnectedServicesPage", () => {
       "href",
       "https://www.canada.ca/en/government/sign-in-online-account.html",
     );
+  });
+
+  it("shows unavailable when login was not recorded", async () => {
+    mockGetConnectedServices.mockResolvedValue([
+      {
+        clientId: "client-2",
+        name: "Service Two",
+        lastLogin: null,
+        lastLogout: null,
+      },
+    ]);
+    render(<ConnectedServicesPage />);
+    expect(await screen.findByText("Service Two")).toBeInTheDocument();
+    expect(screen.getAllByText("Not available")).toHaveLength(1);
   });
 
   it("renders loading, error, and empty states", async () => {
