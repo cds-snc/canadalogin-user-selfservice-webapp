@@ -51,7 +51,7 @@ IBM_VERIFY_ACTIVITY_SLO_ACTIONS=sso_logout
 IBM_VERIFY_ACTIVITY_LOOKBACK_DAYS=30
 ```
 
-Configure both `IBM_VERIFY_ACTIVITY_API_ID` and
+Configure both `IBM_VERIFY_ACTIVITY_API_CLIENT_ID` and
 `IBM_VERIFY_ACTIVITY_API_SECRET` for the dedicated IBM Verify API client.
 Activity lookup does not fall back to profile-management credentials. If either
 activity credential is missing, activity lookup fails and connected services

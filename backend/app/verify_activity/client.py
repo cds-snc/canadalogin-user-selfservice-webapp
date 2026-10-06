@@ -15,7 +15,7 @@ class IBMVerifyActivityClient:
         self.http_client = http_client
         self.settings = settings
         verify = settings.ibm_verify_config
-        self.activity_client_id = verify.IBM_VERIFY_ACTIVITY_API_ID
+        self.activity_client_id = verify.IBM_VERIFY_ACTIVITY_API_CLIENT_ID
         self.activity_client_secret = verify.IBM_VERIFY_ACTIVITY_API_SECRET
         if not self.activity_client_id or not self.activity_client_secret:
             raise ValueError("Both IBM Verify activity credentials must be configured")

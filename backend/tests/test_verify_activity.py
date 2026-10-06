@@ -20,7 +20,7 @@ def settings(sso="sso.success", slo="slo.success"):
             IBM_VERIFY_CLIENT_SECRET=None,
             IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID="client",
             IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET="secret",
-            IBM_VERIFY_ACTIVITY_API_ID="events-client",
+            IBM_VERIFY_ACTIVITY_API_CLIENT_ID="events-client",
             IBM_VERIFY_ACTIVITY_API_SECRET="events-secret",
             IBM_VERIFY_ACTIVITY_SSO_EVENT_TYPES=sso,
             IBM_VERIFY_ACTIVITY_SLO_EVENT_TYPES=slo,
@@ -175,7 +175,7 @@ async def test_events_client_uses_dedicated_activity_credentials():
     )
     config = settings()
     config.ibm_verify_config.IBM_VERIFY_TENANT_URL += "/"
-    config.ibm_verify_config.IBM_VERIFY_ACTIVITY_API_ID = "events-client"
+    config.ibm_verify_config.IBM_VERIFY_ACTIVITY_API_CLIENT_ID = "events-client"
     config.ibm_verify_config.IBM_VERIFY_ACTIVITY_API_SECRET = "events-secret"
 
     await IBMVerifyActivityClient(client, config).get_events(
@@ -197,7 +197,7 @@ async def test_events_client_uses_dedicated_activity_credentials():
 )
 def test_events_client_rejects_missing_activity_credentials(client_id, client_secret):
     config = settings()
-    config.ibm_verify_config.IBM_VERIFY_ACTIVITY_API_ID = client_id
+    config.ibm_verify_config.IBM_VERIFY_ACTIVITY_API_CLIENT_ID = client_id
     config.ibm_verify_config.IBM_VERIFY_ACTIVITY_API_SECRET = client_secret
 
     with pytest.raises(ValueError, match="Both IBM Verify activity credentials"):
