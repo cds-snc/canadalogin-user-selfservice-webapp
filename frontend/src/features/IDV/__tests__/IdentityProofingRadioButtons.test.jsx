@@ -57,10 +57,10 @@ describe("IdentityProofingRadioButtons", () => {
     render(<IdentityProofingRadioButtons {...defaultProps} />);
 
     expect(
-      screen.getByText("Prove identity online and get instant access"),
+      screen.getByText("Online and get instant access"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Do it in person and sign back in when done"),
+      screen.getByText("In person and sign back in when done"),
     ).toBeInTheDocument();
   });
 
@@ -88,7 +88,7 @@ describe("IdentityProofingRadioButtons", () => {
     );
 
     const selectedRadio = screen.getByRole("radio", {
-      name: /Prove identity online and get instant access/,
+      name: /Online and get instant access/,
     });
     expect(selectedRadio).toBeChecked();
   });
@@ -103,7 +103,7 @@ describe("IdentityProofingRadioButtons", () => {
     );
 
     const radio = screen.getByRole("radio", {
-      name: /Do it in person and sign back in when done/,
+      name: /In person and sign back in when done/,
     });
     fireEvent.click(radio);
 
