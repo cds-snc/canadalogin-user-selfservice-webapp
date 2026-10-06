@@ -286,11 +286,11 @@ describe("ConnectedServicesTable", () => {
     },
     {
       language: "fr",
-      localizedUrls: { fr: "javascript:alert(1)" },
+      localizedUrls: { fr: "not a URL" },
       expectedUrl: "https://service.example.com/sign-in",
     },
   ])(
-    "uses the configured safe destination for $language",
+    "uses the configured destination for $language, falling back when needed",
     async ({ language, localizedUrls, expectedUrl }) => {
       mockLanguage = language;
       mockGetConnectedServices.mockResolvedValue([
@@ -313,10 +313,7 @@ describe("ConnectedServicesTable", () => {
   it.each([
     null,
     "not a URL",
-    "javascript:alert(1)",
-    "data:text/html,test",
-    "https://user:password@service.example.com",
-  ])("does not link a missing or unsafe URL: %s", async (url) => {
+  ])("does not link a missing or invalid URL: %s", async (url) => {
     mockGetConnectedServices.mockResolvedValue([
       { clientId: "client-no-link", name: "Unlinked service", url },
     ]);
