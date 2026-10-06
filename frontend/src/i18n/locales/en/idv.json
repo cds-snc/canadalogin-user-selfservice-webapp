@@ -260,7 +260,7 @@
     "communication": "Communication",
     "confirmAndContinue": "Continue",
     "successNoticeTitle": "Success",
-    "successNoticeDescription": "You proved your identity.",
+    "successNoticeDescription": "You proved your identity with [proofing method].",
     "successNoticeTitleWithoutRp": "Your CanadaLogin has succesfully saved your changes",
     "successNoticeDescriptionWithoutRp": "Continue with accessing the service",
     "verifiedBadgeText": "Proven January 27, 2026"
