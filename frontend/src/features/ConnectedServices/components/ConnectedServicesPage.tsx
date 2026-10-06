@@ -51,10 +51,14 @@ export default function ConnectedServicesPage() {
     return null;
   }
 
-  const servicesWithLocalizedStatus = services.map((service) => ({
-    ...service,
-    sessionStatus: t(`sessions.${service.sessionStatus}`),
-  }));
+  const formatTimestamp = (timestamp?: string | null) =>
+    timestamp
+      ? new Intl.DateTimeFormat(language, {
+          dateStyle: "medium",
+          timeStyle: "short",
+          timeZone: "UTC",
+        }).format(new Date(timestamp))
+      : t("notAvailable");
 
   return (
     <GcdsContainer role="main">
@@ -81,16 +85,24 @@ export default function ConnectedServicesPage() {
             <GcdsText>{t("empty")}</GcdsText>
           )}
           {!isLoading && !hasError && services.length > 0 && (
-            <table className="connected-services-table">
-              <tbody>
-                {servicesWithLocalizedStatus.map((service) => (
-                  <tr key={service.clientId}>
-                    <th scope="row">{service.name}</th>
-                    <td>{service.sessionStatus}</td>
+            <div className="connected-services-table-wrapper">
+              <table className="connected-services-table">
+                <thead>
+                  <tr>
+                    <th scope="col">{t("columns.application")}</th>
+                    <th scope="col">{t("columns.lastLogin")}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {services.map((service) => (
+                    <tr key={service.clientId}>
+                      <th scope="row">{service.name}</th>
+                      <td>{formatTimestamp(service.lastLogin)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </GcdsGrid>
 

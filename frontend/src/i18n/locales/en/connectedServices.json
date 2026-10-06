@@ -10,6 +10,12 @@
   "loading": "Loading connected services.",
   "error": "We could not load your connected services. Try again later.",
   "empty": "You do not have any connected services.",
+  "notAvailable": "Not available",
+  "columns": {
+    "application": "Application / RP",
+    "lastLogin": "Last successful login",
+    "lastLogout": "Last logout"
+  },
   "sessions": {
     "activeSession": "Active session",
     "inactiveSession": "Inactive session",
