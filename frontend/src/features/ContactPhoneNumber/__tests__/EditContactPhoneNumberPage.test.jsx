@@ -410,6 +410,9 @@ describe("EditContactPhoneNumberPage Component", () => {
       success: true,
       data: { phoneNumbers: [{ value: "+15551234567" }] },
     });
+    mockAuthService.logout.mockResolvedValue({
+      data: { redirect_url: "https://example.com/logout" },
+    });
 
     render(
       <TestWrapper>
@@ -446,6 +449,13 @@ describe("EditContactPhoneNumberPage Component", () => {
     await waitFor(() => {
       expect(screen.getByTestId("successfully-updated")).toBeInTheDocument();
     });
+
+    fireEvent.click(screen.getByTestId("done-btn"));
+
+    await waitFor(() => {
+      expect(mockAuthService.logout).toHaveBeenCalledTimes(1);
+    });
+    expect(mockNavigate).not.toHaveBeenCalledWith("/en/profile");
   });
 
   it("shows rate-limit error when phone verification change limit is reached", async () => {
