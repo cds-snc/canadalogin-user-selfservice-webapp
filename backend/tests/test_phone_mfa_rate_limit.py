@@ -14,8 +14,7 @@ from app.utils.phone_mfa_rate_limit import (
     OTP_SEND_DAILY_SESSION_KEY,
     OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD,
     OTP_SEND_DAILY_WINDOW_SECONDS_PROD,
-    OTP_SEND_MFA_FIELD,
-    OTP_SEND_TRANSIENT_FIELD,
+    OTP_SEND_FIELD,
     PHONE_RATE_LIMIT,
     PHONE_RATE_LIMIT_WINDOW_SECONDS_NON_PROD,
     PHONE_RATE_LIMIT_WINDOW_SECONDS_PROD,
@@ -172,7 +171,7 @@ async def test_contact_phone_rate_limit_window_is_24_hours_in_prod_environments(
 
 
 @pytest.mark.asyncio
-async def test_otp_send_daily_buckets_are_independent_with_session_fallback(
+async def test_otp_send_daily_bucket_is_shared_with_session_fallback(
     monkeypatch,
 ):
     monkeypatch.setattr(
@@ -185,7 +184,7 @@ async def test_otp_send_daily_buckets_are_independent_with_session_fallback(
     )
     request = _build_request_with_session(redis_client=None)
 
-    for _ in range(OTP_SEND_DAILY_LIMIT):
+    for _ in range(OTP_SEND_DAILY_LIMIT - 1):
         await consume_mfa_send_daily_quota(request, "user@example.com")
 
     await consume_transient_send_daily_quota(request, "user@example.com")
@@ -198,6 +197,12 @@ async def test_otp_send_daily_buckets_are_independent_with_session_fallback(
     assert exc_info.value.headers["Retry-After"] == str(
         OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD
     )
+
+    user_key = phone_mfa_rate_limit_module._hash_user_id_for_rate_limit(
+        "user@example.com"
+    )
+    entry = request.session[OTP_SEND_DAILY_SESSION_KEY][user_key]
+    assert entry[OTP_SEND_FIELD] == OTP_SEND_DAILY_LIMIT
 
 
 @pytest.mark.asyncio
@@ -229,8 +234,7 @@ async def test_otp_send_daily_session_window_resets_after_15_minutes_in_non_prod
         "user@example.com"
     )
     entry = request.session[OTP_SEND_DAILY_SESSION_KEY][user_key]
-    assert entry[OTP_SEND_MFA_FIELD] == 1
-    assert entry[OTP_SEND_TRANSIENT_FIELD] == 0
+    assert entry[OTP_SEND_FIELD] == 1
 
 
 def test_otp_send_daily_redis_key_is_hmac_derived(monkeypatch):
@@ -243,18 +247,15 @@ def test_otp_send_daily_redis_key_is_hmac_derived(monkeypatch):
     )
 
     user_id = "user@example.com"
-    key = phone_mfa_rate_limit_module._build_otp_send_daily_key(
-        user_id, OTP_SEND_TRANSIENT_FIELD
-    )
+    key = phone_mfa_rate_limit_module._build_otp_send_daily_key(user_id)
 
     assert key.startswith(OTP_SEND_DAILY_REDIS_KEY_PREFIX)
     assert user_id not in key
-    assert OTP_SEND_TRANSIENT_FIELD in key
     assert len(key.rsplit(":", 1)[-1]) == 40
 
 
 @pytest.mark.asyncio
-async def test_otp_send_daily_redis_consume_uses_hashed_key_and_endpoint_key(
+async def test_otp_send_daily_redis_consumers_share_hashed_key(
     monkeypatch,
 ):
     monkeypatch.setattr(
@@ -266,15 +267,17 @@ async def test_otp_send_daily_redis_consume_uses_hashed_key_and_endpoint_key(
         ),
     )
     redis_client = AsyncMock()
-    redis_client.incr.return_value = 1
+    redis_client.incr.side_effect = [1, 2]
     request = _build_request_with_session(redis_client=redis_client)
 
+    await consume_mfa_send_daily_quota(request, "user@example.com")
     await consume_transient_send_daily_quota(request, "user@example.com")
 
-    key = redis_client.incr.call_args.args[0]
+    keys = [call.args[0] for call in redis_client.incr.await_args_list]
+    key = keys[0]
     assert key.startswith(OTP_SEND_DAILY_REDIS_KEY_PREFIX)
     assert "user@example.com" not in key
-    assert OTP_SEND_TRANSIENT_FIELD in key
+    assert keys == [key, key]
     redis_client.expire.assert_awaited_once_with(
         key, OTP_SEND_DAILY_WINDOW_SECONDS_PROD
     )
