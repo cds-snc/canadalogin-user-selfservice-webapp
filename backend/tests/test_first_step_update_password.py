@@ -2,6 +2,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
+from fastapi import HTTPException
 from httpx import AsyncClient, Request, Response
 
 from app.password.schemas import FirstStepPasswordUpdatePayload, OtpType
@@ -20,6 +21,7 @@ async def test_first_step_update_password_preserves_email_enrollment_id():
     )
 
     mock_profile = SimpleNamespace(
+        id="user-123",
         userName="user@example.com",
         preferredLanguage="en",
     )
@@ -61,6 +63,99 @@ async def test_first_step_update_password_preserves_email_enrollment_id():
         assert called_payload.userName == "user@example.com"
         assert result.success is True
         assert result.data.trxId == "trx-123"
+
+
+@pytest.mark.asyncio
+async def test_first_step_update_password_consumes_shared_otp_quota_before_dispatch():
+    mock_http_client = AsyncMock(spec=AsyncClient)
+    payload = FirstStepPasswordUpdatePayload(otpType=OtpType.SMSOTP)
+    request = Mock()
+    mock_profile = SimpleNamespace(
+        id="user-123",
+        userName="user@example.com",
+        preferredLanguage="en",
+    )
+    mock_response = Mock()
+    mock_response.json.return_value = {
+        "trxId": "trx-123",
+        "stepsRemaining": 2,
+        "nextStep": {
+            "method": "smsotp",
+            "httpMethod": "POST",
+            "uri": "/v1/password/update/validate",
+        },
+    }
+
+    with (
+        patch(
+            "app.password.services.first_step_update_password.dispatch_get_my_profile_from_ibm",
+            new_callable=AsyncMock,
+        ) as mock_get_profile,
+        patch(
+            "app.password.services.first_step_update_password.consume_mfa_send_daily_quota",
+            new_callable=AsyncMock,
+        ) as mock_consume_quota,
+        patch(
+            "app.password.services.first_step_update_password.dispatch_password_otp",
+            new_callable=AsyncMock,
+        ) as mock_dispatch_password_otp,
+    ):
+        mock_get_profile.return_value = mock_profile
+        mock_dispatch_password_otp.return_value = mock_response
+
+        result = await first_step_update_password(
+            mock_http_client,
+            payload,
+            "user-token",
+            request=request,
+        )
+
+        mock_consume_quota.assert_awaited_once_with(request, "user-123")
+        mock_dispatch_password_otp.assert_awaited_once()
+        assert result.success is True
+
+
+@pytest.mark.asyncio
+async def test_first_step_update_password_does_not_dispatch_when_quota_is_exhausted():
+    mock_http_client = AsyncMock(spec=AsyncClient)
+    payload = FirstStepPasswordUpdatePayload(otpType=OtpType.VOICEOTP)
+    request = Mock()
+    mock_profile = SimpleNamespace(
+        id="user-123",
+        userName="user@example.com",
+        preferredLanguage="en",
+    )
+
+    with (
+        patch(
+            "app.password.services.first_step_update_password.dispatch_get_my_profile_from_ibm",
+            new_callable=AsyncMock,
+        ) as mock_get_profile,
+        patch(
+            "app.password.services.first_step_update_password.consume_mfa_send_daily_quota",
+            new_callable=AsyncMock,
+        ) as mock_consume_quota,
+        patch(
+            "app.password.services.first_step_update_password.dispatch_password_otp",
+            new_callable=AsyncMock,
+        ) as mock_dispatch_password_otp,
+    ):
+        mock_get_profile.return_value = mock_profile
+        mock_consume_quota.side_effect = HTTPException(
+            status_code=429,
+            detail="otp_send_daily_limit",
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            await first_step_update_password(
+                mock_http_client,
+                payload,
+                "user-token",
+                request=request,
+            )
+
+        assert exc_info.value.detail == "otp_send_daily_limit"
+        mock_dispatch_password_otp.assert_not_awaited()
 
 
 @pytest.mark.asyncio

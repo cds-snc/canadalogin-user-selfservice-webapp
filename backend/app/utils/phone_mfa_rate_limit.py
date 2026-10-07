@@ -28,8 +28,7 @@ OTP_SEND_DAILY_ERROR_CODE = "otp_send_daily_limit"
 OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE = "otp_send_limiter_unavailable"
 OTP_SEND_DAILY_SESSION_KEY = "otp_send_daily_events"
 
-OTP_SEND_MFA_FIELD = "mfa_send_count"
-OTP_SEND_TRANSIENT_FIELD = "transient_send_count"
+OTP_SEND_FIELD = "send_count"
 OTP_SEND_WINDOW_START_FIELD = "window_start"
 
 
@@ -68,9 +67,9 @@ def _hash_user_id_for_rate_limit(user_id: str) -> str:
     return digest[:40]
 
 
-def _build_otp_send_daily_key(user_id: str, endpoint_field: str) -> str:
+def _build_otp_send_daily_key(user_id: str) -> str:
     user_hash = _hash_user_id_for_rate_limit(user_id)
-    return f"{OTP_SEND_DAILY_REDIS_KEY_PREFIX}{endpoint_field}:{user_hash}"
+    return f"{OTP_SEND_DAILY_REDIS_KEY_PREFIX}{user_hash}"
 
 
 def _is_otp_send_session_fallback_environment() -> bool:
@@ -104,7 +103,6 @@ def _raise_otp_send_daily_limit(
 def _consume_otp_send_daily_quota_from_session(
     request: Request,
     user_id: str,
-    endpoint_field: str,
 ) -> None:
     now = int(time.time())
     event_store = request.session.get(OTP_SEND_DAILY_SESSION_KEY, {})
@@ -122,11 +120,10 @@ def _consume_otp_send_daily_quota_from_session(
         window_start = now
         entry = {
             OTP_SEND_WINDOW_START_FIELD: window_start,
-            OTP_SEND_MFA_FIELD: 0,
-            OTP_SEND_TRANSIENT_FIELD: 0,
+            OTP_SEND_FIELD: 0,
         }
 
-    count = entry.get(endpoint_field, 0)
+    count = entry.get(OTP_SEND_FIELD, 0)
     if not isinstance(count, int):
         count = 0
 
@@ -136,7 +133,7 @@ def _consume_otp_send_daily_quota_from_session(
             _otp_send_retry_after(now, window_start),
         )
 
-    entry[endpoint_field] = count + 1
+    entry[OTP_SEND_FIELD] = count + 1
     event_store[user_key] = entry
     request.session[OTP_SEND_DAILY_SESSION_KEY] = event_store
 
@@ -144,12 +141,11 @@ def _consume_otp_send_daily_quota_from_session(
 async def _consume_otp_send_daily_quota(
     request: Request,
     user_id: str,
-    endpoint_field: str,
 ) -> None:
     redis_client = _get_redis_client_from_request(request)
     if redis_client is None:
         if _is_otp_send_session_fallback_environment():
-            _consume_otp_send_daily_quota_from_session(request, user_id, endpoint_field)
+            _consume_otp_send_daily_quota_from_session(request, user_id)
             return
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -157,7 +153,7 @@ async def _consume_otp_send_daily_quota(
         )
 
     window_seconds = _get_otp_send_daily_window_seconds()
-    key = _build_otp_send_daily_key(user_id, endpoint_field)
+    key = _build_otp_send_daily_key(user_id)
     try:
         count = int(await redis_client.incr(key))
         if count == 1:
@@ -178,7 +174,7 @@ async def _consume_otp_send_daily_quota(
             logger.warning(
                 "OTP send limiter unavailable, falling back to session: %s", exc
             )
-            _consume_otp_send_daily_quota_from_session(request, user_id, endpoint_field)
+            _consume_otp_send_daily_quota_from_session(request, user_id)
             return
 
         logger.error("OTP send limiter unavailable: %s", exc)
@@ -189,11 +185,11 @@ async def _consume_otp_send_daily_quota(
 
 
 async def consume_mfa_send_daily_quota(request: Request, user_id: str) -> None:
-    await _consume_otp_send_daily_quota(request, user_id, OTP_SEND_MFA_FIELD)
+    await _consume_otp_send_daily_quota(request, user_id)
 
 
 async def consume_transient_send_daily_quota(request: Request, user_id: str) -> None:
-    await _consume_otp_send_daily_quota(request, user_id, OTP_SEND_TRANSIENT_FIELD)
+    await _consume_otp_send_daily_quota(request, user_id)
 
 
 def _build_rate_limit_key(redis_key_prefix: str, user_id: str) -> str:

@@ -4,13 +4,11 @@
 
 Implement a per-account daily send limit for OTP send endpoints:
 
-- `/v1/otp/mfa/send`: max 30 sends per account per day
-- `/v1/otp/transient/send`: max 30 sends per account per day
+- `/v1/otp/mfa/send`, `/v1/otp/transient/send`, and `/v1/password/update/initiate`: a shared maximum of 30 sends per account per day
 
-Limits must be independent:
-
-- Hitting 30 on MFA send must not affect transient send
-- Hitting 30 on transient send must not affect MFA send
+The limit is shared across all three endpoints. Any combination of MFA,
+transient, and change-password sends counts toward the same 30-send quota, and
+the 31st request is blocked.
 
 This guide is written so a developer or coding agent can implement the change step by step.
 
@@ -20,7 +18,7 @@ This guide is written so a developer or coding agent can implement the change st
 
 ### In scope
 
-- Backend enforcement at service layer for both send endpoints
+- Backend enforcement at service layer for all OTP send endpoints
 - Redis-backed counter design that scales and auto-expires
 - Security hardening for Redis key design and failure handling
 - Unit/integration tests
@@ -37,6 +35,7 @@ This guide is written so a developer or coding agent can implement the change st
 
 - Send MFA OTP logic is in `backend/app/otp/services/send_mfa_otp.py`
 - Send transient OTP logic is in `backend/app/otp/services/send_transient_otp.py`
+- Change-password OTP initiation logic is in `backend/app/password/services/first_step_update_password.py`
 - Existing rate-limit helper is in `backend/app/utils/phone_mfa_rate_limit.py`
 - Existing send endpoints are routed in `backend/app/otp/v1_router.py`
 - Existing IBM send-throttle mapping uses `otp_send_rate_limit` for specific upstream 429 message IDs
@@ -49,18 +48,17 @@ Current behavior is not a strict endpoint-wide 30/day send cap. Existing logic i
 
 ## 1) Redis data model (minimize key bloat)
 
-Use one Redis key per user account for this feature, with hash fields for each endpoint bucket.
+Use one Redis key per user account for this feature, with one shared send-count field.
 
 - Key: `rate_limit:otp_send_daily:{user_hash}`
 - Hash fields:
   - `window_start` (epoch seconds)
-  - `mfa_send_count`
-  - `transient_send_count`
+  - `send_count`
 
 Why this model:
 
 - Keeps key cardinality low (1 key per active user, not multiple keys per endpoint/day)
-- Keeps endpoint buckets independent by field
+- Keeps MFA and transient sends in one shared bucket
 - Enables atomic operations in one Lua script
 
 ## 2) Window semantics
@@ -128,10 +126,9 @@ Add constants near existing limiter constants:
 - `OTP_SEND_DAILY_ERROR_CODE = "otp_send_daily_limit"`
 - `OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE = "otp_send_limiter_unavailable"`
 
-Add endpoint field constants:
+Add the shared counter field:
 
-- `OTP_SEND_MFA_FIELD = "mfa_send_count"`
-- `OTP_SEND_TRANSIENT_FIELD = "transient_send_count"`
+- `OTP_SEND_FIELD = "send_count"`
 - `OTP_SEND_WINDOW_START_FIELD = "window_start"`
 
 Do not remove existing phone/contact limit constants.
@@ -180,7 +177,7 @@ File: `backend/app/utils/phone_mfa_rate_limit.py`
 
 Add:
 
-- `async def _consume_otp_send_daily_quota(request: Request, user_id: str, endpoint_field: str) -> None`
+- `async def _consume_otp_send_daily_quota(request: Request, user_id: str) -> None`
 
 Behavior:
 
@@ -206,10 +203,8 @@ Add public functions:
 - `async def consume_mfa_send_daily_quota(request: Request, user_id: str) -> None`
 - `async def consume_transient_send_daily_quota(request: Request, user_id: str) -> None`
 
-These wrappers call the generic consume function with:
-
-- MFA: `OTP_SEND_MFA_FIELD`
-- Transient: `OTP_SEND_TRANSIENT_FIELD`
+Both wrappers call the generic consume function against the same shared
+`OTP_SEND_FIELD` counter.
 
 ## Step 6: Integrate MFA send endpoint
 
@@ -222,7 +217,7 @@ File: `backend/app/otp/services/send_mfa_otp.py`
 
 Result:
 
-- Every `/mfa/send` request consumes from MFA daily send bucket
+- Every `/mfa/send` request consumes from the shared OTP daily send bucket
 
 ## Step 7: Integrate transient send endpoint
 
@@ -235,9 +230,22 @@ File: `backend/app/otp/services/send_transient_otp.py`
 
 Result:
 
-- Every `/transient/send` request consumes from transient daily send bucket
+- Every `/transient/send` request consumes from the shared OTP daily send bucket
 
-## Step 8: Preserve HTTPException headers in global handler
+## Step 8: Integrate change-password OTP initiation
+
+File: `backend/app/password/services/first_step_update_password.py`
+
+1. Pass the request from `/v1/password/update/initiate` into the service
+2. After the authenticated profile is resolved and before calling IBM Verify's password resetter:
+   - `await consume_mfa_send_daily_quota(request, user_profile_response.id)` when `request` is not `None`
+3. Count repeated initiation requests as new sends; do not count OTP validation or password completion
+
+Result:
+
+- Every `/v1/password/update/initiate` request consumes from the shared OTP daily send bucket
+
+## Step 9: Preserve HTTPException headers in global handler
 
 File: `backend/app/utils/global_error_handlers.py`
 
@@ -308,7 +316,7 @@ French locale policy in this repo currently allows English placeholder until off
 
 Add warning-level log on limit block in utility function with fields:
 
-- endpoint bucket (`mfa_send_count` or `transient_send_count`)
+- shared OTP send bucket
 - hashed user id (never raw)
 - retry_after seconds
 
@@ -376,9 +384,9 @@ Set alerts for:
 2. Merge frontend error key
 3. Deploy to staging
 4. Run scripted validation:
-   - confirm 30 allowed + 31st blocked for MFA
-   - confirm 30 allowed + 31st blocked for transient
-   - confirm blocking is independent by endpoint
+   - confirm 30 combined sends are allowed and the 31st is blocked
+   - confirm 29 sends through one endpoint plus 1 send through the other blocks the next send
+   - confirm MFA and transient sends use the same Redis key
 5. Monitor Redis metrics and API 429 patterns for 24-48h
 6. Promote to production
 
@@ -393,9 +401,9 @@ Optional safer rollout:
 
 Implementation is complete when all are true:
 
-1. A single account can make at most 30 `/v1/otp/mfa/send` calls in 24h
-2. A single account can make at most 30 `/v1/otp/transient/send` calls in 24h
-3. Limits are independent across endpoints
+1. A single account can make at most 30 combined `/v1/otp/mfa/send`, `/v1/otp/transient/send`, and `/v1/password/update/initiate` calls in 24h
+2. The 31st send is blocked regardless of which endpoint receives it
+3. MFA, transient, and change-password sends use the same expiring, PII-safe Redis key
 4. Enforcement is race-safe under concurrent requests
 5. Redis keys are bounded, expiring, and PII-safe
 6. Tests pass and include both success and blocked scenarios
