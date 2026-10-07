@@ -32,6 +32,9 @@ CONTENT_SECURITY_POLICY = _build_content_security_policy()
 # Helps isolate this site from cross-origin opener attacks by limiting window access.
 CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 
+# Requires cross-origin subresources to explicitly opt in, enabling cross-origin isolation.
+CROSS_ORIGIN_EMBEDDER_POLICY = "require-corp"
+
 # Prevents cross-origin resource sharing for the browser when fetching site assets.
 CROSS_ORIGIN_RESOURCE_POLICY = "same-site"
 
@@ -55,6 +58,7 @@ X_FRAME_OPTIONS = "DENY"
 
 DEFAULT_SECURITY_HEADERS = {
     "Content-Security-Policy": CONTENT_SECURITY_POLICY,
+    "Cross-Origin-Embedder-Policy": CROSS_ORIGIN_EMBEDDER_POLICY,
     "Cross-Origin-Opener-Policy": CROSS_ORIGIN_OPENER_POLICY,
     "Cross-Origin-Resource-Policy": CROSS_ORIGIN_RESOURCE_POLICY,
     "Permissions-Policy": PERMISSIONS_POLICY,
@@ -109,7 +113,9 @@ class SecurityHeadersMiddleware:
             if message["type"] == "http.response.start":
                 headers = MutableHeaders(scope=message)
 
-                # Remove Server header to prevent technology stack disclosure
+                # Remove Server header if the app itself set one. Note: uvicorn injects
+                # its own "Server: uvicorn" header at the protocol layer after this
+                # middleware runs, so it must also be disabled via --no-server-header.
                 if "server" in headers:
                     del headers["server"]
 
