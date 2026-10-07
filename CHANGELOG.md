@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.38.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.37.0...v1.38.0) (2026-10-07)
+
+
+### Features
+
+* **identity-verification:** Available RP session information ([#2285](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2285)) ([524907e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/524907ec63b308092514ed478d1ffa912981399d))
+* **identity-verification:** Connected Services Update ([#2303](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2303)) ([3b46184](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3b461840cd8830b1e3b7cdc1764d367cce85d892))
+
+
+### Bug Fixes
+
+* **identity-verification:** Update details confirmation notice title and description and change button to link ([#2238](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2238)) ([1d9f402](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1d9f402f889bffb70f362ea6b94904bf14b0639e))
+* implement shared daily limit for OTP sends across multiple endpoints ([#2309](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2309)) ([60ed5c1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/60ed5c1281520e9a6fbc1fb049d79ed30376503a))
+* sign out button in Change Contact Phone Number flow ([#2307](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2307)) ([6a45671](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6a45671658b0524215c2429468ad1ff59dd9c2ee))
+
 ## [1.37.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.36.3...v1.37.0) (2026-10-05)
 
 
