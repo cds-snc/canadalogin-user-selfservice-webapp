@@ -34,6 +34,8 @@ describe("connectedServicesApi.getConnectedServices", () => {
       {
         clientId: "client-123",
         name: "Example Service",
+        url: "https://service.example.com/sign-in",
+        localizedUrls: { fr: "https://service.example.com/fr" },
         lastLogin: "2026-01-01T10:00:00Z",
         lastLogout: null,
       },

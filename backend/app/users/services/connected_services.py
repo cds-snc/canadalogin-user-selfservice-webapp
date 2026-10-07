@@ -111,6 +111,12 @@ async def get_connected_services(request: Request, user_access_token: str):
             None,
         )
         if matching_client_id:
+            link = application.links[0] if application.links else None
+            _, localized = _parse_localized_description(
+                application.description, matching_client_id
+            )
+            if not localized and link:
+                localized = link.localized
             activity = activity_by_application.get(
                 application.id
             ) or activity_by_client.get(matching_client_id)
@@ -118,6 +124,12 @@ async def get_connected_services(request: Request, user_access_token: str):
                 ConnectedService(
                     clientId=matching_client_id,
                     name=application.name,
+                    url=link.url if link else None,
+                    localizedUrls=(
+                        {language: detail.url for language, detail in localized.items()}
+                        if localized
+                        else None
+                    ),
                     lastLogin=activity.last_login if activity else None,
                     lastLogout=activity.last_logout if activity else None,
                 )

@@ -1,4 +1,6 @@
 {
+  "pageTitle": "Connected services",
+  "pageDescription": "Here you can review which services you have signed in with CanadaLogin and when you last signed in.",
   "successNotice": {
     "title": "Your information was successfully saved in CanadaLogin",
     "body": "Your verified information has been updated."
@@ -12,8 +14,8 @@
   "empty": "You do not have any connected services.",
   "notAvailable": "Not available",
   "columns": {
-    "application": "Application / RP",
-    "lastLogin": "Last successful login",
+    "application": "Service name",
+    "lastLogin": "Last signed in",
     "lastLogout": "Last logout"
   },
   "sessions": {
