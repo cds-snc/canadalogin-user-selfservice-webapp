@@ -272,7 +272,7 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByText("Prove identity online and get instant access"),
+      screen.getByText("Online and get instant access"),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -285,7 +285,7 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByText("Do it in person and sign back in when done"),
+      screen.getByText("In person and sign back in when done"),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -338,7 +338,7 @@ describe("StartIdentityProofingPage", () => {
 
     fireEvent.click(
       screen.getByRole("radio", {
-        name: /Prove identity online and get instant access/,
+        name: /Online and get instant access/,
       }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
@@ -352,7 +352,7 @@ describe("StartIdentityProofingPage", () => {
 
     fireEvent.click(
       screen.getByRole("radio", {
-        name: /Prove identity online and get instant access/,
+        name: /Online and get instant access/,
       }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
@@ -367,7 +367,7 @@ describe("StartIdentityProofingPage", () => {
 
     fireEvent.click(
       screen.getByRole("radio", {
-        name: /Do it in person and sign back in when done/,
+        name: /In person and sign back in when done/,
       }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
