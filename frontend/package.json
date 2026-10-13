@@ -17,6 +17,8 @@
     "pre-push": "./.githooks/pre-push",
     "prepare": "husky",
     "test": "vitest --run --coverage",
+    "test:a11y": "vitest --run --project storybook --no-coverage",
+    "test:a11y:pages": "playwright test",
     "test:failed-only": "vitest --run --silent=passed-only --no-coverage",
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
@@ -41,8 +43,10 @@
     "react-router": "^7.5.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@chromatic-com/storybook": "^5.2.1",
     "@eslint/js": "^9.25.1",
+    "@playwright/test": "^1.64.0",
     "@storybook/addon-a11y": "^10.4.2",
     "@storybook/addon-docs": "^10.4.2",
     "@storybook/addon-links": "^10.4.2",
@@ -53,6 +57,7 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@types/jest": "^29.5.14",
+    "@types/node": "^20.19.43",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@types/react-modal": "^3.16.3",
