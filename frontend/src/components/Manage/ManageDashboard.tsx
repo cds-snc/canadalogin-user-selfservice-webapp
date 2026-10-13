@@ -80,6 +80,8 @@ export default function ManageDashboard() {
 
   return (
     <GcdsContainer role="main">
+      {/* TEMP: deliberate a11y violation to test CI (remove) */}
+      <img src="/vite.svg" />
       {hasErrors() && (
         <GcdsErrorSummary
           data-testid="errorSummary"
