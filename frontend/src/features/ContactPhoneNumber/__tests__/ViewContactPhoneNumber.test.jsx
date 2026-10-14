@@ -173,7 +173,7 @@ describe("ViewContactPhoneNumber Component", () => {
     });
   });
 
-  it("renders ContactPhoneNumber component when phoneNumbers exist", () => {
+  it("This number is used for contacting you:", () => {
     const phoneNumbers = [{ value: "+15551234567" }];
 
     render(
@@ -183,9 +183,7 @@ describe("ViewContactPhoneNumber Component", () => {
     );
 
     expect(
-      screen.getByText(
-        "This number is used for 2-step verification and contacting you:",
-      ),
+      screen.getByText("This number is used for contacting you:"),
     ).toBeInTheDocument();
     expect(screen.getByText("Edit")).toBeInTheDocument();
     expect(screen.getByTestId("gcds-link")).toHaveAttribute(
