@@ -53,6 +53,8 @@ export const AppLanguageSetup = () => {
 
     const languageToDisplay = validateSelectedLanguage(possibleLanguages);
 
+    document.documentElement.lang = languageToDisplay;
+
     if (languageToDisplay !== language) {
       setAppLanguage(languageToDisplay);
     }
