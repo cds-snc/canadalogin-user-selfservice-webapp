@@ -58,7 +58,7 @@ body,
   padding-top: 0%;
 }
 
-@media screen and (max-width: 48em) {
+@media screen and (max-width: 47.999em) {
   .gcds-email-fieldset {
     font-size: 18px;
     font-style: normal;
