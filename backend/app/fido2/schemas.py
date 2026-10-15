@@ -98,10 +98,9 @@ class DeleteRegistrationRequest(BaseModel):
     class Action(str, Enum):
         VERIFY = "verify"
         COMMIT = "commit"
-        COMMIT_WITH_VERIFICATION = "commit_with_verification"
 
     id: str  # ID of the passkey to delete
-    action: Action = Action.COMMIT_WITH_VERIFICATION
+    action: Action
     assertionResult: Optional[FIDO2AssertionResultRequest] = (
         None  # FIDO2 authentication proof (optional if OTP-verified)
     )
@@ -145,22 +144,7 @@ class DeleteRegistrationRequest(BaseModel):
 
             return self
 
-        if has_assertion_result and has_any_otp_field:
-            raise ValueError(
-                "Provide either assertionResult or otp, trxnId, and otpVerificationType"
-            )
-
-        if has_any_otp_field and not has_all_otp_fields:
-            raise ValueError(
-                "otp, trxnId, and otpVerificationType must be provided together"
-            )
-
-        if self.verificationProofId is not None:
-            raise ValueError(
-                "verificationProofId is only supported when action is commit"
-            )
-
-        return self
+        raise ValueError("action must be verify or commit")
 
 
 class ErrorResponse(BaseModel):

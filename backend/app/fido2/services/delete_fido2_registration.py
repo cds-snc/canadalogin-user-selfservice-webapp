@@ -353,55 +353,23 @@ async def delete_registration(
             },
         )
 
-    if request_data.action == DeleteRegistrationRequest.Action.COMMIT:
-        _consume_fido2_delete_verification_proof_or_raise(
-            request=request,
-            verification_proof_id=request_data.verificationProofId,
-            registration_id=registration_id,
+    if request_data.action != DeleteRegistrationRequest.Action.COMMIT:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="FIDO2 deletion requires verify and commit actions",
         )
 
-    elif request_data.assertionResult is not None:
-        logger.info("Verifying FIDO2 authentication before deletion")
-        await _verify_assertion_or_raise(
-            request=request,
-            http_client=http_client,
-            user_access_token=user_access_token,
-            assertion_result=request_data.assertionResult,
-        )
-        logger.info("FIDO2 authentication verified successfully")
-    elif (
-        request_data.otp is not None
-        and request_data.trxnId is not None
-        and request_data.otpVerificationType is not None
-    ):
-        logger.info("Verifying OTP before deletion")
-        if request_data.otpFactorId:
-            await handle_verify_mfa_otp(
-                global_http_client=http_client,
-                attempt_request=OtpVerificationAttemptRequest(
-                    id=request_data.otpFactorId,
-                    trxnId=request_data.trxnId,
-                    otp=request_data.otp,
-                    otpType=request_data.otpVerificationType,
-                ),
-                user_access_token=user_access_token,
-                otp_type=request_data.otpVerificationType,
-                request=request,
-            )
-        else:
-            await verify_otp_before_operation(
-                global_http_client=http_client,
-                otp=request_data.otp,
-                trxn_id=request_data.trxnId,
-                otp_type=request_data.otpVerificationType,
-                user_access_token=user_access_token,
-                request=request,
-            )
-        logger.info("OTP verified successfully")
-    else:
-        logger.info(
-            "No assertionResult provided — skipping FIDO2 verification (OTP-verified flow)"
-        )
+    _consume_fido2_delete_verification_proof_or_raise(
+        request=request,
+        verification_proof_id=request_data.verificationProofId,
+        registration_id=registration_id,
+    )
+
+    await assert_remaining_mfa_factor_after_deletion(
+        http_client=http_client,
+        user_access_token=user_access_token,
+        fido2_registration_ids_to_delete={registration_id},
+    )
 
     # Step 2: Get user ID from the token using userinfo endpoint
     _username, _display_name, user_id = await get_user_profile_info(
