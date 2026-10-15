@@ -76,7 +76,6 @@ export default function ConnectedServicesTable() {
           hour: "numeric",
           minute: "2-digit",
           hour12: true,
-          timeZone: "UTC",
         }).format(new Date(timestamp))
       : t("notAvailable");
 

@@ -153,7 +153,6 @@ describe.each([
           hour: "numeric",
           minute: "2-digit",
           hour12: true,
-          timeZone: "UTC",
         }).format(new Date("2026-01-01T10:00:00Z")),
       ),
     ).toBeInTheDocument();
@@ -176,7 +175,6 @@ describe.each([
           hour: "numeric",
           minute: "2-digit",
           hour12: true,
-          timeZone: "UTC",
         }).format(new Date("2026-01-02T11:00:00Z")),
       ),
     ).not.toBeInTheDocument();
@@ -274,6 +272,39 @@ describe.each([
 
 describe("ConnectedServicesTable", () => {
   it.each([
+    { language: "en", timestamp: "2026-01-01T00:30:00Z" },
+    { language: "fr", timestamp: "2026-01-01T00:30:00Z" },
+    { language: "en", timestamp: "2026-07-01T00:30:00Z" },
+    { language: "fr", timestamp: "2026-07-01T00:30:00Z" },
+  ])(
+    "displays UTC timestamp $timestamp in the browser timezone in $language",
+    async ({ language, timestamp }) => {
+      mockLanguage = language;
+      mockGetConnectedServices.mockResolvedValue([
+        {
+          clientId: "client-local-time",
+          name: "Local time service",
+          lastLogin: timestamp,
+        },
+      ]);
+      const expectedTimestamp = new Intl.DateTimeFormat(language, {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }).format(new Date(timestamp));
+
+      render(<ConnectedServicesTable />);
+
+      expect(
+        await screen.findByRole("cell", { name: expectedTimestamp }),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it.each([
     {
       language: "fr",
       localizedUrls: { fr: "https://service.example.com/fr" },
@@ -348,7 +379,6 @@ describe("ConnectedServicesTable", () => {
           hour: "numeric",
           minute: "2-digit",
           hour12: true,
-          timeZone: "UTC",
         }).format(new Date("2026-01-01T10:00:00Z")),
       }),
     ).toBeInTheDocument();
