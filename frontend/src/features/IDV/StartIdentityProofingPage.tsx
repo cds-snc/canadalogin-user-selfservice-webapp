@@ -111,6 +111,10 @@ export default function StartIdentityProofingPage() {
     language,
     journeyType,
   });
+  const cantProveIdentityPage = path(PAGES.idvCompleteIdentityProofingPage, {
+    language,
+    journeyType,
+  });
 
   useEffect(() => {
     if (resolvedJourneyType !== IDV_JOURNEY_TYPE.REQUIRED) {
@@ -148,6 +152,9 @@ export default function StartIdentityProofingPage() {
       case START_IDENTITY_OPTION.inPerson:
         navigate(inPersonPage);
         break;
+      case START_IDENTITY_OPTION.cantProveNow:
+        navigate(cantProveIdentityPage);
+        break;
       default:
         break;
     }
@@ -162,10 +169,12 @@ export default function StartIdentityProofingPage() {
       {resolvedJourneyType === IDV_JOURNEY_TYPE.REQUIRED && (
         <AccessibleNotice
           noticeRole="success"
-          noticeTitle={t("StartIdentityProofing.signedInSuccessNotice")}
+          noticeTitle={t("StartIdentityProofing.signedInSuccessTitle")}
           noticeTitleTag="h2"
         >
-          <GcdsText hidden={true}>{""}</GcdsText>
+          <GcdsText>
+            {t("StartIdentityProofing.signedInSuccessNotice")}
+          </GcdsText>
         </AccessibleNotice>
       )}
       {journeyType === IDV_JOURNEY_TYPE.VERIFICATION_ERROR && (
@@ -227,6 +236,7 @@ export default function StartIdentityProofingPage() {
       <GcdsGrid columns="1">
         <IdentityProofingRadioButtons
           id={RADIOS_ID}
+          journeyType={resolvedJourneyType}
           selectedOption={selectedOption}
           onOptionChange={setSelectedOption}
           rpName={rpName}
