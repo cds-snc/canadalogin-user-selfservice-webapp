@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
@@ -8,7 +8,6 @@ import {
   GcdsLink,
   GcdsText,
   GcdsContainer,
-  GcdsNotice,
 } from "@gcds-core/components-react";
 import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 import ErrorSummaryWithFocus from "../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
@@ -25,7 +24,6 @@ import {
   START_IDENTITY_OPTION,
   type StartIdentityOption,
 } from "./components/methods";
-import { useUser } from "../../components/Providers/useUser";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import {
   identityVerificationApi,
@@ -71,6 +69,7 @@ function extractTargetUrl(searchParams: URLSearchParams): string | null {
 export default function StartIdentityProofingPage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
+  const [searchParams] = useSearchParams();
 
   const { t } = useTranslation("idv");
   const { relyingPartyName: rpName, hasRelyingParty } = useRelyingPartyInfo();
@@ -80,10 +79,8 @@ export default function StartIdentityProofingPage() {
     ? t("StartIdentityProofing.pageTitle", { rpName })
     : t("StartIdentityProofing.proveYourIdentity");
   const titleByJourneyType = {
-    [IDV_JOURNEY_TYPE.REQUIRED]: t("StartIdentityProofing.pageTitle", {
-      rpName: rpName ?? t("StartIdentityProofing.fallbackRpName"),
-    }),
-    [IDV_JOURNEY_TYPE.START]: t("StartIdentityProofing.proveYourIdentity"),
+    [IDV_JOURNEY_TYPE.REQUIRED]: startIdentityTitle,
+    [IDV_JOURNEY_TYPE.START]: startIdentityTitle,
     [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.proveYourIdentity"),
   } as const;
   const requestedJourneyType = journeyType ?? IDV_JOURNEY_TYPE.START;
@@ -94,6 +91,14 @@ export default function StartIdentityProofingPage() {
   const pageTitle = titleByJourneyType[resolvedJourneyType];
   const { t: tLayout } = useTranslation("layout");
   const [selectedOption, setSelectedOption] = useState<StartIdentityOption>();
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
+  const currentLanguage =
+    language === AVAILABLE_LANGUAGES.fr
+      ? AVAILABLE_LANGUAGES.fr
+      : AVAILABLE_LANGUAGES.en;
+  const selectOptionErrorMessage =
+    hasSubmitted && !selectedOption ? getSelectOptionRequiredMessage(t) : "";
   const onlineSelectionPage = path(PAGES.idvProveIdentityOnlinePage, {
     language,
     journeyType,
@@ -129,12 +134,19 @@ export default function StartIdentityProofingPage() {
 
   // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
+    setHasSubmitted(true);
+
+    if (!selectedOption) {
+      setSummaryFocusTrigger((previous) => previous + 1);
+      return;
+    }
+
     switch (selectedOption) {
       case START_IDENTITY_OPTION.online:
         navigate(onlineSelectionPage);
         break;
       case START_IDENTITY_OPTION.inPerson:
-        navigate(visitCanadaPostPage);
+        navigate(inPersonPage);
         break;
       default:
         break;
@@ -224,7 +236,6 @@ export default function StartIdentityProofingPage() {
         <GcdsGrid columns="max-content max-content">
           <GcdsButton
             type="button"
-            disabled={!selectedOption}
             onGcdsClick={(ev) => {
               ev.preventDefault();
               handleContinue();
@@ -233,14 +244,13 @@ export default function StartIdentityProofingPage() {
             {t("ServiceCanadaCentre.continueButton")}
           </GcdsButton>
           <GcdsButton
+            type="button"
             buttonRole="secondary"
-            onGcdsClick={(ev) => {
-              ev.preventDefault();
-              // back to Relying Party page? For now, navigate to account settings page
-              navigate("/");
+            onClick={() => {
+              navigate(profileHomePage);
             }}
           >
-            {t("Button.cancel", { ns: "common" })}
+            {t("ProveIdentityOnline.backButton")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>
