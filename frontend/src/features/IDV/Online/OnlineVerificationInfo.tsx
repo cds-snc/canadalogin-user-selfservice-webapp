@@ -10,8 +10,10 @@ import {
 
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { useNavigate, useParams } from "react-router";
+import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { path } from "../../../utils/routeHelpers";
+import { IDV_JOURNEY_TYPE } from "../constants";
 import {
   identityVerificationApi,
   type OnlineIdentityVerificationResponse,
@@ -20,13 +22,18 @@ import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 
 export default function OnlineVerificationInfo() {
   const navigate = useNavigate();
+  const { language } = useParams();
   const { t } = useTranslation("idv");
+  const verificationErrorPage = path(PAGES.idvStartIdentityProofingPage, {
+    language,
+    journeyType: IDV_JOURNEY_TYPE.VERIFICATION_ERROR,
+  });
 
   const handleContinue = async (
     response: OnlineIdentityVerificationResponse | undefined,
   ) => {
     if (!response?.online_verification_url) {
-      return;
+      throw new Error("Online identity verification URL is missing");
     }
     window.location.assign(response.online_verification_url);
   };
@@ -36,7 +43,7 @@ export default function OnlineVerificationInfo() {
       .postOnlineIdentityVerification()
       .then((response) => handleContinue(response))
       .catch(() => {
-        // TODO: handle API error
+        navigate(verificationErrorPage);
       });
   };
 
