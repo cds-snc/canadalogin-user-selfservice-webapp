@@ -76,12 +76,7 @@ export default function ConnectedServicesTable() {
           hour: "numeric",
           minute: "2-digit",
           hour12: true,
-        })
-          .formatToParts(new Date(timestamp))
-          .map(({ type, value }) =>
-            type === "dayPeriod" ? value.toLowerCase() : value,
-          )
-          .join("")
+        }).format(new Date(timestamp))
       : t("notAvailable");
 
   return (
