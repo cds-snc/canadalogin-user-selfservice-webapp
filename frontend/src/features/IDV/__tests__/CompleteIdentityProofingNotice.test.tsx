@@ -1,9 +1,10 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CompleteIdentityProofingNotice from "../components/CompleteIdentityProofingNotice";
 
 let mockNavigate = vi.fn();
+const mockGetClaims = vi.hoisted(() => vi.fn());
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -32,9 +33,15 @@ vi.mock("react-i18next", async () => {
   };
 });
 
+vi.mock("../api/identityVerificationApi", () => ({
+  identityVerificationApi: {
+    getClaims: mockGetClaims,
+  },
+}));
+
 vi.mock("../../../utils/routeHelpers", () => ({
-  path: (_id: string, params: { language?: string }) =>
-    `/${params.language ?? "en"}/idv`,
+  path: (id: string, params: { language?: string; journeyType?: string }) =>
+    `/${params.language ?? "en"}/${id}${params.journeyType ? `/${params.journeyType}` : ""}`,
 }));
 
 vi.mock("@gcds-core/components-react", () => ({
@@ -112,14 +119,24 @@ describe("CompleteIdentityProofingNotice", () => {
     expect(notice).toHaveAttribute("data-notice-role", "info");
   });
 
-  it("calls navigate with the IDV start route when button is clicked", () => {
-    render(<CompleteIdentityProofingNotice />);
-    const button = screen.getByRole("button", {
-      name: "Complete identity proofing",
-    });
+  it.each([
+    ["pending", "/en/IdvInPersonProofingInProgressPage"],
+    ["in_progress", "/en/IdvInPersonProofingInProgressPage"],
+    ["verified", "/en/IdvStartIdentityProofingPage/start"],
+  ] as const)(
+    "loads claims and navigates to the correct page for status %s",
+    async (status, expectedRoute) => {
+      mockGetClaims.mockResolvedValue({ status });
+      render(<CompleteIdentityProofingNotice />);
 
-    button.click();
+      fireEvent.click(
+        screen.getByRole("button", { name: "Complete identity proofing" }),
+      );
 
-    expect(mockNavigate).toHaveBeenCalledWith("/en/idv");
-  });
+      await waitFor(() => {
+        expect(mockGetClaims).toHaveBeenCalledOnce();
+        expect(mockNavigate).toHaveBeenCalledWith(expectedRoute);
+      });
+    },
+  );
 });

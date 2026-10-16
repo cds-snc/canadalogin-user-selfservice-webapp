@@ -7,15 +7,12 @@ import { useNavigate, useParams } from "react-router";
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { IDV_JOURNEY_TYPE } from "../constants";
-import { type IdentityVerificationClaimsResponse } from "../api/identityVerificationApi";
-import { useState } from "react";
+import { identityVerificationApi } from "../api/identityVerificationApi";
 
 export default function CompleteIdentityProofingNotice() {
   const { language } = useParams<{ language: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
-  const [identityVerificationClaims] =
-    useState<IdentityVerificationClaimsResponse>();
   const startIdentityProofingPage = path(PAGES.idvStartIdentityProofingPage, {
     language,
     journeyType: IDV_JOURNEY_TYPE.START,
@@ -27,11 +24,11 @@ export default function CompleteIdentityProofingNotice() {
     },
   );
 
-  const handleNavigation = () => {
-    const status = identityVerificationClaims?.status;
+  const handleNavigation = async () => {
+    const claims = await identityVerificationApi.getClaims();
 
     const destination =
-      status === "pending" || status === "in_progress"
+      claims?.status === "pending" || claims?.status === "in_progress"
         ? InProgressIdentityProofingPage
         : startIdentityProofingPage;
 
