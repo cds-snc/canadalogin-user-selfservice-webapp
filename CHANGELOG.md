@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.39.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.38.0...v1.39.0) (2026-10-16)
+
+
+### Features
+
+* **identity-verification:** Connected Services Date Update ([#2344](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2344)) ([2c9e39d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2c9e39d58f2b5b9b3a6013e78a279960578113eb))
+* **identity-verification:** Connected Services Date UpdatE) ([2c9e39d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2c9e39d58f2b5b9b3a6013e78a279960578113eb))
+* **identity-verification:** Returning User Time ([#2332](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2332)) ([0f2df9c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0f2df9c90db1a877df067a18aeef9168dbc75065))
+* redirect user to verification error page on failure or missing URL ([#2327](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2327)) ([6d9e5da](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6d9e5dacce672fa3646ccdcb014f098dab914fc5))
+
+
+### Bug Fixes
+
+* **accessibility:** Horizontal scrolling needed at 200% zoom ([#2317](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2317)) ([3b31a42](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3b31a4279ca4c075701234b6fb0a7f4ca6d8517f))
+* **accessibility:** Incorrect or missing lang attribute on French-la… ([#2316](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2316)) ([050ee05](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/050ee05955ab0a1facd89a2c44fa22c767a3fe41))
+* **auth:** return 400 for invalid backchannel logout tokens ([364edd7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/364edd7bbc90e08d52486738c6e086ac590e856d))
+* **auth:** return 400 for invalid logout tokens ([#2324](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2324)) ([364edd7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/364edd7bbc90e08d52486738c6e086ac590e856d))
+
+
+### Code Refactoring
+
+* add the additional cross origin security header and remove … ([#2299](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2299)) ([e18ebe9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e18ebe91e8175041d749abca0886cd7ad762a5cc))
+* add the additional cross origin security header and remove the server header from the docker container ([e18ebe9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e18ebe91e8175041d749abca0886cd7ad762a5cc))
+* **identity-verification:** [FE Content] Update Contact Details section ([#2311](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2311)) ([625ac23](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/625ac23954ed71441dd96d30067f49792daedeff))
+* **identity-verification:** [FE Content] Warning Notice when updating information - Prove Your Identity page ([#2306](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2306)) ([3111d5b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3111d5b106800ab785d32309b69122727d26a25a))
+* **identity-verification:** [FE] Default display radio buttons based on Journey Type - Prove your identity ([#2331](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2331)) ([416080c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/416080c1aa40c849007c9b0e3349d6aa006bc1ae))
+* **identity-verification:** Update Contact Details section ([625ac23](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/625ac23954ed71441dd96d30067f49792daedeff))
+
 ## [1.38.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.37.0...v1.38.0) (2026-10-07)
 
 
