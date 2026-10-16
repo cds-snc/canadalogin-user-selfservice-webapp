@@ -17,6 +17,22 @@ vi.mock("../../api/connectedServicesApi", () => ({
 let mockDevOnlyFeature = true;
 let mockLanguage = "en";
 
+function expectedLocalTimestamp(timestamp: string, language: string) {
+  const date = new Date(timestamp);
+  const dateText = new Intl.DateTimeFormat(language, {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const minuteText = minutes ? String(minutes).padStart(2, "0") : "";
+
+  return language === "fr"
+    ? `${dateText} à ${hours} h${minuteText ? ` ${minuteText}` : ""}`
+    : `${dateText} at ${hours % 12 || 12}${minuteText ? `:${minuteText}` : ""} ${hours < 12 ? "am" : "pm"}`;
+}
+
 vi.mock("react-router", () => ({
   useParams: () => ({ language: mockLanguage }),
 }));
@@ -145,16 +161,7 @@ describe.each([
     );
     expect(mockGetConnectedServices).toHaveBeenCalledTimes(1);
     expect(
-      screen.getByText(
-        new Intl.DateTimeFormat("en", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        }).format(new Date("2026-01-01T10:00:00Z")),
-      ),
+      screen.getByText(expectedLocalTimestamp("2026-01-01T10:00:00Z", "en")),
     ).toBeInTheDocument();
     expect(screen.getAllByRole("columnheader")).toHaveLength(2);
     expect(
@@ -167,16 +174,7 @@ describe.each([
       screen.queryByRole("columnheader", { name: "Last logout" }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText(
-        new Intl.DateTimeFormat("en", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        }).format(new Date("2026-01-02T11:00:00Z")),
-      ),
+      screen.queryByText(expectedLocalTimestamp("2026-01-02T11:00:00Z", "en")),
     ).not.toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
@@ -272,6 +270,35 @@ describe.each([
 
 describe("ConnectedServicesTable", () => {
   it.each([
+    { language: "en", hours: 16, minutes: 30, time: "4:30 pm" },
+    { language: "en", hours: 9, minutes: 0, time: "9 am" },
+    { language: "en", hours: 12, minutes: 0, time: "12 pm" },
+    { language: "en", hours: 0, minutes: 5, time: "12:05 am" },
+    { language: "fr", hours: 16, minutes: 30, time: "16 h 30" },
+    { language: "fr", hours: 9, minutes: 0, time: "9 h" },
+    { language: "fr", hours: 12, minutes: 0, time: "12 h" },
+    { language: "fr", hours: 0, minutes: 5, time: "0 h 05" },
+  ])(
+    "uses Canada.ca time style: $time ($language)",
+    async ({ language, hours, minutes, time }) => {
+      mockLanguage = language;
+      mockGetConnectedServices.mockResolvedValue([
+        {
+          clientId: "client-time-style",
+          name: "Time style service",
+          lastLogin: new Date(2026, 0, 1, hours, minutes).toISOString(),
+        },
+      ]);
+
+      render(<ConnectedServicesTable />);
+
+      expect(await screen.findByRole("cell")).toHaveTextContent(
+        new RegExp(`${time}$`),
+      );
+    },
+  );
+
+  it.each([
     { language: "en", timestamp: "2026-01-01T00:30:00Z" },
     { language: "fr", timestamp: "2026-01-01T00:30:00Z" },
     { language: "en", timestamp: "2026-07-01T00:30:00Z" },
@@ -287,14 +314,7 @@ describe("ConnectedServicesTable", () => {
           lastLogin: timestamp,
         },
       ]);
-      const expectedTimestamp = new Intl.DateTimeFormat(language, {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      }).format(new Date(timestamp));
+      const expectedTimestamp = expectedLocalTimestamp(timestamp, language);
 
       render(<ConnectedServicesTable />);
 
@@ -372,14 +392,7 @@ describe("ConnectedServicesTable", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("cell", {
-        name: new Intl.DateTimeFormat("fr", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        }).format(new Date("2026-01-01T10:00:00Z")),
+        name: expectedLocalTimestamp("2026-01-01T10:00:00Z", "fr"),
       }),
     ).toBeInTheDocument();
   });
