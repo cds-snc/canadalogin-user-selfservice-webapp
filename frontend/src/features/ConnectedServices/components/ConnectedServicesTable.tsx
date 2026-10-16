@@ -67,17 +67,46 @@ export default function ConnectedServicesTable() {
     return <GcdsText>{t("empty")}</GcdsText>;
   }
 
-  const formatTimestamp = (timestamp?: string | null) =>
-    timestamp
-      ? new Intl.DateTimeFormat(language, {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        }).format(new Date(timestamp))
-      : t("notAvailable");
+  const formatTimestamp = (timestamp?: string | null) => {
+    if (!timestamp) {
+      return t("notAvailable");
+    }
+
+    const isFrench = language === "fr";
+    const parts = new Intl.DateTimeFormat(language, {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hourCycle: isFrench ? "h23" : "h12",
+    }).formatToParts(new Date(timestamp));
+    const isWholeHour = parts.some(
+      (part) => part.type === "minute" && part.value === "00",
+    );
+
+    // Canada.ca uses "4:30 pm" / "9 am" and "16 h 30" / "9 h".
+    return parts
+      .map((part, index) => {
+        if (isFrench && part.type === "hour") {
+          return String(Number(part.value));
+        }
+        if (isWholeHour && part.type === "minute") {
+          return "";
+        }
+        if (part.type === "literal" && parts[index + 1]?.type === "minute") {
+          if (isFrench) {
+            return isWholeHour ? " h" : " h ";
+          }
+          return isWholeHour ? "" : ":";
+        }
+        if (part.type === "dayPeriod") {
+          return part.value.toLowerCase();
+        }
+        return part.value.replace(/[\u00a0\u202f]/g, " ");
+      })
+      .join("");
+  };
 
   return (
     <div className="connected-services-table-wrapper">
