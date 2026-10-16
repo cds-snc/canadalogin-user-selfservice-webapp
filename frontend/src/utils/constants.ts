@@ -132,6 +132,7 @@ export const PAGES = {
   manageDashboard: "ManageDashboard",
   ProfileHome: "ProfileHome",
   connectedServices: "ConnectedServices",
+  helpAndSupport: "HelpAndSupport",
   profileUpdateNameSuccess: "ProfileUpdateNameSuccess",
   profileUpdateNameConfirmUpdate: "ProfileUpdateNameConfirmUpdate",
   profileUpdateName: "ProfileUpdateName",
@@ -627,5 +628,12 @@ export const gcHelpCentreLinks = {
   learnAboutPasskeys: {
     en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/get-started/two-step-verification-methods/#passkeys`,
     fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/se-lancer-connexioncanada/verification-deux-etapes/#cles-acces`,
+  },
+} as const;
+
+export const manageDashboardLinks = {
+  helpAndSupport: {
+    en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/`,
+    fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/`,
   },
 } as const;

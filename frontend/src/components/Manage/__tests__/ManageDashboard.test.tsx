@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   devOnlyFeature: true,
   navigate: vi.fn(),
   trackCardClick: vi.fn(),
+  open: vi.fn(),
 }));
 
 vi.mock("react-router", () => ({
@@ -46,6 +47,12 @@ vi.mock("../../../utils/constants", () => ({
     ProfileHome: "ProfileHome",
     securitySettings: "SecuritySettings",
     connectedServices: "ConnectedServices",
+  },
+  manageDashboardLinks: {
+    helpAndSupport: {
+      en: "https://login.canada.ca/en/users/",
+      fr: "https://connexion.canada.ca/fr/utilisateurs/",
+    },
   },
 }));
 
@@ -118,6 +125,13 @@ describe("ManageDashboard", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     mocks.devOnlyFeature = true;
+
+    Object.defineProperty(window, "open", {
+      value: mocks.open,
+      writable: true,
+      configurable: true,
+    });
+
     await i18n.changeLanguage("en");
   });
 
@@ -164,5 +178,40 @@ describe("ManageDashboard", () => {
     expect(
       screen.queryByRole("link", { name: /Connected services/i }),
     ).not.toBeInTheDocument();
+  });
+
+  it("renders the Help and Support card with its destination and description", () => {
+    renderDashboard();
+
+    const cardLink = screen.getByRole("link", { name: /Help and support/i });
+
+    expect(cardLink).toHaveAttribute(
+      "href",
+      "https://login.canada.ca/en/users/",
+    );
+    expect(cardLink).toHaveTextContent(
+      "Get help on how to use CanadaLogin and how to contact support.",
+    );
+    expect(cardLink.querySelector("img")).toHaveAttribute(
+      "src",
+      expect.stringMatching(/^data:image\/svg\+xml/),
+    );
+  });
+
+  it("navigates to Help and Support and tracks the card click", () => {
+    renderDashboard();
+
+    fireEvent.click(screen.getByRole("link", { name: /Help and support/i }));
+
+    expect(mocks.open).toHaveBeenCalledWith(
+      "https://login.canada.ca/en/users/",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    expect(mocks.trackCardClick).toHaveBeenCalledWith({
+      card_name: "Help and Support",
+      card_type: "navigation",
+      destination: "https://login.canada.ca/en/users/",
+    });
   });
 });
