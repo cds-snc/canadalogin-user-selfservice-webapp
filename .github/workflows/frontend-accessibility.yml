@@ -1,0 +1,44 @@
+name: "Frontend Accessibility (axe)"
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-accessibility.yml"
+
+jobs:
+  a11y:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: "Install Node"
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: "Install Deps"
+        working-directory: frontend
+        run: npm ci
+
+      - name: "Cache Playwright browsers"
+        id: playwright-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('frontend/package-lock.json') }}
+
+      - name: "Install Playwright Browsers"
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      # Storybook a11y is configured with test: "error" (axe-core), so violations fail the story tests.
+      - name: "Run axe accessibility tests on stories"
+        working-directory: frontend
+        run: npx vitest --run --project storybook --no-coverage
