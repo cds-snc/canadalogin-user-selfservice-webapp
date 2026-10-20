@@ -367,7 +367,7 @@ describe("CanadaPostIdDetailsPage", () => {
           address: {
             streetAddress: "123 Main St",
             locality: "Ottawa",
-            region: undefined,
+            region: "ON",
             postalCode: "K1A 0B1",
             country: "CA",
           },
