@@ -163,6 +163,11 @@ export default function VisitCanadaPost() {
                 <li>{t("VisitCanadaPost.step4", { rpName })}</li>
               </ol>
             </GcdsText>
+            <GcdsText>
+              <GcdsLink href="#" external={true}>
+                {t("VisitCanadaPost.learnMoreLink")}
+              </GcdsLink>
+            </GcdsText>
           </GcdsContainer>
 
           <GcdsContainer>
@@ -219,20 +224,6 @@ export default function VisitCanadaPost() {
               {t("VisitCanadaPost.differentMethodButton")}
             </GcdsButton>
           </GcdsGrid>
-
-          <AccessibleNotice
-            noticeRole="info"
-            noticeTitleTag="h2"
-            noticeTitle={t("VisitCanadaPost.moreInfoTitle")}
-          >
-            <GcdsLink
-              href="#"
-              external={true}
-              style={{ textDecoration: "underline" }}
-            >
-              {t("VisitCanadaPost.learnMoreLink")}
-            </GcdsLink>
-          </AccessibleNotice>
         </GcdsGrid>
       </form>
     </GcdsContainer>

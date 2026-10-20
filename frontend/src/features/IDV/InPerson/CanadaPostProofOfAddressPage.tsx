@@ -3,6 +3,7 @@ import {
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
+  GcdsIcon,
   GcdsText,
 } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
@@ -11,6 +12,7 @@ import { useLocation, useNavigate, useParams } from "react-router";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import type { CanadaPostIdDetailsLocationState } from "./CanadaPostIdDetailsPage";
+import "./css/CanadaPostProofOfAddressPage.css";
 
 const PROOF_OF_ADDRESS_GROUPS = [
   "governmentId",
@@ -64,6 +66,21 @@ export default function CanadaPostProofOfAddressPage() {
               </section>
             );
           })}
+
+          <section
+            className="canada-post-proof-warning"
+            aria-labelledby="canada-post-proof-warning-heading"
+          >
+            <GcdsIcon name="warning-triangle" size="h2" aria-hidden="true" />
+            <div>
+              <GcdsText id="canada-post-proof-warning-heading">
+                <strong>{t("CanadaPostProofOfAddress.warningTitle")}</strong>
+              </GcdsText>
+              <GcdsText>
+                {t("CanadaPostProofOfAddress.warningMessage")}
+              </GcdsText>
+            </div>
+          </section>
         </GcdsContainer>
 
         <GcdsGrid

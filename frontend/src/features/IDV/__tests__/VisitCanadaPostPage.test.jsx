@@ -44,7 +44,11 @@ vi.mock("@gcds-core/components-react", () => ({
     return <Tag>{children}</Tag>;
   },
   GcdsText: ({ children }) => <div>{children}</div>,
-  GcdsLink: ({ children, href }) => <a href={href}>{children}</a>,
+  GcdsLink: ({ children, href, external }) => (
+    <a href={href} data-external={external}>
+      {children}
+    </a>
+  ),
   GcdsNotice: ({ children, noticeTitle }) => (
     <div data-testid="notice">
       <span>{noticeTitle}</span>
@@ -158,6 +162,24 @@ describe("VisitCanadaPost (Select your ID)", () => {
       screen.getByLabelText("I don't have any of those IDs"),
     ).toBeInTheDocument();
     expect(mockGetIdentityDocuments).not.toHaveBeenCalled();
+  });
+
+  it("renders the external learn-more link immediately after the visit steps", () => {
+    render(<VisitCanadaPost />);
+
+    const step4 = screen.getByText(
+      t("VisitCanadaPost.step4", { rpName: "RP Name" }),
+    );
+    const learnMoreLink = screen.getByRole("link", {
+      name: t("VisitCanadaPost.learnMoreLink"),
+    });
+
+    expect(learnMoreLink).toHaveAttribute("href", "#");
+    expect(learnMoreLink).toHaveAttribute("data-external", "true");
+    expect(
+      step4.compareDocumentPosition(learnMoreLink) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it("requires an ID selection before continuing", () => {

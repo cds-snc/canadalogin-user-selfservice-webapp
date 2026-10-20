@@ -104,8 +104,7 @@
     "countryLabel": "Country",
     "continueButton": "Continue",
     "differentMethodButton": "Choose a different method",
-    "moreInfoTitle": "For more information",
-    "learnMoreLink": "Learn more about Canada Post identity proofing"
+    "learnMoreLink": "Learn more about proving at Canada Post"
   },
   "CanadaPostSelectId": {
     "legend": "Select your ID",
@@ -157,6 +156,8 @@
   "CanadaPostProofOfAddress": {
     "heading": "You must bring a proof of address",
     "intro": "Since the ID you selected does not have an address on it, you will need to bring in one of the documents listed below:",
+    "warningTitle": "You must bring a proof of address",
+    "warningMessage": "Only continue if you have one of the documents listed above. Otherwise, you will not be able to prove your identity.",
     "groups": {
       "governmentId": {
         "title": "Government ID with address",

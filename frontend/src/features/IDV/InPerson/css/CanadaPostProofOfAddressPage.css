@@ -1,0 +1,11 @@
+.canada-post-proof-warning {
+  display: flex;
+  width: min(49rem, 100%);
+  box-sizing: border-box;
+  padding: var(--gcds-spacing-250, 1.25rem);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--gcds-spacing-200, 1rem);
+  border-radius: var(--gcds-border-radius-150, 0.75rem);
+  background: var(--gcds-color-yellow-100, #fcefcf);
+}

@@ -30,11 +30,12 @@ vi.mock("../../../utils/constants", async () => {
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
-  GcdsHeading: ({ children, tag }) => {
+  GcdsHeading: ({ children, tag, ...props }) => {
     const Tag = tag ?? "h2";
-    return <Tag>{children}</Tag>;
+    return <Tag {...props}>{children}</Tag>;
   },
   GcdsText: ({ children }) => <div>{children}</div>,
+  GcdsIcon: ({ name, ...props }) => <span data-icon={name} {...props} />,
   GcdsButton: ({ children, buttonRole, onGcdsClick }) => (
     <button
       data-testid={
@@ -88,6 +89,21 @@ describe("CanadaPostProofOfAddressPage", () => {
       within(screen.getAllByRole("list")[0]).getByText(
         "Provincial/Territorial Photo ID/Service card",
       ),
+    ).toBeInTheDocument();
+  });
+
+  it("warns users to bring one of the listed proof-of-address documents", () => {
+    render(<CanadaPostProofOfAddressPage />);
+
+    const warningSection = screen.getByRole("region", {
+      name: "You must bring a proof of address",
+    });
+    expect(warningSection).toHaveClass("canada-post-proof-warning");
+    expect(warningSection).toHaveTextContent(
+      "Only continue if you have one of the documents listed above. Otherwise, you will not be able to prove your identity.",
+    );
+    expect(
+      warningSection.querySelector('[data-icon="warning-triangle"]'),
     ).toBeInTheDocument();
   });
 
