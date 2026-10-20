@@ -24,6 +24,8 @@ import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO
 import ServiceCanadaCentrePage from "./features/IDV/InPerson/ServiceCanadaCentrePage";
 import ServiceCanadaCentreIDVCodePage from "./features/IDV/InPerson/ServiceCanadaCentreIDVCodePage";
 import VisitCanadaPost from "./features/IDV/InPerson/VisitCanadaPostPage";
+import CanadaPostIdDetailsPage from "./features/IDV/InPerson/CanadaPostIdDetailsPage";
+import CanadaPostProofOfAddressPage from "./features/IDV/InPerson/CanadaPostProofOfAddressPage";
 import ProofingBarcodeCanadaPostPage from "./features/IDV/InPerson/ProofingBarcodeCanadaPostPage";
 import InPersonProofingInProgress from "./features/IDV/InPerson/InPersonProofingInProgress";
 import StartIdentityProofingPage from "./features/IDV/StartIdentityProofingPage";
@@ -173,6 +175,18 @@ export const appRoutes: RouteObject[] = [
                           path: "in-person/canada-post",
                           element: <VisitCanadaPost />,
                           handle: { id: PAGES.idvVisitCanadaPostPage },
+                        },
+                        {
+                          path: "in-person/canada-post/id-details",
+                          element: <CanadaPostIdDetailsPage />,
+                          handle: { id: PAGES.idvCanadaPostIdDetailsPage },
+                        },
+                        {
+                          path: "in-person/canada-post/proof-of-address",
+                          element: <CanadaPostProofOfAddressPage />,
+                          handle: {
+                            id: PAGES.idvCanadaPostProofOfAddressPage,
+                          },
                         },
                         {
                           path: "in-person/canada-post/idv-code",

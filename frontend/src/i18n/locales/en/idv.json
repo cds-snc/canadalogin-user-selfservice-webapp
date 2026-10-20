@@ -14,7 +14,11 @@
     "countryRequired": "Country is required.",
     "idTypeRequired": "Select an ID type.",
     "idExpiryRequired": "ID expiry date is required.",
-    "selectOptionRequired": "Select an option to continue."
+    "selectOptionRequired": "Select an option to continue.",
+    "idExpiryInvalid": "ID expiry date must be a valid date.",
+    "idExpiryTooSoon": "ID must be valid for at least 1 month from today.",
+    "cityRequired": "City, town, or community is required.",
+    "postalCodeRequiredOrInvalid": "Postal code is required or invalid."
   },
   "ServiceCanadaCentre": {
     "heading": "Get ready to visit a Service Canada Centre",
@@ -102,6 +106,104 @@
     "differentMethodButton": "Choose a different method",
     "moreInfoTitle": "For more information",
     "learnMoreLink": "Learn more about Canada Post identity proofing"
+  },
+  "CanadaPostSelectId": {
+    "legend": "Select your ID",
+    "loading": "Loading your ID details...",
+    "loadErrorTitle": "We couldn't load the details for this ID",
+    "loadErrorMessage": "Please try again or choose a different method.",
+    "documents": {
+      "PASSPORT": {
+        "label": "Passport",
+        "hint": "Canadian and international accepted"
+      },
+      "DRIVERS_LICENCE": {
+        "label": "Provincial/Territorial driver's licence"
+      },
+      "PROVINCIAL_PHOTO_ID": {
+        "label": "Provincial/Territorial photo ID/service card"
+      },
+      "PROVINCIAL_HEALTH_CARD": {
+        "label": "Health card",
+        "hint": "Only valid for Quebec"
+      },
+      "PERMANENT_RESIDENT_CARD": {
+        "label": "Canadian PR card"
+      },
+      "INDIAN_STATUS_CARD": {
+        "label": "Secure Certificate of Indian Status"
+      },
+      "COMBO_CARD": {
+        "label": "Combo card",
+        "hint": "Only valid for BC and Alberta"
+      }
+    },
+    "noIds": "I don't have any of those IDs"
+  },
+  "CanadaPostIdDetails": {
+    "passportHeading": "Enter your passport details",
+    "driverLicenceHeading": "Enter your driver's licence details",
+    "defaultHeading": "Enter your ID details",
+    "idExpiryLabel": "When does the ID expire?",
+    "idExpiryHint": "Must be valid for at least 1 month from today",
+    "passportCountryLabel": "What country issued the passport?",
+    "countryLabel": "Country",
+    "provinceLabel": "Province/ Territory",
+    "selectDefaultValue": "Select option",
+    "postalCodeHint": "For example, A1A 1A1",
+    "continueButton": "Continue",
+    "backButton": "Back"
+  },
+  "CanadaPostProofOfAddress": {
+    "heading": "You must bring a proof of address",
+    "intro": "Since the ID you selected does not have an address on it, you will need to bring in one of the documents listed below:",
+    "groups": {
+      "governmentId": {
+        "title": "Government ID with address",
+        "items": [
+          "Provincial/Territorial Driver’s licence",
+          "Provincial/Territorial Photo ID/Service card"
+        ]
+      },
+      "financial": {
+        "title": "Financial",
+        "items": [
+          "Bank or credit card statement",
+          "Income tax assessment",
+          "Pension statement (CPP/QPP)"
+        ]
+      },
+      "billsHousing": {
+        "title": "Bills & Housing",
+        "items": [
+          "Utility bill (phone, cable, hydro, gas, water)",
+          "Lease, mortgage statement, or purchase agreement",
+          "Municipal tax notice",
+          "Insurance policy (home, auto, etc.)"
+        ]
+      },
+      "governmentBenefits": {
+        "title": "Government Benefits",
+        "items": [
+          "Child Tax Benefit statement",
+          "Old Age Security or CPP benefits statement",
+          "Employment Insurance statement",
+          "Disability or social assistance statement"
+        ]
+      },
+      "other": {
+        "title": "Other",
+        "items": [
+          "Government cheque or stub",
+          "School report card or transcript",
+          "Vehicle registration",
+          "Proof of residence letter (from a shelter, care facility, or similar)",
+          "Delivery notice with your name and address (for package pickups only)"
+        ]
+      }
+    },
+    "continueButton": "Continue",
+    "backButton": "Back"
   },
   "ProofingBarcodeCanadaPost": {
     "heading": "Take your proofing barcode to Canada Post",

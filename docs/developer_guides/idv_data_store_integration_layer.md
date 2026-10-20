@@ -76,6 +76,14 @@ return await operation.send_code(payload)
 
 Unlike in-person, online operations return typed domain objects — the router wraps them in `ResponseModel`.
 
+### `IdentityDocumentsClient(BaseIdvDataStoreService)` (`services/identity_documents.py`)
+
+| Method | Endpoint | Scope config key | Returns |
+| --- | --- | --- | --- |
+| `list_documents(types)` | `GET /v1/identity-documents` | `IDV_DATA_STORE_IDENTITY_DOCUMENTS_SCOPES` | `ResponseModel` (`data` is a list of `IdentityDocument`) |
+
+Exposed to the frontend as `GET /v1/identity-verification/identity-documents`. The optional `types` filter is forwarded as repeated query parameters (`?types=PASSPORT&types=DRIVERS_LICENCE`). This is the single source of truth for approved documents shared by the manage app and the Service Canada agent portal.
+
 ### `token_exchange.py`
 
 `exchange_token_for_idv_data_store(http_client, user_access_token, scope)` performs RFC 8693 OAuth 2.0 Token Exchange against IBM Verify using `IDV_DATA_STORE_STS_CLIENT_ID` / `IDV_DATA_STORE_STS_CLIENT_SECRET`. Returns a narrowly-scoped delegated access token sent as `Authorization: Bearer` to idv-data-store.
@@ -93,6 +101,7 @@ Called exclusively by `BaseIdvDataStoreService._request`. Feature modules must n
 | `ReissueOnlineSessionResponse` | Typed response from `OnlineIdentityVerificationClient.reissue_session` |
 | `CaseStatus` | Enum: `pending`, `in_progress`, `verified`, `failed`, `cancelled` |
 | `StoreTargetUrlRequest` | Router body for `POST /target-url` |
+| `IdentityDocument` / `IdentityDocumentOption` / `IdentityDocumentType` | Approved identity documents catalog returned by `IdentityDocumentsClient` |
 
 ## Active Scopes and Config Keys
 
@@ -103,6 +112,7 @@ Scopes are configured in `IdvDataStoreConfig` (read from env):
 | `IDV_DATA_STORE_IDENTITY_VERIFICATION_SCOPES` | `idv:auth:verified-claims` | `InPersonIdentityVerificationClient.send_code` |
 | `IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES` | `idv:in-person-verification:send` | `InPersonIdentityVerificationClient.get_last_email_sent` |
 | `IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES` | `idv:auth:verified-claims` | `OnlineIdentityVerificationClient` (both methods) |
+| `IDV_DATA_STORE_IDENTITY_DOCUMENTS_SCOPES` | `idv:identity-documents:read` | `IdentityDocumentsClient.list_documents` |
 | `IDV_DATA_STORE_AUTH_USERINFO_SCOPES` | `idv:auth:userinfo` | Reserved — not yet wired to a client |
 
 ## Active Endpoints
@@ -115,4 +125,5 @@ Resolved from `Configuration` properties using `IDV_DATA_STORE_BASE_URL`:
 | `idv_data_store_in_person_verification_last_email_endpoint` | `/v1/in-person-verification/last-email-sent` |
 | `idv_data_store_online_verification_endpoint` | `/v1/identity-verifications/online` |
 | `idv_data_store_online_session_endpoint(case_id)` | `/v1/identity-verifications/{case_id}/online-session` |
+| `idv_data_store_identity_documents_endpoint` | `/v1/identity-documents` |
 | `idv_data_store_userinfo_endpoint` | `/v1/auth/userinfo` |
