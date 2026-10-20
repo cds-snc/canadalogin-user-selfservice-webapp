@@ -54,20 +54,22 @@ vi.mock("@gcds-core/components-react", () => {
         ))}
       </div>
     ),
-    GcdsInput: ({ inputId, label, errorMessage, onGcdsChange }) =>
+    GcdsInput: ({ inputId, label, value, errorMessage, onGcdsChange }) =>
       withError(
         <input
           aria-label={label}
           data-testid={inputId}
+          value={value}
           onChange={(event) => onGcdsChange?.(event)}
         />,
         errorMessage,
       ),
-    GcdsDateInput: ({ name, legend, errorMessage, onGcdsChange }) =>
+    GcdsDateInput: ({ name, legend, value, errorMessage, onGcdsChange }) =>
       withError(
         <input
           aria-label={legend}
           data-testid={name}
+          value={value}
           onChange={(event) => onGcdsChange?.(event)}
         />,
         errorMessage,
@@ -310,6 +312,23 @@ describe("CanadaPostIdDetailsPage", () => {
     expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/start/in-person/canada-post/proof-of-address",
+      {
+        state: {
+          document: PASSPORT,
+          formData: {
+            idExpiryDate: "2099-01-01",
+            documentOptionId: "2",
+            country: "",
+            province: "ON",
+            firstName: "Jane",
+            lastName: "Doe",
+            dateOfBirth: "1990-05-15",
+            address: "123 Main St",
+            cityTown: "Ottawa",
+            postalCode: "K1A 0B1",
+          },
+        },
+      },
     );
   });
 
@@ -352,6 +371,72 @@ describe("CanadaPostIdDetailsPage", () => {
     expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/start/in-person/canada-post/proof-of-address",
+      {
+        state: {
+          document: {
+            ...DRIVERS_LICENCE,
+            options: [
+              ...DRIVERS_LICENCE.options,
+              option(12, "Foreign licence", { requires_proof: true }),
+            ],
+          },
+          formData: {
+            idExpiryDate: "2099-01-01",
+            documentOptionId: "12",
+            country: "",
+            province: "ON",
+            firstName: "Jane",
+            lastName: "Doe",
+            dateOfBirth: "1990-05-15",
+            address: "123 Main St",
+            cityTown: "Ottawa",
+            postalCode: "K1A 0B1",
+          },
+        },
+      },
+    );
+  });
+
+  it("restores form values provided in navigation state", () => {
+    const formData = {
+      idExpiryDate: "2099-01-01",
+      documentOptionId: "2",
+      country: "",
+      province: "ON",
+      firstName: "Jane",
+      lastName: "Doe",
+      dateOfBirth: "1990-05-15",
+      address: "123 Main St",
+      cityTown: "Ottawa",
+      postalCode: "K1A 0B1",
+    };
+
+    renderPage(PASSPORT, { formData });
+
+    expect(screen.getByTestId("id-expiry-date-input")).toHaveValue(
+      formData.idExpiryDate,
+    );
+    expect(screen.getByTestId("select-document-option")).toHaveValue(
+      formData.documentOptionId,
+    );
+    expect(screen.getByTestId("select-province")).toHaveValue(
+      formData.province,
+    );
+    expect(screen.getByTestId("first-name-input")).toHaveValue(
+      formData.firstName,
+    );
+    expect(screen.getByTestId("last-name-input")).toHaveValue(
+      formData.lastName,
+    );
+    expect(screen.getByTestId("date-of-birth-input")).toHaveValue(
+      formData.dateOfBirth,
+    );
+    expect(screen.getByTestId("address-input")).toHaveValue(formData.address);
+    expect(screen.getByTestId("city-town-input")).toHaveValue(
+      formData.cityTown,
+    );
+    expect(screen.getByTestId("postal-code-input")).toHaveValue(
+      formData.postalCode,
     );
   });
 

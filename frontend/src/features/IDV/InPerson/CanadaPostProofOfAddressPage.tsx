@@ -27,9 +27,10 @@ export default function CanadaPostProofOfAddressPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { language, journeyType } = useParams();
-  const selectedDocument = (
-    location.state as CanadaPostIdDetailsLocationState | null
-  )?.document;
+  const locationState =
+    location.state as CanadaPostIdDetailsLocationState | null;
+  const selectedDocument = locationState?.document;
+  const formData = locationState?.formData;
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -101,6 +102,7 @@ export default function CanadaPostProofOfAddressPage() {
                   {
                     state: {
                       document: selectedDocument,
+                      formData,
                       proofOfAddressAcknowledged: true,
                     },
                   },

@@ -65,6 +65,7 @@ const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
 
 export interface CanadaPostIdDetailsLocationState {
   document?: IdentityDocument;
+  formData?: CanadaPostIdDetailsFormData;
   proofOfAddressAcknowledged?: boolean;
 }
 
@@ -107,6 +108,7 @@ export default function CanadaPostIdDetailsPage() {
     address: "",
     cityTown: "",
     postalCode: "",
+    ...locationState?.formData,
   }));
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
@@ -201,6 +203,7 @@ export default function CanadaPostIdDetailsPage() {
     ) {
       navigate(
         path(PAGES.idvCanadaPostProofOfAddressPage, { language, journeyType }),
+        { state: { document: selectedDocument, formData } },
       );
     }
   };
@@ -305,6 +308,7 @@ export default function CanadaPostIdDetailsPage() {
               hint={t("CanadaPostIdDetails.idExpiryHint")}
               format="full"
               lang={currentLanguage}
+              value={formData.idExpiryDate}
               required
               errorMessage={fieldError("idExpiryDate")}
               onGcdsChange={updateField("idExpiryDate")}
@@ -333,6 +337,7 @@ export default function CanadaPostIdDetailsPage() {
               lang={currentLanguage}
               label={t("VisitCanadaPost.givenNameLabel")}
               hint={t("VisitCanadaPost.givenNameHint")}
+              value={formData.firstName}
               required
               errorMessage={fieldError("firstName")}
               onGcdsChange={updateField("firstName")}
@@ -345,6 +350,7 @@ export default function CanadaPostIdDetailsPage() {
               lang={currentLanguage}
               label={t("VisitCanadaPost.familyNameLabel")}
               hint={t("VisitCanadaPost.familyNameHint")}
+              value={formData.lastName}
               required
               errorMessage={fieldError("lastName")}
               onGcdsChange={updateField("lastName")}
@@ -356,6 +362,7 @@ export default function CanadaPostIdDetailsPage() {
               legend={t("VisitCanadaPost.dobLabel")}
               format="full"
               lang={currentLanguage}
+              value={formData.dateOfBirth}
               required
               errorMessage={
                 hasSubmitted && errorCodes.dateOfBirth
@@ -372,6 +379,7 @@ export default function CanadaPostIdDetailsPage() {
               lang={currentLanguage}
               label={t("VisitCanadaPost.addressLabel")}
               hint={t("VisitCanadaPost.addressHint")}
+              value={formData.address}
               required
               errorMessage={fieldError("address")}
               onGcdsChange={updateField("address")}
@@ -383,6 +391,7 @@ export default function CanadaPostIdDetailsPage() {
               name={FIELD_IDS.cityTown}
               lang={currentLanguage}
               label={t("VisitCanadaPost.cityTownLabel")}
+              value={formData.cityTown}
               required
               errorMessage={fieldError("cityTown")}
               onGcdsChange={updateField("cityTown")}
@@ -397,6 +406,7 @@ export default function CanadaPostIdDetailsPage() {
               lang={currentLanguage}
               label={t("VisitCanadaPost.postalcodeLabel")}
               hint={t("CanadaPostIdDetails.postalCodeHint")}
+              value={formData.postalCode}
               autocomplete="postal-code"
               required
               errorMessage={fieldError("postalCode")}

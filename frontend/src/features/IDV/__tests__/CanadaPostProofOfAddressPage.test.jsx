@@ -34,7 +34,7 @@ vi.mock("@gcds-core/components-react", () => ({
     const Tag = tag ?? "h2";
     return <Tag {...props}>{children}</Tag>;
   },
-  GcdsText: ({ children }) => <div>{children}</div>,
+  GcdsText: ({ children, ...props }) => <div {...props}>{children}</div>,
   GcdsIcon: ({ name, ...props }) => <span data-icon={name} {...props} />,
   GcdsButton: ({ children, buttonRole, onGcdsClick }) => (
     <button
@@ -119,14 +119,32 @@ describe("CanadaPostProofOfAddressPage", () => {
 
   it("continues to ID details with the selected document and acknowledgement", () => {
     const document = { key: "PERMANENT_RESIDENT_CARD", options: [] };
-    mockLocation.state = { document };
+    const formData = {
+      idExpiryDate: "2099-01-01",
+      documentOptionId: "30",
+      country: "",
+      province: "ON",
+      firstName: "Jane",
+      lastName: "Doe",
+      dateOfBirth: "1990-05-15",
+      address: "123 Main St",
+      cityTown: "Ottawa",
+      postalCode: "K1A 0B1",
+    };
+    mockLocation.state = { document, formData };
     render(<CanadaPostProofOfAddressPage />);
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/start/in-person/canada-post/id-details",
-      { state: { document, proofOfAddressAcknowledged: true } },
+      {
+        state: {
+          document,
+          formData,
+          proofOfAddressAcknowledged: true,
+        },
+      },
     );
   });
 });
