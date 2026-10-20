@@ -110,10 +110,15 @@ export default function VisitCanadaPost() {
         return;
       }
 
-      navigate(
-        path(PAGES.idvCanadaPostIdDetailsPage, { language, journeyType }),
-        { state: { document: selectedDocument } },
-      );
+      const nextPage = selectedDocument.options.every(
+        (option) => option.requires_proof,
+      )
+        ? PAGES.idvCanadaPostProofOfAddressPage
+        : PAGES.idvCanadaPostIdDetailsPage;
+
+      navigate(path(nextPage, { language, journeyType }), {
+        state: { document: selectedDocument },
+      });
     } catch {
       setHasError(true);
     } finally {

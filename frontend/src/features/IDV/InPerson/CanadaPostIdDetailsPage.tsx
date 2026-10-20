@@ -65,6 +65,7 @@ const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
 
 export interface CanadaPostIdDetailsLocationState {
   document?: IdentityDocument;
+  proofOfAddressAcknowledged?: boolean;
 }
 
 export default function CanadaPostIdDetailsPage() {
@@ -77,9 +78,9 @@ export default function CanadaPostIdDetailsPage() {
       ? AVAILABLE_LANGUAGES.fr
       : AVAILABLE_LANGUAGES.en;
 
-  const selectedDocument = (
-    location.state as CanadaPostIdDetailsLocationState | null
-  )?.document;
+  const locationState =
+    location.state as CanadaPostIdDetailsLocationState | null;
+  const selectedDocument = locationState?.document;
 
   const variant = selectedDocument
     ? getIdDetailsFormVariant(selectedDocument.key)
@@ -194,7 +195,10 @@ export default function CanadaPostIdDetailsPage() {
       return;
     }
 
-    if (selectedOption?.requires_proof) {
+    if (
+      selectedOption?.requires_proof &&
+      !locationState?.proofOfAddressAcknowledged
+    ) {
       navigate(
         path(PAGES.idvCanadaPostProofOfAddressPage, { language, journeyType }),
       );

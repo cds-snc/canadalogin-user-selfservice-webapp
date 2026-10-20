@@ -26,7 +26,6 @@ class IdentityDocumentsClient(BaseIdvDataStoreService):
         endpoint = self._settings.idv_data_store_identity_documents_endpoint
         if types:
             endpoint = f"{endpoint}?{urlencode([('types', t.value) for t in types])}"
-        print(":::::::::::::::::::::;::::::::::::::::::;::::::::::::::::::;::::::::::::::::::;::::::::::::::::::;Endpoint URL:", endpoint)
         response = await self._get(
             endpoint,
             scope=self._settings.idv_data_store_config.IDV_DATA_STORE_IDENTITY_DOCUMENTS_SCOPES,

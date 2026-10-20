@@ -4,11 +4,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import CanadaPostProofOfAddressPage from "../InPerson/CanadaPostProofOfAddressPage";
 
 const mockNavigate = vi.fn();
+const mockLocation = { state: null };
 const mockFlags = vi.hoisted(() => ({ devOnlyFeature: true }));
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
-  return { ...actual, useNavigate: () => mockNavigate };
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    useLocation: () => mockLocation,
+    useParams: () => ({ language: "en", journeyType: "start" }),
+  };
 });
 
 vi.mock("../../../utils/constants", async () => {
@@ -45,6 +51,7 @@ describe("CanadaPostProofOfAddressPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
+    mockLocation.state = null;
   });
 
   it("renders nothing when DEV_ONLY_FEATURE is false", () => {
@@ -67,15 +74,15 @@ describe("CanadaPostProofOfAddressPage", () => {
     expect(
       screen.getByText(/Since the ID you selected does not have an address/),
     ).toBeInTheDocument();
-    expect(
-      screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent),
-    ).toEqual([
+    [
       "Government ID with address",
       "Financial",
       "Bills & Housing",
       "Government Benefits",
       "Other",
-    ]);
+    ].forEach((title) => {
+      expect(screen.getByText(title).tagName).toBe("STRONG");
+    });
     expect(screen.getAllByRole("listitem")).toHaveLength(18);
     expect(
       within(screen.getAllByRole("list")[0]).getByText(
@@ -92,5 +99,18 @@ describe("CanadaPostProofOfAddressPage", () => {
 
     fireEvent.click(screen.getByTestId("back-button"));
     expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  it("continues to ID details with the selected document and acknowledgement", () => {
+    const document = { key: "PERMANENT_RESIDENT_CARD", options: [] };
+    mockLocation.state = { document };
+    render(<CanadaPostProofOfAddressPage />);
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/start/in-person/canada-post/id-details",
+      { state: { document, proofOfAddressAcknowledged: true } },
+    );
   });
 });

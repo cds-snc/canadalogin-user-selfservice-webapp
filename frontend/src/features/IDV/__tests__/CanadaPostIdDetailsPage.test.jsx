@@ -163,14 +163,14 @@ const PR_CARD = {
   ],
 };
 
-const renderPage = (document) =>
+const renderPage = (document, state = {}) =>
   render(
     <MemoryRouter
       initialEntries={[
         {
           pathname:
             "/en/identity-verification/start/in-person/canada-post/id-details",
-          state: document ? { document } : null,
+          state: document ? { document, ...state } : null,
         },
       ]}
     >
@@ -322,6 +322,37 @@ describe("CanadaPostIdDetailsPage", () => {
 
     expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("does not show proof of address again after it was acknowledged", () => {
+    renderPage(PR_CARD, { proofOfAddressAcknowledged: true });
+    fillCommonFields();
+    change("select-province", "ON");
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("checks a foreign licence option separately from domestic licences", () => {
+    renderPage({
+      ...DRIVERS_LICENCE,
+      options: [
+        ...DRIVERS_LICENCE.options,
+        option(12, "Foreign licence", { requires_proof: true }),
+      ],
+    });
+    fillCommonFields();
+    change("select-document-option", "12");
+    change("select-province", "ON");
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/start/in-person/canada-post/proof-of-address",
+    );
   });
 
   it("goes back to the previous page", () => {

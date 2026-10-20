@@ -208,8 +208,60 @@ describe("VisitCanadaPost (Select your ID)", () => {
 
     await waitFor(() =>
       expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/identity-verification/start/in-person/canada-post/id-details",
+        "/en/identity-verification/start/in-person/canada-post/proof-of-address",
         { state: { document: PASSPORT } },
+      ),
+    );
+  });
+
+  it.each([
+    "PASSPORT",
+    "PERMANENT_RESIDENT_CARD",
+    "INDIAN_STATUS_CARD",
+    "PROVINCIAL_HEALTH_CARD",
+  ])(
+    "shows proof of address for a single %s option requiring proof",
+    async (key) => {
+      const document = { ...PASSPORT, key };
+      mockGetIdentityDocuments.mockResolvedValue([document]);
+      render(<VisitCanadaPost />);
+
+      fireEvent.click(screen.getByDisplayValue(key));
+      fireEvent.click(screen.getByTestId("continue-button"));
+
+      await waitFor(() =>
+        expect(mockNavigate).toHaveBeenCalledWith(
+          "/en/identity-verification/start/in-person/canada-post/proof-of-address",
+          { state: { document } },
+        ),
+      );
+    },
+  );
+
+  it.each([
+    ["all options require proof", [true, true], "proof-of-address"],
+    ["only the foreign option requires proof", [false, true], "id-details"],
+    ["no options require proof", [false, false], "id-details"],
+    ["a single option does not require proof", [false], "id-details"],
+  ])("routes according to the API when %s", async (_, flags, nextPage) => {
+    const document = {
+      ...PASSPORT,
+      options: flags.map((requires_proof, index) => ({
+        ...PASSPORT.options[0],
+        id: index + 1,
+        requires_proof,
+      })),
+    };
+    mockGetIdentityDocuments.mockResolvedValue([document]);
+    render(<VisitCanadaPost />);
+
+    fireEvent.click(screen.getByLabelText("Passport"));
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith(
+        `/en/identity-verification/start/in-person/canada-post/${nextPage}`,
+        { state: { document } },
       ),
     );
   });
@@ -222,6 +274,13 @@ describe("VisitCanadaPost (Select your ID)", () => {
     [
       "the document is not returned",
       () => mockGetIdentityDocuments.mockResolvedValue([]),
+    ],
+    [
+      "the document has no options",
+      () =>
+        mockGetIdentityDocuments.mockResolvedValue([
+          { ...PASSPORT, options: [] },
+        ]),
     ],
   ])("shows an error notice and keeps the form when %s", async (_, arrange) => {
     arrange();
