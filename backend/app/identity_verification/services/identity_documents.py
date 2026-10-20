@@ -32,7 +32,6 @@ class IdentityDocumentsClient(BaseIdvDataStoreService):
             context=_CONTEXT,
         )
 
-        print("WOWOWOWOWOOWOWOWOW", response.json())
         try:
             response.raise_for_status()
             documents = _IDENTITY_DOCUMENTS_ADAPTER.validate_python(response.json())
