@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import CanadaPostIdDetailsPage from "../InPerson/CanadaPostIdDetailsPage";
@@ -12,6 +12,7 @@ import i18n from "../../../i18n/test";
 
 const mockNavigate = vi.fn();
 const mockFlags = vi.hoisted(() => ({ devOnlyFeature: true }));
+const mockSendInPersonVerificationCode = vi.hoisted(() => vi.fn());
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -29,6 +30,12 @@ vi.mock("../../../utils/constants", async () => {
 });
 
 vi.mock("../helpers/useGcdsSelectWidth", () => ({ default: vi.fn() }));
+
+vi.mock("../api/inPersonIdentityVerificationApi", () => ({
+  inPersonIdentityVerificationApi: {
+    sendInPersonVerificationCode: mockSendInPersonVerificationCode,
+  },
+}));
 
 vi.mock("@gcds-core/components-react", () => {
   const withError = (element, errorMessage) => (
@@ -208,6 +215,15 @@ describe("CanadaPostIdDetailsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
+    mockSendInPersonVerificationCode.mockResolvedValue({
+      success: true,
+      message: "Verification code created",
+      data: {
+        verificationCode: "CP12345678",
+        verificationExpiresAt: "2026-08-12T20:58:26.760127+00:00",
+        verificationValidityDays: 30,
+      },
+    });
     Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
       configurable: true,
       value: vi.fn(),
@@ -330,9 +346,10 @@ describe("CanadaPostIdDetailsPage", () => {
         },
       },
     );
+    expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
   });
 
-  it("does nothing on continue when no proof of address is required", () => {
+  it("creates a case and navigates to the barcode when proof of address is not required", async () => {
     renderPage(DRIVERS_LICENCE);
     fillCommonFields();
     change("select-document-option", "10");
@@ -340,10 +357,42 @@ describe("CanadaPostIdDetailsPage", () => {
     fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
-    expect(mockNavigate).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalledWith({
+        verificationProvider: "canada_post",
+        applicant: {
+          firstName: "Jane",
+          lastName: "Doe",
+          dateOfBirth: "1990-05-15",
+          address: {
+            streetAddress: "123 Main St",
+            locality: "Ottawa",
+            region: undefined,
+            postalCode: "K1A 0B1",
+            country: "CA",
+          },
+          idType: "driverLicence",
+          idExpiryDate: "2099-01-01",
+        },
+      });
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/identity-verification/start/in-person/canada-post/idv-code",
+        {
+          state: {
+            idvCode: "CP12345678",
+            givenName: "Jane",
+            lastName: "Doe",
+            dateOfBirth: "May 15, 1990",
+            idSelected: "Driver's licence",
+            verificationExpiresAt: "2026-08-12T20:58:26.760127+00:00",
+            verificationValidityDays: 30,
+          },
+        },
+      );
+    });
   });
 
-  it("does not show proof of address again after it was acknowledged", () => {
+  it("creates a case and navigates to the barcode after proof of address is acknowledged", async () => {
     renderPage(PR_CARD, { proofOfAddressAcknowledged: true });
     fillCommonFields();
     change("select-province", "ON");
@@ -351,6 +400,46 @@ describe("CanadaPostIdDetailsPage", () => {
     fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalledWith(
+        expect.objectContaining({
+          verificationProvider: "canada_post",
+          applicant: expect.objectContaining({
+            firstName: "Jane",
+            lastName: "Doe",
+            idType: "canadianPRCard",
+          }),
+        }),
+      );
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/identity-verification/start/in-person/canada-post/idv-code",
+        expect.objectContaining({
+          state: expect.objectContaining({
+            idvCode: "CP12345678",
+            givenName: "Jane",
+            lastName: "Doe",
+            dateOfBirth: "May 15, 1990",
+            idSelected: "PR card",
+          }),
+        }),
+      );
+    });
+  });
+
+  it("does not navigate when case creation fails", async () => {
+    mockSendInPersonVerificationCode.mockResolvedValue({
+      success: false,
+      message: "Could not create case",
+    });
+    renderPage(DRIVERS_LICENCE);
+    fillCommonFields();
+    change("select-document-option", "10");
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    await waitFor(() =>
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalled(),
+    );
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 

@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 
 import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
+import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 import {
   AVAILABLE_LANGUAGES,
   CANADIAN_PROVINCES_AND_TERRITORIES,
@@ -27,6 +28,7 @@ import {
   sortOptionsByLabel,
 } from "../data/identityDocuments";
 import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
+import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.validation";
 import {
   type CanadaPostIdDetailsErrorCodes,
   type CanadaPostIdDetailsFormData,
@@ -49,6 +51,15 @@ import {
 
 const ERROR_SUMMARY_ID = "canada-post-id-details-error-summary";
 const CANADA_COUNTRY_CODE = "CA";
+const ID_TYPE_BY_DOCUMENT: Record<IdentityDocument["key"], string> = {
+  DRIVERS_LICENCE: "driverLicence",
+  PASSPORT: "passport",
+  PROVINCIAL_PHOTO_ID: "photoIDServiceCard",
+  PROVINCIAL_HEALTH_CARD: "photoIDHealthCard",
+  PERMANENT_RESIDENT_CARD: "canadianPRCard",
+  INDIAN_STATUS_CARD: "indianStatus",
+  COMBO_CARD: "COMBO_CARD",
+};
 
 const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
   idExpiryDate: "id-expiry-date-input",
@@ -188,7 +199,7 @@ export default function CanadaPostIdDetailsPage() {
     (option) => String(option.id) === formData.documentOptionId,
   );
 
-  const onContinue = () => {
+  const onContinue = async () => {
     setHasSubmitted(true);
 
     if (!isFormValid) {
@@ -205,7 +216,49 @@ export default function CanadaPostIdDetailsPage() {
         path(PAGES.idvCanadaPostProofOfAddressPage, { language, journeyType }),
         { state: { document: selectedDocument, formData } },
       );
+      return;
     }
+
+    const response =
+      await inPersonIdentityVerificationApi.sendInPersonVerificationCode({
+        verificationProvider: "canada_post",
+        applicant: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          dateOfBirth: formData.dateOfBirth,
+          address: {
+            streetAddress: formData.address,
+            locality: formData.cityTown,
+            region: formData.province || undefined,
+            postalCode: formData.postalCode,
+            country: CANADA_COUNTRY_CODE,
+          },
+          idType: ID_TYPE_BY_DOCUMENT[selectedDocument.key],
+          idExpiryDate: formData.idExpiryDate,
+        },
+      });
+
+    if (!response?.success) {
+      return;
+    }
+
+    navigate(
+      path(PAGES.idvProofingBarcodeCanadaPostPage, { language, journeyType }),
+      {
+        state: {
+          idvCode: response.data?.verificationCode,
+          givenName: formData.firstName,
+          lastName: formData.lastName,
+          dateOfBirth: formatDateOfBirthForDisplay(
+            formData.dateOfBirth,
+            currentLanguage,
+          ),
+          idSelected: getLocalizedName(selectedDocument, currentLanguage),
+          verificationExpiresAt: response.data.verificationExpiresAt,
+          verificationValidityDays: response.data.verificationValidityDays,
+        },
+      },
+    );
   };
 
   const headingKey =
@@ -423,7 +476,7 @@ export default function CanadaPostIdDetailsPage() {
               type="button"
               onGcdsClick={(event: Event) => {
                 event.preventDefault();
-                onContinue();
+                void onContinue();
               }}
             >
               {t("CanadaPostIdDetails.continueButton")}
