@@ -229,7 +229,8 @@ export default function CanadaPostIdDetailsPage() {
           address: {
             streetAddress: formData.address,
             locality: formData.cityTown,
-            region: formData.province || undefined,
+            region:
+              formData.province || selectedOption?.province_code || undefined,
             postalCode: formData.postalCode,
             country: CANADA_COUNTRY_CODE,
           },
