@@ -242,8 +242,8 @@
     "noIds": "Je n'ai aucune de ces pièces d'identité"
   },
   "ConfirmIdentityDetails": {
-    "pageTitle": "Confirmez les éléments qui seront associés à votre identifiant ConnexionCanada",
-    "description": "Passez en revue les éléments qui seront associés à votre identifiant ConnexionCanada. Vous pouvez modifier la plupart des renseignements ici ou les mettre à jour plus tard.",
+    "pageTitle": "Ajouté à votre identifiant ConnexionCanada",
+    "description": "Passez en revue les éléments ajoutés à votre identifiant ConnexionCanada.",
     "identityProofingDetails": "Détails de la confirmation de l’identité",
     "name": "Nom",
     "dateOfBirth": "Date de naissance",
@@ -256,8 +256,8 @@
     "phoneNumber": "Phone number",
     "communication": "Communication",
     "confirmAndContinue": "Continuer",
-    "successNoticeTitle": "Vos renseignements d’identité ont bien été vérifiés et la confirmation a été effectuée.",
-    "successNoticeDescription": "Le processus est presque terminé. Confirmez vos renseignements et ajoutez-les à votre identifiant ConnexionCanada, puis transmettez les renseignements demandés {{appName}} pour obtenir votre accès.",
+    "successNoticeTitle": "Opération réussie",
+    "successNoticeDescription": "Vous avez confirmé votre identité avec [méthode de confirmation].",
     "successNoticeTitleWithoutRp": "Your CanadaLogin has succesfully saved your changes",
     "successNoticeDescriptionWithoutRp": "Continue with accessing the service",
     "verifiedBadgeText": "Identité confirmée le 27 janvier 2026"
