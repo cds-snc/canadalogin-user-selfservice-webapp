@@ -227,7 +227,7 @@ describe("ProfileHome", () => {
     await waitFor(() => {
       const badges = screen.getAllByTestId("verified-badge");
       expect(
-        badges.some((b) => b.textContent.match(/Date de vérification [\w\s,]+/)),
+        badges.some((b) => /Date de vérification .+/.test(b.textContent ?? "")),
       ).toBe(true);
     });
   });
