@@ -226,8 +226,10 @@ describe("ProfileHome", () => {
 
     await waitFor(() => {
       const badges = screen.getAllByTestId("verified-badge");
+      const label = i18n.t("ProfileHome.verified", { lng: "fr" });
+
       expect(
-        badges.some((b) => /Date de vérification .+/.test(b.textContent ?? "")),
+        badges.some((b) => new RegExp(`${label} .+`).test(b.textContent ?? "")),
       ).toBe(true);
     });
   });
