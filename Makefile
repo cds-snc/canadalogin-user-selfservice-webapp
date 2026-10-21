@@ -19,7 +19,7 @@ lint-python:
 	flake8 .
 
 check-local-state:
-	semgrep --config .semgrep/no-local-state.yml --error backend/app/
+	pipx run --spec semgrep==1.180.0 semgrep --config .semgrep/no-local-state.yml --error backend/app/
 
 run-pytest:
 	pytest
