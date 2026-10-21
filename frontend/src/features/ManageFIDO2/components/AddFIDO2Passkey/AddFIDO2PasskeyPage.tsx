@@ -197,8 +197,7 @@ export default function AddFIDO2PasskeyPage({
 
     try {
       const attestationResponse = (await fido2Api.getAttestationOptions()) as
-        | { success?: boolean; data?: Record<string, unknown> }
-        | undefined;
+        { success?: boolean; data?: Record<string, unknown> } | undefined;
 
       if (!attestationResponse?.success || !attestationResponse?.data) {
         setErrorCode("error_failed_to_get_attestation_options");
