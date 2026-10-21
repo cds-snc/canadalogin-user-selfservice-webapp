@@ -46,8 +46,7 @@ export default function SuccessfullyUpdated({
 
     try {
       const response = (await authService.logout()) as
-        | AuthServiceResponse<LogoutResponseData>
-        | undefined;
+        AuthServiceResponse<LogoutResponseData> | undefined;
       const redirectUrl = response?.data?.redirect_url || null;
 
       if (redirectUrl) {

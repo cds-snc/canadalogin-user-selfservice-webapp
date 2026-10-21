@@ -83,9 +83,7 @@ export default function ServiceCanadaCentrePage() {
   const createChangeHandler =
     (field: keyof ServiceCanadaCentreFormData) => (event: CustomEvent) => {
       const target = event.target as
-        | HTMLInputElement
-        | HTMLSelectElement
-        | null;
+        HTMLInputElement | HTMLSelectElement | null;
 
       updateField(field, target?.value ?? "");
     };

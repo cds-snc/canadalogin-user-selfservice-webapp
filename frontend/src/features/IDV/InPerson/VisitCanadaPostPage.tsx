@@ -82,9 +82,7 @@ export default function VisitCanadaPost() {
   const createChangeHandler =
     (field: keyof VisitCanadaPostFormData) => (event: CustomEvent) => {
       const target = event.target as
-        | HTMLInputElement
-        | HTMLSelectElement
-        | null;
+        HTMLInputElement | HTMLSelectElement | null;
 
       updateField(field, target?.value ?? "");
     };
