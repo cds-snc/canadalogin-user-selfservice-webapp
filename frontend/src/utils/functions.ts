@@ -56,8 +56,7 @@ export function getPageContent(
 
   const lng = language === AVAILABLE_LANGUAGES.fr ? "fr" : "en";
   const bundle = i18n.getResourceBundle(lng, ns) as
-    | Record<string, PageContent>
-    | undefined;
+    Record<string, PageContent> | undefined;
 
   return bundle?.[pageName];
 }
