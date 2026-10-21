@@ -1,5 +1,5 @@
 import logging
-from fastapi import Request
+from fastapi import HTTPException, Request, status
 from typing import Optional
 from urllib.parse import urlencode
 from authlib.jose import jwt
@@ -22,17 +22,23 @@ async def validate_logout_token(request: Request):
     """Validate logout token using your registered OAuth client"""
     form_data = await request.form()
     if form_data is None:
-        raise ValueError("Missing logout_token parameter")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing logout_token parameter",
+        )
     form_dict = dict(form_data)
 
     logout_token = form_dict.get("logout_token")
     if logout_token is None or not isinstance(logout_token, str):
-        raise ValueError("Missing logout_token parameter Or invalid type")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing or invalid logout_token parameter",
+        )
 
     # Get your registered client
     client = oauth.verify
     if client is None:
-        raise ValueError("OAuth client 'verify' is not registered")
+        raise RuntimeError("OAuth client 'verify' is not registered")
 
     jwk_set_data = await client.fetch_jwk_set()
     load_key = create_load_key(jwk_set_data)
@@ -53,7 +59,10 @@ async def validate_logout_token(request: Request):
         claims.validate(leeway=120)
         return claims
     except JoseError as e:
-        raise ValueError(f"Invalid logout token: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid logout token",
+        ) from e
 
 
 def _validate_logout_events(claims, events):
@@ -161,12 +170,16 @@ async def backchannel_logout(request: Request):
 
     # Ensure sid is present (it should be based on validation)
     if not sid:
-        logger.error("Missing sid claim in logout token")
-        raise ValueError("Missing sid claim in logout token")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing sid claim in logout token",
+        )
     # Ensure jti is present (it should be based on validation)
     if not jti:
-        logger.error("Missing jti claim in logout token")
-        raise ValueError("Missing jti claim in logout token")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing jti claim in logout token",
+        )
 
     # Check if this logout token has already been processed
     if await is_logout_processed(request, sid):

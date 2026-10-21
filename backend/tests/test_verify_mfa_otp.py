@@ -5,7 +5,9 @@ These tests verify the refactored unified functions that accept OTP type paramet
 instead of having separate SMS and Voice functions.
 """
 
+import json
 from unittest.mock import AsyncMock, MagicMock, patch
+from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
@@ -23,6 +25,9 @@ from app.otp.services.verify_mfa_otp import (
 from app.otp.services.send_mfa_otp import (
     dispatch_send_mfa_otp,
     handle_send_mfa_otp,
+)
+from app.otp.services.profile_otp_transaction_store import (
+    store_mfa_otp_transaction,
 )
 
 
@@ -279,6 +284,37 @@ class TestHandleMFAOTPVerificationCreate:
     """Test the main verification create handler function."""
 
     @pytest.mark.asyncio
+    async def test_mfa_resend_replaces_session_transaction_key(self):
+        redis_client = AsyncMock()
+        request = SimpleNamespace(
+            session={},
+            cookies={"gc-manage-app": "session-123"},
+            app=SimpleNamespace(state=SimpleNamespace(redis_client=redis_client)),
+        )
+
+        for transaction_id, factor_id in (
+            ("mfa-1", "factor123"),
+            ("mfa-2", "factor456"),
+        ):
+            await store_mfa_otp_transaction(
+                request=request,
+                response_json={
+                    "id": transaction_id,
+                    "expiry": "2999-01-01T00:00:00Z",
+                },
+                factor_id=factor_id,
+                otp_type="sms",
+            )
+
+        assert [call.args[0] for call in redis_client.set.call_args_list] == [
+            "mfa_otp_transaction:session-123",
+            "mfa_otp_transaction:session-123",
+        ]
+        latest_transaction = json.loads(redis_client.set.call_args.args[1])
+        assert latest_transaction["transactionId"] == "mfa-2"
+        assert latest_transaction["factorId"] == "factor456"
+
+    @pytest.mark.asyncio
     async def test_verification_create_success_sms(
         self,
         mock_sms_verification_create_request,
@@ -335,31 +371,38 @@ class TestHandleMFAOTPVerificationCreate:
                     "app.otp.services.send_mfa_otp.record_phone_mfa_registration_event"
                 ) as mock_record_rate_limit:
                     with patch(
-                        "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
-                    ) as mock_dispatch:
-                        mock_response = MagicMock()
-                        mock_response.json.return_value = (
-                            mock_successful_verification_response
-                        )
-                        mock_dispatch.return_value = mock_response
+                        "app.otp.services.send_mfa_otp.consume_mfa_send_daily_quota"
+                    ) as mock_daily_quota:
+                        with patch(
+                            "app.otp.services.send_mfa_otp.dispatch_send_mfa_otp"
+                        ) as mock_dispatch:
+                            mock_response = MagicMock()
+                            mock_response.json.return_value = (
+                                mock_successful_verification_response
+                            )
+                            mock_dispatch.return_value = mock_response
 
-                        result = await handle_send_mfa_otp(
-                            mock_http_client,
-                            verification_request,
-                            "user_token",
-                            OtpType.SMS,
-                            request=mock_request,
-                        )
+                            result = await handle_send_mfa_otp(
+                                mock_http_client,
+                                verification_request,
+                                "user_token",
+                                OtpType.SMS,
+                                request=mock_request,
+                            )
 
-                        assert result.success is True
-                        mock_assert_rate_limit.assert_awaited_once_with(
-                            mock_request,
-                            "user123",
-                        )
-                        mock_record_rate_limit.assert_awaited_once_with(
-                            mock_request,
-                            "user123",
-                        )
+                            assert result.success is True
+                            mock_assert_rate_limit.assert_awaited_once_with(
+                                mock_request,
+                                "user123",
+                            )
+                            mock_daily_quota.assert_awaited_once_with(
+                                mock_request,
+                                "user123",
+                            )
+                            mock_record_rate_limit.assert_awaited_once_with(
+                                mock_request,
+                                "user123",
+                            )
 
     @pytest.mark.asyncio
     async def test_verification_create_does_not_count_rate_limit_for_resend(
@@ -523,6 +566,28 @@ class TestHandleMFAOTPVerificationCreate:
 class TestHandleMFAOTPVerificationAttempt:
     """Test the main verification attempt handler function."""
 
+    @pytest.fixture(autouse=True)
+    def mock_bound_mfa_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "trxn456",
+                "factorId": "factor123",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        async def consume_bound_transaction(**_kwargs):
+            return None
+
+        monkeypatch.setattr(
+            "app.otp.services.verify_mfa_otp.get_bound_otp_transaction",
+            get_bound_transaction,
+        )
+        monkeypatch.setattr(
+            "app.otp.services.verify_mfa_otp.consume_mfa_otp_transaction",
+            consume_bound_transaction,
+        )
+
     @pytest.mark.asyncio
     async def test_verification_attempt_success_sms(
         self, mock_sms_verification_attempt_request, mock_profile_success_response
@@ -562,6 +627,39 @@ class TestHandleMFAOTPVerificationAttempt:
                         "user_token",
                         "factor123",
                     )
+
+    @pytest.mark.asyncio
+    async def test_rejects_transaction_not_bound_to_session(
+        self, mock_sms_verification_attempt_request, mock_profile_success_response
+    ):
+        mock_http_client = AsyncMock()
+
+        async def no_bound_transaction(**_kwargs):
+            return None
+
+        with patch(
+            "app.otp.services.verify_mfa_otp.get_bound_otp_transaction",
+            new=no_bound_transaction,
+        ):
+            with patch(
+                "app.otp.services.verify_mfa_otp.get_my_profile",
+                return_value=mock_profile_success_response,
+            ):
+                with patch(
+                    "app.otp.services.verify_mfa_otp._resolve_factor_verification_context",
+                    return_value=(OtpType.SMS, True),
+                ):
+                    with pytest.raises(HTTPException) as exc_info:
+                        await handle_verify_mfa_otp(
+                            mock_http_client,
+                            mock_sms_verification_attempt_request,
+                            "user_token",
+                            OtpType.SMS,
+                            request=MagicMock(),
+                        )
+
+        assert exc_info.value.status_code == 400
+        assert exc_info.value.detail == "invalidCode"
 
     @pytest.mark.asyncio
     async def test_verification_attempt_success_voice(

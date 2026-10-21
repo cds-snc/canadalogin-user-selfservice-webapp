@@ -162,15 +162,9 @@ describe("ConfirmIdentityDetails", () => {
   it("shows the existing RP success notice when RP details are available", () => {
     render(<ConfirmIdentityDetails />);
 
+    expect(screen.getByText("Success")).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "Your identity information was successfully verified and proofing is complete.",
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "You're almost done. Confirm and save your details to CanadaLogin, then share the requested information with CRA to get access.",
-      ),
+      screen.getByText(/^You proved your identity with .+\.$/),
     ).toBeInTheDocument();
   });
 

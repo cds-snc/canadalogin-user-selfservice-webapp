@@ -6,8 +6,12 @@ from httpx import AsyncClient
 
 from app.config import get_configuration
 from app.otp.schemas import RetrievalData, OtpDataResponse, OtpType
+from app.otp.services.profile_otp_transaction_store import (
+    get_transient_otp_transaction,
+)
 from app.utils.access_token import get_auth_request_headers
 from app.utils.schemas import ResponseModel
+from fastapi import Request
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +20,20 @@ async def handle_otp_status_retrieval(
     global_http_client: AsyncClient,
     retrieval_data: RetrievalData,
     user_access_token: str,
+    request: Request | None = None,
 ):
+    if request is not None:
+        transaction = await get_transient_otp_transaction(
+            request=request,
+            transaction_id=retrieval_data.trxnId,
+            otp_type=retrieval_data.otpType.value,
+        )
+        if transaction is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
     logger.info(f"Attempting to retrieve {retrieval_data.otpType} OTP.")
     start_time = datetime.now()
     http_client_response = await dispatch_otp_status_retrieval(

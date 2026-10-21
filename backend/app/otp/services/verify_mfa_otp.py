@@ -8,6 +8,10 @@ from app.otp.schemas import (
 from app.users.schemas import UserAuthFactorsIbmResponse
 from app.users.services.get_my_profile import get_my_profile
 from app.users.services.otp_factors import dispatch_user_auth_factors
+from app.otp.services.profile_otp_transaction_store import (
+    consume_mfa_otp_transaction,
+    get_bound_otp_transaction,
+)
 from app.utils.access_token import get_auth_request_headers
 from app.utils.phone_mfa_rate_limit import (
     assert_phone_mfa_registration_rate_limit_not_exceeded,
@@ -137,6 +141,19 @@ async def handle_verify_mfa_otp(
             resolved_otp_type,
         )
 
+    if request is not None:
+        transaction = await get_bound_otp_transaction(
+            request=request,
+            transaction_id=attempt_request.trxnId,
+            otp_type=resolved_otp_type.value,
+            factor_id=attempt_request.id,
+        )
+        if transaction is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="invalidCode",
+            )
+
     if (
         request is not None
         and not is_factor_validated
@@ -154,6 +171,13 @@ async def handle_verify_mfa_otp(
         resolved_otp_type,
         user_access_token,
     )
+
+    if request is not None:
+        await consume_mfa_otp_transaction(
+            request=request,
+            transaction_id=attempt_request.trxnId,
+            factor_id=attempt_request.id,
+        )
 
     # IBM Verify API returns 204 No Content on successful verification attempt
     return ResponseModel(

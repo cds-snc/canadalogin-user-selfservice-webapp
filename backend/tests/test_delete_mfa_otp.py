@@ -91,7 +91,7 @@ async def test_handle_otp_deletion_sms_success(monkeypatch, mock_delete_guard):
 
     # Mock verify_otp_before_operation to succeed
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None  # Success means no exception
 
@@ -171,7 +171,7 @@ async def test_handle_otp_deletion_voice_success(monkeypatch):
 
     # Mock verify_otp_before_operation to succeed
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None  # Success means no exception
 
@@ -281,7 +281,7 @@ async def test_handle_otp_deletion_last_factor_protection(
 
     # Mock verify_otp_before_operation to succeed
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None  # Success means no exception
 
@@ -732,7 +732,7 @@ async def test_handle_otp_deletion_verify_action_issues_proof(monkeypatch):
     """Verify action should validate OTP and issue a one-time proof."""
 
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None
 
@@ -1008,7 +1008,7 @@ async def test_handle_otp_batch_deletion_success(monkeypatch, mock_delete_guard)
     """Test successful batch deletion of multiple OTP factors"""
 
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None
 
@@ -1124,7 +1124,7 @@ async def test_handle_otp_batch_deletion_last_factor_protection(
     """Test that batch deletion is prevented when it would remove the last factor"""
 
     async def mock_verify_otp(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         return None
 
@@ -1159,7 +1159,7 @@ async def test_handle_otp_batch_deletion_otp_failure(monkeypatch):
     """Test that batch deletion is aborted when OTP verification fails"""
 
     async def mock_verify_otp_fail(
-        global_http_client, otp, trxn_id, otp_type, user_access_token
+        global_http_client, otp, trxn_id, otp_type, user_access_token, request=None
     ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

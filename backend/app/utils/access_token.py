@@ -3,7 +3,7 @@ import threading
 from datetime import datetime
 from fastapi import HTTPException, status
 from httpx import AsyncClient
-from app.config import get_configuration
+from app.config import IBMVerifyConfig, get_configuration
 
 logger = logging.getLogger(__name__)
 lock = threading.Lock()
@@ -11,17 +11,24 @@ lock = threading.Lock()
 admin_token_ttl = 7170
 
 
-async def request_access_token(global_http_client: AsyncClient):
+async def request_access_token(
+    global_http_client: AsyncClient,
+    *,
+    verify_config: IBMVerifyConfig | None = None,
+    client_id: str | None = None,
+    client_secret: str | None = None,
+):
     """Request token from IBM Verify API"""
-    settings = get_configuration().ibm_verify_config
+    settings = verify_config or get_configuration().ibm_verify_config
 
-    token_url = f"{settings.IBM_VERIFY_TENANT_URL}/oauth2/token"
+    token_url = f"{settings.IBM_VERIFY_TENANT_URL.rstrip('/')}/oauth2/token"
     logger.info(f"Attempting to get access token from: {token_url}")
 
     data = {
         "grant_type": "client_credentials",
-        "client_id": settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID,
-        "client_secret": settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET,
+        "client_id": client_id or settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_CLIENT_ID,
+        "client_secret": client_secret
+        or settings.IBM_VERIFY_PROFILE_MANAGEMENT_API_SECRET,
         "scope": "openid",
     }
     logger.debug(f"Token URL: {token_url}")
@@ -36,12 +43,23 @@ async def request_access_token(global_http_client: AsyncClient):
     return response
 
 
-async def get_admin_token(global_http_client: AsyncClient) -> str:
+async def get_admin_token(
+    global_http_client: AsyncClient,
+    *,
+    verify_config: IBMVerifyConfig | None = None,
+    client_id: str | None = None,
+    client_secret: str | None = None,
+) -> str:
     """Get access token for IBM Verify API operations"""
     logger.info("Attempting to get access token")
 
     start_time = datetime.now()
-    response = await request_access_token(global_http_client)
+    response = await request_access_token(
+        global_http_client,
+        verify_config=verify_config,
+        client_id=client_id,
+        client_secret=client_secret,
+    )
     duration = (datetime.now() - start_time).total_seconds()
     logger.info(f"Token request completed in {duration:.2f} seconds")
     response_json = response.json()

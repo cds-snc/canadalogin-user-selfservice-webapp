@@ -189,7 +189,7 @@
   },
   "StartIdentityProofing": {
     "pageTitle": "{{rpName}} vous demande de prouver votre identité",
-    "proveYourIdentity": "Prove your identity",
+    "proveYourIdentity": "Prouvez votre identité en ligne",
     "heading": "Le processus de confirmation d’identité prouve qui vous êtes, vous protège contre la fraude et vous permet de récupérer votre identifiant {{appName}} en cas de besoin.",
     "learnMoreDescription": "En savoir plus sur la confirmation d’identité",
     "howToProveHeading": "Comment souhaitez-vous prouver votre identité?",

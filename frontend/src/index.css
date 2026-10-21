@@ -58,7 +58,7 @@ body,
   padding-top: 0%;
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 47.999em) {
   .gcds-email-fieldset {
     font-size: 18px;
     font-style: normal;
@@ -92,9 +92,10 @@ body,
   }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 48em) {
   .gcds-page {
-    max-width: fit-content;
+    width: 100%;
+    box-sizing: border-box;
     margin-left: auto;
     margin-right: auto;
     padding: var(--gcds-spacing-300) var(--gcds-spacing-200)
@@ -105,7 +106,8 @@ body,
   .gcds-content {
     background: #fff;
     display: flex;
-    width: 950px;
+    width: 100%;
+    box-sizing: border-box;
     justify-content: center;
     align-items: center;
     margin: auto;

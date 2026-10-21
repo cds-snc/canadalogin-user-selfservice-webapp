@@ -89,7 +89,7 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsButton: ({ children, onGcdsClick, buttonRole, disabled }) => (
     <button
       data-testid={
-        buttonRole === "secondary" ? "cancel-button" : "continue-button"
+        buttonRole === "secondary" ? "back-button" : "continue-button"
       }
       disabled={disabled}
       onClick={(e) => onGcdsClick && onGcdsClick(e)}
@@ -248,7 +248,7 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByText(/Identity proofing confirms who you are/),
+      screen.getByText(/Proving your identity confirms who you are/),
     ).toBeInTheDocument();
   });
 
@@ -272,11 +272,11 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByText("Prove identity online and get instant access"),
+      screen.getByText("Online and get instant access"),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Do either a selfie and ID check with your phone or sign in with a provincial account (BC, AB, QC).",
+        "Do either a self-photo and ID check or sign in with a provincial account (BC, AB, QC).",
       ),
     ).toBeInTheDocument();
   });
@@ -285,7 +285,7 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByText("Do it in person and sign back in when done"),
+      screen.getByText("In person and sign back in when done"),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -294,23 +294,17 @@ describe("StartIdentityProofingPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the cant prove now option", () => {
-    render(<StartIdentityProofingPage />);
-
-    expect(
-      screen.getByText("Need more time, or a different way in"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "Sign out and come back when you're ready, or find out about other ways to access RP Name.",
-      ),
-    ).toBeInTheDocument();
-  });
-
   it("renders Continue button", () => {
     render(<StartIdentityProofingPage />);
 
     expect(screen.getByTestId("continue-button")).toHaveTextContent("Continue");
+  });
+
+  it("renders Back button", () => {
+    render(<StartIdentityProofingPage />);
+
+    const backButton = screen.getByTestId("back-button");
+    expect(backButton).toBeInTheDocument();
   });
 
   // ── Button never disabled / validation ─────────
@@ -344,7 +338,7 @@ describe("StartIdentityProofingPage", () => {
 
     fireEvent.click(
       screen.getByRole("radio", {
-        name: /Prove identity online and get instant access/,
+        name: /Online and get instant access/,
       }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
@@ -358,7 +352,7 @@ describe("StartIdentityProofingPage", () => {
 
     fireEvent.click(
       screen.getByRole("radio", {
-        name: /Prove identity online and get instant access/,
+        name: /Online and get instant access/,
       }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
@@ -373,28 +367,13 @@ describe("StartIdentityProofingPage", () => {
 
     fireEvent.click(
       screen.getByRole("radio", {
-        name: /Do it in person and sign back in when done/,
+        name: /In person and sign back in when done/,
       }),
     );
     fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/in-person/canada-post",
-    );
-  });
-
-  it("navigates to not-ready page for cant prove now option", () => {
-    render(<StartIdentityProofingPage />);
-
-    fireEvent.click(
-      screen.getByRole("radio", {
-        name: /Need more time, or a different way in/,
-      }),
-    );
-    fireEvent.click(screen.getByTestId("continue-button"));
-
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/not-ready",
     );
   });
 });

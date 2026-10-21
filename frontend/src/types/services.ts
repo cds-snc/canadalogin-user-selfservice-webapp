@@ -32,7 +32,6 @@ export type UserPayload = {
 export type OtpTransportType = "sms" | "voice" | "email";
 
 export type OtpRequestPayload = {
-  user_id?: string | null;
   otpType: string;
   countAsContactPhoneUpdate?: boolean;
   factor_id?: string;

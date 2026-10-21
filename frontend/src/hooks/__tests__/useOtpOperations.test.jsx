@@ -418,7 +418,6 @@ describe("useOtpOperations", () => {
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
         otpType: "sms",
         factor_id: "factor-1",
-        user_id: "test-user-123",
       });
       expect(result.current.otpSentResponse).toEqual({
         trxnId: "test-transaction-id",
@@ -567,7 +566,6 @@ describe("useOtpOperations", () => {
       });
 
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
-        user_id: "test-user-123",
         otpType: "email",
         destination: "test@example.com",
       });
@@ -897,7 +895,6 @@ describe("useOtpOperations", () => {
       expect(mockAuthService.transientOtpSend).toHaveBeenCalledWith({
         otpType: "voice",
         factor_id: "factor-2",
-        user_id: "test-user-123",
       });
     });
 

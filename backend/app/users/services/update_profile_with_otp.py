@@ -505,6 +505,7 @@ async def _apply_profile_update_otp_action(
             trxn_id=trxn_id,
             otp_type=otp_type,
             user_access_token=user_access_token,
+            request=request,
         )
         logger.info("OTP verification successful")
 

@@ -1189,6 +1189,7 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         request_data = {
             "id": "credential-id",
+            "action": "verify",
             "assertionResult": {
                 "response": {
                     "clientDataJSON": "client-data-json",
@@ -1242,6 +1243,7 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         request_data = {
             "id": "credential-id",
+            "action": "verify",
             "assertionResult": {
                 "response": {
                     "clientDataJSON": "client-data-json",
@@ -1322,19 +1324,21 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         request_data = {
             "id": "credential-id",
-            "assertionResult": {
-                "response": {
-                    "clientDataJSON": "client-data-json",
-                    "authenticatorData": "authenticator-data",
-                    "signature": "signature",
-                },
-                "id": "",
-                "rawId": "",
-                "type": "",
-            },
+            "action": "commit",
+            "verificationProofId": "proof-id",
         }
 
-        client = mock_test_client(mock_client)
+        client = mock_test_client(
+            mock_client,
+            {
+                "fido2_delete_verification_proofs": {
+                    "proof-id": {
+                        "expiresAt": int(time.time()) + 120,
+                        "registrationId": "credential-id",
+                    }
+                }
+            },
+        )
 
         response = client.request("DELETE", "/v1/fido2/registration", json=request_data)
         response_json = response.json()
@@ -1353,6 +1357,7 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         request_data = {
             "id": "credential-id",
+            "action": "verify",
             "assertionResult": {
                 "response": {
                     "clientDataJSON": "client-data-json",
@@ -1425,19 +1430,21 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         request_data = {
             "id": "credential-id",
-            "assertionResult": {
-                "response": {
-                    "clientDataJSON": "client-data-json",
-                    "authenticatorData": "authenticator-data",
-                    "signature": "signature",
-                },
-                "id": "",
-                "rawId": "",
-                "type": "",
-            },
+            "action": "commit",
+            "verificationProofId": "proof-id",
         }
 
-        client = mock_test_client(mock_client)
+        client = mock_test_client(
+            mock_client,
+            {
+                "fido2_delete_verification_proofs": {
+                    "proof-id": {
+                        "expiresAt": int(time.time()) + 120,
+                        "registrationId": "credential-id",
+                    }
+                }
+            },
+        )
 
         response = client.request("DELETE", "/v1/fido2/registration", json=request_data)
         response_json = response.json()
@@ -1842,6 +1849,30 @@ class TestErrorHandlingEnrollMfaOtp:
 
 
 class TestErrorHandlingSendMfaOtp:
+
+    @pytest.fixture(autouse=True)
+    def mock_bound_mfa_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "trxn456",
+                "factorId": "factor123",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        async def consume_bound_transaction(**_kwargs):
+            return None
+
+        monkeypatch.setattr(
+            verify_mfa_otp_module,
+            "get_bound_otp_transaction",
+            get_bound_transaction,
+        )
+        monkeypatch.setattr(
+            verify_mfa_otp_module,
+            "consume_mfa_otp_transaction",
+            consume_bound_transaction,
+        )
 
     @pytest.mark.asyncio
     @patch.object(
@@ -2570,6 +2601,21 @@ class TestErrorHandlingAuthLogout:
 
 class TestErrorHandlingRetrieveTransientOtp:
 
+    @pytest.fixture(autouse=True)
+    def mock_bound_transient_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "bound-transaction",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        monkeypatch.setattr(
+            retrieve_transient_otp_module,
+            "get_transient_otp_transaction",
+            get_bound_transaction,
+        )
+
     @pytest.mark.asyncio
     @patch.object(retrieve_transient_otp_module, "dispatch_otp_status_retrieval")
     async def test_handle_non_200_returns_error_model(
@@ -2639,7 +2685,6 @@ class TestErrorHandlingRetrieveTransientOtp:
 class TestErrorHandlingSendTransientOtp:
 
     @pytest.mark.asyncio
-    @patch.object(otp_router, "validate_user_id_matches_session")
     @patch.object(
         send_transient_otp_module,
         "assert_contact_phone_update_rate_limit_not_exceeded",
@@ -2649,10 +2694,8 @@ class TestErrorHandlingSendTransientOtp:
         self,
         mock_get_my_profile,
         mock_assert_contact_phone_update_rate_limit_not_exceeded,
-        mock_validate_user_id_matches_session,
         mock_test_client,
     ):
-        mock_validate_user_id_matches_session.return_value = MagicMock()
         mock_profile = MagicMock()
         mock_profile.data = MagicMock(id="user-123", preferredLanguage="en")
         mock_get_my_profile.return_value = mock_profile
@@ -2665,7 +2708,6 @@ class TestErrorHandlingSendTransientOtp:
 
         request_data = {
             "otpType": "sms",
-            "user_id": "user@example.com",
             "destination": "+14165551234",
             "countAsContactPhoneUpdate": True,
         }
@@ -2680,7 +2722,6 @@ class TestErrorHandlingSendTransientOtp:
         assert response_json["message"] == "phone_mfa_change_rate_limit"
 
     @pytest.mark.asyncio
-    @patch.object(otp_router, "validate_user_id_matches_session")
     @patch.object(
         send_transient_otp_module,
         "assert_contact_phone_update_rate_limit_not_exceeded",
@@ -2690,10 +2731,8 @@ class TestErrorHandlingSendTransientOtp:
         self,
         mock_get_my_profile,
         mock_assert_contact_phone_update_rate_limit_not_exceeded,
-        mock_validate_user_id_matches_session,
         mock_test_client,
     ):
-        mock_validate_user_id_matches_session.return_value = MagicMock()
         mock_profile = MagicMock()
         mock_profile.data = MagicMock(id="user-123", preferredLanguage="en")
         mock_get_my_profile.return_value = mock_profile
@@ -2706,7 +2745,6 @@ class TestErrorHandlingSendTransientOtp:
 
         request_data = {
             "otpType": "sms",
-            "user_id": "user@example.com",
             "destination": "+14165551234",
             "countAsContactPhoneUpdate": False,
         }
@@ -2721,17 +2759,14 @@ class TestErrorHandlingSendTransientOtp:
         assert response_json["message"] == "phone_mfa_change_rate_limit"
 
     @pytest.mark.asyncio
-    @patch.object(otp_router, "validate_user_id_matches_session")
     @patch.object(send_transient_otp_module, "get_my_profile")
     @patch.object(send_transient_otp_module, "dispatch_otp")
     async def test_handle_non_201_returns_error_model(
         self,
         mock_dispatch_otp,
         mock_get_my_profile,
-        mock_validate_user_id_matches_session,
         mock_test_client,
     ):
-        mock_validate_user_id_matches_session.return_value = MagicMock()
         mock_get_my_profile.return_value = MagicMock()
         mock_dispatch_otp.return_value = Response(
             400, json={"error": "Bad Request"}, request=MagicMock()
@@ -2739,7 +2774,6 @@ class TestErrorHandlingSendTransientOtp:
 
         request_data = {
             "otpType": "email",
-            "user_id": "user@example.com",
             "destination": "user@example.com",
         }
 
@@ -2756,17 +2790,14 @@ class TestErrorHandlingSendTransientOtp:
         )
 
     @pytest.mark.asyncio
-    @patch.object(otp_router, "validate_user_id_matches_session")
     @patch.object(send_transient_otp_module, "get_my_profile")
     @patch.object(send_transient_otp_module, "dispatch_otp")
     async def test_handle_validation_error_due_to_incomplete_payload(
         self,
         mock_dispatch_otp,
         mock_get_my_profile,
-        mock_validate_user_id_matches_session,
         mock_test_client,
     ):
-        mock_validate_user_id_matches_session.return_value = MagicMock()
         mock_get_my_profile.return_value = MagicMock()
         mock_dispatch_otp.return_value = Response(
             201, json={"trxnId": "only-id"}, request=MagicMock()
@@ -2774,7 +2805,6 @@ class TestErrorHandlingSendTransientOtp:
 
         request_data = {
             "otpType": "email",
-            "user_id": "user@example.com",
             "destination": "user@example.com",
         }
 
@@ -2788,24 +2818,20 @@ class TestErrorHandlingSendTransientOtp:
         assert response_json["message"] == "The provided data is not valid."
 
     @pytest.mark.asyncio
-    @patch.object(otp_router, "validate_user_id_matches_session")
     @patch.object(send_transient_otp_module, "get_my_profile")
     @patch.object(send_transient_otp_module, "dispatch_otp")
     async def test_handle_transport_exception_is_captured_in_message(
         self,
         mock_dispatch_otp,
         mock_get_my_profile,
-        mock_validate_user_id_matches_session,
         mock_test_client,
         caplog,
     ):
-        mock_validate_user_id_matches_session.return_value = MagicMock()
         mock_get_my_profile.return_value = MagicMock()
         mock_dispatch_otp.side_effect = RuntimeError("simulated network failure")
 
         request_data = {
             "otpType": "email",
-            "user_id": "user@example.com",
             "destination": "user@example.com",
         }
 
@@ -3390,6 +3416,21 @@ class TestErrorHandlingVerifyPasswordStepup:
 
 
 class TestErrorHandlingVerifyTransientOtp:
+
+    @pytest.fixture(autouse=True)
+    def mock_bound_transient_transaction(self, monkeypatch):
+        async def get_bound_transaction(**_kwargs):
+            return {
+                "transactionId": "bound-transaction",
+                "otpType": "sms",
+                "expiry": "2099-01-01T00:00:00Z",
+            }
+
+        monkeypatch.setattr(
+            verify_transient_otp_module,
+            "get_transient_otp_transaction",
+            get_bound_transaction,
+        )
 
     @pytest.mark.asyncio
     @patch.object(verify_transient_otp_module, "get_auth_request_headers")

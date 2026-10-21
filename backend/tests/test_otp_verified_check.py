@@ -1,8 +1,10 @@
 # backend/tests/test_otp_verified_check.py
 import json
+from unittest.mock import MagicMock
 
 import app.otp.services.verify_transient_otp as feature_module
 import pytest
+from fastapi import HTTPException
 
 # Schemas
 from app.otp.schemas import OtpType, UserOtpVerificationInfo
@@ -162,6 +164,34 @@ async def test_handle_otp_verification_success_returns_model(otp_type):
     assert result_dict.get("success") is True
     msg = result_dict.get("message") or ""
     assert msg == f"{otp_type.value} OTP has been verified"
+
+
+@pytest.mark.asyncio
+async def test_handle_otp_verification_rejects_unbound_transaction(monkeypatch):
+    async def no_bound_transaction(**_kwargs):
+        return None
+
+    monkeypatch.setattr(
+        feature_module,
+        "get_transient_otp_transaction",
+        no_bound_transaction,
+    )
+
+    data = UserOtpVerificationInfo(
+        otp="123456", trxnId="unbound-transaction", otpType=OtpType.SMS
+    )
+
+    async with AsyncClient() as client:
+        with pytest.raises(HTTPException) as exc_info:
+            await handle_otp_verification(
+                client,
+                data,
+                "USER_TOKEN",
+                request=MagicMock(),
+            )
+
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail == "invalidCode"
 
 
 # -----------------------------------------------

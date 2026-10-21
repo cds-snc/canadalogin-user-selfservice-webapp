@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import ConnectedServicesPage from "../ConnectedServicesPage";
+import ArchivedConnectedServicesPage from "../ArchivedConnectedServicesPage";
+import ConnectedServicesTable from "../ConnectedServicesTable";
 
 const mockGetConnectedServices = vi.fn();
 
@@ -13,15 +15,35 @@ vi.mock("../../api/connectedServicesApi", () => ({
 }));
 
 let mockDevOnlyFeature = true;
+let mockLanguage = "en";
+
+function expectedLocalTimestamp(timestamp: string, language: string) {
+  const date = new Date(timestamp);
+  const dateText = new Intl.DateTimeFormat(language, {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const minuteText = minutes ? String(minutes).padStart(2, "0") : "";
+
+  return language === "fr"
+    ? `${dateText} à ${hours} h${minuteText ? ` ${minuteText}` : ""}`
+    : `${dateText} at ${hours % 12 || 12}${minuteText ? `:${minuteText}` : ""} ${hours < 12 ? "am" : "pm"}`;
+}
 
 vi.mock("react-router", () => ({
-  useParams: () => ({ language: "en" }),
+  useParams: () => ({ language: mockLanguage }),
 }));
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) =>
       ({
+        pageTitle: "Connected services",
+        pageDescription:
+          "Here you can review which services you have signed in with CanadaLogin and when you last signed in.",
         "successNotice.title":
           "Your information was successfully saved in CanadaLogin",
         "successNotice.body": "Your verified information has been updated.",
@@ -32,6 +54,10 @@ vi.mock("react-i18next", () => ({
         "sessions.activeSession": "Active session",
         "sessions.inactiveSession": "Inactive session",
         "sessions.unknownSession": "Connected",
+        "columns.application": "Service name",
+        "columns.lastLogin": "Last signed in",
+        "columns.lastLogout": "Last logout",
+        notAvailable: "Not available",
         loading: "Loading connected services.",
         error: "We could not load your connected services. Try again later.",
         empty: "You do not have any connected services.",
@@ -73,8 +99,14 @@ vi.mock("@gcds-core/components-react", () => ({
     const Tag = tag;
     return <Tag>{children}</Tag>;
   },
-  GcdsLink: ({ children, href }: React.PropsWithChildren<{ href: string }>) => (
-    <a href={href}>{children}</a>
+  GcdsLink: ({
+    children,
+    href,
+    external,
+  }: React.PropsWithChildren<{ href: string; external?: boolean }>) => (
+    <a href={href} data-external={external}>
+      {children}
+    </a>
   ),
   GcdsNotice: ({
     children,
@@ -90,28 +122,83 @@ vi.mock("@gcds-core/components-react", () => ({
 
 afterEach(() => {
   mockDevOnlyFeature = true;
+  mockLanguage = "en";
   mockGetConnectedServices.mockReset();
 });
 
-describe("ConnectedServicesPage", () => {
+describe.each([
+  {
+    name: "ConnectedServicesPage",
+    Page: ConnectedServicesPage,
+    archived: false,
+  },
+  {
+    name: "ArchivedConnectedServicesPage",
+    Page: ArchivedConnectedServicesPage,
+    archived: true,
+  },
+])("$name", ({ Page, archived }) => {
   it("renders services returned by the backend in development", async () => {
     mockGetConnectedServices.mockResolvedValue([
       {
         clientId: "client-1",
         name: "Service One",
-        sessionStatus: "unknownSession",
+        url: "https://service-one.example.com/sign-in",
+        lastLogin: "2026-01-01T10:00:00Z",
+        lastLogout: "2026-01-02T11:00:00Z",
       },
     ]);
-    render(<ConnectedServicesPage />);
+    render(<Page />);
 
     expect(await screen.findByText("Service One")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Service One" })).toHaveAttribute(
+      "href",
+      "https://service-one.example.com/sign-in",
+    );
+    expect(screen.getByRole("link", { name: "Service One" })).toHaveAttribute(
+      "data-external",
+      "true",
+    );
+    expect(mockGetConnectedServices).toHaveBeenCalledTimes(1);
+    expect(
+      screen.getByText(expectedLocalTimestamp("2026-01-01T10:00:00Z", "en")),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole("columnheader")).toHaveLength(2);
+    expect(
+      screen.getByRole("columnheader", { name: "Service name" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "Last signed in" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("columnheader", { name: "Last logout" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(expectedLocalTimestamp("2026-01-02T11:00:00Z", "en")),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "Sign in to services to apply this update",
+        name: archived
+          ? "Sign in to services to apply this update"
+          : "Connected services",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Connected")).toBeInTheDocument();
+    if (!archived) {
+      expect(
+        screen.getByText(
+          "Here you can review which services you have signed in with CanadaLogin and when you last signed in.",
+        ),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole("button")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Your verified information has been updated."),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("heading", { level: 2 }),
+      ).not.toBeInTheDocument();
+      return;
+    }
     expect(
       screen.getByRole("button", { name: "Sign out everywhere" }),
     ).toHaveAttribute("data-button-role", "danger");
@@ -128,6 +215,23 @@ describe("ConnectedServicesPage", () => {
     );
   });
 
+  it("shows unavailable when login was not recorded", async () => {
+    mockGetConnectedServices.mockResolvedValue([
+      {
+        clientId: "client-2",
+        name: "Service Two",
+        lastLogin: null,
+        lastLogout: null,
+      },
+    ]);
+    render(<Page />);
+    expect(await screen.findByText("Service Two")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Service Two" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getAllByText("Not available")).toHaveLength(1);
+  });
+
   it("renders loading, error, and empty states", async () => {
     let rejectRequest: (error: Error) => void = () => undefined;
     mockGetConnectedServices.mockImplementation(
@@ -136,7 +240,7 @@ describe("ConnectedServicesPage", () => {
           rejectRequest = reject;
         }),
     );
-    render(<ConnectedServicesPage />);
+    render(<Page />);
     expect(screen.getByText("Loading connected services.")).toBeInTheDocument();
 
     rejectRequest(new Error("request failed"));
@@ -147,7 +251,7 @@ describe("ConnectedServicesPage", () => {
     ).toBeInTheDocument();
 
     mockGetConnectedServices.mockResolvedValue([]);
-    const { unmount } = render(<ConnectedServicesPage />);
+    const { unmount } = render(<Page />);
     expect(
       await screen.findByText("You do not have any connected services."),
     ).toBeInTheDocument();
@@ -157,8 +261,139 @@ describe("ConnectedServicesPage", () => {
   it("does not render outside the development environment", () => {
     mockDevOnlyFeature = false;
 
-    const { container } = render(<ConnectedServicesPage />);
+    const { container } = render(<Page />);
 
     expect(container).toBeEmptyDOMElement();
+    expect(mockGetConnectedServices).not.toHaveBeenCalled();
+  });
+});
+
+describe("ConnectedServicesTable", () => {
+  it.each([
+    { language: "en", hours: 16, minutes: 30, time: "4:30 pm" },
+    { language: "en", hours: 9, minutes: 0, time: "9 am" },
+    { language: "en", hours: 12, minutes: 0, time: "12 pm" },
+    { language: "en", hours: 0, minutes: 5, time: "12:05 am" },
+    { language: "fr", hours: 16, minutes: 30, time: "16 h 30" },
+    { language: "fr", hours: 9, minutes: 0, time: "9 h" },
+    { language: "fr", hours: 12, minutes: 0, time: "12 h" },
+    { language: "fr", hours: 0, minutes: 5, time: "0 h 05" },
+  ])(
+    "uses Canada.ca time style: $time ($language)",
+    async ({ language, hours, minutes, time }) => {
+      mockLanguage = language;
+      mockGetConnectedServices.mockResolvedValue([
+        {
+          clientId: "client-time-style",
+          name: "Time style service",
+          lastLogin: new Date(2026, 0, 1, hours, minutes).toISOString(),
+        },
+      ]);
+
+      render(<ConnectedServicesTable />);
+
+      expect(await screen.findByRole("cell")).toHaveTextContent(
+        new RegExp(`${time}$`),
+      );
+    },
+  );
+
+  it.each([
+    { language: "en", timestamp: "2026-01-01T00:30:00Z" },
+    { language: "fr", timestamp: "2026-01-01T00:30:00Z" },
+    { language: "en", timestamp: "2026-07-01T00:30:00Z" },
+    { language: "fr", timestamp: "2026-07-01T00:30:00Z" },
+  ])(
+    "displays UTC timestamp $timestamp in the browser timezone in $language",
+    async ({ language, timestamp }) => {
+      mockLanguage = language;
+      mockGetConnectedServices.mockResolvedValue([
+        {
+          clientId: "client-local-time",
+          name: "Local time service",
+          lastLogin: timestamp,
+        },
+      ]);
+      const expectedTimestamp = expectedLocalTimestamp(timestamp, language);
+
+      render(<ConnectedServicesTable />);
+
+      expect(
+        await screen.findByRole("cell", { name: expectedTimestamp }),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it.each([
+    {
+      language: "fr",
+      localizedUrls: { fr: "https://service.example.com/fr" },
+      expectedUrl: "https://service.example.com/fr",
+    },
+    {
+      language: "en",
+      localizedUrls: { fr: "https://service.example.com/fr" },
+      expectedUrl: "https://service.example.com/sign-in",
+    },
+    {
+      language: "fr",
+      localizedUrls: { fr: "not a URL" },
+      expectedUrl: "https://service.example.com/sign-in",
+    },
+  ])(
+    "uses the configured destination for $language, falling back when needed",
+    async ({ language, localizedUrls, expectedUrl }) => {
+      mockLanguage = language;
+      mockGetConnectedServices.mockResolvedValue([
+        {
+          clientId: "client-link",
+          name: "Linked service",
+          url: "https://service.example.com/sign-in",
+          localizedUrls,
+        },
+      ]);
+
+      render(<ConnectedServicesTable />);
+
+      expect(
+        await screen.findByRole("link", { name: "Linked service" }),
+      ).toHaveAttribute("href", expectedUrl);
+    },
+  );
+
+  it.each([null, "not a URL"])(
+    "does not link a missing or invalid URL: %s",
+    async (url) => {
+      mockGetConnectedServices.mockResolvedValue([
+        { clientId: "client-no-link", name: "Unlinked service", url },
+      ]);
+
+      render(<ConnectedServicesTable />);
+
+      expect(await screen.findByText("Unlinked service")).toBeInTheDocument();
+      expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    },
+  );
+
+  it("can be rendered independently and formats timestamps for the route language", async () => {
+    mockLanguage = "fr";
+    mockGetConnectedServices.mockResolvedValue([
+      {
+        clientId: "client-fr",
+        name: "Service français",
+        lastLogin: "2026-01-01T10:00:00Z",
+      },
+    ]);
+
+    render(<ConnectedServicesTable />);
+
+    expect(
+      await screen.findByRole("rowheader", { name: "Service français" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("cell", {
+        name: expectedLocalTimestamp("2026-01-01T10:00:00Z", "fr"),
+      }),
+    ).toBeInTheDocument();
   });
 });

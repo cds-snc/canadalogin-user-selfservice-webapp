@@ -2,6 +2,10 @@ import { JSX } from "react";
 import { GcdsRadios } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { START_IDENTITY_OPTION, type StartIdentityOption } from "./methods";
+import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
+import { IDV_JOURNEY_TYPE } from "../constants";
+
+type IDVJourneyType = (typeof IDV_JOURNEY_TYPE)[keyof typeof IDV_JOURNEY_TYPE];
 
 interface RadioOption {
   label: string;
@@ -13,6 +17,7 @@ interface RadioOption {
 
 interface IdentityProofingRadioButtonsProps {
   selectedOption: StartIdentityOption | undefined;
+  journeyType: IDVJourneyType;
   onOptionChange: (option: StartIdentityOption) => void;
   rpName: string;
   errorMessage?: string;
@@ -21,12 +26,13 @@ interface IdentityProofingRadioButtonsProps {
 
 export default function IdentityProofingRadioButtons({
   selectedOption,
+  journeyType,
   onOptionChange,
-  rpName,
   errorMessage,
   id,
 }: IdentityProofingRadioButtonsProps): JSX.Element {
   const { t } = useTranslation("idv");
+  const { relyingPartyName: rpName } = useRelyingPartyInfo();
 
   const radioOptions: RadioOption[] = [
     {
@@ -43,16 +49,16 @@ export default function IdentityProofingRadioButtons({
       hint: t("StartIdentityProofing.inPersonSignBackInHint"),
       checked: selectedOption === START_IDENTITY_OPTION.inPerson,
     },
-    {
-      label: t("StartIdentityProofing.cantProveNowOption"),
+  ];
+  if (journeyType === IDV_JOURNEY_TYPE.REQUIRED) {
+    radioOptions.push({
+      label: t("StartIdentityProofing.notReadyOption"),
       id: `radio-${START_IDENTITY_OPTION.cantProveNow}`,
       value: START_IDENTITY_OPTION.cantProveNow,
-      hint: t("StartIdentityProofing.cantProveNowHint", {
-        rpName,
-      }),
+      hint: t("StartIdentityProofing.notReadyHint", { rpName }),
       checked: selectedOption === START_IDENTITY_OPTION.cantProveNow,
-    },
-  ];
+    });
+  }
 
   return (
     <GcdsRadios

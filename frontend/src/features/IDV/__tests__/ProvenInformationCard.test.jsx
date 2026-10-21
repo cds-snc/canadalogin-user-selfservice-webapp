@@ -50,23 +50,20 @@ vi.mock("../../../utils/constants", async () => {
   };
 });
 
-vi.mock("@gcds-core/components-react", () => ({
-  GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsGrid: ({ children }) => <div>{children}</div>,
-  GcdsHeading: ({ children, tag }) => {
-    const Tag = tag ?? "h2";
-    return <Tag>{children}</Tag>;
-  },
-  GcdsText: ({ children }) => <p>{children}</p>,
-  GcdsButton: ({ children, onGcdsClick, buttonRole }) => (
-    <button
-      data-testid={buttonRole === "secondary" ? "update-button" : "button"}
-      onClick={onGcdsClick}
-    >
-      {children}
-    </button>
-  ),
-}));
+vi.mock("@gcds-core/components-react", async (importOriginal) => {
+  const actual = await importOriginal();
+
+  return {
+    ...actual,
+    GcdsContainer: ({ children, ...props }) => <div {...props}>{children}</div>,
+    GcdsGrid: ({ children }) => <div>{children}</div>,
+    GcdsHeading: ({ children, tag }) => {
+      const Tag = tag ?? "h2";
+      return <Tag>{children}</Tag>;
+    },
+    GcdsText: ({ children }) => <p>{children}</p>,
+  };
+});
 
 describe("ProvenInformationCard", () => {
   const claims = {
@@ -133,13 +130,6 @@ describe("ProvenInformationCard", () => {
         "To update this information, you'll need to complete identity proofing again.",
       ),
     ).toBeInTheDocument();
-  });
-
-  it("renders the Update information button", () => {
-    render(<ProvenInformationCard claims={claims} />);
-    expect(screen.getByTestId("update-button")).toHaveTextContent(
-      "Update information",
-    );
   });
 
   it("renders an empty name when claims have no name", () => {

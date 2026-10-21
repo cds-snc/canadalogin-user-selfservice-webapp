@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
@@ -11,6 +12,7 @@ from app.users.schemas import (
 )
 from app.users.services.connected_services import get_connected_services
 from app.users.services.connected_services import _pairwise_client_ids
+from app.verify_activity.schemas import RelyingPartyActivity
 
 
 def make_profile(name, value):
@@ -29,7 +31,9 @@ def make_profile(name, value):
 
 def make_request():
     return SimpleNamespace(
-        app=SimpleNamespace(state=SimpleNamespace(request_client=object()))
+        app=SimpleNamespace(
+            state=SimpleNamespace(request_client=object(), config=object())
+        )
     )
 
 
@@ -103,7 +107,14 @@ async def test_returns_all_applications_matching_pairwise_client_ids():
             IBMVerifyRelyingPartyInfoSchema(
                 id="verify-app-1",
                 name="Service One",
-                links=[],
+                links=[
+                    {
+                        "id": "link-1",
+                        "icon": "",
+                        "linkName": "Service One",
+                        "url": "https://service-one.example.com/sign-in",
+                    }
+                ],
                 description="client-1",
                 status=["ENABLED"],
                 category=[],
@@ -112,46 +123,181 @@ async def test_returns_all_applications_matching_pairwise_client_ids():
                 id="verify-app-2",
                 name="Service Two",
                 links=[],
-                description="client-2",
+                description=json.dumps(
+                    {
+                        "client-2": {
+                            "en": {
+                                "name": "Service Two",
+                                "url": "https://service-two.example.com/en",
+                            },
+                            "fr": {
+                                "name": "Service Deux",
+                                "url": "https://service-two.example.com/fr",
+                            },
+                        }
+                    }
+                ),
                 status=["ENABLED"],
                 category=[],
             ),
         ]
     )
 
+    profile = make_profile(
+        "pairwiseIdPerClient",
+        [
+            {"clientId": "client-1", "pai": "pai-1"},
+            {"clientId": "client-2", "pai": "different-pai"},
+        ],
+    )
+    profile.id = "user-1"
     with (
         patch(
             "app.users.services.connected_services.dispatch_get_my_profile_from_ibm",
-            new=AsyncMock(
-                return_value=make_profile(
-                    "pairwiseIdPerClient",
-                    [
-                        {"clientId": "client-1", "pai": "pai-1"},
-                        {"clientId": "client-2", "pai": "different-pai"},
-                    ],
-                )
-            ),
+            new=AsyncMock(return_value=profile),
         ),
         patch(
             "app.users.services.connected_services.dispatch_get_oidc_user_applications",
             new=AsyncMock(return_value=applications),
         ) as get_applications,
+        patch("app.users.services.connected_services.IBMVerifyActivityClient"),
+        patch(
+            "app.users.services.connected_services.get_user_activity",
+            new=AsyncMock(
+                return_value=[
+                    RelyingPartyActivity(
+                        application_id="verify-app-1",
+                        client_id="client-1",
+                        last_login=datetime(2026, 1, 1, 10, tzinfo=timezone.utc),
+                        last_logout=datetime(2026, 1, 1, 11, tzinfo=timezone.utc),
+                    )
+                ]
+            ),
+        ) as get_activity,
     ):
         response = await get_connected_services(request, "user-token")
 
     get_applications.assert_awaited_once_with(request, user_access_token="user-token")
+    assert get_activity.await_args.args[1] == "user-1"
     assert [service.model_dump() for service in response.services] == [
         {
             "clientId": "client-1",
             "name": "Service One",
-            "sessionStatus": "unknownSession",
+            "url": "https://service-one.example.com/sign-in",
+            "localizedUrls": None,
+            "lastLogin": datetime(2026, 1, 1, 10, tzinfo=timezone.utc),
+            "lastLogout": datetime(2026, 1, 1, 11, tzinfo=timezone.utc),
         },
         {
             "clientId": "client-2",
             "name": "Service Two",
-            "sessionStatus": "unknownSession",
+            "url": None,
+            "localizedUrls": {
+                "en": "https://service-two.example.com/en",
+                "fr": "https://service-two.example.com/fr",
+            },
+            "lastLogin": None,
+            "lastLogout": None,
         },
     ]
+
+
+@pytest.mark.asyncio
+async def test_activity_failure_keeps_connected_services_with_null_timestamps():
+    request = make_request()
+    profile = make_profile(
+        "pairwiseIdPerClient", [{"clientId": "client-1", "pai": "pai-1"}]
+    )
+    profile.id = "user-1"
+    applications = IBMVerifyRelyingPartyUserApplicationsSchema(
+        applications=[
+            IBMVerifyRelyingPartyInfoSchema(
+                id="verify-app-1",
+                name="Service One",
+                links=[],
+                description="client-1",
+                status=["ENABLED"],
+                category=[],
+            )
+        ]
+    )
+
+    with (
+        patch(
+            "app.users.services.connected_services.dispatch_get_my_profile_from_ibm",
+            new=AsyncMock(return_value=profile),
+        ),
+        patch(
+            "app.users.services.connected_services.dispatch_get_oidc_user_applications",
+            new=AsyncMock(return_value=applications),
+        ),
+        patch("app.users.services.connected_services.IBMVerifyActivityClient"),
+        patch(
+            "app.users.services.connected_services.get_user_activity",
+            new=AsyncMock(side_effect=RuntimeError("Events API unavailable")),
+        ),
+    ):
+        response = await get_connected_services(request, "user-token")
+
+    assert [service.model_dump() for service in response.services] == [
+        {
+            "clientId": "client-1",
+            "name": "Service One",
+            "url": None,
+            "localizedUrls": None,
+            "lastLogin": None,
+            "lastLogout": None,
+        }
+    ]
+
+
+@pytest.mark.asyncio
+async def test_returns_localized_urls_from_application_link():
+    request = make_request()
+    profile = make_profile(
+        "pairwiseIdPerClient", [{"clientId": "client-1", "pai": "pai-1"}]
+    )
+    applications = IBMVerifyRelyingPartyUserApplicationsSchema(
+        applications=[
+            IBMVerifyRelyingPartyInfoSchema(
+                id="client-1",
+                name="Service One",
+                links=[
+                    {
+                        "id": "link-1",
+                        "icon": "",
+                        "linkName": "Service One",
+                        "url": "https://service.example.com",
+                        "localized": {
+                            "fr": {
+                                "name": "Service Un",
+                                "url": "https://service.example.com/fr",
+                            }
+                        },
+                    }
+                ],
+                status=["ENABLED"],
+                category=[],
+            )
+        ]
+    )
+
+    with (
+        patch(
+            "app.users.services.connected_services.dispatch_get_my_profile_from_ibm",
+            new=AsyncMock(return_value=profile),
+        ),
+        patch(
+            "app.users.services.connected_services.dispatch_get_oidc_user_applications",
+            new=AsyncMock(return_value=applications),
+        ),
+    ):
+        response = await get_connected_services(request, "user-token")
+
+    assert response.services[0].url == "https://service.example.com"
+    assert response.services[0].localizedUrls == {
+        "fr": "https://service.example.com/fr"
+    }
 
 
 @pytest.mark.asyncio

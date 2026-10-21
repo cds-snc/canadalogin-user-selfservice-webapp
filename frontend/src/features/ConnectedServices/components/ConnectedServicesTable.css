@@ -1,0 +1,30 @@
+.connected-services-table {
+  width: 100%;
+  max-width: 49rem;
+  border-collapse: collapse;
+}
+
+.connected-services-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.connected-services-table th,
+.connected-services-table td {
+  padding: var(--gcds-spacing-150, 0.75rem);
+  border-bottom: 0.0625rem solid var(--gcds-color-grayscale-300, #afafaf);
+  text-align: left;
+}
+
+.connected-services-table th {
+  font-weight: 600;
+}
+
+.connected-services-table tbody th {
+  font-weight: 400;
+}
+
+.connected-services-table thead th {
+  background: transparent;
+  border-bottom: 0.1875rem solid var(--gcds-color-grayscale-1000, #333);
+}

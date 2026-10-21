@@ -89,7 +89,6 @@ export const useOtpOperations = ({
 
     let userData:
       | {
-          user_id: string | null | undefined;
           otpType: string;
           factor_id?: string;
           destination?: string;
@@ -99,7 +98,6 @@ export const useOtpOperations = ({
     const currentFactor = userSelectedMfaFactorRef.current;
     if (currentFactor && !override) {
       userData = {
-        user_id: userId,
         otpType: mapFactorTypeToServerOtpType(currentFactor.type),
         factor_id: currentFactor.id,
       };
@@ -107,7 +105,6 @@ export const useOtpOperations = ({
 
     if (override) {
       userData = {
-        user_id: userId,
         otpType: override.otpType,
         destination: override.destination,
       };

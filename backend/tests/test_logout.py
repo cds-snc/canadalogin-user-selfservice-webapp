@@ -1,6 +1,7 @@
 import pytest
 from authlib.jose.errors import JoseError
 from unittest.mock import patch, AsyncMock, MagicMock
+from fastapi import HTTPException, status
 
 from app.auth.services import auth_logout
 from app.constants.redis_keys import RedisKeys
@@ -103,6 +104,19 @@ async def test_backchannel_logout_deletes_session_and_marks_processed():
 
 
 @pytest.mark.asyncio
+async def test_backchannel_logout_missing_sid_is_bad_request():
+    with patch(
+        "app.auth.services.auth_logout.validate_logout_token",
+        new_callable=AsyncMock,
+        return_value={"jti": "jtiX"},
+    ):
+        with pytest.raises(HTTPException) as exc_info:
+            await auth_logout.backchannel_logout(AsyncMock())
+
+    assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.asyncio
 async def test_validate_logout_token_success():
     mock_request = AsyncMock()
     mock_request.form = AsyncMock(return_value={"logout_token": "token123"})
@@ -134,7 +148,18 @@ async def test_validate_logout_token_missing_token_raises():
     with patch(
         "app.auth.services.auth_logout.oauth", new=MagicMock(verify=MagicMock())
     ):
-        with pytest.raises(ValueError):
+        with pytest.raises(HTTPException) as exc_info:
+            await auth_logout.validate_logout_token(mock_request)
+    assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.asyncio
+async def test_validate_logout_token_unregistered_oauth_client_is_server_error():
+    mock_request = AsyncMock()
+    mock_request.form = AsyncMock(return_value={"logout_token": "token123"})
+
+    with patch("app.auth.services.auth_logout.oauth", new=MagicMock(verify=None)):
+        with pytest.raises(RuntimeError, match="not registered"):
             await auth_logout.validate_logout_token(mock_request)
 
 
@@ -155,8 +180,9 @@ async def test_validate_logout_token_jose_error_raises():
             side_effect=JoseError("bad token"),
         ),
     ):
-        with pytest.raises(ValueError):
+        with pytest.raises(HTTPException) as exc_info:
             await auth_logout.validate_logout_token(mock_request)
+    assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
 
 
 def test_validate_logout_events_and_reject_nonce():
@@ -234,8 +260,9 @@ async def test_validate_logout_token_missing_events_raises():
         patch("app.auth.services.auth_logout.create_load_key", return_value="loadkey"),
         patch("app.auth.services.auth_logout.jwt.decode", return_value=BadClaims()),
     ):
-        with pytest.raises(ValueError):
+        with pytest.raises(HTTPException) as exc_info:
             await auth_logout.validate_logout_token(mock_request)
+    assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.asyncio
@@ -257,5 +284,6 @@ async def test_validate_logout_token_missing_jti_raises():
         patch("app.auth.services.auth_logout.create_load_key", return_value="loadkey"),
         patch("app.auth.services.auth_logout.jwt.decode", return_value=BadClaims2()),
     ):
-        with pytest.raises(ValueError):
+        with pytest.raises(HTTPException) as exc_info:
             await auth_logout.validate_logout_token(mock_request)
+    assert exc_info.value.status_code == status.HTTP_400_BAD_REQUEST

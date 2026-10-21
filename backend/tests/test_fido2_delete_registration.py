@@ -10,6 +10,7 @@ import time
 import pytest
 from fastapi import HTTPException, status
 from httpx import AsyncClient
+from pydantic import ValidationError
 from unittest.mock import AsyncMock, MagicMock, patch
 from app.fido2.schemas import DeleteRegistrationRequest
 
@@ -37,7 +38,14 @@ class TestDeleteRegistration:
     def mock_request(self):
         """Create a mock FastAPI Request object"""
         mock_req = MagicMock()
-        mock_req.session = {}
+        mock_req.session = {
+            "fido2_delete_verification_proofs": {
+                "proof-123": {
+                    "expiresAt": int(time.time()) + 120,
+                    "registrationId": "registration-123",
+                }
+            }
+        }
         return mock_req
 
     @pytest.fixture
@@ -51,7 +59,8 @@ class TestDeleteRegistration:
         """Create mock request data with registration ID and assertion result"""
         mock_data = MagicMock()
         mock_data.id = "registration-123"
-        mock_data.assertionResult = MagicMock()  # Mock assertion result
+        mock_data.action = DeleteRegistrationRequest.Action.COMMIT
+        mock_data.verificationProofId = "proof-123"
         return mock_data
 
     @pytest.fixture(autouse=True)
@@ -118,7 +127,7 @@ class TestDeleteRegistration:
         # Verify
         assert result.success is True
         assert result.message == "FIDO2 registration deleted successfully"
-        mock_submit_assertion_result.assert_called_once()
+        mock_submit_assertion_result.assert_not_called()
         mock_get_tenant_url.assert_called_once()
         mock_get_user_profile_info.assert_called_once_with(
             mock_http_client, "user-token-abc"
@@ -321,7 +330,11 @@ class TestDeleteRegistration:
         # Test with UUID-style registration ID
         mock_request_data = MagicMock()
         mock_request_data.id = "550e8400-e29b-41d4-a716-446655440000"
-        mock_request_data.assertionResult = MagicMock()
+        mock_request_data.action = DeleteRegistrationRequest.Action.COMMIT
+        mock_request_data.verificationProofId = "proof-123"
+        mock_request.session["fido2_delete_verification_proofs"]["proof-123"][
+            "registrationId"
+        ] = mock_request_data.id
 
         await delete_registration(
             request=mock_request,
@@ -389,6 +402,19 @@ class TestDeleteRegistration:
         assert result.success is True
         assert result.message == "FIDO2 registration deleted successfully"
         assert result.data is None
+
+    def test_requires_explicit_verify_or_commit_action(self):
+        with pytest.raises(ValidationError):
+            DeleteRegistrationRequest(
+                id="registration-123",
+                assertionResult=MagicMock(),
+            )
+
+        with pytest.raises(ValidationError):
+            DeleteRegistrationRequest(
+                id="registration-123",
+                action="commit_with_verification",
+            )
 
     @pytest.mark.asyncio
     @patch.object(delete_module, "submit_assertion_result")

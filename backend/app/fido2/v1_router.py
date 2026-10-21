@@ -97,7 +97,7 @@ async def get_registration_details(
     "/registration",
     response_model=ResponseModel,
     summary="Delete FIDO2 registration",
-    description="Delete a FIDO2 registration using action-based verify/commit or legacy commit_with_verification flow",
+    description="Delete a FIDO2 registration using the action-based verify/commit flow",
 )
 async def delete_fido2_registration(
     request: Request,
