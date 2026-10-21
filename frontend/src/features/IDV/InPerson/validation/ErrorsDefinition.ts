@@ -1,10 +1,7 @@
 type TranslateFn = (key: string) => string;
 
 export type SharedDateOfBirthErrorCode =
-  | "required"
-  | "invalid"
-  | "year"
-  | "future";
+  "required" | "invalid" | "year" | "future";
 
 export interface SharedDateOfBirthMessage {
   inline: string;

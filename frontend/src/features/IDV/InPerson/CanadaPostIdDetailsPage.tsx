@@ -188,9 +188,7 @@ export default function CanadaPostIdDetailsPage() {
   const updateField =
     (field: keyof CanadaPostIdDetailsFormData) => (event: CustomEvent) => {
       const target = event.target as
-        | HTMLInputElement
-        | HTMLSelectElement
-        | null;
+        HTMLInputElement | HTMLSelectElement | null;
       const value = target?.value ?? "";
       setFormData((previous) => ({ ...previous, [field]: value }));
     };
