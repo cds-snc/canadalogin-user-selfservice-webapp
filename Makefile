@@ -34,3 +34,4 @@ setup-hooks:
 uninstall-hooks:
 	@git config --local --unset core.hooksPath
 	@echo "✅ Git hooks disabled"
+
