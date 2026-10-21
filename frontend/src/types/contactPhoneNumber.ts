@@ -7,10 +7,7 @@ export type ContactPhoneDisplayEntry = {
 };
 
 export type ContactPhoneWizardStep =
-  | "enterPhone"
-  | "verifyOtp"
-  | "confirmUpdate"
-  | "success";
+  "enterPhone" | "verifyOtp" | "confirmUpdate" | "success";
 
 export type ContactPhoneOtpType = Extract<FlowType, "smsotp" | "voiceotp">;
 
