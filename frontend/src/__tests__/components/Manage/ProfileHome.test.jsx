@@ -226,7 +226,7 @@ describe("ProfileHome", () => {
 
     await waitFor(() => {
       const badges = screen.getAllByTestId("verified-badge");
-      const label = i18n.t("ProfileHome.verified", { lng: "fr" });
+      const label = i18n.t("profile:ProfileHome.verified", { lng: "fr" });
 
       expect(
         badges.some((b) => new RegExp(`${label} .+`).test(b.textContent ?? "")),
