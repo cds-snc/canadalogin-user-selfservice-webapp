@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import {
   Outlet,
+  ScrollRestoration,
   useLocation,
   useMatches,
   useNavigationType,
@@ -94,6 +95,7 @@ export default function RootLayout() {
       </GcdsContainer>
 
       <Footer currentLang={currentLang} />
+      <ScrollRestoration />
     </div>
   );
 }
