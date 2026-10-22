@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import {
   Outlet,
-  ScrollRestoration,
   useLocation,
   useMatches,
   useNavigationType,
@@ -9,6 +8,7 @@ import {
 import { useLanguage } from "../Providers/LanguageProvider";
 import { useRelyingPartyAnalyticsParams } from "../../hooks/useRelyingPartyAnalyticsParams";
 import { useFirstTabPageFocus } from "../../hooks/useFirstTabPageFocus";
+import { usePageScrollRestoration } from "../../hooks/usePageScrollRestoration";
 import { getLangValues } from "../../utils/functions";
 import { setAnalyticsContext, trackPage } from "../../utils/gatag";
 import { PAGES } from "../../utils/constants";
@@ -83,6 +83,7 @@ export default function RootLayout() {
     enabled:
       !hash && (navigationType === "PUSH" || navigationType === "REPLACE"),
   });
+  usePageScrollRestoration();
 
   return (
     <div className="mainBody">
@@ -95,7 +96,6 @@ export default function RootLayout() {
       </GcdsContainer>
 
       <Footer currentLang={currentLang} />
-      <ScrollRestoration />
     </div>
   );
 }
