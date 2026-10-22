@@ -31,8 +31,7 @@ export function usePasswordValidation(
     try {
       const passwordPolicyResponse = await authService.requestPasswordPolicy();
       const passwordPolicy = passwordPolicyResponse?.data as
-        | PasswordPolicyData
-        | undefined;
+        PasswordPolicyData | undefined;
 
       if (passwordPolicyResponse?.success && passwordPolicy) {
         if (

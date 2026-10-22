@@ -47,6 +47,7 @@ vi.mock("../../../utils/constants", async () => {
     },
     PAGES: {
       idvDetailsConfirmationPage: "IdvDetailsConfirmationPage",
+      idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
     },
     VITE_ENVIRONMENTS: { dev: "development", test: "test" },
   };
@@ -55,6 +56,9 @@ vi.mock("../../../utils/constants", async () => {
 vi.mock("../../../utils/routeHelpers", () => ({
   path: (_page, { language, journeyType } = {}) => {
     const jType = journeyType ? `/${journeyType}` : "";
+    if (_page === "IdvStartIdentityProofingPage") {
+      return `/${language ?? "en"}/identity-verification${jType}`;
+    }
     return `/${language ?? "en"}/identity-verification${jType}/details-confirmation`;
   },
 }));
@@ -223,6 +227,34 @@ describe("OnlineVerificationInfo", () => {
 
     await waitFor(() => {
       expect(mockPostOnlineIdentityVerification).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("redirects to the verification error page when online verification fails", async () => {
+    mockPostOnlineIdentityVerification.mockRejectedValue(
+      new Error("idv-data-store unavailable"),
+    );
+
+    render(<OnlineVerificationInfo />);
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/identity-verification/verification-error",
+      );
+    });
+  });
+
+  it("redirects to the verification error page when the verification URL is missing", async () => {
+    render(<OnlineVerificationInfo />);
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/identity-verification/verification-error",
+      );
     });
   });
 

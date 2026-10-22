@@ -9,7 +9,6 @@ import {
   GcdsText,
   GcdsContainer,
 } from "@gcds-core/components-react";
-
 import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 import ErrorSummaryWithFocus from "../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 
@@ -26,7 +25,10 @@ import {
   type StartIdentityOption,
 } from "./components/methods";
 import { IDV_JOURNEY_TYPE } from "./constants";
-import { identityVerificationApi } from "./api/identityVerificationApi";
+import {
+  identityVerificationApi,
+  IdentityVerificationClaimsResponse,
+} from "./api/identityVerificationApi";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 import {
   getSelectOptionRequiredMessage,
@@ -71,7 +73,8 @@ export default function StartIdentityProofingPage() {
 
   const { t } = useTranslation("idv");
   const { relyingPartyName: rpName, hasRelyingParty } = useRelyingPartyInfo();
-
+  const [identityVerificationClaims] =
+    useState<IdentityVerificationClaimsResponse>();
   const startIdentityTitle = hasRelyingParty
     ? t("StartIdentityProofing.pageTitle", { rpName })
     : t("StartIdentityProofing.proveYourIdentity");
@@ -108,6 +111,10 @@ export default function StartIdentityProofingPage() {
     language,
     journeyType,
   });
+  const cantProveIdentityPage = path(PAGES.idvCompleteIdentityProofingPage, {
+    language,
+    journeyType,
+  });
 
   useEffect(() => {
     if (resolvedJourneyType !== IDV_JOURNEY_TYPE.REQUIRED) {
@@ -123,6 +130,11 @@ export default function StartIdentityProofingPage() {
       console.error("Unable to store IDV target URL:", error);
     });
   }, [resolvedJourneyType, searchParams]);
+
+  const verifiedClaims =
+    identityVerificationClaims?.status === "verified"
+      ? identityVerificationClaims.verified_claims
+      : null;
 
   // placeholder for now, since no in-person main page exists
   const handleContinue = () => {
@@ -140,6 +152,9 @@ export default function StartIdentityProofingPage() {
       case START_IDENTITY_OPTION.inPerson:
         navigate(inPersonPage);
         break;
+      case START_IDENTITY_OPTION.cantProveNow:
+        navigate(cantProveIdentityPage);
+        break;
       default:
         break;
     }
@@ -151,66 +166,84 @@ export default function StartIdentityProofingPage() {
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="450">
-        {resolvedJourneyType === IDV_JOURNEY_TYPE.REQUIRED && (
+      {resolvedJourneyType === IDV_JOURNEY_TYPE.REQUIRED && (
+        <AccessibleNotice
+          noticeRole="success"
+          noticeTitle={t("StartIdentityProofing.signedInSuccessTitle")}
+          noticeTitleTag="h2"
+        >
+          <GcdsText>
+            {t("StartIdentityProofing.signedInSuccessNotice")}
+          </GcdsText>
+        </AccessibleNotice>
+      )}
+      {journeyType === IDV_JOURNEY_TYPE.VERIFICATION_ERROR && (
+        <AccessibleNotice
+          noticeRole="danger"
+          noticeTitle={t("StartIdentityProofing.errorNoticeTitle")}
+          noticeTitleTag="h2"
+        >
+          <GcdsText>
+            {t("StartIdentityProofing.errorNoticeDescription")}
+          </GcdsText>
+        </AccessibleNotice>
+      )}
+      {selectOptionErrorMessage ? (
+        <ErrorSummaryWithFocus
+          key={summaryFocusTrigger}
+          id={ERROR_SUMMARY_ID}
+          errorMessage={getValidationSummaryHeading(t)}
+          errorLinks={{ [`#${RADIOS_ID}`]: selectOptionErrorMessage }}
+          language={currentLanguage}
+        />
+      ) : null}
+
+      <GcdsHeading tag="h1">{pageTitle}</GcdsHeading>
+      <GcdsText>
+        {t("StartIdentityProofing.heading", {
+          appName: tLayout("TopNavBar.appName"),
+        })}
+      </GcdsText>
+      <GcdsText>{t("StartIdentityProofing.bodyText")}</GcdsText>
+
+      <GcdsGrid columns="1">
+        <GcdsLink
+          href="#"
+          external
+          size="regular"
+          style={{ textDecoration: "underline" }}
+        >
+          {t("StartIdentityProofing.learnMoreDescription")}
+        </GcdsLink>
+
+        {journeyType === IDV_JOURNEY_TYPE.UPDATE && verifiedClaims === null && (
           <AccessibleNotice
-            noticeRole="success"
-            noticeTitle={t("StartIdentityProofing.signedInSuccessNotice")}
-            noticeTitleTag="h2"
-          >
-            <GcdsText hidden={true}>{""}</GcdsText>
-          </AccessibleNotice>
-        )}
-        {journeyType === IDV_JOURNEY_TYPE.VERIFICATION_ERROR && (
-          <AccessibleNotice
-            noticeRole="danger"
-            noticeTitle={t("StartIdentityProofing.errorNoticeTitle")}
+            noticeRole="warning"
+            noticeTitle={t("StartIdentityProofing.updateNoticeTitle")}
             noticeTitleTag="h2"
           >
             <GcdsText>
-              {t("StartIdentityProofing.errorNoticeDescription")}
+              {t("StartIdentityProofing.updateNoticeDescription")}
             </GcdsText>
           </AccessibleNotice>
         )}
-        {selectOptionErrorMessage ? (
-          <ErrorSummaryWithFocus
-            key={summaryFocusTrigger}
-            id={ERROR_SUMMARY_ID}
-            errorMessage={getValidationSummaryHeading(t)}
-            errorLinks={{ [`#${RADIOS_ID}`]: selectOptionErrorMessage }}
-            language={currentLanguage}
-          />
-        ) : null}
-        <GcdsContainer>
-          <GcdsHeading tag="h1">{pageTitle}</GcdsHeading>
-          <GcdsText>
-            {t("StartIdentityProofing.heading", {
-              appName: tLayout("TopNavBar.appName"),
-            })}
-          </GcdsText>
-          <GcdsText>{t("StartIdentityProofing.bodyText")}</GcdsText>
+      </GcdsGrid>
 
-          <GcdsLink
-            href="#"
-            external
-            size="regular"
-            style={{ textDecoration: "underline" }}
-          >
-            {t("StartIdentityProofing.learnMoreDescription")}
-          </GcdsLink>
-          <GcdsHeading tag="h2" marginTop="300" characterLimit={false}>
-            {t("StartIdentityProofing.howToProveHeading")}
-          </GcdsHeading>
-          <IdentityProofingRadioButtons
-            id={RADIOS_ID}
-            selectedOption={selectedOption}
-            onOptionChange={setSelectedOption}
-            rpName={rpName}
-            errorMessage={selectOptionErrorMessage}
-          />
-        </GcdsContainer>
+      <GcdsHeading tag="h2" marginTop="300" characterLimit={false}>
+        {t("StartIdentityProofing.howToProveHeading")}
+      </GcdsHeading>
 
-        <GcdsGrid columns="1" columnsDesktop="max-content max-content">
+      <GcdsGrid columns="1">
+        <IdentityProofingRadioButtons
+          id={RADIOS_ID}
+          journeyType={resolvedJourneyType}
+          selectedOption={selectedOption}
+          onOptionChange={setSelectedOption}
+          rpName={rpName}
+          errorMessage={selectOptionErrorMessage}
+        />
+
+        <GcdsGrid columns="max-content max-content">
           <GcdsButton
             type="button"
             onGcdsClick={(ev) => {
