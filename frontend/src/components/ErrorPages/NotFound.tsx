@@ -7,7 +7,7 @@ export default function NotFound() {
       text="The page you are looking for does not exist."
       primaryButtonName="Go Back"
       primaryButtonLink="/"
-      secondaryButtonName="Managed CanadaLogin"
+      secondaryButtonName="Manage CanadaLogin"
       secondaryButtonLink="/"
     />
   );
