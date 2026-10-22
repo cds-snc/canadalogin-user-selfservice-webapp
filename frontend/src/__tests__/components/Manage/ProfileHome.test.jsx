@@ -155,7 +155,7 @@ describe("ProfileHome", () => {
   it("renders the Contact information section", () => {
     render(<ProfileHome />);
     expect(
-      screen.getByRole("heading", { name: "Contact information" }),
+      screen.getByRole("heading", { name: "Contact details" }),
     ).toBeInTheDocument();
     expect(screen.getByTestId("view-name-card")).toBeInTheDocument();
     expect(

@@ -72,6 +72,7 @@ def test_app_starts():
         "base-uri 'self'; "
         "form-action 'self';"
     )
+    assert response.headers["cross-origin-embedder-policy"] == "require-corp"
     assert response.headers["cross-origin-opener-policy"] == "same-origin"
     assert response.headers["cross-origin-resource-policy"] == "same-site"
     assert response.headers["permissions-policy"] == (

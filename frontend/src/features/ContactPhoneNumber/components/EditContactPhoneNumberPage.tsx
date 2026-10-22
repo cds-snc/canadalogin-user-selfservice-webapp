@@ -441,6 +441,28 @@ export default function EditContactPhoneNumberPage() {
     navigate(backToProfile);
   };
 
+  const handleSignOut = async (event?: Event) => {
+    event?.preventDefault();
+    setLocalLoading(true);
+
+    try {
+      const response = await authService.logout();
+      const redirectUrl =
+        (response as { data?: { redirect_url?: string } })?.data
+          ?.redirect_url ?? null;
+
+      if (!redirectUrl) {
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setLocalLoading(true);
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    }
+  };
+
   const handleBackToEnterPhone = ({
     clearErrorState = true,
   }: {
@@ -553,7 +575,7 @@ export default function EditContactPhoneNumberPage() {
     success: (
       <SuccessfullyUpdated
         phoneFormData={phoneFormData}
-        onNext={handleBackToProfile}
+        onNext={handleSignOut}
         onCancel={handleBackToProfile}
       />
     ),

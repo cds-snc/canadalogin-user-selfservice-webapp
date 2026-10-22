@@ -127,8 +127,7 @@ export const useOtpOperations = ({
         : await authService.transientOtpSend(userData);
       if (response?.success) {
         const responseData = (response.data ?? null) as
-          | (OtpSentData & { id?: string })
-          | null;
+          (OtpSentData & { id?: string }) | null;
         const normalizedOtpData =
           useMfaEndpoint && responseData && !responseData.trxnId
             ? {
@@ -256,8 +255,7 @@ export const useOtpOperations = ({
       } else if (selectedMapType === MAP_TYPES.fullPhoneNumber) {
         const current =
           (acc[factor.destination] as
-            | { type: string; id: string }[]
-            | undefined) ?? [];
+            { type: string; id: string }[] | undefined) ?? [];
         acc[factor.destination] = [
           ...current,
           { type: factor.type, id: factor.id },

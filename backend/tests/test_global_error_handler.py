@@ -1189,6 +1189,7 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         request_data = {
             "id": "credential-id",
+            "action": "verify",
             "assertionResult": {
                 "response": {
                     "clientDataJSON": "client-data-json",
@@ -1242,6 +1243,7 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         request_data = {
             "id": "credential-id",
+            "action": "verify",
             "assertionResult": {
                 "response": {
                     "clientDataJSON": "client-data-json",
@@ -1322,19 +1324,21 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         request_data = {
             "id": "credential-id",
-            "assertionResult": {
-                "response": {
-                    "clientDataJSON": "client-data-json",
-                    "authenticatorData": "authenticator-data",
-                    "signature": "signature",
-                },
-                "id": "",
-                "rawId": "",
-                "type": "",
-            },
+            "action": "commit",
+            "verificationProofId": "proof-id",
         }
 
-        client = mock_test_client(mock_client)
+        client = mock_test_client(
+            mock_client,
+            {
+                "fido2_delete_verification_proofs": {
+                    "proof-id": {
+                        "expiresAt": int(time.time()) + 120,
+                        "registrationId": "credential-id",
+                    }
+                }
+            },
+        )
 
         response = client.request("DELETE", "/v1/fido2/registration", json=request_data)
         response_json = response.json()
@@ -1353,6 +1357,7 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         request_data = {
             "id": "credential-id",
+            "action": "verify",
             "assertionResult": {
                 "response": {
                     "clientDataJSON": "client-data-json",
@@ -1425,19 +1430,21 @@ class TestErrorHandlingFido2DeleteRegistration:
 
         request_data = {
             "id": "credential-id",
-            "assertionResult": {
-                "response": {
-                    "clientDataJSON": "client-data-json",
-                    "authenticatorData": "authenticator-data",
-                    "signature": "signature",
-                },
-                "id": "",
-                "rawId": "",
-                "type": "",
-            },
+            "action": "commit",
+            "verificationProofId": "proof-id",
         }
 
-        client = mock_test_client(mock_client)
+        client = mock_test_client(
+            mock_client,
+            {
+                "fido2_delete_verification_proofs": {
+                    "proof-id": {
+                        "expiresAt": int(time.time()) + 120,
+                        "registrationId": "credential-id",
+                    }
+                }
+            },
+        )
 
         response = client.request("DELETE", "/v1/fido2/registration", json=request_data)
         response_json = response.json()

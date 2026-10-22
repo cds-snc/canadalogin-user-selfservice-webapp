@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router";
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { IDV_JOURNEY_TYPE } from "../constants";
+import { identityVerificationApi } from "../api/identityVerificationApi";
 
 export default function CompleteIdentityProofingNotice() {
   const { language } = useParams<{ language: string }>();
@@ -16,6 +17,23 @@ export default function CompleteIdentityProofingNotice() {
     language,
     journeyType: IDV_JOURNEY_TYPE.START,
   });
+  const InProgressIdentityProofingPage = path(
+    PAGES.idvInPersonProofingInProgressPage,
+    {
+      language,
+    },
+  );
+
+  const handleNavigation = async () => {
+    const claims = await identityVerificationApi.getClaims();
+
+    const destination =
+      claims?.status === "pending" || claims?.status === "in_progress"
+        ? InProgressIdentityProofingPage
+        : startIdentityProofingPage;
+
+    navigate(destination);
+  };
 
   return (
     <AccessibleNotice
@@ -27,9 +45,7 @@ export default function CompleteIdentityProofingNotice() {
       <GcdsButton
         type="button"
         buttonRole="secondary"
-        onGcdsClick={() => {
-          navigate(startIdentityProofingPage);
-        }}
+        onGcdsClick={handleNavigation}
       >
         {t("CompleteIdentityProofing.noticeCta")}
       </GcdsButton>

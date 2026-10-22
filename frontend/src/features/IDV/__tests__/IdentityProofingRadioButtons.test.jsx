@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import IdentityProofingRadioButtons from "../components/IdentityProofingRadioButtons";
 import { START_IDENTITY_OPTION } from "../components/methods";
+import { IDV_JOURNEY_TYPE } from "../constants";
 
 vi.mock("@gcds-core/components-react", () => ({
   GcdsRadios: ({ name, legend, options, value, hideLegend, onGcdsChange }) => (
@@ -38,9 +39,14 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
 }));
 
+vi.mock("../../../hooks/useRelyingPartyInfo", () => ({
+  useRelyingPartyInfo: () => ({ relyingPartyName: "RP Name" }),
+}));
+
 describe("IdentityProofingRadioButtons", () => {
   const defaultProps = {
     selectedOption: undefined,
+    journeyType: IDV_JOURNEY_TYPE.REQUIRED,
     onOptionChange: vi.fn(),
   };
 
@@ -56,13 +62,31 @@ describe("IdentityProofingRadioButtons", () => {
   it("renders all identity proofing options", () => {
     render(<IdentityProofingRadioButtons {...defaultProps} />);
 
+    expect(screen.getAllByRole("radio")).toHaveLength(3);
     expect(
-      screen.getByText("Prove identity online and get instant access"),
+      screen.getByText("Online and get instant access"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Do it in person and sign back in when done"),
+      screen.getByText("In person and sign back in when done"),
     ).toBeInTheDocument();
   });
+
+  it.each([IDV_JOURNEY_TYPE.START, IDV_JOURNEY_TYPE.UPDATE])(
+    "renders only the first two options for the %s journey",
+    (journeyType) => {
+      render(
+        <IdentityProofingRadioButtons
+          {...defaultProps}
+          journeyType={journeyType}
+        />,
+      );
+
+      expect(screen.getAllByRole("radio")).toHaveLength(2);
+      expect(
+        screen.queryByText("Need more time or a different way in"),
+      ).not.toBeInTheDocument();
+    },
+  );
 
   it("renders hint text for all options", () => {
     render(<IdentityProofingRadioButtons {...defaultProps} rpName="RP Name" />);
@@ -88,7 +112,7 @@ describe("IdentityProofingRadioButtons", () => {
     );
 
     const selectedRadio = screen.getByRole("radio", {
-      name: /Prove identity online and get instant access/,
+      name: /Online and get instant access/,
     });
     expect(selectedRadio).toBeChecked();
   });
@@ -103,7 +127,7 @@ describe("IdentityProofingRadioButtons", () => {
     );
 
     const radio = screen.getByRole("radio", {
-      name: /Do it in person and sign back in when done/,
+      name: /In person and sign back in when done/,
     });
     fireEvent.click(radio);
 
