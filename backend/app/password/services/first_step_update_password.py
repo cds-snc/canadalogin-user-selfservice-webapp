@@ -13,7 +13,10 @@ from app.password.schemas import (
 from app.users.services.get_my_profile import dispatch_get_my_profile_from_ibm
 from app.utils.access_token import get_admin_token, get_auth_request_headers
 from app.utils.schemas import ResponseModel
-from app.utils.phone_mfa_rate_limit import consume_mfa_send_daily_quota
+from app.utils.phone_mfa_rate_limit import (
+    consume_mfa_send_daily_quota,
+    release_otp_send_daily_quota,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -42,9 +45,14 @@ async def first_step_update_password(
     if request is not None:
         await consume_mfa_send_daily_quota(request, user_profile_response.id)
 
-    password_otp_response = await dispatch_password_otp(
-        global_http_client, payload, user_language
-    )
+    try:
+        password_otp_response = await dispatch_password_otp(
+            global_http_client, payload, user_language
+        )
+    except Exception:
+        if request is not None:
+            await release_otp_send_daily_quota(request, user_profile_response.id)
+        raise
     duration = (datetime.now() - start_time).total_seconds()
     logger.info(
         f"First step - dispatch_password_reset_otp returned in {duration:.2f} seconds"
