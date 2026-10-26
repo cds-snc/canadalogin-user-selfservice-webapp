@@ -28,20 +28,14 @@ export default function ProvenInformationCard({
   const name = [claims?.claims?.given_name, claims?.claims?.family_name]
     .filter(Boolean)
     .join(" ");
-  /* const dateOfBirth = format(
-    parseISO(claims?.claims?.birthdate),
-    i18n.language === "fr" ? "do MMMM yyyy" : "d MMMM yyyy",
-    {
-      locale: i18n.language === "fr" ? frCA : enCA,
-    },
-  ); */
-  const dateOfBirth = format(
-    parseISO("2000-01-01"),
-    i18n.language === "fr" ? "do MMMM yyyy" : "d MMMM yyyy",
-    {
-      locale: i18n.language === "fr" ? frCA : enCA,
-    },
-  );
+  const birthdate = claims?.claims?.birthdate;
+  const dateOfBirth = birthdate
+    ? format(
+        parseISO(birthdate),
+        i18n.language === "fr" ? "do MMMM yyyy" : "MMMM d, yyyy",
+        { locale: i18n.language === "fr" ? frCA : enCA },
+      )
+    : "";
   const idDocument = claims?.claims?.id_document;
 
   const startIdentityVerificationFlow = path(
