@@ -22,7 +22,7 @@ CONTACT_PHONE_UPDATE_REDIS_KEY_PREFIX = "rate_limit:contact_phone_update:"
 
 OTP_SEND_DAILY_LIMIT = 30
 OTP_SEND_DAILY_WINDOW_SECONDS_PROD = 24 * 60 * 60
-OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD = 15 * 60
+OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD = 30 * 60
 OTP_SEND_DAILY_REDIS_KEY_PREFIX = "rate_limit:otp_send_daily:"
 OTP_SEND_DAILY_ERROR_CODE = "otp_send_daily_limit"
 OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE = "otp_send_limiter_unavailable"
@@ -138,6 +138,35 @@ def _consume_otp_send_daily_quota_from_session(
     request.session[OTP_SEND_DAILY_SESSION_KEY] = event_store
 
 
+def _release_otp_send_daily_quota_from_session(
+    request: Request,
+    user_id: str,
+) -> None:
+    now = int(time.time())
+    event_store = request.session.get(OTP_SEND_DAILY_SESSION_KEY, {})
+    if not isinstance(event_store, dict):
+        return
+
+    user_key = _hash_user_id_for_rate_limit(user_id)
+    entry = event_store.get(user_key)
+    if not isinstance(entry, dict):
+        return
+
+    window_start = entry.get(OTP_SEND_WINDOW_START_FIELD)
+    count = entry.get(OTP_SEND_FIELD)
+    if (
+        not isinstance(window_start, int)
+        or now - window_start >= _get_otp_send_daily_window_seconds()
+        or not isinstance(count, int)
+        or count < 1
+    ):
+        return
+
+    entry[OTP_SEND_FIELD] = count - 1
+    event_store[user_key] = entry
+    request.session[OTP_SEND_DAILY_SESSION_KEY] = event_store
+
+
 async def _consume_otp_send_daily_quota(
     request: Request,
     user_id: str,
@@ -163,6 +192,7 @@ async def _consume_otp_send_daily_quota(
             retry_after = int(await redis_client.ttl(key))
             if retry_after < 1:
                 retry_after = window_seconds
+            await _release_otp_send_daily_quota_from_redis(redis_client, key)
             _raise_otp_send_daily_limit(
                 _hash_user_id_for_rate_limit(user_id),
                 retry_after,
@@ -190,6 +220,28 @@ async def consume_mfa_send_daily_quota(request: Request, user_id: str) -> None:
 
 async def consume_transient_send_daily_quota(request: Request, user_id: str) -> None:
     await _consume_otp_send_daily_quota(request, user_id)
+
+
+async def _release_otp_send_daily_quota_from_redis(redis_client: Any, key: str) -> None:
+    try:
+        count = int(await redis_client.decr(key))
+        if count <= 0:
+            await redis_client.delete(key)
+    except Exception as exc:  # noqa: BLE001 - release is best effort
+        logger.warning("Failed to release OTP send quota reservation: %s", exc)
+
+
+async def release_otp_send_daily_quota(request: Request, user_id: str) -> None:
+    redis_client = _get_redis_client_from_request(request)
+    if redis_client is None:
+        if _is_otp_send_session_fallback_environment():
+            _release_otp_send_daily_quota_from_session(request, user_id)
+        return
+
+    await _release_otp_send_daily_quota_from_redis(
+        redis_client,
+        _build_otp_send_daily_key(user_id),
+    )
 
 
 def _build_rate_limit_key(redis_key_prefix: str, user_id: str) -> str:
