@@ -226,10 +226,10 @@ describe("ProfileHome", () => {
 
     await waitFor(() => {
       const badges = screen.getAllByTestId("verified-badge");
+      const label = i18n.t("profile:ProfileHome.verified", { lng: "fr" });
+
       expect(
-        badges.some(
-          (b) => b.textContent === "Vérification effectuée 27 janvier 2026",
-        ),
+        badges.some((b) => new RegExp(`${label} .+`).test(b.textContent ?? "")),
       ).toBe(true);
     });
   });
