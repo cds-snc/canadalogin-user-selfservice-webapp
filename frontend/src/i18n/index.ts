@@ -119,6 +119,8 @@ export const PAGE_NAMESPACE_MAP: Record<string, I18nNamespace> = {
   IdvCompleteIdentityProofingPage: "idv",
   IdvServiceCanadaCentrePage: "idv",
   IdvVisitCanadaPostPage: "idv",
+  IdvCanadaPostIdDetailsPage: "idv",
+  IdvCanadaPostProofOfAddressPage: "idv",
   IdvServiceCanadaCentreCodePage: "idv",
   IdvProofingBarcodeCanadaPostPage: "idv",
   IdvOnlineVerificationInfoPage: "idv",

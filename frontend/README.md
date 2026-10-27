@@ -33,6 +33,15 @@ This is the frontend application built with React and GC Design System for the G
 
 See `package.json` scripts for additional commands.
 
+### Canada Post proof of address
+
+The identity-documents API's `requires_proof` flag controls whether proof of
+address is required. If every option for the selected ID requires proof (including
+IDs with a single option), the proof-of-address page appears before ID details.
+Continuing opens the ID-details form without showing the notice again. For IDs
+with mixed requirements, the selected option determines whether the notice
+appears after ID details.
+
 ### Pre-commit Hook (optional)
 
 A pre-commit hook is available that runs `prettier` and `eslint` automatically on staged frontend files whenever you commit. It is **opt-in** and must be activated from the repo root:
@@ -79,3 +88,17 @@ npx vitest src/features/ProfileName/__tests__/ProfileUpdateName.test.jsx -u
 vitest docs:
 
 - [Vitest CLI Documentation](https://vitest.dev/guide/cli.html)
+
+### Navigation accessibility
+
+The shared root layout restores scrolling through `usePageScrollRestoration`,
+which runs from the application bundle without injecting an inline script. It is
+compatible with the backend's `script-src 'self'` Content Security Policy and
+does not require a nonce or a relaxed policy.
+
+New client-side navigations start at the top. Back and Forward restore positions
+saved during the current layout's lifetime, and anchor links scroll to their
+targets. Initial loads without an anchor do not force a scroll position. Scrolling
+does not move keyboard focus; existing first-Tab heading focus behavior is
+unchanged. This client-rendered implementation does not provide pre-paint
+restoration before the application bundle loads.
