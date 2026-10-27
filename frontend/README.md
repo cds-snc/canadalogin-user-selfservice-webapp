@@ -33,6 +33,15 @@ This is the frontend application built with React and GC Design System for the G
 
 See `package.json` scripts for additional commands.
 
+### Canada Post proof of address
+
+The identity-documents API's `requires_proof` flag controls whether proof of
+address is required. If every option for the selected ID requires proof (including
+IDs with a single option), the proof-of-address page appears before ID details.
+Continuing opens the ID-details form without showing the notice again. For IDs
+with mixed requirements, the selected option determines whether the notice
+appears after ID details.
+
 ### Pre-commit Hook (optional)
 
 A pre-commit hook is available that runs `prettier` and `eslint` automatically on staged frontend files whenever you commit. It is **opt-in** and must be activated from the repo root:

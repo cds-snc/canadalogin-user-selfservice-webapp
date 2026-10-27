@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, model_validator
 from enum import Enum
-from typing import Optional
+from typing import Literal, Optional
 from datetime import date, datetime
 
 
@@ -79,3 +79,31 @@ class ReissueOnlineSessionResponse(BaseModel):
     case_id: str
     status: CaseStatus
     online_verification_url: str
+
+
+class IdentityDocumentType(str, Enum):
+    DRIVERS_LICENCE = "DRIVERS_LICENCE"
+    PASSPORT = "PASSPORT"
+    PROVINCIAL_PHOTO_ID = "PROVINCIAL_PHOTO_ID"
+    PROVINCIAL_HEALTH_CARD = "PROVINCIAL_HEALTH_CARD"
+    PERMANENT_RESIDENT_CARD = "PERMANENT_RESIDENT_CARD"
+    INDIAN_STATUS_CARD = "INDIAN_STATUS_CARD"
+    COMBO_CARD = "COMBO_CARD"
+
+
+class IdentityDocumentOption(BaseModel):
+    id: int
+    name_en: str
+    name_fr: str
+    option_type: Literal["country", "province", "value"]
+    canada_post_id: Optional[str] = None
+    country_code: Optional[str] = None
+    province_code: Optional[str] = None
+    requires_proof: bool
+
+
+class IdentityDocument(BaseModel):
+    key: IdentityDocumentType
+    name_en: str
+    name_fr: str
+    options: list[IdentityDocumentOption]

@@ -1,11 +1,12 @@
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from app.auth.services.auth_user_session import get_users_current_session
 from app.utils.schemas import ResponseModel
 from app.identity_verification.schemas import (
     CreateInPersonIdentityVerificationRequest,
+    IdentityDocumentType,
     StoreTargetUrlRequest,
 )
 from app.identity_verification.services.create_identity_verification import (
@@ -15,6 +16,9 @@ from app.identity_verification.services.create_identity_verification import (
 from app.identity_verification.services.in_person_identity_verification import (
     create_in_person_identity_verification_case,
     get_last_email_sent,
+)
+from app.identity_verification.services.identity_documents import (
+    get_identity_documents,
 )
 from app.identity_verification.services.redirect_target_url import (
     get_identity_verification_redirect_url,
@@ -122,6 +126,30 @@ async def get_in_person_last_email_sent(
 ):
     return await get_last_email_sent(
         request.app.state.request_client, user_access_token
+    )
+
+
+@router.get(
+    "/identity-documents",
+    response_model=ResponseModel,
+    status_code=status.HTTP_200_OK,
+    tags=["Identity Verification"],
+    summary="Get the approved identity documents",
+    description=(
+        "Returns the approved identity documents and their selection options "
+        "from idv-data-store. Omit types to retrieve all document types, or "
+        "repeat types to filter (for example ?types=PASSPORT&types=DRIVERS_LICENCE)."
+    ),
+)
+async def list_identity_documents(
+    request: Request,
+    types: Optional[list[IdentityDocumentType]] = Query(default=None),
+    user_access_token: str = Depends(get_users_current_session),
+):
+    return await get_identity_documents(
+        request.app.state.request_client,
+        user_access_token,
+        types,
     )
 
 
