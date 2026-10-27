@@ -6,7 +6,9 @@ import StartIdentityProofingPage from "../StartIdentityProofingPage";
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
+const mockRadioJourneyType = vi.hoisted(() => vi.fn());
 let mockNavigate = vi.fn();
+let mockJourneyType = "start";
 
 vi.mock("react-router", async () => {
   const actual =
@@ -15,7 +17,7 @@ vi.mock("react-router", async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    useParams: () => ({ language: "en", journeyType: "start" }),
+    useParams: () => ({ language: "en", journeyType: mockJourneyType }),
     useSearchParams: () => [new URLSearchParams(), vi.fn()],
   };
 });
@@ -36,21 +38,27 @@ vi.mock("../../../components/Providers/useUser", () => ({
 vi.mock("../components/IdentityProofingRadioButtons", () => ({
   default: ({
     onOptionChange,
+    journeyType,
   }: {
     onOptionChange: (option: "online" | "inPerson" | "cantProveNow") => void;
-  }) => (
-    <div>
-      <button type="button" onClick={() => onOptionChange("inPerson")}>
-        pick in person
-      </button>
-      <button type="button" onClick={() => onOptionChange("online")}>
-        pick online
-      </button>
-      <button type="button" onClick={() => onOptionChange("cantProveNow")}>
-        pick later
-      </button>
-    </div>
-  ),
+    journeyType: string;
+  }) => {
+    mockRadioJourneyType(journeyType);
+
+    return (
+      <div>
+        <button type="button" onClick={() => onOptionChange("inPerson")}>
+          pick in person
+        </button>
+        <button type="button" onClick={() => onOptionChange("online")}>
+          pick online
+        </button>
+        <button type="button" onClick={() => onOptionChange("cantProveNow")}>
+          pick later
+        </button>
+      </div>
+    );
+  },
 }));
 
 vi.mock("react-i18next", async () => {
@@ -152,6 +160,16 @@ vi.mock("@gcds-core/components-react", () => ({
 describe("StartIdentityProofingPage", () => {
   beforeEach(() => {
     mockNavigate = vi.fn();
+    mockJourneyType = "start";
+    mockRadioJourneyType.mockClear();
+  });
+
+  it("passes the verification-error journey type to the radio options", () => {
+    mockJourneyType = "verification-error";
+
+    render(<StartIdentityProofingPage />);
+
+    expect(mockRadioJourneyType).toHaveBeenCalledWith("verification-error");
   });
 
   it("navigates to the new in-person route when in-person option is selected", () => {

@@ -82,6 +82,7 @@ export default function StartIdentityProofingPage() {
     [IDV_JOURNEY_TYPE.REQUIRED]: startIdentityTitle,
     [IDV_JOURNEY_TYPE.START]: startIdentityTitle,
     [IDV_JOURNEY_TYPE.UPDATE]: t("StartIdentityProofing.proveYourIdentity"),
+    [IDV_JOURNEY_TYPE.VERIFICATION_ERROR]: startIdentityTitle,
   } as const;
   const requestedJourneyType = journeyType ?? IDV_JOURNEY_TYPE.START;
   const resolvedJourneyType: keyof typeof titleByJourneyType =

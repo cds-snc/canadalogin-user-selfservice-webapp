@@ -50,12 +50,15 @@ export default function IdentityProofingRadioButtons({
       checked: selectedOption === START_IDENTITY_OPTION.inPerson,
     },
   ];
-  if (journeyType === IDV_JOURNEY_TYPE.REQUIRED) {
+  if (
+    journeyType === IDV_JOURNEY_TYPE.REQUIRED ||
+    journeyType === IDV_JOURNEY_TYPE.VERIFICATION_ERROR
+  ) {
     radioOptions.push({
-      label: t("StartIdentityProofing.notReadyOption"),
+      label: t("StartIdentityProofing.cantProveNowOption"),
       id: `radio-${START_IDENTITY_OPTION.cantProveNow}`,
       value: START_IDENTITY_OPTION.cantProveNow,
-      hint: t("StartIdentityProofing.notReadyHint", { rpName }),
+      hint: t("StartIdentityProofing.cantProveNowHint", { rpName }),
       checked: selectedOption === START_IDENTITY_OPTION.cantProveNow,
     });
   }
