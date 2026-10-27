@@ -1,11 +1,11 @@
-fastapi==0.143.1
+fastapi==0.152.0
 uvicorn==0.54.0
 requests==2.34.2
 python-multipart==0.0.32
 python-dotenv==1.2.4
 webauthn==1.11.1
 cryptography==50.0.2
-pydantic-settings==2.16.0
+pydantic-settings==2.16.1
 pydantic==2.14.1
 httpx==0.28.1
 email-validator==2.3.0
@@ -15,7 +15,7 @@ cachetools==5.5.2
 authlib==1.9.1
 itsdangerous==2.2.0
 starsessions==2.2.1
-PyJWT==2.15.0
+PyJWT==2.15.1
 redis==6.4.0
 fido2==2.2.1
 Secweb==1.30.10
