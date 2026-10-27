@@ -38,6 +38,19 @@ export default function ProvenInformationCard({
     : "";
   const idDocument = claims?.claims?.id_document;
 
+  const formatFrenchOrdinalDate = (value: string) => {
+    if (i18n.language !== "fr" || !value.startsWith("1er ")) {
+      return value;
+    }
+
+    return (
+      <>
+        1<sup>er</sup>
+        {value.slice(3)}
+      </>
+    );
+  };
+
   const startIdentityVerificationFlow = path(
     PAGES.idvStartIdentityProofingPage,
     {
@@ -50,85 +63,42 @@ export default function ProvenInformationCard({
     return null;
   }
 
-  const sections =
-    i18n.language === "fr" && dateOfBirth.startsWith("1er ")
-      ? [
-          <GcdsContainer>
-            <GcdsHeading tag="h3" marginTop="300" marginBottom="0">
-              {t("ProvenInformationCard.name")}
-            </GcdsHeading>
-            <GcdsText marginTop="200" marginBottom="0">
-              {name}
-            </GcdsText>
-          </GcdsContainer>,
-          dateOfBirth ? (
-            <GcdsContainer>
-              <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-                {t("ProvenInformationCard.dateOfBirth")}
-              </GcdsHeading>
-              <GcdsText marginTop="200" marginBottom="0">
-                1<sup>er</sup>
-                {dateOfBirth.slice(3)}
-              </GcdsText>
-            </GcdsContainer>
-          ) : null,
-          idDocument ? (
-            <GcdsContainer>
-              <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-                {t("ProvenInformationCard.idDocument")}
-              </GcdsHeading>
-              <GcdsText marginTop="200" marginBottom="0">
-                {idDocument}
-              </GcdsText>
-            </GcdsContainer>
-          ) : null,
-          <GcdsContainer>
-            <GcdsText>{t("ProvenInformationCard.updateInfo")}</GcdsText>
-            <GcdsText>
-              <GcdsLink href={startIdentityVerificationFlow}>
-                {t("ProvenInformationCard.updateButton")}
-              </GcdsLink>
-            </GcdsText>
-          </GcdsContainer>,
-        ].filter(Boolean)
-      : [
-          <GcdsContainer>
-            <GcdsHeading tag="h3" marginTop="300" marginBottom="0">
-              {t("ProvenInformationCard.name")}
-            </GcdsHeading>
-            <GcdsText marginTop="200" marginBottom="0">
-              {name}
-            </GcdsText>
-          </GcdsContainer>,
-          dateOfBirth ? (
-            <GcdsContainer>
-              <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-                {t("ProvenInformationCard.dateOfBirth")}
-              </GcdsHeading>
-              <GcdsText marginTop="200" marginBottom="0">
-                {dateOfBirth}
-              </GcdsText>
-            </GcdsContainer>
-          ) : null,
-          idDocument ? (
-            <GcdsContainer>
-              <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-                {t("ProvenInformationCard.idDocument")}
-              </GcdsHeading>
-              <GcdsText marginTop="200" marginBottom="0">
-                {idDocument}
-              </GcdsText>
-            </GcdsContainer>
-          ) : null,
-          <GcdsContainer>
-            <GcdsText>{t("ProvenInformationCard.updateInfo")}</GcdsText>
-            <GcdsText>
-              <GcdsLink href={startIdentityVerificationFlow}>
-                {t("ProvenInformationCard.updateButton")}
-              </GcdsLink>
-            </GcdsText>
-          </GcdsContainer>,
-        ].filter(Boolean);
+  const DateOfBirthSection = dateOfBirth ? (
+    <GcdsContainer>
+      <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+        {t("ProvenInformationCard.dateOfBirth")}
+      </GcdsHeading>
+      <GcdsText marginTop="200" marginBottom="0">
+        {formatFrenchOrdinalDate(dateOfBirth)}
+      </GcdsText>
+    </GcdsContainer>
+  ) : null;
+
+  const sections = [
+    <GcdsContainer key="name">
+      <GcdsHeading tag="h3" marginTop="300" marginBottom="0">
+        {t("ProvenInformationCard.name")}
+      </GcdsHeading>
+      <GcdsText marginTop="200" marginBottom="0">{name}</GcdsText>
+    </GcdsContainer>,
+    DateOfBirthSection,
+    idDocument ? (
+      <GcdsContainer key="idDocument">
+        <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+          {t("ProvenInformationCard.idDocument")}
+        </GcdsHeading>
+        <GcdsText marginTop="200" marginBottom="0">{idDocument}</GcdsText>
+      </GcdsContainer>
+    ) : null,
+    <GcdsContainer key="update">
+      <GcdsText>{t("ProvenInformationCard.updateInfo")}</GcdsText>
+      <GcdsText>
+        <GcdsLink href={startIdentityVerificationFlow}>
+          {t("ProvenInformationCard.updateButton")}
+        </GcdsLink>
+      </GcdsText>
+    </GcdsContainer>,
+  ];
 
   return (
     <GcdsContainer className="sectionCard">
