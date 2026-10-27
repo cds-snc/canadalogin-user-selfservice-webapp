@@ -113,9 +113,9 @@ describe("ProvenInformationCard", () => {
 
     render(<ProvenInformationCard claims={claims} />);
 
-    const dobSection = screen
-      .getByRole("heading", { name: "Date de naissance" })
-      .parentElement;
+    const dobSection = screen.getByRole("heading", {
+      name: "Date de naissance",
+    }).parentElement;
 
     expect(dobSection).toHaveTextContent("1er février 1990");
     expect(within(dobSection).getByText("er").tagName).toBe("SUP");

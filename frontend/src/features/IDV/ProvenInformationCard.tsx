@@ -79,7 +79,9 @@ export default function ProvenInformationCard({
       <GcdsHeading tag="h3" marginTop="300" marginBottom="0">
         {t("ProvenInformationCard.name")}
       </GcdsHeading>
-      <GcdsText marginTop="200" marginBottom="0">{name}</GcdsText>
+      <GcdsText marginTop="200" marginBottom="0">
+        {name}
+      </GcdsText>
     </GcdsContainer>,
     DateOfBirthSection,
     idDocument ? (
@@ -87,7 +89,9 @@ export default function ProvenInformationCard({
         <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
           {t("ProvenInformationCard.idDocument")}
         </GcdsHeading>
-        <GcdsText marginTop="200" marginBottom="0">{idDocument}</GcdsText>
+        <GcdsText marginTop="200" marginBottom="0">
+          {idDocument}
+        </GcdsText>
       </GcdsContainer>
     ) : null,
     <GcdsContainer key="update">
