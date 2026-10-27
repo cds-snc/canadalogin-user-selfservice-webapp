@@ -71,20 +71,6 @@ describe("IdentityProofingRadioButtons", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders all identity proofing options for the verification-error journey", () => {
-    render(
-      <IdentityProofingRadioButtons
-        {...defaultProps}
-        journeyType={IDV_JOURNEY_TYPE.VERIFICATION_ERROR}
-      />,
-    );
-
-    expect(screen.getAllByRole("radio")).toHaveLength(3);
-    expect(
-      screen.getByText("Need more time or a different way in"),
-    ).toBeInTheDocument();
-  });
-
   it.each([IDV_JOURNEY_TYPE.START, IDV_JOURNEY_TYPE.UPDATE])(
     "renders only the first two options for the %s journey",
     (journeyType) => {
