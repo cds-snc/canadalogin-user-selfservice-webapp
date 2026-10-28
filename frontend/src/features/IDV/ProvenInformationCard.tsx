@@ -31,6 +31,7 @@ export default function ProvenInformationCard({
     ? formatDateOfBirthForDisplay(claims.claims.birthdate, i18n.language)
     : undefined;
   const idDocument = claims?.claims?.id_document;
+  const address = claims?.claims?.address?.formatted;
 
   const startIdentityVerificationFlow = path(
     PAGES.idvStartIdentityProofingPage,
@@ -60,6 +61,16 @@ export default function ProvenInformationCard({
         </GcdsHeading>
         <GcdsText marginTop="200" marginBottom="0">
           {dateOfBirth}
+        </GcdsText>
+      </GcdsContainer>
+    ) : null,
+    address ? (
+      <GcdsContainer>
+        <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+          {t("ProvenInformationCard.address")}
+        </GcdsHeading>
+        <GcdsText marginTop="200" marginBottom="0">
+          {address}
         </GcdsText>
       </GcdsContainer>
     ) : null,

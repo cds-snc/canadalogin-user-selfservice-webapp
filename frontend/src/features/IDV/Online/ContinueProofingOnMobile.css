@@ -1,0 +1,28 @@
+.mobile-proofing {
+  max-width: 34.125rem;
+}
+
+.mobile-proofing-qr {
+  display: block;
+  width: 100%;
+  max-width: 22.5rem;
+  height: auto;
+}
+
+.mobile-proofing-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mobile-proofing-link gcds-link {
+  min-width: 0;
+  font-size: 1.125em;
+  overflow-wrap: anywhere;
+}
+
+.mobile-proofing-link gcds-button {
+  flex-shrink: 0;
+}

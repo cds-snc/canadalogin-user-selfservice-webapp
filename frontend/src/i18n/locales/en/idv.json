@@ -160,6 +160,19 @@
     "continueButton": "Continue",
     "backButton": "Back"
   },
+  "ContinueProofingOnMobile": {
+    "pageTitle": "Continue proofing on mobile",
+    "heading": "Continue proofing on mobile",
+    "description": "In order to capture a photo of yourself and your ID, you will need to use your mobile phone device.",
+    "keepOpen": "Keep this window open",
+    "returnHere": "Return here once proofing is complete.",
+    "scanInstruction": "Scan the QR code below to continue proofing on your mobile device.",
+    "qrLabel": "Example identity proofing QR code",
+    "cannotScan": "Can’t scan the QR code? Send this link to your mobile device.",
+    "copyLink": "Copy link",
+    "copyError": "We couldn’t copy the link. Select and copy the link above instead.",
+    "continueButton": "Continue"
+  },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",
     "heading": "Get ready for self-photo and ID check",
