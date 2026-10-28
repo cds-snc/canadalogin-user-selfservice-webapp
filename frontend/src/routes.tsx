@@ -37,6 +37,7 @@ import OnlineVerificationInfo from "./features/IDV/Online/OnlineVerificationInfo
 import PartnerLinkSuccessPage from "./features/IDV/Online/PartnerLinkSuccessPage";
 import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
+import IdentityVerificationSuccess from "./features/IDV/Online/IdentityVerificationSuccess";
 import ContinueProofingOnMobile from "./features/IDV/Online/ContinueProofingOnMobile";
 import ConnectedServicesPage from "./features/ConnectedServices/components/ConnectedServicesPage";
 import DataTransparencyPage from "./features/DataTransparency/DataTransparencyPage";
