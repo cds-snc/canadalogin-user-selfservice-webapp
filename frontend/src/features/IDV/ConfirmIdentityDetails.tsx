@@ -93,9 +93,12 @@ export default function ConfirmIdentityDetails() {
     return null;
   }
 
+  const reviewClaims = isMockProofing
+    ? mockIdentityClaims
+    : identityVerificationClaims;
   const verifiedClaims =
-    identityVerificationClaims?.status === "verified"
-      ? identityVerificationClaims.verified_claims
+    reviewClaims?.status === "verified"
+      ? reviewClaims.verified_claims
       : undefined;
   const verificationTime = verifiedClaims?.verification?.time;
   const provenDate = verificationTime

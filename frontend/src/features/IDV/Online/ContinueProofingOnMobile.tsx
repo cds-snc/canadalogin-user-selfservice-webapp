@@ -13,7 +13,6 @@ import {
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import { mockIdentityClaims } from "../data/mockIdentityClaims";
 import "./ContinueProofingOnMobile.css";
 
 const DUMMY_PROOFING_LINK = "canadalogin.ca/prove/daUf30fn2/";
@@ -24,6 +23,10 @@ export default function ContinueProofingOnMobile() {
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
   const [error, setError] = useState("");
+  const successPage = path(PAGES.idvIdentityVerificationSuccessPage, {
+    language,
+    journeyType,
+  });
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -94,21 +97,12 @@ export default function ContinueProofingOnMobile() {
           type="button"
           buttonRole="primary"
           onClick={() => {
-            navigate(
-              path(PAGES.idvDetailsConfirmationPage, {
-                language,
-                journeyType,
-              }),
-              {
-                state: {
-                  mockProofing: true,
-                  mockIdentityClaims,
-                },
-              },
-            );
+            navigate(successPage, {
+              state: { mockProofing: true },
+            });
           }}
         >
-          {t("ContinueProofingOnMobile.nextStepButton")}
+          {t("ContinueProofingOnMobile.continueButton")}
         </GcdsButton>
         <GcdsButton
           type="button"
