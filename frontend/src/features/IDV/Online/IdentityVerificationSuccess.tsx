@@ -8,12 +8,14 @@ import {
 
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
 export default function IdentityVerificationSuccess() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const isMockProofing = state?.mockProofing === true;
   const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
   const { t: tLayout } = useTranslation("layout");
@@ -54,7 +56,10 @@ export default function IdentityVerificationSuccess() {
           <GcdsButton
             type="button"
             onClick={() => {
-              navigate(detailsConfirmationPage);
+              navigate(
+                detailsConfirmationPage,
+                isMockProofing ? { state: { mockProofing: true } } : undefined,
+              );
             }}
           >
             {t("IdentityVerificationSuccess.continueButton")}
