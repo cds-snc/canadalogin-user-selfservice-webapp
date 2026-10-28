@@ -79,7 +79,7 @@ export default function ConfirmIdentityDetails() {
     useState<IdentityVerificationClaimsResponse>();
 
   useEffect(() => {
-    if (!DEV_ONLY_FEATURE) {
+    if (!DEV_ONLY_FEATURE || isMockProofing) {
       return;
     }
 
