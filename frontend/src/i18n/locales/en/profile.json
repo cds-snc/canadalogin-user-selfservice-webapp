@@ -30,6 +30,7 @@
   "ProvenInformationCard": {
     "name": "Legal name",
     "dateOfBirth": "Date of birth",
+    "address": "Address",
     "idDocument": "Source of information",
     "updateInfo": "To update this information you will need to verify your identity again.",
     "updateButton": "Update information",
