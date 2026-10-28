@@ -35,6 +35,7 @@ import PartnerLinkSuccessPage from "./features/IDV/Online/PartnerLinkSuccessPage
 import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
 import IdentityVerificationSuccess from "./features/IDV/Online/IdentityVerificationSuccess";
+import ContinueProofingOnMobile from "./features/IDV/Online/ContinueProofingOnMobile";
 import ConnectedServicesPage from "./features/ConnectedServices/components/ConnectedServicesPage";
 
 export const appRoutes: RouteObject[] = [
@@ -207,6 +208,11 @@ export const appRoutes: RouteObject[] = [
                           path: "online/identity-verification-info",
                           element: <OnlineVerificationInfo />,
                           handle: { id: PAGES.idvOnlineVerificationInfoPage },
+                        },
+                        {
+                          path: "online/bluink/mobile",
+                          element: <ContinueProofingOnMobile />,
+                          handle: { id: PAGES.idvContinueProofingOnMobilePage },
                         },
                         {
                           path: "online/provincial",
