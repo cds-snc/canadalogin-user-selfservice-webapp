@@ -303,3 +303,7 @@ gcds-error-summary.error-summary-focus-no-ring:focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
+
+gcds-notice.notice-heading-no-character-limit {
+  --gcds-heading-character-limit-h2: none;
+}
