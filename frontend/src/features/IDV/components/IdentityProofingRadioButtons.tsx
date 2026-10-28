@@ -52,10 +52,10 @@ export default function IdentityProofingRadioButtons({
   ];
   if (journeyType === IDV_JOURNEY_TYPE.REQUIRED) {
     radioOptions.push({
-      label: t("StartIdentityProofing.notReadyOption"),
+      label: t("StartIdentityProofing.cantProveNowOption"),
       id: `radio-${START_IDENTITY_OPTION.cantProveNow}`,
       value: START_IDENTITY_OPTION.cantProveNow,
-      hint: t("StartIdentityProofing.notReadyHint", { rpName }),
+      hint: t("StartIdentityProofing.cantProveNowHint", { rpName }),
       checked: selectedOption === START_IDENTITY_OPTION.cantProveNow,
     });
   }
