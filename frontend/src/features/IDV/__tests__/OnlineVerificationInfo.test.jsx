@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import OnlineVerificationInfo from "../Online/OnlineVerificationInfo";
 
@@ -48,6 +48,7 @@ vi.mock("../../../utils/constants", async () => {
     PAGES: {
       idvDetailsConfirmationPage: "IdvDetailsConfirmationPage",
       idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
+      idvContinueProofingOnMobilePage: "ContinueProofingOnMobile",
     },
     VITE_ENVIRONMENTS: { dev: "development", test: "test" },
   };
@@ -58,6 +59,9 @@ vi.mock("../../../utils/routeHelpers", () => ({
     const jType = journeyType ? `/${journeyType}` : "";
     if (_page === "IdvStartIdentityProofingPage") {
       return `/${language ?? "en"}/identity-verification${jType}`;
+    }
+    if (_page === "ContinueProofingOnMobile") {
+      return `/${language ?? "en"}/identity-verification${jType}/online/bluink/mobile`;
     }
     return `/${language ?? "en"}/identity-verification${jType}/details-confirmation`;
   },
@@ -220,42 +224,15 @@ describe("OnlineVerificationInfo", () => {
     expect(mockNavigate).toHaveBeenCalledTimes(1);
   });
 
-  it("calls online verification API when Continue button is clicked", async () => {
+  it("opens the QR handoff and preserves the journey instead of starting Bluink", () => {
     render(<OnlineVerificationInfo />);
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    await waitFor(() => {
-      expect(mockPostOnlineIdentityVerification).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it("redirects to the verification error page when online verification fails", async () => {
-    mockPostOnlineIdentityVerification.mockRejectedValue(
-      new Error("idv-data-store unavailable"),
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/update/online/bluink/mobile",
     );
-
-    render(<OnlineVerificationInfo />);
-
-    fireEvent.click(screen.getByTestId("continue-button"));
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/identity-verification/verification-error",
-      );
-    });
-  });
-
-  it("redirects to the verification error page when the verification URL is missing", async () => {
-    render(<OnlineVerificationInfo />);
-
-    fireEvent.click(screen.getByTestId("continue-button"));
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/identity-verification/verification-error",
-      );
-    });
+    expect(mockPostOnlineIdentityVerification).not.toHaveBeenCalled();
   });
 
   it("renders the more information notice", () => {
