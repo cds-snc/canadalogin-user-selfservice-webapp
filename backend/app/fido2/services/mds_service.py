@@ -309,7 +309,7 @@ def _iter_mds3_entries(blob_jwt: bytes, cert_bytes: bytes):
     entries = payload["entries"]
     if not isinstance(entries, list):
         raise ValueError("MDS payload entries must be a list")
-    for raw_entry in entries
+    for raw_entry in entries:
         statement = raw_entry.get("metadataStatement")
         if isinstance(statement, dict):
             for key in _STATEMENT_DEFAULT_LIST_FIELDS:
