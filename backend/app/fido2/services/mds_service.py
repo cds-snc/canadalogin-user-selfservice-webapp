@@ -21,11 +21,16 @@ import enum
 import json
 import logging
 import uuid as uuid_module
-from base64 import b64encode
+from base64 import b64decode, b64encode
 from typing import Any
 
 import httpx
-from fido2.mds3 import parse_blob
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from fido2.attestation import verify_x509_chain
+from fido2.cose import CoseKey
+from fido2.mds3 import MetadataBlobPayloadEntry
+from fido2.utils import websafe_decode
 from redis.asyncio import Redis
 
 from app.config import FIDO2MDSConfig
@@ -189,7 +194,7 @@ class FIDO2MetadataService:
 
             logger.info("MDS: parsing blob (%d bytes)…", len(blob_jwt))
 
-            # parse_blob is CPU-bound; run in thread pool to avoid blocking the event loop
+            # blob parsing is CPU-bound; run in thread pool to avoid blocking the event loop
             metadata = await asyncio.to_thread(_parse_mds3_blob, blob_jwt, cert_bytes)
 
             self._metadata = metadata
@@ -238,13 +243,16 @@ def _parse_mds3_blob(blob_jwt: bytes, cert_bytes: bytes) -> dict[str, dict[str, 
     with ``aaguid``, ``status_reports``, and ``is_known`` merged in at the top
     level for easy access.  Entries that have no metadata statement are skipped.
 
-    This function is synchronous because ``fido2.mds3.parse_blob`` is itself
-    synchronous.  Callers should run it via ``asyncio.to_thread``.
+    The blob signature is verified against ``cert_bytes``, then each entry is
+    parsed independently so a single malformed entry is skipped (and logged)
+    instead of failing the entire refresh.
+
+    This function is synchronous and CPU-bound.  Callers should run it via
+    ``asyncio.to_thread``.
     """
-    payload = parse_blob(blob_jwt, cert_bytes)
     result: dict[str, dict[str, Any]] = {}
 
-    for entry in payload.entries:
+    for entry in _iter_mds3_entries(blob_jwt, cert_bytes):
         if not entry.aaguid:
             continue
 
@@ -262,6 +270,64 @@ def _parse_mds3_blob(blob_jwt: bytes, cert_bytes: bytes) -> dict[str, dict[str, 
         result[aaguid] = metadata
 
     return result
+
+
+# Fields the fido2 library declares as required but that some vendors omit in
+# the MDS3 blob (the FIDO schema treats them as optional).
+_STATEMENT_DEFAULT_LIST_FIELDS = (
+    "attestationTypes",
+    "userVerificationDetails",
+    "keyProtection",
+    "matcherProtection",
+    "attachmentHint",
+    "tcDisplay",
+    "attestationRootCertificates",
+)
+
+
+def _iter_mds3_entries(blob_jwt: bytes, cert_bytes: bytes):
+    """Verify the MDS3 JWT and yield each entry parsed into a ``MetadataBlobPayloadEntry``.
+
+    Mirrors ``fido2.mds3.parse_blob`` for signature verification, but parses
+    entries one at a time and tolerates missing "required" list fields.
+    """
+    message, signature_b64 = blob_jwt.rsplit(b".", 1)
+    signature = websafe_decode(signature_b64)
+    header, payload = (json.loads(websafe_decode(x)) for x in message.split(b"."))
+
+    chain = [
+        x509.load_der_x509_certificate(b64decode(c), default_backend())
+        for c in header.get("x5c", [])
+    ]
+    chain.append(x509.load_der_x509_certificate(cert_bytes, default_backend()))
+    verify_x509_chain(chain)
+
+    leaf = chain[0]
+    public_key = CoseKey.for_name(header["alg"]).from_cryptography_key(
+        leaf.public_key()
+    )
+    public_key.verify(message, signature)
+
+    skipped = 0
+    entries = payload["entries"]
+    if not isinstance(entries, list):
+        raise ValueError("MDS payload entries must be a list")
+    for raw_entry in entries:
+        statement = raw_entry.get("metadataStatement")
+        if isinstance(statement, dict):
+            for key in _STATEMENT_DEFAULT_LIST_FIELDS:
+                statement.setdefault(key, [])
+        try:
+            yield MetadataBlobPayloadEntry.from_dict(raw_entry)
+        except Exception as exc:
+            skipped += 1
+            logger.warning(
+                "MDS: skipping malformed entry (aaguid=%s): %s",
+                raw_entry.get("aaguid"),
+                exc,
+            )
+    if skipped:
+        logger.warning("MDS: skipped %d malformed entries", skipped)
 
 
 def _to_json_safe(obj: Any) -> Any:
