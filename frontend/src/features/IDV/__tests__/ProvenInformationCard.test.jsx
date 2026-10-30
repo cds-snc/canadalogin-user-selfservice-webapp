@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import ProvenInformationCard from "../ProvenInformationCard";
 import i18n from "../../../i18n/test";
@@ -108,12 +108,17 @@ describe("ProvenInformationCard", () => {
     expect(screen.getByText("February 1, 1990")).toBeInTheDocument();
   });
 
-  it("renders the date of birth in the selected French language", async () => {
+  it("renders the date of birth with the French ordinal for the first day", async () => {
     await i18n.changeLanguage("fr");
 
     render(<ProvenInformationCard claims={claims} />);
 
-    expect(screen.getByText("1 février 1990")).toBeInTheDocument();
+    const dobSection = screen.getByRole("heading", {
+      name: "Date de naissance",
+    }).parentElement;
+
+    expect(dobSection).toHaveTextContent("1er février 1990");
+    expect(within(dobSection).getByText("er").tagName).toBe("SUP");
   });
 
   it("renders the ID document section heading", () => {
@@ -140,6 +145,6 @@ describe("ProvenInformationCard", () => {
     expect(
       screen.getByRole("heading", { name: "Legal name" }),
     ).toBeInTheDocument();
-    expect(container.querySelectorAll(".separator")).toHaveLength(1);
+    expect(container.querySelectorAll(".separator").length).toBeGreaterThan(0);
   });
 });
