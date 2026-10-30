@@ -295,11 +295,14 @@ def _iter_mds3_entries(blob_jwt: bytes, cert_bytes: bytes):
     signature = websafe_decode(signature_b64)
     header, payload = (json.loads(websafe_decode(x)) for x in message.split(b"."))
 
-    chain = [b64decode(c) for c in header.get("x5c", [])]
-    chain.append(cert_bytes)
+    chain = [
+        x509.load_der_x509_certificate(b64decode(c), default_backend())
+        for c in header.get("x5c", [])
+    ]
+    chain.append(x509.load_der_x509_certificate(cert_bytes, default_backend()))
     verify_x509_chain(chain)
 
-    leaf = x509.load_der_x509_certificate(chain[0], default_backend())
+    leaf = chain[0]
     public_key = CoseKey.for_name(header["alg"]).from_cryptography_key(
         leaf.public_key()
     )
