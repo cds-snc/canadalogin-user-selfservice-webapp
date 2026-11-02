@@ -29,6 +29,9 @@ export type IdentityVerificationClaimsResponse = {
       given_name?: string | null;
       family_name?: string | null;
       birthdate?: string | null;
+      address?: {
+        formatted?: string | null;
+      } | null;
       id_document?: string | null;
     };
   };

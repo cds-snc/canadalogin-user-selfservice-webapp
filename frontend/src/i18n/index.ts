@@ -131,8 +131,8 @@ export const PAGE_NAMESPACE_MAP: Record<string, I18nNamespace> = {
   IdvProvincialVerificationPage: "idv",
   IdvDetailsConfirmationPage: "idv",
   IdvPartnerLinkSuccessPage: "idv",
-  // dataTransparency
   DataTransparencyPage: "dataTransparency",
+  ContinueProofingOnMobile: "idv",
 };
 
 i18n.use(initReactI18next).init({

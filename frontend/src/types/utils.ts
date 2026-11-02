@@ -66,6 +66,7 @@ export const pageIds = [
   "IdvProveIdentityInPersonPage",
   "IdvProveIdentityOnlinePage",
   "IdvOnlineVerificationInfoPage",
+  "ContinueProofingOnMobile",
   "IdvInPersonProofingInProgressPage",
   "IdvProvincialVerificationPage",
   "IdvDetailsConfirmationPage",

@@ -37,6 +37,7 @@ export default function ProvenInformationCard({
       )
     : "";
   const idDocument = claims?.claims?.id_document;
+  const address = claims?.claims?.address?.formatted;
 
   const formatFrenchOrdinalDate = (value: string) => {
     if (i18n.language !== "fr" || !value.startsWith("1er ")) {
@@ -83,7 +84,26 @@ export default function ProvenInformationCard({
         {name}
       </GcdsText>
     </GcdsContainer>,
-    DateOfBirthSection,
+    dateOfBirth ? (
+      <GcdsContainer>
+        <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+          {t("ProvenInformationCard.dateOfBirth")}
+        </GcdsHeading>
+        <GcdsText marginTop="200" marginBottom="0">
+          {dateOfBirth}
+        </GcdsText>
+      </GcdsContainer>
+    ) : null,
+    address ? (
+      <GcdsContainer>
+        <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+          {t("ProvenInformationCard.address")}
+        </GcdsHeading>
+        <GcdsText marginTop="200" marginBottom="0">
+          {address}
+        </GcdsText>
+      </GcdsContainer>
+    ) : null,
     idDocument ? (
       <GcdsContainer key="idDocument">
         <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
