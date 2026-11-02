@@ -13,7 +13,8 @@ import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import type { IdentityVerificationClaimsResponse } from "./api/identityVerificationApi";
-import { formatDateOfBirthForDisplay } from "./InPerson/validation/InPersonIdentity.validation";
+import { format, parseISO } from "date-fns";
+import { enCA, frCA } from "date-fns/locale";
 
 type ProvenInformationCardProps = {
   claims?: NonNullable<IdentityVerificationClaimsResponse["verified_claims"]>;
@@ -27,10 +28,28 @@ export default function ProvenInformationCard({
   const name = [claims?.claims?.given_name, claims?.claims?.family_name]
     .filter(Boolean)
     .join(" ");
-  const dateOfBirth = claims?.claims?.birthdate
-    ? formatDateOfBirthForDisplay(claims.claims.birthdate, i18n.language)
-    : undefined;
+  const birthdate = claims?.claims?.birthdate;
+  const dateOfBirth = birthdate
+    ? format(
+        parseISO(birthdate),
+        i18n.language === "fr" ? "do MMMM yyyy" : "MMMM d, yyyy",
+        { locale: i18n.language === "fr" ? frCA : enCA },
+      )
+    : "";
   const idDocument = claims?.claims?.id_document;
+
+  const formatFrenchOrdinalDate = (value: string) => {
+    if (i18n.language !== "fr" || !value.startsWith("1er ")) {
+      return value;
+    }
+
+    return (
+      <>
+        1<sup>er</sup>
+        {value.slice(3)}
+      </>
+    );
+  };
 
   const startIdentityVerificationFlow = path(
     PAGES.idvStartIdentityProofingPage,
@@ -44,8 +63,19 @@ export default function ProvenInformationCard({
     return null;
   }
 
-  const sections = [
+  const DateOfBirthSection = dateOfBirth ? (
     <GcdsContainer>
+      <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+        {t("ProvenInformationCard.dateOfBirth")}
+      </GcdsHeading>
+      <GcdsText marginTop="200" marginBottom="0">
+        {formatFrenchOrdinalDate(dateOfBirth)}
+      </GcdsText>
+    </GcdsContainer>
+  ) : null;
+
+  const sections = [
+    <GcdsContainer key="name">
       <GcdsHeading tag="h3" marginTop="300" marginBottom="0">
         {t("ProvenInformationCard.name")}
       </GcdsHeading>
@@ -53,18 +83,9 @@ export default function ProvenInformationCard({
         {name}
       </GcdsText>
     </GcdsContainer>,
-    dateOfBirth ? (
-      <GcdsContainer>
-        <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-          {t("ProvenInformationCard.dateOfBirth")}
-        </GcdsHeading>
-        <GcdsText marginTop="200" marginBottom="0">
-          {dateOfBirth}
-        </GcdsText>
-      </GcdsContainer>
-    ) : null,
+    DateOfBirthSection,
     idDocument ? (
-      <GcdsContainer>
+      <GcdsContainer key="idDocument">
         <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
           {t("ProvenInformationCard.idDocument")}
         </GcdsHeading>
@@ -73,7 +94,7 @@ export default function ProvenInformationCard({
         </GcdsText>
       </GcdsContainer>
     ) : null,
-    <GcdsContainer>
+    <GcdsContainer key="update">
       <GcdsText>{t("ProvenInformationCard.updateInfo")}</GcdsText>
       <GcdsText>
         <GcdsLink href={startIdentityVerificationFlow}>
@@ -81,7 +102,7 @@ export default function ProvenInformationCard({
         </GcdsLink>
       </GcdsText>
     </GcdsContainer>,
-  ].filter(Boolean);
+  ];
 
   return (
     <GcdsContainer className="sectionCard">
