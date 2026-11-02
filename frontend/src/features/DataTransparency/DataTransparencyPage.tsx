@@ -12,7 +12,7 @@ import {
 
 import { PAGES } from "../../utils/constants";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
-import { useUser } from "../../components/Providers/useUser";
+import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 import DataInformationCard from "./components/DataInformationCard";
 import { path } from "../../utils/routeHelpers";
 import {
@@ -26,7 +26,6 @@ export default function DataTransparencyPage() {
   const { language } = useParams();
   const { relyingPartyUrl, relyingPartyName, hasRelyingParty } =
     useRelyingPartyInfo();
-  const { state } = useUser();
 
   const [identityVerificationClaims, setIdentityVerificationClaims] =
     useState<IdentityVerificationClaimsResponse>();
@@ -66,8 +65,6 @@ export default function DataTransparencyPage() {
       ? identityVerificationClaims.verified_claims
       : undefined;
 
-  const userProfile = state.userProfile;
-
   return (
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
@@ -77,30 +74,32 @@ export default function DataTransparencyPage() {
           </GcdsHeading>
 
           <GcdsText>
-            {t("DataTransparencyPage.description", { relyingPartyName })}
+            {t("DataTransparencyPage.descriptionPrefix")}
+            <strong>{relyingPartyName}</strong>
+            {t("DataTransparencyPage.descriptionSuffix")}
           </GcdsText>
         </GcdsContainer>
 
         <GcdsContainer>
-          <DataInformationCard
-            userProfile={userProfile}
-            verifiedClaims={verifiedClaims}
-          />
+          <DataInformationCard verifiedClaims={verifiedClaims} />
         </GcdsContainer>
 
         {hasRelyingParty && (
           <GcdsContainer>
-            <GcdsHeading tag="h2" marginTop="0">
-              {t("DataTransparencyPage.informationSharingTitle")}
-            </GcdsHeading>
-            <GcdsText>
-              {t("DataTransparencyPage.informationSharingDescription")}
-            </GcdsText>
-            <GcdsText>
-              <GcdsLink href="#" external>
-                {t("DataTransparencyPage.learnMoreLink")}
-              </GcdsLink>
-            </GcdsText>
+            <AccessibleNotice
+              noticeRole="info"
+              noticeTitleTag="h2"
+              noticeTitle={t("DataTransparencyPage.informationSharingTitle")}
+            >
+              <GcdsText>
+                {t("DataTransparencyPage.informationSharingDescription")}
+              </GcdsText>
+              <GcdsText>
+                <GcdsLink href="#" external>
+                  {t("DataTransparencyPage.learnMoreLink")}
+                </GcdsLink>
+              </GcdsText>
+            </AccessibleNotice>
           </GcdsContainer>
         )}
 

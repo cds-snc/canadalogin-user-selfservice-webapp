@@ -39,19 +39,6 @@ export default function ProvenInformationCard({
   const idDocument = claims?.claims?.id_document;
   const address = claims?.claims?.address?.formatted;
 
-  const formatFrenchOrdinalDate = (value: string) => {
-    if (i18n.language !== "fr" || !value.startsWith("1er ")) {
-      return value;
-    }
-
-    return (
-      <>
-        1<sup>er</sup>
-        {value.slice(3)}
-      </>
-    );
-  };
-
   const startIdentityVerificationFlow = path(
     PAGES.idvStartIdentityProofingPage,
     {
@@ -63,17 +50,6 @@ export default function ProvenInformationCard({
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
-
-  const DateOfBirthSection = dateOfBirth ? (
-    <GcdsContainer>
-      <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-        {t("ProvenInformationCard.dateOfBirth")}
-      </GcdsHeading>
-      <GcdsText marginTop="200" marginBottom="0">
-        {formatFrenchOrdinalDate(dateOfBirth)}
-      </GcdsText>
-    </GcdsContainer>
-  ) : null;
 
   const sections = [
     <GcdsContainer key="name">

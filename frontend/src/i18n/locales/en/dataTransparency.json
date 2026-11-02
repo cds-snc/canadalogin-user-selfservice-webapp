@@ -1,9 +1,8 @@
 {
   "DataTransparencyPage": {
     "title": "Information being shared with {{relyingPartyName}}",
-    "description": "By continuing, CanadaLogin will share the following details with {{relyingPartyName}}:",
-    "sharingPrefix": "By continuing, CanadaLogin will share the following details with ",
-    "sharingSuffix": ":",
+    "descriptionPrefix": "By continuing, CanadaLogin will share the following details with ",
+    "descriptionSuffix": ":",
     "informationSharingTitle": "How CanadaLogin shares your information",
     "informationSharingDescription": "Services request your details from CanadaLogin to know who you are and to provide a personalized experience.",
     "learnMoreLink": "Learn how your information is shared and stored with services",
@@ -17,3 +16,4 @@
     "updateLink": "Update your information"
   }
 }
+
