@@ -43,6 +43,7 @@ Before deploying the Manage App frontend and backend, verify that the required A
 
 2. Follow the AWS ECR commands to authenticate, tag, and push the Docker image to the appropriate repository.
 3. Confirm that the new image is available in ECR.
+   - Environment variables for the backend are configured via Terraform
 4. Manually force a new deployment of the backend ECS service to deploy the updated image.
 
    **Note:** Ensure the ECS task definition references the intended image tag or digest before triggering deployment.
