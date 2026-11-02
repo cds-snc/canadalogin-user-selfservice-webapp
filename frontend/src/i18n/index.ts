@@ -32,6 +32,8 @@ import enIdv from "./locales/en/idv.json";
 import frIdv from "./locales/fr/idv.json";
 import enConnectedServices from "./locales/en/connectedServices.json";
 import frConnectedServices from "./locales/fr/connectedServices.json";
+import enDataTransparency from "./locales/en/dataTransparency.json";
+import frDataTransparency from "./locales/fr/dataTransparency.json";
 
 export const NAMESPACES = [
   "common",
@@ -49,6 +51,7 @@ export const NAMESPACES = [
   "otp",
   "idv",
   "connectedServices",
+  "dataTransparency",
 ] as const;
 
 export type I18nNamespace = (typeof NAMESPACES)[number];
@@ -128,6 +131,8 @@ export const PAGE_NAMESPACE_MAP: Record<string, I18nNamespace> = {
   IdvProvincialVerificationPage: "idv",
   IdvDetailsConfirmationPage: "idv",
   IdvPartnerLinkSuccessPage: "idv",
+  // dataTransparency
+  DataTransparencyPage: "dataTransparency",
 };
 
 i18n.use(initReactI18next).init({
@@ -148,6 +153,7 @@ i18n.use(initReactI18next).init({
       otp: enOtp,
       idv: enIdv,
       connectedServices: enConnectedServices,
+      dataTransparency: enDataTransparency,
     },
     fr: {
       common: frCommon,
@@ -165,6 +171,7 @@ i18n.use(initReactI18next).init({
       otp: frOtp,
       idv: frIdv,
       connectedServices: frConnectedServices,
+      dataTransparency: frDataTransparency,
     },
   },
   lng: "en",
