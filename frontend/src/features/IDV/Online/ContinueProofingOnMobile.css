@@ -26,3 +26,7 @@
 .mobile-proofing-link gcds-button {
   flex-shrink: 0;
 }
+
+.mobile-proofing-choose-different {
+  margin-bottom: 1.5rem;
+}
