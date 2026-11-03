@@ -13,7 +13,8 @@ import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import type { IdentityVerificationClaimsResponse } from "./api/identityVerificationApi";
-import { formatDateOfBirthForDisplay } from "./InPerson/validation/InPersonIdentity.validation";
+import { format, parseISO } from "date-fns";
+import { enCA, frCA } from "date-fns/locale";
 
 type ProvenInformationCardProps = {
   claims?: NonNullable<IdentityVerificationClaimsResponse["verified_claims"]>;
@@ -27,9 +28,14 @@ export default function ProvenInformationCard({
   const name = [claims?.claims?.given_name, claims?.claims?.family_name]
     .filter(Boolean)
     .join(" ");
-  const dateOfBirth = claims?.claims?.birthdate
-    ? formatDateOfBirthForDisplay(claims.claims.birthdate, i18n.language)
-    : undefined;
+  const birthdate = claims?.claims?.birthdate;
+  const dateOfBirth = birthdate
+    ? format(
+        parseISO(birthdate),
+        i18n.language === "fr" ? "do MMMM yyyy" : "MMMM d, yyyy",
+        { locale: i18n.language === "fr" ? frCA : enCA },
+      )
+    : "";
   const idDocument = claims?.claims?.id_document;
   const address = claims?.claims?.address?.formatted;
 
@@ -46,7 +52,7 @@ export default function ProvenInformationCard({
   }
 
   const sections = [
-    <GcdsContainer>
+    <GcdsContainer key="name">
       <GcdsHeading tag="h3" marginTop="300" marginBottom="0">
         {t("ProvenInformationCard.name")}
       </GcdsHeading>
@@ -75,7 +81,7 @@ export default function ProvenInformationCard({
       </GcdsContainer>
     ) : null,
     idDocument ? (
-      <GcdsContainer>
+      <GcdsContainer key="idDocument">
         <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
           {t("ProvenInformationCard.idDocument")}
         </GcdsHeading>
@@ -84,7 +90,7 @@ export default function ProvenInformationCard({
         </GcdsText>
       </GcdsContainer>
     ) : null,
-    <GcdsContainer>
+    <GcdsContainer key="update">
       <GcdsText>{t("ProvenInformationCard.updateInfo")}</GcdsText>
       <GcdsText>
         <GcdsLink href={startIdentityVerificationFlow}>
@@ -92,7 +98,7 @@ export default function ProvenInformationCard({
         </GcdsLink>
       </GcdsText>
     </GcdsContainer>,
-  ].filter(Boolean);
+  ];
 
   return (
     <GcdsContainer className="sectionCard">
