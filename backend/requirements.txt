@@ -10,7 +10,7 @@ pydantic==2.14.1
 httpx==0.28.1
 email-validator==2.3.0
 pydantic-extra-types==2.11.1
-phonenumbers==9.0.41
+phonenumbers==9.0.42
 cachetools==5.5.2
 authlib==1.9.1
 itsdangerous==2.2.0
