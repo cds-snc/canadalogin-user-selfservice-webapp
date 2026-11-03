@@ -1,0 +1,18 @@
+{
+  "DataTransparencyPage": {
+    "title": "Information being shared with {{relyingPartyName}}",
+    "descriptionPrefix": "By continuing, CanadaLogin will share the following details with ",
+    "descriptionSuffix": ":",
+    "informationSharingTitle": "How CanadaLogin shares your information",
+    "informationSharingDescription": "Services request your details from CanadaLogin to know who you are and to provide a personalized experience.",
+    "learnMoreLink": "Learn how your information is shared and stored with services",
+    "continueButton": "Continue"
+  },
+  "DataInformationCard": {
+    "preferredName": "Preferred name",
+    "languagePreference": "Language preference",
+    "emailAddress": "Email address",
+    "wrongInformation": "If your information is wrong",
+    "updateLink": "Update your information"
+  }
+}

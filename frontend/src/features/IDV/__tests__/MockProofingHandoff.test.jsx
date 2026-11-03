@@ -202,7 +202,7 @@ describe("IdentityVerificationSuccess", () => {
     render(<IdentityVerificationSuccess />);
     fireEvent.click(screen.getByRole("button"));
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/en/identity-verification/required/IdvDetailsConfirmationPage",
+      "/en/identity-verification/required/DataTransparencyPage",
       { state: { mockProofing: true } },
     );
   });
@@ -211,7 +211,7 @@ describe("IdentityVerificationSuccess", () => {
     render(<IdentityVerificationSuccess />);
     fireEvent.click(screen.getByRole("button"));
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/en/identity-verification/required/IdvDetailsConfirmationPage",
+      "/en/identity-verification/required/DataTransparencyPage",
       undefined,
     );
   });
