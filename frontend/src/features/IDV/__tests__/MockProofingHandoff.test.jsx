@@ -90,7 +90,7 @@ describe("ContinueProofingOnMobile", () => {
       "Example identity proofing QR code",
     );
     expect(container.querySelector("svg path")).not.toBeNull();
-    expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Next Step" })).toBeEnabled();
     expect(mocks.navigate).not.toHaveBeenCalled();
   });
 
@@ -98,7 +98,7 @@ describe("ContinueProofingOnMobile", () => {
     render(<ContinueProofingOnMobile />);
     const link = screen.getByRole("link");
     const copy = screen.getByRole("button", { name: "Copy link" });
-    const continueButton = screen.getByRole("button", { name: "Continue" });
+    const continueButton = screen.getByRole("button", { name: "Next Step" });
     const differentMethod = screen.getByRole("button", {
       name: "Choose a different method",
     });
@@ -125,10 +125,9 @@ describe("ContinueProofingOnMobile", () => {
     await act(async () => vi.advanceTimersByTimeAsync(60000));
     expect(mocks.navigate).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next Step" }));
     expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith(
-      "/en/identity-verification/required/IdvIdentityVerificationSuccessPage",
-      { state: { mockProofing: true } },
+      "/en/identity-verification/required/IdvInPersonProofingInProgressPage",
     );
   });
 
@@ -136,10 +135,9 @@ describe("ContinueProofingOnMobile", () => {
     mocks.language = "fr";
     mocks.journeyType = "update";
     render(<ContinueProofingOnMobile />);
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next Step" }));
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/fr/identity-verification/update/IdvIdentityVerificationSuccessPage",
-      { state: { mockProofing: true } },
+      "/fr/identity-verification/update/IdvInPersonProofingInProgressPage",
     );
   });
 
@@ -171,10 +169,9 @@ describe("ContinueProofingOnMobile", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Select and copy the link above instead.",
     );
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next Step" }));
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/en/identity-verification/required/IdvIdentityVerificationSuccessPage",
-      { state: { mockProofing: true } },
+      "/en/identity-verification/required/IdvInPersonProofingInProgressPage",
     );
   });
 
