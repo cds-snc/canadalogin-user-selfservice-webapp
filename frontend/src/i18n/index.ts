@@ -33,7 +33,6 @@ import frIdv from "./locales/fr/idv.json";
 import enConnectedServices from "./locales/en/connectedServices.json";
 import frConnectedServices from "./locales/fr/connectedServices.json";
 import enDataTransparency from "./locales/en/dataTransparency.json";
-import frDataTransparency from "./locales/fr/dataTransparency.json";
 
 export const NAMESPACES = [
   "common",
@@ -171,7 +170,7 @@ i18n.use(initReactI18next).init({
       otp: frOtp,
       idv: frIdv,
       connectedServices: frConnectedServices,
-      dataTransparency: frDataTransparency,
+      dataTransparency: enDataTransparency,
     },
   },
   lng: "en",

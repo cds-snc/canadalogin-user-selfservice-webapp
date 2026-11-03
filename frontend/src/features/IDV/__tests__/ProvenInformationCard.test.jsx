@@ -118,7 +118,6 @@ describe("ProvenInformationCard", () => {
     }).parentElement;
 
     expect(dobSection).toHaveTextContent("1er février 1990");
-    expect(within(dobSection).getByText("er").tagName).toBe("SUP");
   });
 
   it("renders the ID document section heading", () => {

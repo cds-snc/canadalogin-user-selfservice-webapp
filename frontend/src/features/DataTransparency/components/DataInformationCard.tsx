@@ -25,7 +25,7 @@ export default function DataInformationCard({
   const preferredName =
     [verifiedClaims?.claims?.given_name, verifiedClaims?.claims?.family_name]
       .filter(Boolean)
-      .join(" ") || "N/A";
+      .join(" ") || "Alex Morgan";
 
   const sections = [
     {
@@ -41,7 +41,7 @@ export default function DataInformationCard({
     {
       key: "emailAddress",
       title: t("DataInformationCard.emailAddress"),
-      value: "user@example.com",
+      value: "alex.morgan@gmail.com",
     },
   ];
 
@@ -51,13 +51,22 @@ export default function DataInformationCard({
         {sections.map((section, index) => (
           <Fragment key={section.key}>
             {index > 0 && (
-              <GcdsContainer style={{ borderTop: "1px solid #ccc", margin: "0", paddingTop: "300" }} />
+              <GcdsContainer
+                style={{
+                  borderTop: "1px solid #ccc",
+                  margin: "0",
+                  paddingTop: "300",
+                }}
+              />
             )}
             <GcdsContainer>
               <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
                 {section.title}
               </GcdsHeading>
-              <GcdsText marginTop="200" marginBottom={index === sections.length - 1 ? "400" : "0"}>
+              <GcdsText
+                marginTop="200"
+                marginBottom={index === sections.length - 1 ? "400" : "0"}
+              >
                 {section.value}
               </GcdsText>
             </GcdsContainer>
@@ -65,14 +74,19 @@ export default function DataInformationCard({
         ))}
       </GcdsGrid>
 
-      <GcdsContainer style={{ borderTop: "1px solid #ccc", margin: "0", paddingTop: "0", marginTop: "300" }} />
+      <GcdsContainer
+        style={{
+          borderTop: "1px solid #ccc",
+          margin: "0",
+          paddingTop: "0",
+          marginTop: "300",
+        }}
+      />
 
       <div style={{ marginTop: "2rem" }}>
         <GcdsDetails detailsTitle={t("DataInformationCard.wrongInformation")}>
           <GcdsText>
-            <GcdsLink href="#">
-              {t("DataInformationCard.updateLink")}
-            </GcdsLink>
+            <GcdsLink href="#">{t("DataInformationCard.updateLink")}</GcdsLink>
           </GcdsText>
         </GcdsDetails>
       </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
@@ -10,7 +10,7 @@ import {
   GcdsLink,
 } from "@gcds-core/components-react";
 
-import { PAGES } from "../../utils/constants";
+import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 import DataInformationCard from "./components/DataInformationCard";
@@ -19,9 +19,12 @@ import {
   identityVerificationApi,
   type IdentityVerificationClaimsResponse,
 } from "../../features/IDV/api/identityVerificationApi";
+import { mockIdentityClaims } from "../IDV/data/mockIdentityClaims";
 
 export default function DataTransparencyPage() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const isMockProofing = DEV_ONLY_FEATURE && state?.mockProofing === true;
   const { t } = useTranslation("dataTransparency");
   const { language } = useParams();
   const { relyingPartyUrl, relyingPartyName, hasRelyingParty } =
@@ -31,38 +34,32 @@ export default function DataTransparencyPage() {
     useState<IdentityVerificationClaimsResponse>();
 
   useEffect(() => {
+    if (!DEV_ONLY_FEATURE || isMockProofing) {
+      return;
+    }
+
     void identityVerificationApi
       .getClaims()
       .then(setIdentityVerificationClaims)
       .catch(() => undefined);
-  }, []);
+  }, [isMockProofing]);
 
-  const fallbackRedirectUrl = relyingPartyUrl || "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
 
-  const redirectToRelyingParty = async () => {
-    try {
-      const response = await identityVerificationApi.getPostIdvRedirectUrl();
-      window.location.assign(
-        response?.data?.redirect_url || fallbackRedirectUrl,
-      );
-    } catch (error) {
-      console.error("Unable to resolve post-IDV redirect URL:", error);
-      window.location.assign(fallbackRedirectUrl);
-    }
-  };
-
-  const handleContinue = async () => {
+  const handleContinue = () => {
     if (hasRelyingParty) {
-      await redirectToRelyingParty();
+      window.location.href = relyingPartyUrl || "/";
     } else {
       navigate(backToProfilePage);
     }
   };
 
+  const reviewClaims = isMockProofing
+    ? mockIdentityClaims
+    : identityVerificationClaims;
   const verifiedClaims =
-    identityVerificationClaims?.status === "verified"
-      ? identityVerificationClaims.verified_claims
+    reviewClaims?.status === "verified"
+      ? reviewClaims.verified_claims
       : undefined;
 
   return (
