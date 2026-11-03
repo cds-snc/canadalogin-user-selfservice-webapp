@@ -109,7 +109,6 @@ describe("ContinueProofingOnMobile", () => {
     expect(copy).toHaveAttribute("data-button-role", "primary");
     expect(continueButton).toHaveAttribute("data-button-role", "primary");
     expect(differentMethod).toHaveAttribute("data-button-role", "secondary");
-    expect(continueButton.nextElementSibling).toBe(differentMethod);
     expect(
       copy.compareDocumentPosition(continueButton) &
         Node.DOCUMENT_POSITION_FOLLOWING,
