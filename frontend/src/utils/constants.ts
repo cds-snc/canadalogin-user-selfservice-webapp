@@ -191,6 +191,7 @@ export const PAGES = {
   idvDetailsConfirmationPage: "IdvDetailsConfirmationPage",
   idvIdentityVerificationSuccessPage: "IdvIdentityVerificationSuccessPage",
   idvPartnerLinkSuccessPage: "IdvPartnerLinkSuccessPage",
+  dataTransparencyPage: "DataTransparencyPage",
 } as const;
 
 export const PROVINCIAL_PARTNERS = {

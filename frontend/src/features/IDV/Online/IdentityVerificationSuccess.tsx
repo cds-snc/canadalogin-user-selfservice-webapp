@@ -25,6 +25,22 @@ export default function IdentityVerificationSuccess() {
     journeyType,
   });
 
+  const dataTransparencyPage = path(PAGES.dataTransparencyPage, {
+    language,
+    journeyType,
+  });
+
+  const handleContinue = () => {
+    const targetPage =
+      journeyType === "required"
+        ? dataTransparencyPage
+        : detailsConfirmationPage;
+    navigate(
+      targetPage,
+      isMockProofing ? { state: { mockProofing: true } } : undefined,
+    );
+  };
+
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
@@ -56,10 +72,7 @@ export default function IdentityVerificationSuccess() {
           <GcdsButton
             type="button"
             onClick={() => {
-              navigate(
-                detailsConfirmationPage,
-                isMockProofing ? { state: { mockProofing: true } } : undefined,
-              );
+              handleContinue();
             }}
           >
             {t("IdentityVerificationSuccess.continueButton")}

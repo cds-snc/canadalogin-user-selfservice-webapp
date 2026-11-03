@@ -58,6 +58,8 @@ vi.mock("../../../utils/constants", () => ({
     editEmailPage: "EditEmailPage",
     editContactPhoneNumberPage: "EditContactPhoneNumberPage",
     idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
+    ProfileHome: "ProfileHome",
+    dataTransparencyPage: "DataTransparencyPage",
   },
 }));
 
@@ -217,7 +219,7 @@ describe("ConfirmIdentityDetails", () => {
     ).toBeInTheDocument();
   });
 
-  it("redirects to the stored RP target when Continue is clicked", async () => {
+  it("redirects to the data transparency page when Continue is clicked", async () => {
     mockJourneyType = "required";
 
     render(<ConfirmIdentityDetails />);
@@ -225,9 +227,9 @@ describe("ConfirmIdentityDetails", () => {
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
 
     await waitFor(() => {
-      expect(identityVerificationApi.getPostIdvRedirectUrl).toHaveBeenCalled();
-      expect(window.location.assign).toHaveBeenCalledWith(
-        "https://rp.example.com/service/return",
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/DataTransparencyPage",
+        undefined,
       );
     });
   });
