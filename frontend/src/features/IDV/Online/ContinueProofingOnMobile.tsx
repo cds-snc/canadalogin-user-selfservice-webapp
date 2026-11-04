@@ -13,6 +13,7 @@ import {
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+import { mockIdentityClaims } from "../data/mockIdentityClaims";
 import "./ContinueProofingOnMobile.css";
 
 const DUMMY_PROOFING_LINK = "canadalogin.ca/prove/daUf30fn2/";
@@ -98,6 +99,12 @@ export default function ContinueProofingOnMobile() {
                 language,
                 journeyType,
               }),
+              {
+                state: {
+                  mockProofing: true,
+                  mockIdentityClaims,
+                },
+              },
             );
           }}
         >
