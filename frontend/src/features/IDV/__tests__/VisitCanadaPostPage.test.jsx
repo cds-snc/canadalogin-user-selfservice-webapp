@@ -64,9 +64,10 @@ vi.mock("@gcds-core/components-react", () => ({
       ))}
     </div>
   ),
-  GcdsRadios: ({ id, legend, options, errorMessage, onGcdsChange }) => (
+  GcdsRadios: ({ id, legend, hint, options, errorMessage, onGcdsChange }) => (
     <fieldset id={id}>
       <legend>{legend}</legend>
+      {hint ? <span>{hint}</span> : null}
       {options.map((option) => (
         <div key={option.id}>
           <label>
@@ -74,6 +75,7 @@ vi.mock("@gcds-core/components-react", () => ({
               type="radio"
               name={id}
               value={option.value}
+              checked={option.checked}
               onChange={(event) => onGcdsChange?.(event)}
             />
             {option.label}
@@ -140,7 +142,12 @@ describe("VisitCanadaPost (Select your ID)", () => {
   it("renders the static ID radios without calling the API", () => {
     render(<VisitCanadaPost />);
 
-    expect(screen.getAllByRole("radio").map((radio) => radio.value)).toEqual([
+    expect(
+      screen
+        .getAllByRole("radio")
+        .filter((radio) => radio.closest("fieldset")?.id === "select-id-radios")
+        .map((radio) => radio.value),
+    ).toEqual([
       "PASSPORT",
       "DRIVERS_LICENCE",
       "PROVINCIAL_PHOTO_ID",
@@ -162,6 +169,44 @@ describe("VisitCanadaPost (Select your ID)", () => {
       screen.getByLabelText("I don't have any of those IDs"),
     ).toBeInTheDocument();
     expect(mockGetIdentityDocuments).not.toHaveBeenCalled();
+  });
+
+  it("displays and tracks the non-expired ID yes/no question", () => {
+    render(<VisitCanadaPost />);
+
+    expect(
+      screen.getByText(t("VisitCanadaPost.nonExpiredIdTitle")),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(t("VisitCanadaPost.nonExpiredIdHint")),
+    ).toBeInTheDocument();
+
+    const yesRadio = screen.getByRole("radio", {
+      name: t("VisitCanadaPost.yesOption"),
+    });
+    const noRadio = screen.getByRole("radio", {
+      name: t("VisitCanadaPost.noOption"),
+    });
+
+    fireEvent.click(yesRadio);
+
+    expect(yesRadio).toBeChecked();
+    expect(noRadio).not.toBeChecked();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("navigates to the complete identity proofing page when No is selected", () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.click(
+      screen.getByRole("radio", {
+        name: t("VisitCanadaPost.noOption"),
+      }),
+    );
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/start/not-ready",
+    );
   });
 
   it("renders the external learn-more link immediately after the visit steps", () => {
@@ -314,7 +359,13 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(
       await screen.findByText(t("CanadaPostSelectId.loadErrorTitle")),
     ).toBeInTheDocument();
-    expect(screen.getAllByRole("radio")).toHaveLength(8);
+    expect(
+      screen
+        .getAllByRole("radio")
+        .filter(
+          (radio) => radio.closest("fieldset")?.id === "select-id-radios",
+        ),
+    ).toHaveLength(8);
     expect(screen.getByTestId("continue-button")).toBeInTheDocument();
     expect(mockNavigate).not.toHaveBeenCalled();
   });

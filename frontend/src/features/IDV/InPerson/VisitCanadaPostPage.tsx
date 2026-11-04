@@ -38,6 +38,7 @@ import {
 
 const ERROR_SUMMARY_ID = "visit-canada-post-error-summary";
 const RADIOS_ID = "select-id-radios";
+const NON_EXPIRED_ID_RADIOS_ID = "non-expired-id-radios";
 
 export default function VisitCanadaPost() {
   const { t } = useTranslation("idv");
@@ -47,9 +48,14 @@ export default function VisitCanadaPost() {
     language === AVAILABLE_LANGUAGES.fr
       ? AVAILABLE_LANGUAGES.fr
       : AVAILABLE_LANGUAGES.en;
+  const completeIdentityProofingPage = path(
+    PAGES.idvCompleteIdentityProofingPage,
+    { language, journeyType },
+  );
 
   const { relyingPartyName: rpName } = useRelyingPartyInfo();
   const [selectedValue, setSelectedValue] = useState("");
+  const [nonExpiredIdAnswer, setNonExpiredIdAnswer] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -71,6 +77,21 @@ export default function VisitCanadaPost() {
       value: NO_IDS_VALUE,
       label: t("CanadaPostSelectId.noIds"),
       checked: selectedValue === NO_IDS_VALUE,
+    },
+  ];
+
+  const nonExpiredIdRadioOptions = [
+    {
+      id: "radio-non-expired-id-yes",
+      value: "yes",
+      label: t("VisitCanadaPost.yesOption"),
+      checked: nonExpiredIdAnswer === "yes",
+    },
+    {
+      id: "radio-non-expired-id-no",
+      value: "no",
+      label: t("VisitCanadaPost.noOption"),
+      checked: nonExpiredIdAnswer === "no",
     },
   ];
 
@@ -195,6 +216,23 @@ export default function VisitCanadaPost() {
                 setSelectedValue(
                   (event.target as HTMLInputElement | null)?.value ?? "",
                 );
+              }}
+            />
+            <GcdsRadios
+              id={NON_EXPIRED_ID_RADIOS_ID}
+              name="non-expired-id"
+              legend={t("VisitCanadaPost.nonExpiredIdTitle")}
+              hint={t("VisitCanadaPost.nonExpiredIdHint")}
+              options={nonExpiredIdRadioOptions}
+              value={nonExpiredIdAnswer}
+              onGcdsChange={(event: CustomEvent<string>) => {
+                const answer = (event.target as HTMLInputElement | null)?.value;
+                if (answer === "yes" || answer === "no") {
+                  setNonExpiredIdAnswer(answer);
+                  if (answer === "no") {
+                    navigate(completeIdentityProofingPage);
+                  }
+                }
               }}
             />
           </GcdsContainer>
