@@ -195,7 +195,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("navigates to the complete identity proofing page when No is selected", () => {
+  it("navigates to the complete identity proofing page when No is selected and Continue is clicked", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(
@@ -203,6 +203,10 @@ describe("VisitCanadaPost (Select your ID)", () => {
         name: t("VisitCanadaPost.noOption"),
       }),
     );
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/start/not-ready",

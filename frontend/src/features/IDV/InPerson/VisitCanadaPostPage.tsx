@@ -98,8 +98,19 @@ export default function VisitCanadaPost() {
   const showError = hasSubmitted && !selectedValue;
   const idTypeErrorMessage = showError ? getIdTypeRequiredMessage(t) : "";
 
+  const onNonExpiredIdChange = (event: CustomEvent<string>) => {
+    setNonExpiredIdAnswer(
+      (event.target as HTMLInputElement | null)?.value ?? "",
+    );
+  };
+
   const onContinue = async () => {
     setHasSubmitted(true);
+
+    if (nonExpiredIdAnswer === "no") {
+      navigate(completeIdentityProofingPage);
+      return;
+    }
 
     if (!selectedValue) {
       // Re-trigger focus/scroll if user submits invalid data multiple times.
@@ -225,15 +236,7 @@ export default function VisitCanadaPost() {
               hint={t("VisitCanadaPost.nonExpiredIdHint")}
               options={nonExpiredIdRadioOptions}
               value={nonExpiredIdAnswer}
-              onGcdsChange={(event: CustomEvent<string>) => {
-                const answer = (event.target as HTMLInputElement | null)?.value;
-                if (answer === "yes" || answer === "no") {
-                  setNonExpiredIdAnswer(answer);
-                  if (answer === "no") {
-                    navigate(completeIdentityProofingPage);
-                  }
-                }
-              }}
+              onGcdsChange={onNonExpiredIdChange}
             />
           </GcdsContainer>
 
