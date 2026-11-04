@@ -35,7 +35,16 @@ export default function ConfirmIdentityDetails() {
     useState<IdentityVerificationClaimsResponse>();
 
   useEffect(() => {
-    if (!DEV_ONLY_FEATURE || isMockProofing) {
+    if (!DEV_ONLY_FEATURE) {
+      return;
+    }
+
+    if (isMockProofing && state?.mockIdentityClaims) {
+      setIdentityVerificationClaims(state.mockIdentityClaims);
+      return;
+    }
+
+    if (isMockProofing) {
       return;
     }
 
@@ -43,7 +52,7 @@ export default function ConfirmIdentityDetails() {
       .getClaims()
       .then(setIdentityVerificationClaims)
       .catch(() => undefined);
-  }, [isMockProofing]);
+  }, [isMockProofing, state?.mockIdentityClaims]);
 
   const backToProfilePage = path(PAGES.ProfileHome, { language });
 
