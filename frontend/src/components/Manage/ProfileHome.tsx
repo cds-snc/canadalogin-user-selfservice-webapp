@@ -86,7 +86,7 @@ export default function ProfileHome() {
               </GcdsHeading>
               {provenDate && (
                 <VerifiedBadge
-                  text={`${t("ProfileHome.verified")} ${provenDate}`}
+                  text={`${t("ProfileHome.verifiedOn")} ${provenDate}`}
                 />
               )}
             </GcdsGrid>
