@@ -108,7 +108,7 @@ export default function ContinueProofingOnMobile() {
             );
           }}
         >
-          {t("ContinueProofingOnMobile.continueButton")}
+          {t("ContinueProofingOnMobile.nextStepButton")}
         </GcdsButton>
         <GcdsButton
           type="button"
