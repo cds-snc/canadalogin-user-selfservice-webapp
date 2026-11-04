@@ -23,10 +23,6 @@ export default function ContinueProofingOnMobile() {
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
   const [error, setError] = useState("");
-  const successPage = path(PAGES.idvIdentityVerificationSuccessPage, {
-    language,
-    journeyType,
-  });
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -97,12 +93,15 @@ export default function ContinueProofingOnMobile() {
           type="button"
           buttonRole="primary"
           onClick={() => {
-            navigate(successPage, {
-              state: { mockProofing: true },
-            });
+            navigate(
+              path(PAGES.idvDetailsConfirmationPage, {
+                language,
+                journeyType,
+              }),
+            );
           }}
         >
-          {t("ContinueProofingOnMobile.continueButton")}
+          {t("ContinueProofingOnMobile.nextStepButton")}
         </GcdsButton>
         <GcdsButton
           type="button"
