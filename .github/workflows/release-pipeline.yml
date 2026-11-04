@@ -207,7 +207,34 @@ jobs:
         with:
           registry-type: public
 
+      - name: Check if backend image already exists in ECR
+        id: check-backend-image
+        env:
+          ECR_REPOSITORY: ${{ vars.ARTIFACT_ECR_REPOSITORY }}
+        run: |
+          set -euo pipefail
+
+          repository="${ECR_REPOSITORY#*/}"
+          if image_digest=$(aws ecr describe-images \
+            --repository-name "$repository" \
+            --image-ids "imageTag=$GITHUB_SHA" \
+            --query 'imageDetails[0].imageDigest' \
+            --output text 2>&1); then
+            echo "image_exists=true" >> "$GITHUB_OUTPUT"
+            echo "Image $ECR_REPOSITORY:$GITHUB_SHA already exists with digest $image_digest; skipping build and push."
+          else
+            aws_status=$?
+            if [[ "$image_digest" == *"(ImageNotFoundException)"* ]]; then
+              echo "image_exists=false" >> "$GITHUB_OUTPUT"
+              echo "No image found for $ECR_REPOSITORY:$GITHUB_SHA; building and pushing it."
+            else
+              printf '%s\n' "$image_digest" >&2
+              exit "$aws_status"
+            fi
+          fi
+
       - name: Build and push Docker image (SHA and latest tag)
+        if: steps.check-backend-image.outputs.image_exists != 'true'
         working-directory: ./backend/
         run: |
 
@@ -239,7 +266,7 @@ jobs:
           docker push "${{ vars.ARTIFACT_ECR_REPOSITORY }}:latest"
 
       - name: Tag and push Docker image (Release tag)
-        if: needs.detect-release-tag.outputs.release_tag != ''
+        if: needs.detect-release-tag.outputs.release_tag != '' && steps.check-backend-image.outputs.image_exists != 'true'
         run: |
           RELEASE_TAG="${{ needs.detect-release-tag.outputs.release_tag }}"
 
