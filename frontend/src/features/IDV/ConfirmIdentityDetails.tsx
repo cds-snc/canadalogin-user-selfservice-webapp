@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
@@ -21,9 +21,12 @@ import {
   type IdentityVerificationClaimsResponse,
 } from "../../features/IDV/api/identityVerificationApi";
 import VerifiedBadge from "../../components/Badges/VerifiedBadge";
+import { mockIdentityClaims } from "./data/mockIdentityClaims";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const isMockProofing = DEV_ONLY_FEATURE && state?.mockProofing === true;
   const { t, i18n } = useTranslation(["idv", "profile"]);
   const { language, journeyType } = useParams();
   const { relyingPartyUrl, relyingPartyName, hasRelyingParty } =
@@ -37,11 +40,20 @@ export default function ConfirmIdentityDetails() {
       return;
     }
 
+    if (isMockProofing && state?.mockIdentityClaims) {
+      setIdentityVerificationClaims(state.mockIdentityClaims);
+      return;
+    }
+
+    if (isMockProofing) {
+      return;
+    }
+
     void identityVerificationApi
       .getClaims()
       .then(setIdentityVerificationClaims)
       .catch(() => undefined);
-  }, []);
+  }, [isMockProofing, state?.mockIdentityClaims]);
 
   const fallbackRedirectUrl = relyingPartyUrl || "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
