@@ -103,7 +103,7 @@ vi.mock("../../../components/InfoBlocks/AccessibleNotice", () => ({
 }));
 
 vi.mock("qrcode.react", () => ({
-  QRCodeSVG: ({ value, size, title, role }) => (
+  QRCodeSVG: ({ _value, size, title, role }) => (
     <svg
       viewBox="0 0 37 37"
       width={size}
