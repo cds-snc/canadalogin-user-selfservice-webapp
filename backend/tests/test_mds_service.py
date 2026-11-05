@@ -6,6 +6,7 @@ import dataclasses
 import datetime
 import enum
 import json
+from base64 import urlsafe_b64encode
 from unittest.mock import AsyncMock, MagicMock, patch
 import uuid
 
@@ -16,6 +17,7 @@ from app.fido2.services.mds_service import (
     GLOBALSIGN_ROOT_CERT_URL,
     MDS3_URL,
     REDIS_MDS_TTL,
+    _parse_mds3_blob,
     _to_json_safe,
 )
 from app.config import _BUNDLED_GLOBALSIGN_CERT_PATH
@@ -408,3 +410,81 @@ def test_mds_url_constants():
     assert (
         GLOBALSIGN_ROOT_CERT_URL == "https://secure.globalsign.com/cacert/root-r3.crt"
     )
+
+
+# ---------------------------------------------------------------------------
+# _parse_mds3_blob: tolerant parsing
+# ---------------------------------------------------------------------------
+
+
+def _b64url(data: bytes) -> bytes:
+    return urlsafe_b64encode(data).rstrip(b"=")
+
+
+def _make_blob(entries: list[dict]) -> bytes:
+    header = {"alg": "ES256", "x5c": []}
+    payload = {
+        "legalHeader": "x",
+        "no": 1,
+        "nextUpdate": "2030-01-01",
+        "entries": entries,
+    }
+    return b".".join(
+        [
+            _b64url(json.dumps(header).encode()),
+            _b64url(json.dumps(payload).encode()),
+            _b64url(b"sig"),
+        ]
+    )
+
+
+def _entry(aaguid: str, **statement_overrides) -> dict:
+    statement = {
+        "description": "Test key",
+        "authenticatorVersion": 1,
+        "schema": 3,
+        "upv": [{"major": 1, "minor": 0}],
+        "attestationTypes": ["basic_full"],
+        "userVerificationDetails": [[{"userVerificationMethod": "none"}]],
+        "keyProtection": ["hardware"],
+        "matcherProtection": ["on_chip"],
+        "attachmentHint": ["external"],
+        "tcDisplay": [],
+        "attestationRootCertificates": [],
+        "aaguid": aaguid,
+    }
+    statement.update(statement_overrides)
+    return {
+        "aaguid": aaguid,
+        "statusReports": [{"status": "FIDO_CERTIFIED"}],
+        "timeOfLastStatusChange": "2024-01-01",
+        "metadataStatement": statement,
+    }
+
+
+def test_parse_mds3_blob_tolerates_missing_required_fields():
+    good = _entry("11111111-1111-1111-1111-111111111111")
+    incomplete = _entry("22222222-2222-2222-2222-222222222222")
+    del incomplete["metadataStatement"]["userVerificationDetails"]
+    del incomplete["metadataStatement"]["attachmentHint"]
+    broken = _entry("33333333-3333-3333-3333-333333333333")
+    broken["timeOfLastStatusChange"] = "not-a-date"
+
+    blob = _make_blob([good, incomplete, broken])
+
+    with (
+        patch("app.fido2.services.mds_service.verify_x509_chain"),
+        patch("app.fido2.services.mds_service.CoseKey"),
+        patch(
+            "app.fido2.services.mds_service.x509.load_der_x509_certificate"
+        ) as load_cert,
+    ):
+        load_cert.return_value = MagicMock()
+        # chain[0] is the trust root because the header has no x5c
+        result = _parse_mds3_blob(blob, b"root")
+
+    assert set(result) == {
+        "11111111-1111-1111-1111-111111111111",
+        "22222222-2222-2222-2222-222222222222",
+    }
+    assert result["22222222-2222-2222-2222-222222222222"]["attachment_hint"] == []
