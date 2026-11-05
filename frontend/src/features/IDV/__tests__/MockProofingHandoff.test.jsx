@@ -66,6 +66,57 @@ vi.mock("@gcds-core/components-react", () => ({
   ),
 }));
 
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key) => {
+      const translations = {
+        "ContinueProofingOnMobile.heading": "Continue proofing on mobile",
+        "ContinueProofingOnMobile.description":
+          "In order to capture a photo of yourself and your ID, you will need to use your mobile phone device.",
+        "ContinueProofingOnMobile.keepOpen": "Keep this window open",
+        "ContinueProofingOnMobile.returnHere":
+          "Return here once proofing is complete.",
+        "ContinueProofingOnMobile.scanInstruction":
+          "Scan the QR code below to continue proofing on your mobile device.",
+        "ContinueProofingOnMobile.qrLabel": "Example identity proofing QR code",
+        "ContinueProofingOnMobile.cannotScan":
+          "Can't scan the QR code? Send this link to your mobile device.",
+        "ContinueProofingOnMobile.copyLink": "Copy link",
+        "ContinueProofingOnMobile.copyError":
+          "Select and copy the link above instead.",
+        "ContinueProofingOnMobile.continueButton": "Continue",
+        "ContinueProofingOnMobile.nextStepButton": "Next Step",
+        "OnlineVerificationInfo.chooseDifferentMethodButton":
+          "Choose a different method",
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
+vi.mock("../../../components/InfoBlocks/AccessibleNotice", () => ({
+  default: ({ children, noticeTitle }) => (
+    <aside>
+      {noticeTitle}
+      {children}
+    </aside>
+  ),
+}));
+
+vi.mock("qrcode.react", () => ({
+  QRCodeSVG: ({ _value, size, title, role }) => (
+    <svg
+      viewBox="0 0 37 37"
+      width={size}
+      height={size}
+      role={role}
+      title={title}
+    >
+      <path d="M0,0 h37v37H0z" fill="#FFFFFF" />
+    </svg>
+  ),
+}));
+
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.enabled = true;
@@ -180,7 +231,13 @@ describe("ContinueProofingOnMobile", () => {
       screen.getByRole("button", { name: "Choose a different method" }),
     );
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/en/identity-verification/required/IdvProveIdentityOnlinePage",
+      "/en/identity-verification/required/IdvDetailsConfirmationPage",
+      expect.objectContaining({
+        state: expect.objectContaining({
+          mockProofing: true,
+          mockIdentityClaims: expect.any(Object),
+        }),
+      }),
     );
   });
 
