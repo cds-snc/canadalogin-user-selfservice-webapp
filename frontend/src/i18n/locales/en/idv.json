@@ -282,7 +282,8 @@
     "cannotScan": "Can’t scan the QR code? Send this link to your mobile device.",
     "copyLink": "Copy link",
     "copyError": "We couldn’t copy the link. Select and copy the link above instead.",
-    "continueButton": "Continue"
+    "continueButton": "Continue",
+    "nextStepButton": "Next Step"
   },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",
