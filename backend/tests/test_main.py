@@ -229,23 +229,14 @@ def test_create_app_csrf_flow_uses_real_session_middlewares(monkeypatch):
     assert post_response.json() == {"ok": True}
 
 
-def test_create_app_excludes_identity_verification_routes_outside_local_and_dev(
+def test_create_app_includes_identity_verification_routes_in_all_environments(
     monkeypatch,
 ):
-    monkeypatch.setattr(main_module.configuration, "ENVIRONMENT", "prod")
+    for environment in ("local", "dev", "test", "staging", "prod"):
+        monkeypatch.setattr(main_module.configuration, "ENVIRONMENT", environment)
 
-    app = main_module.create_app()
-    routes = get_all_route_paths(app)
+        app = main_module.create_app()
+        routes = get_all_route_paths(app)
 
-    assert "/v1/identity-verification/online" not in routes
-    assert "/v1/identity-verification/online/mock-success-response" not in routes
-
-
-def test_create_app_includes_identity_verification_routes_in_dev(monkeypatch):
-    monkeypatch.setattr(main_module.configuration, "ENVIRONMENT", "dev")
-
-    app = main_module.create_app()
-    routes = get_all_route_paths(app)
-
-    assert "/v1/identity-verification/online" in routes
-    assert "/v1/identity-verification/online/mock-success-response" in routes
+        assert "/v1/identity-verification/online" in routes
+        assert "/v1/identity-verification/online/mock-success-response" in routes

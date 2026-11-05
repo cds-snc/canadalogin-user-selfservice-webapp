@@ -39,7 +39,8 @@ async def test_idv_access_remains_enabled_in_local_and_dev(environment, monkeypa
 
 
 @pytest.mark.asyncio
-async def test_idv_access_allows_configured_group_member(monkeypatch):
+@pytest.mark.parametrize("environment", ["test", "staging", "prod"])
+async def test_idv_access_allows_configured_group_member(environment, monkeypatch):
     profile_lookup = AsyncMock(
         return_value=IBMVerifyUserProfileSchema.model_construct(
             groups=[SimpleNamespace(id="second-group")]
@@ -51,7 +52,7 @@ async def test_idv_access_allows_configured_group_member(monkeypatch):
     )
 
     await require_idv_feature_access(
-        build_request("prod", {"8160000157", "second-group"}),
+        build_request(environment, {"8160000157", "second-group"}),
         user_access_token="user-token",
     )
 
@@ -59,7 +60,10 @@ async def test_idv_access_allows_configured_group_member(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_idv_access_forbids_users_outside_configured_groups(monkeypatch):
+@pytest.mark.parametrize("environment", ["test", "staging", "prod"])
+async def test_idv_access_forbids_users_outside_configured_groups(
+    environment, monkeypatch
+):
     profile_lookup = AsyncMock(
         return_value=IBMVerifyUserProfileSchema.model_construct(groups=[])
     )
@@ -70,7 +74,7 @@ async def test_idv_access_forbids_users_outside_configured_groups(monkeypatch):
 
     with pytest.raises(HTTPException) as error:
         await require_idv_feature_access(
-            build_request("prod", {"8160000157"}),
+            build_request(environment, {"8160000157"}),
             user_access_token="user-token",
         )
 
