@@ -1,5 +1,76 @@
 # Changelog
 
+## [1.39.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.38.0...v1.39.0) (2026-11-05)
+
+
+### Features
+
+* **Identity-verification:** [Content update] Add "Can you bring a non-expired ID?" to "Get ready to visit a Canada Post location" page ([#2474](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2474)) ([abc39eb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/abc39ebc0306b0720ea386b91bc6064f364a7520))
+* **identity-verification:** [Content update] Add "Can you bring a non-expired ID?" to "Get ready to visit a Service Canada Centre" page ([9c4ad51](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9c4ad51d4d1541c7512695beb6149ea3d3064d47))
+* **identity-verification:** [Content update] Add "Can you bring a non-expired ID?" to "Get ready to visit a Service Canada Centre" page ([#2480](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2480)) ([9c4ad51](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9c4ad51d4d1541c7512695beb6149ea3d3064d47))
+* **identity-verification:** [FE] Add Help and Support card to the manage app dashboard ([#2310](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2310)) ([e40fea8](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e40fea811cbe9d3f5f0775ca8d4341561fec816b))
+* **identity-verification:** Connected Services Date Update ([#2344](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2344)) ([2c9e39d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2c9e39d58f2b5b9b3a6013e78a279960578113eb))
+* **identity-verification:** Connected Services Date UpdatE) ([2c9e39d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/2c9e39d58f2b5b9b3a6013e78a279960578113eb))
+* **identity-verification:** retrieve list approved documents ([#2352](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2352)) ([734f1fb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/734f1fb1cda7c83535250e45aadc7293f81c8155))
+* **identity-verification:** Returning User Time ([#2332](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2332)) ([0f2df9c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0f2df9c90db1a877df067a18aeef9168dbc75065))
+* Increase load-test peak to 500 requests per second ([#2355](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2355)) ([4ed3a6e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4ed3a6e7518c0c6a2787938988c77c279a4c12f8))
+* redirect user to verification error page on failure or missing URL ([#2327](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2327)) ([6d9e5da](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6d9e5dacce672fa3646ccdcb014f098dab914fc5))
+
+
+### Bug Fixes
+
+* **accessibility:** Horizontal scrolling needed at 200% zoom ([#2317](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2317)) ([3b31a42](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3b31a4279ca4c075701234b6fb0a7f4ca6d8517f))
+* **accessibility:** Incorrect or missing lang attribute on French-la… ([#2316](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2316)) ([050ee05](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/050ee05955ab0a1facd89a2c44fa22c767a3fe41))
+* Added French localization to confirm details page ([#2359](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2359)) ([81b7d6b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/81b7d6ba0d90512543d38c6bd64e95ccb48619f1))
+* authenticate public ECR pulls ([#2363](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2363)) ([4042e79](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4042e79dff75ab3284985580e321413a2cfeacb4))
+* **auth:** return 400 for invalid backchannel logout tokens ([364edd7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/364edd7bbc90e08d52486738c6e086ac590e856d))
+* **auth:** return 400 for invalid logout tokens ([#2324](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2324)) ([364edd7](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/364edd7bbc90e08d52486738c6e086ac590e856d))
+* **Identity-verification:** [FE] Fix Verified badge text ([#2470](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2470)) ([ba2efd9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ba2efd97b8938b0a86e30667d0b9140adb696991))
+* Multiple pages - sub menus ([#2364](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2364)) ([1252bd4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/1252bd4d0f490afc709db4cfa88d49211b513fab))
+* prettier format CI pipeline failure ([#2362](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2362)) ([9df9b8a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9df9b8add8bfadf98dec60524719ebe7b1821875))
+* skip existing ECR image tags ([ad2348b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ad2348b45b4b132abf9dd03fcf13f3a3fd528dbf))
+* skip existing ECR image tags during build ([#2475](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2475)) ([ad2348b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ad2348b45b4b132abf9dd03fcf13f3a3fd528dbf))
+* user profile verified claims ([#2478](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2478)) ([49bf46f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/49bf46f579276286c3e36f05a8f46e4e5820fb8d))
+
+
+### Code Refactoring
+
+* add the additional cross origin security header and remove … ([#2299](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2299)) ([e18ebe9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e18ebe91e8175041d749abca0886cd7ad762a5cc))
+* add the additional cross origin security header and remove the server header from the docker container ([e18ebe9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/e18ebe91e8175041d749abca0886cd7ad762a5cc))
+* Enhance OTP daily quota management and increase non-prod time window ([#2368](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2368)) ([94db1ab](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/94db1ab8f4b8dca227705e1d4899053dfcdf953b))
+* **identity-verification:** [FE Content] Update Contact Details section ([#2311](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2311)) ([625ac23](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/625ac23954ed71441dd96d30067f49792daedeff))
+* **identity-verification:** [FE Content] Update FR Translation - Prove your identity page ([#2439](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2439)) ([cf7f875](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/cf7f87502ce7bb9a02831cf87ee75d120b73cac3))
+* **identity-verification:** [FE Content] Warning Notice when updating information - Prove Your Identity page ([#2306](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2306)) ([3111d5b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3111d5b106800ab785d32309b69122727d26a25a))
+* **identity-verification:** [FE] Default display radio buttons based on Journey Type - Prove your identity ([#2331](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2331)) ([416080c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/416080c1aa40c849007c9b0e3349d6aa006bc1ae))
+* **identity-verification:** [FE] Fix title line premature wrapping on Provincial Success page ([#2441](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2441)) ([74496e2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/74496e25e0d017458a8ebaf6fd577362e4070681))
+* **identity-verification:** [FE] Navigate user to the partway through proofing page ([#2345](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2345)) ([765783d](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/765783d4b24e5b403711c650b9e5222084387d32))
+* **identity-verification:** [FE] Update functionality to display DOB using superscript on Details Confirmation page ([#2373](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2373)) ([709354f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/709354f1a373efebfd1bc7d850390a0186fab65f))
+* **identity-verification:** Update Contact Details section ([625ac23](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/625ac23954ed71441dd96d30067f49792daedeff))
+
+
+### Miscellaneous Chores
+
+* bump staging version to 1.38.0 ([#2353](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2353)) ([7fd6f27](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/7fd6f27b689287c7a9960b529d710817fa4e2daa))
+* **deps-dev:** bump follow-redirects from 1.16.0 to 1.16.1 in /frontend ([#2356](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2356)) ([9aca8be](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9aca8be975fe581d8d8a79dd5ce699ffedfd1f64))
+* **deps-dev:** bump follow-redirects in /frontend ([9aca8be](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9aca8be975fe581d8d8a79dd5ce699ffedfd1f64))
+* **deps-dev:** bump source-map-js from 1.2.1 to 1.2.2 in /frontend ([#2302](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2302)) ([140f215](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/140f21521811eb761892b1735649f589a2cd6423))
+* **deps-dev:** bump vite from 6.4.3 to 6.4.5 in /frontend ([#2357](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2357)) ([4d856e4](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4d856e42cfdea4ef1966b9c8f62b5699ece5abf5))
+* **deps:** lock file maintenance ([#2273](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2273)) ([8c4e9b2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/8c4e9b243a1730c1478a350979b57ffa212680f9))
+* **deps:** lock file maintenance ([#2372](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2372)) ([76c6589](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/76c65899bc1d1290c9047f38846dcc13bd3f0a70))
+* **deps:** lock file maintenance ([#2457](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2457)) ([246ffeb](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/246ffebbcf51a8d1d8107a174eba8074a47f9c09))
+* **deps:** pin Node.js version to 22.x for compatibility with new Storybook version ([#2468](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2468)) ([dc008e6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/dc008e69e7e5321e59584217189f81982d7d8a0c))
+* **deps:** update all minor dependencies ([#2157](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2157)) ([30205ee](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/30205ee71b33f1e15aeadb856536f3328cbe6db0))
+* **deps:** update all non-major github action dependencies ([#2204](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2204)) ([214bc5b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/214bc5b79511ddaaae4e3da6cc5e6a148edcdd32))
+* **deps:** update all patch dependencies ([#2004](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2004)) ([18eca2a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/18eca2acb811368b74faef281bde164ced771369))
+* **deps:** update all patch dependencies ([#2369](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2369)) ([a825c0c](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a825c0c9ba99b7ca72e54ac37ca0cd53379dd70d))
+* **deps:** update all patch dependencies ([#2454](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2454)) ([b3add83](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b3add83da454c3a36ce77df3ef252a7492d98868))
+* **deps:** update dependency fastapi to v0.152.0 ([#2371](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2371)) ([3fac907](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3fac907e3527dcdbe1a26dae91c63a5dfd993728))
+* **deps:** update dependency fastapi to v0.162.0 ([#2456](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2456)) ([8284518](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/82845185b5f112508e8c400c64d779444b31caf7))
+* **deps:** update dependency prettier to v3.9.10 ([#1789](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/1789)) ([d248edf](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d248edf97f8cd4e4587018a76790e82a3e02038c))
+* **deps:** update dependency pyjwt to v2.15.0 [security] ([#2291](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2291)) ([d7fc4c9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/d7fc4c9620f3d5264ff3d8d4a0563f40b49227c5))
+* **deps:** update github/codeql-action action to v3.39.0 ([#2370](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2370)) ([5f95b36](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/5f95b3602d6fe4e05f7f59dceae042d7f7b3fc8e))
+* **deps:** update github/codeql-action action to v3.39.1 ([#2455](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2455)) ([c52ccb5](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/c52ccb512a32c652edf733abb29366480f7d6d9e))
+
 ## [1.38.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.37.0...v1.38.0) (2026-10-07)
 
 
