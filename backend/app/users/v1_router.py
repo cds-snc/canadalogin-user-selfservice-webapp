@@ -5,6 +5,7 @@ from fastapi import Request, Depends
 
 from app.users.schemas import (
     ProfileResponse,
+    MyProfileResponse,
     UserProfileUpdateRequest,
     RelyingPartyResponse,
     UserPhoneAuthFactorsResponse,
@@ -54,7 +55,7 @@ async def user_profile(
 
 @router.get(
     "/profile",
-    response_model=ProfileResponse,
+    response_model=MyProfileResponse,
     response_model_by_alias=False,
     tags=["Users"],
     summary="Get a single user's profile",

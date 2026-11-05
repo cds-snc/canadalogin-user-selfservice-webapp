@@ -169,6 +169,12 @@ class Configuration(BaseSettings):
     session_config: SessionConfig = SessionConfig()
     idv_data_store_config: IdvDataStoreConfig = IdvDataStoreConfig()
     ENVIRONMENT: str = Field(default="local")
+    IDV_FEATURE_ACCESS_GROUP_IDS: str = Field(
+        default="8160000157",
+        description=(
+            "Comma-separated IBM Verify group IDs allowed to access IDV features."
+        ),
+    )
     V1_API_VERSION: str = "/v1"
     ROOT_DOMAIN: Optional[str] = (
         None  # Not required for local development, value should be ".gc-signin.cdssandbox.xyz"
@@ -199,6 +205,14 @@ class Configuration(BaseSettings):
         return [
             f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")
         ]
+
+    @property
+    def idv_feature_access_group_ids(self) -> set[str]:
+        return {
+            group_id.strip()
+            for group_id in self.IDV_FEATURE_ACCESS_GROUP_IDS.split(",")
+            if group_id.strip()
+        }
 
     @property
     def profile_api_endpoint(self) -> str:

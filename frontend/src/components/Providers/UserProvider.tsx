@@ -117,6 +117,11 @@ function userReducer(
         ...state,
         userProfile: action.payload,
       };
+    case CONTEXT_ACTIONS.set_feature_flags:
+      return {
+        ...state,
+        features: action.payload,
+      };
     case CONTEXT_ACTIONS.set_relying_party_data:
       return {
         ...state,
@@ -403,6 +408,10 @@ export function UserProvider({
 
         const response = await authService.get_my_user_profile(rp_client_id);
         if (response && response.data) {
+          userDispatch({
+            type: CONTEXT_ACTIONS.set_feature_flags,
+            payload: response.features ?? { idv: false },
+          });
           const normalizedProfile = normalizeUserProfile(
             response.data as UserProfileApiShape,
           );

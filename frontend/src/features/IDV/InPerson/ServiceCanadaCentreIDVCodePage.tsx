@@ -16,7 +16,7 @@ import {
   APPROVED_DOCUMENT_VALUES,
   type ApprovedDocumentValue,
 } from "../data/approvedDocuments";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import "./css/ServiceCanadaCentreIDVCodePage.print.css";
 
@@ -91,10 +91,6 @@ export default function ServiceCanadaCentreIDVCodePage() {
   const handlePrintPage = () => {
     window.print();
   };
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   if (!idvCode) {
     return <Navigate to={serviceCanadaCentrePage} replace />;

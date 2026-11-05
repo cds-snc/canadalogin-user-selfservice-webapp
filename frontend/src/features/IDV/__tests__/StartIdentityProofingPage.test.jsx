@@ -160,14 +160,6 @@ describe("StartIdentityProofingPage", () => {
   });
 
   // ── Rendering ──────────────────────────────────
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
-
-    const { container } = render(<StartIdentityProofingPage />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it("renders Prove your identity title by default", () => {
     render(<StartIdentityProofingPage />);
 

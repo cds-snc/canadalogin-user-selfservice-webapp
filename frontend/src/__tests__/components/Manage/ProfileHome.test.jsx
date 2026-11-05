@@ -43,7 +43,15 @@ vi.mock("../../../utils/constants", () => ({
   PAGES: {
     editEmailPage: "editEmailPage",
   },
-  VITE_ENVIRONMENTS: { dev: "dev", test: "test" },
+  VITE_ENVIRONMENTS: { local: "local", dev: "dev", test: "test" },
+}));
+
+vi.mock("../../../config", () => ({
+  default: {
+    get environment() {
+      return mockDevOnlyFeature ? "dev" : "prod";
+    },
+  },
 }));
 
 vi.mock("../../../utils/routeHelpers", () => ({

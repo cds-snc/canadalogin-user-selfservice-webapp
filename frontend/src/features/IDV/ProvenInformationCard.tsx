@@ -9,8 +9,9 @@ import {
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
-import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import { PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
+import { useIdvFeatureAccess } from "../../hooks/useIdvFeatureAccess";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import type { IdentityVerificationClaimsResponse } from "./api/identityVerificationApi";
 import { format, parseISO } from "date-fns";
@@ -23,6 +24,7 @@ type ProvenInformationCardProps = {
 export default function ProvenInformationCard({
   claims,
 }: ProvenInformationCardProps) {
+  const idvFeatureEnabled = useIdvFeatureAccess();
   const { t, i18n } = useTranslation("profile");
   const { language } = useParams();
   const name = [claims?.claims?.given_name, claims?.claims?.family_name]
@@ -59,7 +61,7 @@ export default function ProvenInformationCard({
     },
   );
 
-  if (!DEV_ONLY_FEATURE) {
+  if (!idvFeatureEnabled) {
     return null;
   }
 

@@ -121,24 +121,14 @@ describe("CompleteIdentityProofingPage", () => {
     vi.useRealTimers();
   });
 
-  describe("DEV_ONLY_FEATURE gating", () => {
-    it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-      mockFlags.devOnlyFeature = false;
+  it("renders page content", () => {
+    setup();
 
-      const { container } = setup();
-
-      expect(container).toBeEmptyDOMElement();
-    });
-
-    it("renders page content when DEV_ONLY_FEATURE is true", () => {
-      setup();
-
-      expect(
-        screen.getByRole("heading", {
-          name: "Localized RP needs you to prove your identity",
-        }),
-      ).toBeInTheDocument();
-    });
+    expect(
+      screen.getByRole("heading", {
+        name: "Localized RP needs you to prove your identity",
+      }),
+    ).toBeInTheDocument();
   });
 
   describe("RP name resolution", () => {

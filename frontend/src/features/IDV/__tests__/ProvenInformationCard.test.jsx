@@ -18,6 +18,14 @@ vi.mock("react-router", async () => {
   };
 });
 
+vi.mock("../../../config", () => ({
+  default: {
+    get environment() {
+      return mockFlags.devOnlyFeature ? "dev" : "prod";
+    },
+  },
+}));
+
 vi.mock("../../../components/Providers/useUser", () => ({
   useUser: () => ({
     state: {

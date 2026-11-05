@@ -410,12 +410,4 @@ describe("ServiceCanadaCentrePage", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Québec" })).toBeInTheDocument();
   });
-
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockFlags.devOnlyFeature = false;
-
-    const { container } = render(<ServiceCanadaCentrePage />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
 });

@@ -2,14 +2,22 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import UserContext from "../../../components/Providers/UserContext";
+import type { UserContextValue } from "../../../types/user";
 import IdentityInfoSuccessNotice from "../components/IdentityInfoSuccessNotice";
 
 let mockDevOnlyFeature = true;
 
-vi.mock("../../../utils/constants", () => ({
-  get DEV_ONLY_FEATURE() {
-    return mockDevOnlyFeature;
+vi.mock("../../../config", () => ({
+  default: {
+    get environment() {
+      return mockDevOnlyFeature ? "dev" : "prod";
+    },
   },
+}));
+
+vi.mock("../../../utils/constants", () => ({
+  VITE_ENVIRONMENTS: { local: "local", dev: "dev" },
 }));
 
 vi.mock("react-i18next", () => ({
@@ -78,5 +86,21 @@ describe("IdentityInfoSuccessNotice", () => {
     render(<IdentityInfoSuccessNotice showIDVSuccessNotice={true} />);
 
     expect(screen.queryByTestId("success-notice")).toBeNull();
+  });
+
+  it("renders for a user with IDV feature access outside dev", () => {
+    mockDevOnlyFeature = false;
+    const contextValue = {
+      state: { features: { idv: true } },
+      dispatch: vi.fn(),
+    } as unknown as UserContextValue;
+
+    render(
+      <UserContext.Provider value={contextValue}>
+        <IdentityInfoSuccessNotice showIDVSuccessNotice={true} />
+      </UserContext.Provider>,
+    );
+
+    expect(screen.getByTestId("success-notice")).toBeInTheDocument();
   });
 });

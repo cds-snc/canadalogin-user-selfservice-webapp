@@ -129,14 +129,6 @@ describe("VisitCanadaPost (Select your ID)", () => {
     });
   });
 
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockFlags.devOnlyFeature = false;
-
-    const { container } = render(<VisitCanadaPost />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it("renders the static ID radios without calling the API", () => {
     render(<VisitCanadaPost />);
 
