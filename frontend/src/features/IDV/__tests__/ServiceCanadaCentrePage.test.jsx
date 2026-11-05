@@ -84,6 +84,24 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </fieldset>
   ),
+  GcdsRadios: ({ id, legend, hint, options, onGcdsChange }) => (
+    <fieldset id={id}>
+      <legend>{legend}</legend>
+      <p>{hint}</p>
+      {options.map(({ id: optionId, value, label, checked }) => (
+        <label key={optionId} htmlFor={optionId}>
+          <input
+            id={optionId}
+            type="radio"
+            value={value}
+            checked={checked}
+            onChange={(event) => onGcdsChange?.({ target: event.target })}
+          />
+          {label}
+        </label>
+      ))}
+    </fieldset>
+  ),
   GcdsText: ({ children, ...props }) => <p {...props}>{children}</p>,
   GcdsErrorSummary: ({ id, heading, errorLinks }) => (
     <div id={id} data-testid="error-summary">
@@ -243,6 +261,21 @@ describe("ServiceCanadaCentrePage", () => {
     expect(screen.getByTestId("back-button")).toBeInTheDocument();
   });
 
+  it("renders the non-expired ID question and its options", () => {
+    render(<ServiceCanadaCentrePage />);
+
+    expect(
+      screen.getByRole("group", { name: "Can you bring a non-expired ID?" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "ID must be valid when you visit the Service Canada Centre",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Yes" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "No" })).toBeInTheDocument();
+  });
+
   it("renders the rest of the form once an ID is selected", () => {
     render(<ServiceCanadaCentrePage />);
 
@@ -386,6 +419,22 @@ describe("ServiceCanadaCentrePage", () => {
     expect(screen.getAllByText(dobInvalidMessage).length).toBeGreaterThan(1);
     expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("navigates to the not-ready page when the user cannot bring non-expired ID", async () => {
+    render(<ServiceCanadaCentrePage />);
+
+    fireEvent.click(screen.getByRole("radio", { name: "No" }));
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith(
+        expect.stringContaining("/not-ready"),
+      );
+    });
+    expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
   });
 
   it("calls navigate(-1) when Back button is clicked", () => {
