@@ -117,10 +117,16 @@ export default function ContinueProofingOnMobile() {
           buttonRole="secondary"
           onClick={() => {
             navigate(
-              path(PAGES.idvProveIdentityOnlinePage, {
+              path(PAGES.idvDetailsConfirmationPage, {
                 language,
                 journeyType,
               }),
+              {
+                state: {
+                  mockProofing: true,
+                  mockIdentityClaims,
+                },
+              },
             );
           }}
         >
