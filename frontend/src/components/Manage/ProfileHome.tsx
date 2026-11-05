@@ -86,12 +86,15 @@ export default function ProfileHome() {
               </GcdsHeading>
               {provenDate && (
                 <VerifiedBadge
-                  text={`${t("ProfileHome.verified")} ${provenDate}`}
+                  text={`${t("ProfileHome.verifiedOn")} ${provenDate}`}
                 />
               )}
             </GcdsGrid>
 
-            <ProvenInformationCard claims={verifiedClaims} />
+            <ProvenInformationCard
+              claims={verifiedClaims}
+              sourceDisplay={identityVerificationClaims?.source_display}
+            />
           </GcdsContainer>
         )}
         <GcdsContainer>
