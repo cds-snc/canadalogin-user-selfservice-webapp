@@ -23,10 +23,6 @@ export default function ContinueProofingOnMobile() {
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
   const [error, setError] = useState("");
-  const successPage = path(PAGES.idvIdentityVerificationSuccessPage, {
-    language,
-    journeyType,
-  });
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -92,18 +88,7 @@ export default function ContinueProofingOnMobile() {
           {t("ContinueProofingOnMobile.copyLink")}
         </GcdsButton>
       </div>
-      <GcdsGrid columns="1" columnsDesktop="max-content max-content" gap="200">
-        <GcdsButton
-          type="button"
-          buttonRole="primary"
-          onClick={() => {
-            navigate(successPage, {
-              state: { mockProofing: true },
-            });
-          }}
-        >
-          {t("ContinueProofingOnMobile.continueButton")}
-        </GcdsButton>
+      <div className="mobile-proofing-choose-different">
         <GcdsButton
           type="button"
           buttonRole="secondary"
@@ -117,6 +102,22 @@ export default function ContinueProofingOnMobile() {
           }}
         >
           {t("OnlineVerificationInfo.chooseDifferentMethodButton")}
+        </GcdsButton>
+      </div>
+      <GcdsGrid columns="1" columnsDesktop="max-content max-content" gap="200">
+        <GcdsButton
+          type="button"
+          buttonRole="primary"
+          onClick={() => {
+            navigate(
+              path(PAGES.idvInPersonProofingInProgressPage, {
+                language,
+                journeyType,
+              }),
+            );
+          }}
+        >
+          {t("ContinueProofingOnMobile.nextStepButton")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>
