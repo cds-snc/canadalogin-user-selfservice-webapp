@@ -31,7 +31,8 @@
     "dateOfBirth": "Date of birth",
     "idDocument": "Source of information",
     "updateInfo": "To update this information, you'll need to complete identity proofing again.",
-    "updateButton": "Update information"
+    "updateButton": "Update information",
+    "sourceOfInformation": "Source of information"
   },
   "ProfileUpdateName": {
     "firstName": "First name",
