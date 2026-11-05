@@ -89,10 +89,10 @@ export default function ContinueProofingOnMobile() {
           {t("ContinueProofingOnMobile.copyLink")}
         </GcdsButton>
       </div>
-      <GcdsGrid columns="1" columnsDesktop="max-content max-content" gap="200">
+      <div className="mobile-proofing-choose-different">
         <GcdsButton
           type="button"
-          buttonRole="primary"
+          buttonRole="secondary"
           onClick={() => {
             navigate(
               path(PAGES.idvDetailsConfirmationPage, {
@@ -108,21 +108,23 @@ export default function ContinueProofingOnMobile() {
             );
           }}
         >
-          {t("ContinueProofingOnMobile.continueButton")}
+          {t("OnlineVerificationInfo.chooseDifferentMethodButton")}
         </GcdsButton>
+      </div>
+      <GcdsGrid columns="1" columnsDesktop="max-content max-content" gap="200">
         <GcdsButton
           type="button"
-          buttonRole="secondary"
+          buttonRole="primary"
           onClick={() => {
             navigate(
-              path(PAGES.idvProveIdentityOnlinePage, {
+              path(PAGES.idvInPersonProofingInProgressPage, {
                 language,
                 journeyType,
               }),
             );
           }}
         >
-          {t("OnlineVerificationInfo.chooseDifferentMethodButton")}
+          {t("ContinueProofingOnMobile.nextStepButton")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>
