@@ -6,16 +6,13 @@ import {
 } from "@gcds-core/components-react";
 
 import { useNavigate, useParams } from "react-router";
-
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
 export default function InProgressIDV() {
   const navigate = useNavigate();
-
   const { language, journeyType } = useParams();
-
-  const iDVSuccessPage = path(PAGES.idvIdentityVerificationSuccessPage, {
+  const iDVSuccessPage = path(PAGES.idvDetailsConfirmationPage, {
     language,
     journeyType,
   });

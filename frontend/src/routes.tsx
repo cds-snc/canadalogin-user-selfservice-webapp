@@ -38,7 +38,7 @@ import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
 import IdentityVerificationSuccess from "./features/IDV/Online/IdentityVerificationSuccess";
 import ConnectedServicesPage from "./features/ConnectedServices/components/ConnectedServicesPage";
-import IDVInProgressPage from "./features/IDV/components/InProgressIDV";
+import IDVInProgressPage from "./features/IDV/components/IDVInProgress";
 
 export const appRoutes: RouteObject[] = [
   {
