@@ -32,7 +32,7 @@
     "idDocument": "Source des renseignements",
     "updateInfo": "Pour mettre à jour ces renseignements, vous devrez effectuer un autre processus de vérification d'identité.",
     "updateButton": "Mettre à jour les renseignements",
-    "sourceOfInformation": "Source des renseignements"
+    "sourceOfInformation": "Source of information"
   },
   "ProfileUpdateName": {
     "firstName": "Prénom",
