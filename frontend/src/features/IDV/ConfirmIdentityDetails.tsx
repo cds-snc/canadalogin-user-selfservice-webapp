@@ -12,7 +12,6 @@ import {
 import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
-import { IDV_JOURNEY_TYPE } from "./constants";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 import ProvenInformationCard from "./ProvenInformationCard";
 import { path } from "../../utils/routeHelpers";
@@ -54,8 +53,6 @@ export default function ConfirmIdentityDetails() {
       .catch(() => undefined);
   }, [isMockProofing, state?.mockIdentityClaims]);
 
-  const backToProfilePage = path(PAGES.ProfileHome, { language });
-
   const dataTransparencyPage = path(PAGES.dataTransparencyPage, {
     language,
     journeyType,
@@ -69,18 +66,10 @@ export default function ConfirmIdentityDetails() {
     : "ConfirmIdentityDetails.successNoticeDescriptionWithoutRp";
 
   const handleContinue = async () => {
-    switch (journeyType) {
-      case IDV_JOURNEY_TYPE.REQUIRED:
-        navigate(
-          dataTransparencyPage,
-          isMockProofing ? { state: { mockProofing: true } } : undefined,
-        );
-        break;
-      default:
-        navigate(backToProfilePage, {
-          state: { showIDVSuccessNotice: true },
-        });
-    }
+    navigate(
+      dataTransparencyPage,
+      isMockProofing ? { state: { mockProofing: true } } : undefined,
+    );
   };
 
   if (!DEV_ONLY_FEATURE) {
@@ -139,7 +128,7 @@ export default function ConfirmIdentityDetails() {
               </GcdsGrid>
               <ProvenInformationCard
                 claims={verifiedClaims}
-                sourceDisplay={identityVerificationClaims?.source_display}
+                sourceDisplay={reviewClaims?.source_display}
               />
             </GcdsContainer>
           )}
