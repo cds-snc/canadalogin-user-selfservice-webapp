@@ -46,7 +46,9 @@
         "--ssl-certfile=backend/certs/cert.pem"
       ],
       "env": {
-        "PYTHONPATH": "backend"
+        "PYTHONPATH": "backend",
+        "SESSION_REDIS_URL": "redis://localhost:6379/0",
+        "IDV_DATA_STORE_ALLOW_INSECURE_LOOPBACK_TLS": "true"
       },
       "jinja": true,
       "envFile": "${workspaceFolder}/backend/.env"
@@ -77,6 +79,10 @@
         "--host",
         "127.0.0.1"
       ],
+      "env": {
+        "SESSION_REDIS_URL": "redis://localhost:6379/0",
+        "IDV_DATA_STORE_ALLOW_INSECURE_LOOPBACK_TLS": "true"
+      },
       "jinja": true,
       "envFile": "${workspaceFolder}/backend/.env"
     },

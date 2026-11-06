@@ -1,4 +1,5 @@
 import app.main as main_module
+from types import SimpleNamespace
 from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.csrf import CSRF_HEADER_NAME, CSRF_TOKEN_KEY
 from fastapi.testclient import TestClient
@@ -7,6 +8,44 @@ from fastapi.responses import Response
 from datetime import datetime
 from starsessions import SessionAutoloadMiddleware, SessionMiddleware
 from starsessions.stores import InMemoryStore
+
+
+def test_build_redis_url_uses_configured_url_in_non_local_environment():
+    app_configuration = SimpleNamespace(
+        ENVIRONMENT="prod",
+        session_config=SimpleNamespace(SESSION_REDIS_URL="redis://localhost:6379/0"),
+    )
+
+    assert main_module._build_redis_url(app_configuration) == (
+        "redis://localhost:6379/0"
+    )
+
+
+def test_build_redis_url_keeps_tls_default_in_non_local_environment():
+    app_configuration = SimpleNamespace(
+        ENVIRONMENT="prod",
+        session_config=SimpleNamespace(
+            SESSION_REDIS_URL=None,
+            REDIS_AUTH_SECRET="secret",
+            REDIS_DOMAIN="redis.example",
+            REDIS_PORT=6380,
+        ),
+    )
+
+    assert main_module._build_redis_url(app_configuration) == (
+        "rediss://:secret@redis.example:6380?ssl_cert_reqs=none"
+    )
+
+
+def test_build_redis_url_defaults_to_local_redis():
+    app_configuration = SimpleNamespace(
+        ENVIRONMENT="local",
+        session_config=SimpleNamespace(SESSION_REDIS_URL=None),
+    )
+
+    assert main_module._build_redis_url(app_configuration) == (
+        "redis://localhost:6379/0"
+    )
 
 
 class InjectSessionMiddleware:

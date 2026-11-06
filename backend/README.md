@@ -28,6 +28,11 @@ redis-cli ping
 # Should return: PONG
 ```
 
+For production-mode testing against a local, non-TLS Redis instance, set
+`SESSION_REDIS_URL=redis://localhost:6379/0` in the backend environment file. If
+`SESSION_REDIS_URL` is unset, non-local environments use the configured Redis
+host with TLS and authentication.
+
 For other operating systems:
 
 - **Ubuntu/Debian**: `sudo apt-get install redis-server`
@@ -388,6 +393,7 @@ Test discovery and the run/debug buttons in the **Testing** panel will then work
   ```bash
   make uninstall-hooks
   ```
+
 - Building a Dockerimage from your macbook M1 to AWS
   ```bash
   docker buildx  build --platform linux/amd64 -t [NAME] .

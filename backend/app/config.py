@@ -48,7 +48,7 @@ class IBMVerifyConfig(BaseSettings):
 
 
 class SessionConfig(BaseSettings):
-    SESSION_REDIS_URL: str = "redis://localhost:6379/0"
+    SESSION_REDIS_URL: Optional[str] = None
     SESSION_COOKIE_NAME: str = "gc-manage-app"
     SESSION_LIFETIME: int = 60 * 30  # default to 30 minutes in seconds
     REDIS_AUTH_SECRET: str = "test-secret"
@@ -116,6 +116,13 @@ class IdvDataStoreConfig(BaseSettings):
     """
 
     IDV_DATA_STORE_BASE_URL: str = "https://idv.dev.login-connexion.alpha.canada.ca"
+    IDV_DATA_STORE_ALLOW_INSECURE_LOOPBACK_TLS: bool = Field(
+        default=False,
+        description=(
+            "Allow unverified TLS only for localhost/loopback idv-data-store "
+            "requests during local development."
+        ),
+    )
     IDV_DATA_STORE_STS_CLIENT_ID: str = ""
     IDV_DATA_STORE_STS_CLIENT_SECRET: str = ""
     IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES: str = Field(
