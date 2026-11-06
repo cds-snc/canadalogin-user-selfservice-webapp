@@ -18,15 +18,29 @@ GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH = (
 )
 
 
-def test_idv_feature_access_group_ids_parses_comma_separated_values():
+@pytest.mark.parametrize(
+    ("environment", "expected_group_ids"),
+    [
+        ("local", {"dev-group", "8160000157"}),
+        ("dev", {"dev-group", "8160000157"}),
+        ("test", {"test-group"}),
+        ("staging", {"staging-group"}),
+        ("prod", {"prod-group"}),
+        ("unknown", set()),
+    ],
+)
+def test_idv_feature_access_group_ids_selects_environment_list(
+    environment, expected_group_ids
+):
     configuration = Configuration.model_construct(
-        IDV_FEATURE_ACCESS_GROUP_IDS=" 8160000157, second-group, , "
+        ENVIRONMENT=environment,
+        IDV_FEATURE_ACCESS_GROUP_IDS_DEV="dev-group, 8160000157, ,",
+        IDV_FEATURE_ACCESS_GROUP_IDS_TEST=" test-group ",
+        IDV_FEATURE_ACCESS_GROUP_IDS_STAGING="staging-group",
+        IDV_FEATURE_ACCESS_GROUP_IDS_PROD="prod-group",
     )
 
-    assert configuration.idv_feature_access_group_ids == {
-        "8160000157",
-        "second-group",
-    }
+    assert configuration.idv_feature_access_group_ids == expected_group_ids
 
 
 @pytest.mark.asyncio

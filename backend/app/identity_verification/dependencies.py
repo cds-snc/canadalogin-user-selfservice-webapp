@@ -11,9 +11,6 @@ async def require_idv_feature_access(
     user_access_token: Annotated[str, Depends(get_users_current_session)],
 ) -> None:
     configuration = request.app.state.config
-    if configuration.ENVIRONMENT in {"local", "dev"}:
-        return
-
     profile = await dispatch_get_my_profile_from_ibm(
         request.app.state.request_client,
         user_access_token,

@@ -176,10 +176,28 @@ class Configuration(BaseSettings):
     session_config: SessionConfig = SessionConfig()
     idv_data_store_config: IdvDataStoreConfig = IdvDataStoreConfig()
     ENVIRONMENT: str = Field(default="local")
-    IDV_FEATURE_ACCESS_GROUP_IDS: str = Field(
+    IDV_FEATURE_ACCESS_GROUP_IDS_DEV: str = Field(
         default="8160000157",
         description=(
-            "Comma-separated IBM Verify group IDs allowed to access IDV features."
+            "Comma-separated IBM Verify Dev group IDs allowed to access IDV features."
+        ),
+    )
+    IDV_FEATURE_ACCESS_GROUP_IDS_TEST: str = Field(
+        default="",
+        description=(
+            "Comma-separated IBM Verify Test group IDs allowed to access IDV features."
+        ),
+    )
+    IDV_FEATURE_ACCESS_GROUP_IDS_STAGING: str = Field(
+        default="",
+        description=(
+            "Comma-separated IBM Verify Staging group IDs allowed to access IDV features."
+        ),
+    )
+    IDV_FEATURE_ACCESS_GROUP_IDS_PROD: str = Field(
+        default="",
+        description=(
+            "Comma-separated IBM Verify Prod group IDs allowed to access IDV features."
         ),
     )
     V1_API_VERSION: str = "/v1"
@@ -215,9 +233,23 @@ class Configuration(BaseSettings):
 
     @property
     def idv_feature_access_group_ids(self) -> set[str]:
+        """Return the allowlist for this deployment's IBM Verify tenant.
+
+        Local development uses the Dev Verify tenant and therefore the Dev list.
+        """
+        environment = self.ENVIRONMENT.strip().lower()
+        if environment == "local":
+            environment = "dev"
+
+        group_ids_by_environment = {
+            "dev": self.IDV_FEATURE_ACCESS_GROUP_IDS_DEV,
+            "test": self.IDV_FEATURE_ACCESS_GROUP_IDS_TEST,
+            "staging": self.IDV_FEATURE_ACCESS_GROUP_IDS_STAGING,
+            "prod": self.IDV_FEATURE_ACCESS_GROUP_IDS_PROD,
+        }
         return {
             group_id.strip()
-            for group_id in self.IDV_FEATURE_ACCESS_GROUP_IDS.split(",")
+            for group_id in group_ids_by_environment.get(environment, "").split(",")
             if group_id.strip()
         }
 

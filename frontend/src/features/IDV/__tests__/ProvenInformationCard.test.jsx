@@ -6,7 +6,7 @@ import i18n from "../../../i18n/test";
 
 const mockNavigate = vi.fn();
 const mockFlags = vi.hoisted(() => ({
-  devOnlyFeature: true,
+  idvFeatureAccess: true,
 }));
 
 vi.mock("react-router", async () => {
@@ -18,12 +18,8 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../config", () => ({
-  default: {
-    get environment() {
-      return mockFlags.devOnlyFeature ? "dev" : "prod";
-    },
-  },
+vi.mock("../../../hooks/useIdvFeatureAccess", () => ({
+  useIdvFeatureAccess: () => mockFlags.idvFeatureAccess,
 }));
 
 vi.mock("../../../components/Providers/useUser", () => ({
@@ -46,9 +42,6 @@ vi.mock("../../../utils/constants", async () => {
   const actual = await vi.importActual("../../../utils/constants");
   return {
     ...actual,
-    get DEV_ONLY_FEATURE() {
-      return mockFlags.devOnlyFeature;
-    },
     PAGES: {
       ...actual.PAGES,
       idvServiceCanadaCentrePage: "idvServiceCanadaCentrePage",
@@ -86,12 +79,12 @@ describe("ProvenInformationCard", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    mockFlags.devOnlyFeature = true;
+    mockFlags.idvFeatureAccess = true;
     await i18n.changeLanguage("en");
   });
 
-  it("renders null when DEV_ONLY_FEATURE is false", () => {
-    mockFlags.devOnlyFeature = false;
+  it("renders nothing when IDV access is disabled", () => {
+    mockFlags.idvFeatureAccess = false;
     const { container } = render(<ProvenInformationCard claims={claims} />);
     expect(container).toBeEmptyDOMElement();
   });

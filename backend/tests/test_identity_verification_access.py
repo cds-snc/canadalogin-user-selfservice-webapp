@@ -22,45 +22,7 @@ def build_request(environment: str, group_ids: set[str]) -> Request:
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("environment", ["local", "dev"])
-async def test_idv_access_remains_enabled_in_local_and_dev(environment, monkeypatch):
-    profile_lookup = AsyncMock()
-    monkeypatch.setattr(
-        "app.identity_verification.dependencies.dispatch_get_my_profile_from_ibm",
-        profile_lookup,
-    )
-
-    await require_idv_feature_access(
-        build_request(environment, set()),
-        user_access_token="user-token",
-    )
-
-    profile_lookup.assert_not_awaited()
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("environment", ["test", "staging", "prod"])
-async def test_idv_access_allows_configured_group_member(environment, monkeypatch):
-    profile_lookup = AsyncMock(
-        return_value=IBMVerifyUserProfileSchema.model_construct(
-            groups=[SimpleNamespace(id="second-group")]
-        )
-    )
-    monkeypatch.setattr(
-        "app.identity_verification.dependencies.dispatch_get_my_profile_from_ibm",
-        profile_lookup,
-    )
-
-    await require_idv_feature_access(
-        build_request(environment, {"8160000157", "second-group"}),
-        user_access_token="user-token",
-    )
-
-    profile_lookup.assert_awaited_once()
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("environment", ["test", "staging", "prod"])
+@pytest.mark.parametrize("environment", ["local", "dev", "test", "staging", "prod"])
 async def test_idv_access_forbids_users_outside_configured_groups(
     environment, monkeypatch
 ):
@@ -79,3 +41,25 @@ async def test_idv_access_forbids_users_outside_configured_groups(
         )
 
     assert error.value.status_code == 403
+    profile_lookup.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("environment", ["local", "dev", "test", "staging", "prod"])
+async def test_idv_access_allows_configured_group_member(environment, monkeypatch):
+    profile_lookup = AsyncMock(
+        return_value=IBMVerifyUserProfileSchema.model_construct(
+            groups=[SimpleNamespace(id="second-group")]
+        )
+    )
+    monkeypatch.setattr(
+        "app.identity_verification.dependencies.dispatch_get_my_profile_from_ibm",
+        profile_lookup,
+    )
+
+    await require_idv_feature_access(
+        build_request(environment, {"8160000157", "second-group"}),
+        user_access_token="user-token",
+    )
+
+    profile_lookup.assert_awaited_once()
