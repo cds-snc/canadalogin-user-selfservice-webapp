@@ -14,7 +14,16 @@ export const mockIdentityClaims: IdentityVerificationClaimsResponse = {
       address: {
         formatted: "123 Example Street, Ottawa, ON K1A 0B1, Canada",
       },
-      id_document: "Ontario driver's licence: Expires August 14, 2030",
     },
+  },
+  source_display: {
+    documents: [
+      {
+        display_name: {
+          en: "Ontario driver's licence: Expires August 14, 2030",
+          fr: "Permis de conduire de l’Ontario : Expire le 14 août 2030",
+        },
+      },
+    ],
   },
 };

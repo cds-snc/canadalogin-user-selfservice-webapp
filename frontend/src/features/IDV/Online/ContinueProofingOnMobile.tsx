@@ -117,10 +117,16 @@ export default function ContinueProofingOnMobile() {
           buttonRole="primary"
           onClick={() => {
             navigate(
-              path(PAGES.idvInPersonProofingInProgressPage, {
+              path(PAGES.idvDetailsConfirmationPage, {
                 language,
                 journeyType,
               }),
+              {
+                state: {
+                  mockProofing: true,
+                  mockIdentityClaims,
+                },
+              },
             );
           }}
         >
