@@ -38,6 +38,7 @@ import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
 import ContinueProofingOnMobile from "./features/IDV/Online/ContinueProofingOnMobile";
 import ConnectedServicesPage from "./features/ConnectedServices/components/ConnectedServicesPage";
+import IDVInProgressPage from "./features/IDV/components/IDVInProgress";
 import DataTransparencyPage from "./features/DataTransparency/DataTransparencyPage";
 
 export const appRoutes: RouteObject[] = [
@@ -244,6 +245,9 @@ export const appRoutes: RouteObject[] = [
                           handle: { id: PAGES.idvDetailsConfirmationPage },
                         },
                         {
+                          path: "idv-inprogress",
+                          element: <IDVInProgressPage />,
+                          handle: { id: PAGES.idvInProgressIDVPage },
                           path: "data-transparency",
                           element: <DataTransparencyPage />,
                           handle: { id: PAGES.dataTransparencyPage },

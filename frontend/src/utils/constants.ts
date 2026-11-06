@@ -190,6 +190,7 @@ export const PAGES = {
   idvDetailsConfirmationPage: "IdvDetailsConfirmationPage",
   idvIdentityVerificationSuccessPage: "IdvIdentityVerificationSuccessPage",
   idvPartnerLinkSuccessPage: "IdvPartnerLinkSuccessPage",
+  idvInProgressIDVPage: "InProgressIDVPage",
   dataTransparencyPage: "DataTransparencyPage",
 } as const;
 
