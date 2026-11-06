@@ -35,6 +35,14 @@ export type IdentityVerificationClaimsResponse = {
       id_document?: string | null;
     };
   };
+  source_display?: {
+    documents?: Array<{
+      display_name?: {
+        en?: string | null;
+        fr?: string | null;
+      };
+    }>;
+  };
 };
 
 axios.defaults.withCredentials = true;
