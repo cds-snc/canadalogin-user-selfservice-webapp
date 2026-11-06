@@ -18,10 +18,12 @@ import { enCA, frCA } from "date-fns/locale";
 
 type ProvenInformationCardProps = {
   claims?: NonNullable<IdentityVerificationClaimsResponse["verified_claims"]>;
+  sourceDisplay?: IdentityVerificationClaimsResponse["source_display"];
 };
 
 export default function ProvenInformationCard({
   claims,
+  sourceDisplay,
 }: ProvenInformationCardProps) {
   const { t, i18n } = useTranslation("profile");
   const { language } = useParams();
@@ -36,8 +38,23 @@ export default function ProvenInformationCard({
         { locale: i18n.language === "fr" ? frCA : enCA },
       )
     : "";
-  const idDocument = claims?.claims?.id_document;
   const address = claims?.claims?.address?.formatted;
+
+  const sourceOfInformation =
+    sourceDisplay?.documents?.[0]?.display_name?.[i18n.language as "en" | "fr"];
+
+  const formatFrenchOrdinalDate = (value: string) => {
+    if (i18n.language !== "fr" || !value.startsWith("1er ")) {
+      return value;
+    }
+
+    return (
+      <>
+        1<sup>er</sup>
+        {value.slice(3)}
+      </>
+    );
+  };
 
   const startIdentityVerificationFlow = path(
     PAGES.idvStartIdentityProofingPage,
@@ -51,6 +68,28 @@ export default function ProvenInformationCard({
     return null;
   }
 
+  const DateOfBirthSection = dateOfBirth ? (
+    <GcdsContainer>
+      <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+        {t("ProvenInformationCard.dateOfBirth")}
+      </GcdsHeading>
+      <GcdsText marginTop="200" marginBottom="0">
+        {formatFrenchOrdinalDate(dateOfBirth)}
+      </GcdsText>
+    </GcdsContainer>
+  ) : null;
+
+  const SourceOfInformationSection = sourceOfInformation ? (
+    <GcdsContainer>
+      <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+        {t("ProvenInformationCard.sourceOfInformation")}
+      </GcdsHeading>
+      <GcdsText marginTop="200" marginBottom="0">
+        {sourceOfInformation}
+      </GcdsText>
+    </GcdsContainer>
+  ) : null;
+
   const sections = [
     <GcdsContainer key="name">
       <GcdsHeading tag="h3" marginTop="300" marginBottom="0">
@@ -60,16 +99,7 @@ export default function ProvenInformationCard({
         {name}
       </GcdsText>
     </GcdsContainer>,
-    dateOfBirth ? (
-      <GcdsContainer>
-        <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-          {t("ProvenInformationCard.dateOfBirth")}
-        </GcdsHeading>
-        <GcdsText marginTop="200" marginBottom="0">
-          {dateOfBirth}
-        </GcdsText>
-      </GcdsContainer>
-    ) : null,
+    DateOfBirthSection,
     address ? (
       <GcdsContainer>
         <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
@@ -80,16 +110,7 @@ export default function ProvenInformationCard({
         </GcdsText>
       </GcdsContainer>
     ) : null,
-    idDocument ? (
-      <GcdsContainer key="idDocument">
-        <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
-          {t("ProvenInformationCard.idDocument")}
-        </GcdsHeading>
-        <GcdsText marginTop="200" marginBottom="0">
-          {idDocument}
-        </GcdsText>
-      </GcdsContainer>
-    ) : null,
+    SourceOfInformationSection,
     <GcdsContainer key="update">
       <GcdsText>{t("ProvenInformationCard.updateInfo")}</GcdsText>
       <GcdsText>

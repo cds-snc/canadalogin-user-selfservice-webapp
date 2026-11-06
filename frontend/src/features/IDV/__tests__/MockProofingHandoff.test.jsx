@@ -177,7 +177,13 @@ describe("ContinueProofingOnMobile", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Next Step" }));
     expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith(
-      "/en/identity-verification/required/IdvInPersonProofingInProgressPage",
+      "/en/identity-verification/required/IdvDetailsConfirmationPage",
+      {
+        state: {
+          mockProofing: true,
+          mockIdentityClaims: expect.any(Object),
+        },
+      },
     );
   });
 
@@ -187,7 +193,13 @@ describe("ContinueProofingOnMobile", () => {
     render(<ContinueProofingOnMobile />);
     fireEvent.click(screen.getByRole("button", { name: "Next Step" }));
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/fr/identity-verification/update/IdvInPersonProofingInProgressPage",
+      "/fr/identity-verification/update/IdvDetailsConfirmationPage",
+      {
+        state: {
+          mockProofing: true,
+          mockIdentityClaims: expect.any(Object),
+        },
+      },
     );
   });
 
@@ -221,7 +233,13 @@ describe("ContinueProofingOnMobile", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Next Step" }));
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/en/identity-verification/required/IdvInPersonProofingInProgressPage",
+      "/en/identity-verification/required/IdvDetailsConfirmationPage",
+      {
+        state: {
+          mockProofing: true,
+          mockIdentityClaims: expect.any(Object),
+        },
+      },
     );
   });
 
