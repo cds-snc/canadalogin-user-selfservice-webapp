@@ -92,7 +92,10 @@ export default function ProfileHome() {
               )}
             </GcdsGrid>
 
-            <ProvenInformationCard claims={verifiedClaims} />
+            <ProvenInformationCard
+              claims={verifiedClaims}
+              sourceDisplay={identityVerificationClaims?.source_display}
+            />
           </GcdsContainer>
         )}
         <GcdsContainer>

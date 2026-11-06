@@ -9,6 +9,7 @@ import {
   GcdsDateInput,
   GcdsInput,
   GcdsFieldset,
+  GcdsRadios,
 } from "@gcds-core/components-react";
 
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
@@ -40,6 +41,7 @@ import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.valid
 import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
 
 const ERROR_SUMMARY_ID = "service-canada-centre-error-summary";
+const NON_EXPIRED_ID_RADIOS_ID = "non-expired-id-radios";
 
 export default function ServiceCanadaCentrePage() {
   const navigate = useNavigate();
@@ -63,6 +65,14 @@ export default function ServiceCanadaCentrePage() {
   const { t } = useTranslation("idv");
   const { relyingPartyName: rpName } = useRelyingPartyInfo();
 
+  const completeIdentityProofingPage = path(
+    PAGES.idvCompleteIdentityProofingPage,
+    {
+      language: language,
+      journeyType: journeyType,
+    },
+  );
+
   const serviceCanadaCodePage = path(PAGES.idvServiceCanadaCentreCodePage, {
     language: language,
     journeyType: journeyType,
@@ -77,6 +87,29 @@ export default function ServiceCanadaCentrePage() {
     value: string,
   ) => {
     setFormData((previous) => ({ ...previous, [field]: value }));
+  };
+
+  const [nonExpiredIdAnswer, setNonExpiredIdAnswer] = useState("");
+
+  const nonExpiredIdRadioOptions = [
+    {
+      id: "radio-non-expired-id-yes",
+      value: "yes",
+      label: t("ServiceCanadaCentre.yesOption"),
+      checked: nonExpiredIdAnswer === "yes",
+    },
+    {
+      id: "radio-non-expired-id-no",
+      value: "no",
+      label: t("ServiceCanadaCentre.noOption"),
+      checked: nonExpiredIdAnswer === "no",
+    },
+  ];
+
+  const onNonExpiredIdChange = (event: CustomEvent<string>) => {
+    setNonExpiredIdAnswer(
+      (event.target as HTMLInputElement | null)?.value ?? "",
+    );
   };
 
   const createChangeHandler =
@@ -145,6 +178,11 @@ export default function ServiceCanadaCentrePage() {
 
   const onContinue = async () => {
     setHasSubmitted(true);
+
+    if (nonExpiredIdAnswer === "no") {
+      navigate(completeIdentityProofingPage);
+      return;
+    }
 
     if (!isFormValid) {
       setShowErrorSummary(true);
@@ -361,6 +399,15 @@ export default function ServiceCanadaCentrePage() {
               </>
             )}
           </GcdsFieldset>
+
+          <GcdsRadios
+            id={NON_EXPIRED_ID_RADIOS_ID}
+            name="non-expired-id-radios"
+            legend={t("ServiceCanadaCentre.nonExpiredIdTitle")}
+            hint={t("ServiceCanadaCentre.nonExpiredIdHint")}
+            options={nonExpiredIdRadioOptions}
+            onGcdsChange={onNonExpiredIdChange}
+          />
 
           <GcdsGrid
             columns="1"

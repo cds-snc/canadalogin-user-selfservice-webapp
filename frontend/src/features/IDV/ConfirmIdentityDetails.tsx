@@ -120,7 +120,10 @@ export default function ConfirmIdentityDetails() {
                   />
                 )}
               </GcdsGrid>
-              <ProvenInformationCard claims={verifiedClaims} />
+              <ProvenInformationCard
+                claims={verifiedClaims}
+                sourceDisplay={identityVerificationClaims?.source_display}
+              />
             </GcdsContainer>
           )}
           <GcdsButton
