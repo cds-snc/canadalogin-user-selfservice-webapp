@@ -103,7 +103,7 @@ if configuration.session_config.SESSION_REDIS_URL:
 elif configuration.ENVIRONMENT != "local":
     logger.info(f"Redis instance {configuration.session_config.REDIS_DOMAIN}")
 else:
-    logger.info(f"Redis instance {redis_url}")
+    logger.info("Using local Redis instance")
 redis_client = Redis.from_url(redis_url)
 
 
