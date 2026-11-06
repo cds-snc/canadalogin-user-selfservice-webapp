@@ -27,6 +27,10 @@
     "step2": "Get a unique code sent to your email, valid for 30 days.",
     "step3": "Bring your code and selected photo ID to any Service Canada Centre.",
     "step4": "A service agent will verify your identity, once done, sign back in to {{rpName}} to continue.",
+    "nonExpiredIdTitle": "Can you bring a non-expired ID?",
+    "nonExpiredIdHint": "ID must be valid when you visit the Service Canada Centre",
+    "yesOption": "Yes",
+    "noOption": "No",
     "fallbackRpName": "RP Name",
     "enterDetailsHeading": "Enter your ID details",
     "continueButton": "Continue",
@@ -266,6 +270,20 @@
     "serviceCanadaDescription": "Select your ID type, enter the details, and get a unique code to bring to any Service Canada Centre within 30 days.",
     "continueButton": "Continue",
     "backButton": "Back"
+  },
+  "ContinueProofingOnMobile": {
+    "pageTitle": "Continue proofing on mobile",
+    "heading": "Continue proofing on mobile",
+    "description": "In order to capture a photo of yourself and your ID, you will need to use your mobile phone device.",
+    "keepOpen": "Keep this window open",
+    "returnHere": "Return here once proofing is complete.",
+    "scanInstruction": "Scan the QR code below to continue proofing on your mobile device.",
+    "qrLabel": "Example identity proofing QR code",
+    "cannotScan": "Can’t scan the QR code? Send this link to your mobile device.",
+    "copyLink": "Copy link",
+    "copyError": "We couldn’t copy the link. Select and copy the link above instead.",
+    "continueButton": "Continue",
+    "nextStepButton": "Next Step"
   },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",

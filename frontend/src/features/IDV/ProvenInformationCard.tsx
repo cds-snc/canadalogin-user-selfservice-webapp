@@ -38,6 +38,7 @@ export default function ProvenInformationCard({
         { locale: i18n.language === "fr" ? frCA : enCA },
       )
     : "";
+  const address = claims?.claims?.address?.formatted;
 
   const sourceOfInformation =
     sourceDisplay?.documents?.[0]?.display_name?.[i18n.language as "en" | "fr"];
@@ -99,6 +100,16 @@ export default function ProvenInformationCard({
       </GcdsText>
     </GcdsContainer>,
     DateOfBirthSection,
+    address ? (
+      <GcdsContainer>
+        <GcdsHeading tag="h3" marginTop="0" marginBottom="0">
+          {t("ProvenInformationCard.address")}
+        </GcdsHeading>
+        <GcdsText marginTop="200" marginBottom="0">
+          {address}
+        </GcdsText>
+      </GcdsContainer>
+    ) : null,
     SourceOfInformationSection,
     <GcdsContainer key="update">
       <GcdsText>{t("ProvenInformationCard.updateInfo")}</GcdsText>

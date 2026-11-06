@@ -150,6 +150,42 @@ describe("ProvenInformationCard", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders the formatted address alongside the source of information", () => {
+    render(
+      <ProvenInformationCard
+        claims={{
+          ...claims,
+          claims: {
+            ...claims.claims,
+            address: { formatted: "123 Main Street, Ottawa, ON" },
+            id_document: "Legacy document",
+          },
+        }}
+        sourceDisplay={sourceDisplay}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Address" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("123 Main Street, Ottawa, ON")).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("heading", { name: "Source of information" }),
+    ).toHaveLength(1);
+    expect(screen.getByText("Driver's Licence (Ontario)")).toBeInTheDocument();
+    expect(screen.queryByText("Legacy document")).not.toBeInTheDocument();
+  });
+
+  it("does not render the address section when no address is provided", () => {
+    render(
+      <ProvenInformationCard claims={claims} sourceDisplay={sourceDisplay} />,
+    );
+
+    expect(
+      screen.queryByRole("heading", { name: "Address" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders the source of information display name in English", () => {
     render(
       <ProvenInformationCard claims={claims} sourceDisplay={sourceDisplay} />,
