@@ -10,7 +10,7 @@ import {
   GcdsDetails,
 } from "@gcds-core/components-react";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import { PAGES } from "../../utils/constants";
 import { path } from "../../utils/routeHelpers";
 import { useUser } from "../../components/Providers/useUser";
 import { authService } from "../../services/authService";
@@ -62,10 +62,6 @@ export default function CompleteIdentityProofingPage() {
       }, 2000);
     }
   };
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main">

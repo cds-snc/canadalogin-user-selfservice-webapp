@@ -8,11 +8,7 @@ import {
   GcdsContainer,
 } from "@gcds-core/components-react";
 
-import {
-  AVAILABLE_LANGUAGES,
-  DEV_ONLY_FEATURE,
-  PAGES,
-} from "../../../utils/constants";
+import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import OnlineRadioButtons from "../components/OnlineRadioButtons";
 import { ONLINE_IDV_METHOD, type IdvMethod } from "../components/methods";
@@ -77,10 +73,6 @@ export default function ProveIdentityOnlinePage() {
     event.preventDefault();
     handleContinue();
   };
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main">

@@ -55,14 +55,6 @@ describe("CanadaPostProofOfAddressPage", () => {
     mockLocation.state = null;
   });
 
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockFlags.devOnlyFeature = false;
-
-    const { container } = render(<CanadaPostProofOfAddressPage />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it("renders the heading, intro and every document group", () => {
     render(<CanadaPostProofOfAddressPage />);
 

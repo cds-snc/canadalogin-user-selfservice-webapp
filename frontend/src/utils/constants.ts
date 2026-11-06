@@ -74,6 +74,7 @@ export const CONTEXT_ACTIONS = {
   set_loading: "SET_LOADING",
   update_profile: "UPDATE_PROFILE",
   updated_profile_success: "UPDATE_PROFILE_SUCCESS",
+  set_feature_flags: "SET_FEATURE_FLAGS",
   set_language: "SET_LANGUAGE",
   set_relying_party_data: "SET_RELYING_PARTY_DATA",
   set_authenticated_pages: "SET_AUTHENTICATED_PAGES",
@@ -255,6 +256,7 @@ export const IDV_TARGET_URL_KEY = "Target";
 export const DEFAULT_RP_NAME = "Manage CanadaLogin";
 
 export const VITE_ENVIRONMENTS = {
+  local: "local",
   dev: "dev",
   test: "test",
   staging: "staging",

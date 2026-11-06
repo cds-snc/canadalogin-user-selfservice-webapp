@@ -48,7 +48,7 @@ class IBMVerifyConfig(BaseSettings):
 
 
 class SessionConfig(BaseSettings):
-    SESSION_REDIS_URL: str = "redis://localhost:6379/0"
+    SESSION_REDIS_URL: Optional[str] = None
     SESSION_COOKIE_NAME: str = "gc-manage-app"
     SESSION_LIFETIME: int = 60 * 30  # default to 30 minutes in seconds
     REDIS_AUTH_SECRET: str = "test-secret"
@@ -116,6 +116,13 @@ class IdvDataStoreConfig(BaseSettings):
     """
 
     IDV_DATA_STORE_BASE_URL: str = "https://idv.dev.login-connexion.alpha.canada.ca"
+    IDV_DATA_STORE_ALLOW_INSECURE_LOOPBACK_TLS: bool = Field(
+        default=False,
+        description=(
+            "Allow unverified TLS only for localhost/loopback idv-data-store "
+            "requests during local development."
+        ),
+    )
     IDV_DATA_STORE_STS_CLIENT_ID: str = ""
     IDV_DATA_STORE_STS_CLIENT_SECRET: str = ""
     IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES: str = Field(
@@ -169,6 +176,30 @@ class Configuration(BaseSettings):
     session_config: SessionConfig = SessionConfig()
     idv_data_store_config: IdvDataStoreConfig = IdvDataStoreConfig()
     ENVIRONMENT: str = Field(default="local")
+    IDV_FEATURE_ACCESS_GROUP_IDS_DEV: str = Field(
+        default="8160000157",
+        description=(
+            "Comma-separated IBM Verify Dev group IDs allowed to access IDV features."
+        ),
+    )
+    IDV_FEATURE_ACCESS_GROUP_IDS_TEST: str = Field(
+        default="",
+        description=(
+            "Comma-separated IBM Verify Test group IDs allowed to access IDV features."
+        ),
+    )
+    IDV_FEATURE_ACCESS_GROUP_IDS_STAGING: str = Field(
+        default="",
+        description=(
+            "Comma-separated IBM Verify Staging group IDs allowed to access IDV features."
+        ),
+    )
+    IDV_FEATURE_ACCESS_GROUP_IDS_PROD: str = Field(
+        default="",
+        description=(
+            "Comma-separated IBM Verify Prod group IDs allowed to access IDV features."
+        ),
+    )
     V1_API_VERSION: str = "/v1"
     ROOT_DOMAIN: Optional[str] = (
         None  # Not required for local development, value should be ".gc-signin.cdssandbox.xyz"
@@ -199,6 +230,28 @@ class Configuration(BaseSettings):
         return [
             f"{http_value}{origin.strip()}" for origin in self.CORS_ORIGINS.split(",")
         ]
+
+    @property
+    def idv_feature_access_group_ids(self) -> set[str]:
+        """Return the allowlist for this deployment's IBM Verify tenant.
+
+        Local development uses the Dev Verify tenant and therefore the Dev list.
+        """
+        environment = self.ENVIRONMENT.strip().lower()
+        if environment == "local":
+            environment = "dev"
+
+        group_ids_by_environment = {
+            "dev": self.IDV_FEATURE_ACCESS_GROUP_IDS_DEV,
+            "test": self.IDV_FEATURE_ACCESS_GROUP_IDS_TEST,
+            "staging": self.IDV_FEATURE_ACCESS_GROUP_IDS_STAGING,
+            "prod": self.IDV_FEATURE_ACCESS_GROUP_IDS_PROD,
+        }
+        return {
+            group_id.strip()
+            for group_id in group_ids_by_environment.get(environment, "").split(",")
+            if group_id.strip()
+        }
 
     @property
     def profile_api_endpoint(self) -> str:

@@ -245,12 +245,4 @@ describe("ProvincialVerificationPage", () => {
     const link = screen.getByText("Learn more about provincial verfication");
     expect(link.closest("a")).toHaveAttribute("target", "_blank");
   });
-
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockState.devOnlyFeature = false;
-
-    const { container } = render(<ProvincialVerificationPage />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
 });

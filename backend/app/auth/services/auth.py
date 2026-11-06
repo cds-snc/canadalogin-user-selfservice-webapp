@@ -97,11 +97,16 @@ def resolve_oidc_login_language(
 
 def get_base_profile_management_url():
     config = get_configuration()
-    redirectValue = config.PROFILE_MANAGEMENT_DOMAIN
+    profile_management_url = config.PROFILE_MANAGEMENT_DOMAIN.strip()
 
-    if config.ENVIRONMENT != "local":
-        redirectValue = f"https://{config.PROFILE_MANAGEMENT_DOMAIN}"
-    return redirectValue
+    if config.ENVIRONMENT == "local":
+        return profile_management_url
+
+    parsed_url = urlparse(profile_management_url)
+    if parsed_url.scheme.lower() in {"http", "https"}:
+        return parsed_url._replace(scheme="https").geturl()
+
+    return f"https://{profile_management_url}"
 
 
 def get_callback_redirect_uri(request: Request):

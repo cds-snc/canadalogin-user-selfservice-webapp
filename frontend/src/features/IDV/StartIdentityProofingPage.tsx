@@ -14,7 +14,6 @@ import ErrorSummaryWithFocus from "../../components/ErrorSummaryWithFocus/ErrorS
 
 import {
   AVAILABLE_LANGUAGES,
-  DEV_ONLY_FEATURE,
   IDV_TARGET_URL_KEY,
   PAGES,
 } from "../../utils/constants";
@@ -159,10 +158,6 @@ export default function StartIdentityProofingPage() {
         break;
     }
   };
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main">

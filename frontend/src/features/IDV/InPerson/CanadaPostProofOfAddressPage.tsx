@@ -9,7 +9,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import type { CanadaPostIdDetailsLocationState } from "./CanadaPostIdDetailsPage";
 import "./css/CanadaPostProofOfAddressPage.css";
@@ -31,10 +31,6 @@ export default function CanadaPostProofOfAddressPage() {
     location.state as CanadaPostIdDetailsLocationState | null;
   const selectedDocument = locationState?.document;
   const formData = locationState?.formData;
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main">

@@ -57,6 +57,7 @@ vi.mock("../../../utils/constants", () => ({
     editContactPhoneNumberPage: "EditContactPhoneNumberPage",
     idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
   },
+  VITE_ENVIRONMENTS: { local: "local", dev: "dev" },
 }));
 
 vi.mock("../../../utils/routeHelpers", () => ({
@@ -139,14 +140,6 @@ describe("ConfirmIdentityDetails", () => {
         },
       },
     };
-  });
-
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
-
-    const { container } = render(<ConfirmIdentityDetails />);
-
-    expect(container).toBeEmptyDOMElement();
   });
 
   it("renders the core page sections", () => {
