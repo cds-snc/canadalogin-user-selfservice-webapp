@@ -7,6 +7,7 @@ import { identityVerificationApi } from "../api/identityVerificationApi";
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
 let mockJourneyType;
+let mockLocationState;
 let mockUserState = {
   userProfile: {
     name: {
@@ -21,6 +22,7 @@ vi.mock("react-router", async () => {
     ...actual,
     useParams: () => ({ language: "en", journeyType: mockJourneyType }),
     useNavigate: () => mockNavigate,
+    useLocation: () => ({ state: mockLocationState }),
   };
 });
 
@@ -56,6 +58,8 @@ vi.mock("../../../utils/constants", () => ({
     editEmailPage: "EditEmailPage",
     editContactPhoneNumberPage: "EditContactPhoneNumberPage",
     idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
+    ProfileHome: "ProfileHome",
+    dataTransparencyPage: "DataTransparencyPage",
   },
 }));
 
@@ -118,6 +122,7 @@ describe("ConfirmIdentityDetails", () => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
     mockJourneyType = undefined;
+    mockLocationState = undefined;
     Object.defineProperty(window, "location", {
       configurable: true,
       value: {
@@ -159,6 +164,36 @@ describe("ConfirmIdentityDetails", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows sample review details for the mock QR journey without fetching real claims", () => {
+    mockLocationState = { mockProofing: true };
+    render(<ConfirmIdentityDetails />);
+
+    expect(screen.getByText("Alex Morgan")).toBeInTheDocument();
+    expect(screen.getByText("August 14, 1992")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Address" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("123 Example Street, Ottawa, ON K1A 0B1, Canada"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Source of information" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Ontario driver's licence: Expires August 14, 2030"),
+    ).toBeInTheDocument();
+    expect(identityVerificationApi.getClaims).not.toHaveBeenCalled();
+  });
+
+  it("continues fetching real claims for journeys that did not use the mock QR code", async () => {
+    render(<ConfirmIdentityDetails />);
+
+    await waitFor(() =>
+      expect(identityVerificationApi.getClaims).toHaveBeenCalledOnce(),
+    );
+    expect(screen.queryByText("Alex Morgan")).not.toBeInTheDocument();
+  });
+
   it("shows the existing RP success notice when RP details are available", () => {
     render(<ConfirmIdentityDetails />);
 
@@ -184,7 +219,7 @@ describe("ConfirmIdentityDetails", () => {
     ).toBeInTheDocument();
   });
 
-  it("redirects to the stored RP target when Continue is clicked", async () => {
+  it("redirects to the data transparency page when Continue is clicked", async () => {
     mockJourneyType = "required";
 
     render(<ConfirmIdentityDetails />);
@@ -192,9 +227,9 @@ describe("ConfirmIdentityDetails", () => {
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
 
     await waitFor(() => {
-      expect(identityVerificationApi.getPostIdvRedirectUrl).toHaveBeenCalled();
-      expect(window.location.assign).toHaveBeenCalledWith(
-        "https://rp.example.com/service/return",
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/DataTransparencyPage",
+        undefined,
       );
     });
   });

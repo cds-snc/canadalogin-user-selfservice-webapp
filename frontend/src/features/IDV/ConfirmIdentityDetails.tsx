@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   GcdsButton,
@@ -21,13 +21,15 @@ import {
   type IdentityVerificationClaimsResponse,
 } from "../../features/IDV/api/identityVerificationApi";
 import VerifiedBadge from "../../components/Badges/VerifiedBadge";
+import { mockIdentityClaims } from "./data/mockIdentityClaims";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const isMockProofing = DEV_ONLY_FEATURE && state?.mockProofing === true;
   const { t, i18n } = useTranslation(["idv", "profile"]);
   const { language, journeyType } = useParams();
-  const { relyingPartyUrl, relyingPartyName, hasRelyingParty } =
-    useRelyingPartyInfo();
+  const { relyingPartyName, hasRelyingParty } = useRelyingPartyInfo();
 
   const [identityVerificationClaims, setIdentityVerificationClaims] =
     useState<IdentityVerificationClaimsResponse>();
@@ -37,14 +39,27 @@ export default function ConfirmIdentityDetails() {
       return;
     }
 
+    if (isMockProofing && state?.mockIdentityClaims) {
+      setIdentityVerificationClaims(state.mockIdentityClaims);
+      return;
+    }
+
+    if (isMockProofing) {
+      return;
+    }
+
     void identityVerificationApi
       .getClaims()
       .then(setIdentityVerificationClaims)
       .catch(() => undefined);
-  }, []);
+  }, [isMockProofing, state?.mockIdentityClaims]);
 
-  const fallbackRedirectUrl = relyingPartyUrl || "/";
   const backToProfilePage = path(PAGES.ProfileHome, { language });
+
+  const dataTransparencyPage = path(PAGES.dataTransparencyPage, {
+    language,
+    journeyType,
+  });
 
   const successNoticeTitleKey = hasRelyingParty
     ? "ConfirmIdentityDetails.successNoticeTitle"
@@ -53,22 +68,13 @@ export default function ConfirmIdentityDetails() {
     ? "ConfirmIdentityDetails.successNoticeDescription"
     : "ConfirmIdentityDetails.successNoticeDescriptionWithoutRp";
 
-  const redirectToRelyingParty = async () => {
-    try {
-      const response = await identityVerificationApi.getPostIdvRedirectUrl();
-      window.location.assign(
-        response?.data?.redirect_url || fallbackRedirectUrl,
-      );
-    } catch (error) {
-      console.error("Unable to resolve post-IDV redirect URL:", error);
-      window.location.assign(fallbackRedirectUrl);
-    }
-  };
-
   const handleContinue = async () => {
     switch (journeyType) {
       case IDV_JOURNEY_TYPE.REQUIRED:
-        await redirectToRelyingParty();
+        navigate(
+          dataTransparencyPage,
+          isMockProofing ? { state: { mockProofing: true } } : undefined,
+        );
         break;
       default:
         navigate(backToProfilePage, {
@@ -81,9 +87,12 @@ export default function ConfirmIdentityDetails() {
     return null;
   }
 
+  const reviewClaims = isMockProofing
+    ? mockIdentityClaims
+    : identityVerificationClaims;
   const verifiedClaims =
-    identityVerificationClaims?.status === "verified"
-      ? identityVerificationClaims.verified_claims
+    reviewClaims?.status === "verified"
+      ? reviewClaims.verified_claims
       : undefined;
   const verificationTime = verifiedClaims?.verification?.time;
   const provenDate = verificationTime
@@ -130,7 +139,7 @@ export default function ConfirmIdentityDetails() {
               </GcdsGrid>
               <ProvenInformationCard
                 claims={verifiedClaims}
-                sourceDisplay={identityVerificationClaims?.source_display}
+                sourceDisplay={reviewClaims?.source_display}
               />
             </GcdsContainer>
           )}

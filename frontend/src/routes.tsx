@@ -36,8 +36,9 @@ import OnlineVerificationInfo from "./features/IDV/Online/OnlineVerificationInfo
 import PartnerLinkSuccessPage from "./features/IDV/Online/PartnerLinkSuccessPage";
 import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
-import IdentityVerificationSuccess from "./features/IDV/Online/IdentityVerificationSuccess";
+import ContinueProofingOnMobile from "./features/IDV/Online/ContinueProofingOnMobile";
 import ConnectedServicesPage from "./features/ConnectedServices/components/ConnectedServicesPage";
+import DataTransparencyPage from "./features/DataTransparency/DataTransparencyPage";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -223,6 +224,11 @@ export const appRoutes: RouteObject[] = [
                           handle: { id: PAGES.idvOnlineVerificationInfoPage },
                         },
                         {
+                          path: "online/bluink/mobile",
+                          element: <ContinueProofingOnMobile />,
+                          handle: { id: PAGES.idvContinueProofingOnMobilePage },
+                        },
+                        {
                           path: "online/provincial",
                           element: <ProvincialVerificationPage />,
                           handle: { id: PAGES.idvProvincialVerificationPage },
@@ -233,16 +239,14 @@ export const appRoutes: RouteObject[] = [
                           handle: { id: PAGES.idvPartnerLinkSuccessPage },
                         },
                         {
-                          path: "online/bluink/confirmation",
-                          element: <IdentityVerificationSuccess />,
-                          handle: {
-                            id: PAGES.idvIdentityVerificationSuccessPage,
-                          },
-                        },
-                        {
                           path: "details-confirmation",
                           element: <ConfirmIdentityDetails />,
                           handle: { id: PAGES.idvDetailsConfirmationPage },
+                        },
+                        {
+                          path: "data-transparency",
+                          element: <DataTransparencyPage />,
+                          handle: { id: PAGES.dataTransparencyPage },
                         },
                       ],
                     },
