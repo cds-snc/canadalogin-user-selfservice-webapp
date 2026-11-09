@@ -416,9 +416,7 @@ async def _exchange_and_update_session(
         payload = _decode_jwt_payload(combined_id_token)
         if payload:
             combined_amr = payload.get("amr")
-            logger.info(
-                f"Combined token amr: {combined_amr}, sid: {payload.get('sid')}"
-            )
+            logger.info("Combined token amr: %s", combined_amr)
 
     logger.info(
         "Updating FastAPI session with elevated authentication (password + FIDO2)"
