@@ -1,0 +1,45 @@
+name: Release pipeline - dev
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to deploy
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+      rebuild:
+        description: Rebuild application artifacts during this manual deployment
+        required: false
+        default: false
+        type: boolean
+      disable_old_code_protection:
+        description: Disable protections against deploying old code
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  attestations: write
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  release:
+    uses: cds-snc/canadalogin-release-pipeline/.github/workflows/release__release-pipeline.yml@4bdc2bfa86b44e6e3df1d86e8c49992160e49f32 # v2.0.0 + ECS metadata fix
+    with:
+      environment: ${{ inputs.environment || 'dev' }}
+      rebuild: ${{ inputs.rebuild || false }}
+      force-redeploy: false
+      disable_old_code_protection: ${{ inputs.disable_old_code_protection || false }}
+    secrets: inherit
