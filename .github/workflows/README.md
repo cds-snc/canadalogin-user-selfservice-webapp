@@ -80,25 +80,3 @@ Full example of implementing the aws cli and credentials
 ## Debug Docker daemon 
 https://github.com/nektos/act/issues/1051
 https://github.com/nektos/act/issues/2239
-
-## Central release pipeline migration
-
-The migration is being done one environment at a time. The central pipeline
-currently targets only `dev`; the legacy workflow continues to deploy `test`,
-`staging`, and `prod` using the existing `.deployed_versions` pins. It also
-continues to build the load-test image while those environments remain on the
-legacy pipeline. The central workflow owns release-please and the dev builds.
-
-Keep the central workflow dispatch limited to `dev` until that deployment has
-been validated. Before dispatching it, confirm the `dev` GitHub environment has
-the Variables and Secrets required by the central pipeline. Do not change
-application version pins or force a redeployment for this same-version
-handover. Expand the central environment choices and remove each migrated
-environment from the legacy workflow in a reviewed follow-up. Keep an
-environment out of the central configuration until that cutover, so version
-pin changes for environments still on the legacy workflow are not deployed by
-both pipelines.
-
-To roll back before migrating another environment, stop central dispatches and
-revert the workflow/configuration change. No application version pin needs to
-change for that rollback.
