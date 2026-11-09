@@ -251,14 +251,14 @@ describe("CanadaPostIdDetailsPage", () => {
     expect(
       screen.getByRole("heading", { name: "Enter your passport details" }),
     ).toBeInTheDocument();
-    /* const issuer = screen.getByLabelText("What country issued the passport?");
-    expect(
-      Array.from(issuer.querySelectorAll("option")).map((o) => o.textContent),
-    ).toEqual(["-", "Canada", "France"]);
+    // const issuer = screen.getByLabelText("What country issued the passport?");
+    // expect(
+    //   Array.from(issuer.querySelectorAll("option")).map((o) => o.textContent),
+    // ).toEqual(["-", "Canada", "France"]);
     expect(screen.getByTestId("select-province")).toBeInTheDocument();
-    expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
+    // expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
     expect(screen.getByTestId("postal-code-input")).toBeInTheDocument();
-  }); */
+  });
 
   it("renders the driver's licence form with API provinces only", () => {
     renderPage(DRIVERS_LICENCE);
