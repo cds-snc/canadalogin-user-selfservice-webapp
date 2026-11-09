@@ -52,6 +52,7 @@ vi.mock("@gcds-core/components-react", () => {
       const Tag = tag ?? "h2";
       return <Tag>{children}</Tag>;
     },
+    GcdsText: ({ children }) => <p>{children}</p>,
     GcdsErrorSummary: ({ id, errorLinks }) => (
       <div id={id} data-testid="errorSummary">
         {Object.entries(errorLinks ?? {}).map(([href, message]) => (
