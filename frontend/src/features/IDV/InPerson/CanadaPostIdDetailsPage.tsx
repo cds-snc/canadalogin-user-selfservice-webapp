@@ -26,7 +26,6 @@ import {
   getIdDetailsFormVariant,
   getLocalizedName,
   isProvinceScopedDocument,
-  sortOptionsByLabel,
 } from "../data/identityDocuments";
 import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
 import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.validation";
