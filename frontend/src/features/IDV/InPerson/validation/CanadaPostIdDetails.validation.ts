@@ -103,7 +103,7 @@ export const isValidCanadianPostalCode = (value: string): boolean =>
 export const getCanadaPostIdDetailsValidation = (
   formData: CanadaPostIdDetailsFormData,
   { showProvince }: CanadaPostIdDetailsFieldVisibility,
-  today: Date = new Date(),
+  _today: Date = new Date(),
 ): CanadaPostIdDetailsValidationResult => {
   const errorCodes: CanadaPostIdDetailsErrorCodes = {};
 
