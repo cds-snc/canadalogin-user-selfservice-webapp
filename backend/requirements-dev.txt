@@ -4,5 +4,5 @@ pytest-cov==4.1.0
 fastapi-cli==0.0.32
 flake8==7.5.0
 black==26.10.1
-pytest-asyncio==1.4.1
+pytest-asyncio==1.4.1.post1
 respx==0.23.1
