@@ -98,12 +98,16 @@ async def is_logout_processed(request: Request, sid: str) -> bool:
     # Try to get Redis client from the application state
     redis_client = get_redis_client(request)
     # Use Redis to check if token was processed
-    result = await redis_client.get(get_logout_marker_key(sid))
     if result is not None:
-        return True
+        if isinstance(result, bytes):
+            result = result.decode("utf-8")
+        return result == "backchannel_logout"
 
     legacy_cache_key = f"{RedisKeys.REDIS_LOGOUT_SESSION_KEY.value}{sid}"
-    return await redis_client.get(legacy_cache_key) is not None
+    result = await redis_client.get(legacy_cache_key)
+    if isinstance(result, bytes):
+        result = result.decode("utf-8")
+    return result == "backchannel_logout"
 
 
 async def mark_session_logout(
