@@ -197,13 +197,14 @@ async def test_log_request_query_string_blacklist(monkeypatch, caplog):
 
     monkeypatch.setattr("app.users.v1_router.get_relying_party_info", mock_500)
 
-    client.get("/v1/users/rp_info?test=data&secret=password")
+    client.get("/v1/users/rp_info?test=data&secret=password&sid=oidc-sid-value")
 
     log_json = get_logged_response(caplog)
     assert (
         log_json["context"]["request"]["query_string"]
-        == "test=data&secret=5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+        == "test=data&secret=5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8&sid=%3Credacted%3E"
     )
+    assert "oidc-sid-value" not in json.dumps(log_json)
 
 
 @pytest.mark.asyncio
