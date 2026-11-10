@@ -4,6 +4,11 @@ from unittest.mock import patch, AsyncMock, MagicMock
 from fastapi import HTTPException, status
 
 from app.auth.services import auth_logout
+from app.auth.services.auth_session_index import (
+    OIDC_SESSION_INDEX_TTL_SECONDS,
+    get_logout_marker_key,
+    get_oidc_session_index_key,
+)
 from app.constants.redis_keys import RedisKeys
 
 
@@ -29,12 +34,12 @@ async def test_is_logout_processed_true_when_in_redis():
     ):
         result = await auth_logout.is_logout_processed(AsyncMock(), "sid123")
         assert result is True
-        expected_key = f"{RedisKeys.REDIS_LOGOUT_SESSION_KEY.value}sid123"
+        expected_key = get_logout_marker_key("sid123")
         mock_redis.get.assert_awaited_once_with(expected_key)
 
 
 @pytest.mark.asyncio
-async def test_mark_session_logout_sets_redis_key():
+async def test_mark_session_logout_sets_hashed_redis_key_without_logging_sid(caplog):
     mock_redis = MagicMock()
     mock_redis.setex = AsyncMock()
 
@@ -44,8 +49,9 @@ async def test_mark_session_logout_sets_redis_key():
         await auth_logout.mark_session_logout(
             AsyncMock(), "sid123", source="test_source", expiration_seconds=60
         )
-        expected_key = f"{RedisKeys.REDIS_LOGOUT_SESSION_KEY.value}sid123"
+        expected_key = get_logout_marker_key("sid123")
         mock_redis.setex.assert_awaited_once_with(expected_key, 60, "test_source")
+        assert "sid123" not in caplog.text
 
 
 @pytest.mark.asyncio
@@ -57,12 +63,13 @@ async def test_backchannel_logout_already_processed():
             "app.auth.services.auth_logout.validate_logout_token",
             new_callable=AsyncMock,
         ) as mock_validate,
-        patch("app.auth.services.auth_logout.get_redis_client") as mock_get_redis,
+        patch(
+            "app.auth.services.auth_logout.is_logout_processed",
+            new_callable=AsyncMock,
+            return_value=True,
+        ),
     ):
         mock_validate.return_value = {"sid": "sidX", "jti": "jtiX"}
-        mock_redis = MagicMock()
-        mock_redis.get = AsyncMock(return_value=b"already")
-        mock_get_redis.return_value = mock_redis
 
         response = await auth_logout.backchannel_logout(mock_request)
 
@@ -71,8 +78,11 @@ async def test_backchannel_logout_already_processed():
 
 
 @pytest.mark.asyncio
-async def test_backchannel_logout_deletes_session_and_marks_processed():
+async def test_backchannel_logout_deletes_indexed_and_legacy_sessions_without_sid_logs(
+    caplog,
+):
     mock_request = AsyncMock()
+    caplog.set_level("DEBUG")
 
     with (
         patch(
@@ -80,6 +90,20 @@ async def test_backchannel_logout_deletes_session_and_marks_processed():
             new_callable=AsyncMock,
         ) as mock_validate,
         patch("app.auth.services.auth_logout.get_redis_client") as mock_get_redis,
+        patch(
+            "app.auth.services.auth_logout.is_logout_processed",
+            new_callable=AsyncMock,
+            return_value=False,
+        ),
+        patch(
+            "app.auth.services.auth_logout.get_associated_session_ids",
+            new_callable=AsyncMock,
+            return_value={"app-session-1", "app-session-2"},
+        ),
+        patch(
+            "app.auth.services.auth_logout.remove_oidc_session_association",
+            new_callable=AsyncMock,
+        ) as mock_remove_association,
         patch(
             "app.auth.services.auth_logout.mark_session_logout", new_callable=AsyncMock
         ) as mock_mark,
@@ -95,11 +119,39 @@ async def test_backchannel_logout_deletes_session_and_marks_processed():
         assert response.success is True
         assert response.message == "Backchannel logout successful"
 
-        expected_delete_key = f"{RedisKeys.REDIS_SESSION_KEY.value}sidY"
-        mock_redis.delete.assert_awaited_once_with(expected_delete_key)
-    # The implementation calls mark_session_logout(request, sid, source=...)
+        expected_delete_keys = {
+            f"{RedisKeys.REDIS_SESSION_KEY.value}app-session-1",
+            f"{RedisKeys.REDIS_SESSION_KEY.value}app-session-2",
+            f"{RedisKeys.REDIS_SESSION_KEY.value}sidY",
+        }
+        assert set(mock_redis.delete.await_args.args) == expected_delete_keys
+    mock_remove_association.assert_awaited_once_with(mock_request, "sidY")
     mock_mark.assert_awaited_once_with(
         mock_request, "sidY", source="backchannel_logout"
+    )
+    assert "sidY" not in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_associate_oidc_session_stores_generated_id_under_sid_fingerprint():
+    mock_redis = MagicMock()
+    mock_redis.sadd = AsyncMock()
+    mock_redis.expire = AsyncMock()
+    mock_request = AsyncMock()
+
+    with patch(
+        "app.auth.services.auth_session_index.get_redis_client",
+        return_value=mock_redis,
+    ):
+        from app.auth.services.auth_session_index import associate_oidc_session
+
+        await associate_oidc_session(mock_request, "private-sid", "app-session-id")
+
+    index_key = get_oidc_session_index_key("private-sid")
+    assert "private-sid" not in index_key
+    mock_redis.sadd.assert_awaited_once_with(index_key, "app-session-id")
+    mock_redis.expire.assert_awaited_once_with(
+        index_key, OIDC_SESSION_INDEX_TTL_SECONDS
     )
 
 
