@@ -102,13 +102,13 @@ async def is_logout_processed(request: Request, sid: str) -> bool:
     if result is not None:
         if isinstance(result, bytes):
             result = result.decode("utf-8")
-        return result == "backchannel_logout"
+        return result is not None
 
     legacy_cache_key = f"{RedisKeys.REDIS_LOGOUT_SESSION_KEY.value}{sid}"
     result = await redis_client.get(legacy_cache_key)
     if isinstance(result, bytes):
         result = result.decode("utf-8")
-    return result == "backchannel_logout"
+    return result is not None
 
 
 async def mark_session_logout(
