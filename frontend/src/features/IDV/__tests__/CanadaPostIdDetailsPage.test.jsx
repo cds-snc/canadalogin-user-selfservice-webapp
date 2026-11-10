@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import CanadaPostIdDetailsPage from "../InPerson/CanadaPostIdDetailsPage";
 import {
   getIdExpiryRequiredMessage,
-  getIdExpiryTooSoonMessage,
   getPostalCodeRequiredOrInvalidMessage,
 } from "../InPerson/validation/ErrorsDefinition";
 import i18n from "../../../i18n/test";
@@ -317,12 +316,12 @@ describe("CanadaPostIdDetailsPage", () => {
     fireEvent.click(screen.getByTestId("continue-button"));
 
     const summary = screen.getByTestId("errorSummary");
-    expect(summary).toHaveTextContent(getIdExpiryRequiredMessage(t));
+    expect(summary).not.toHaveTextContent(getIdExpiryRequiredMessage(t));
     expect(summary).toHaveTextContent(getPostalCodeRequiredOrInvalidMessage(t));
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("rejects IDs expiring in less than one month", () => {
+  it("does not validate expiry dates when the expiry field is omitted", async () => {
     renderPage(DRIVERS_LICENCE, {
       formData: validFormData({
         idExpiryDate: new Date().toISOString().slice(0, 10),
@@ -332,8 +331,9 @@ describe("CanadaPostIdDetailsPage", () => {
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(screen.getByTestId("errorSummary")).toHaveTextContent(
-      getIdExpiryTooSoonMessage(t),
+    expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalled(),
     );
   });
 

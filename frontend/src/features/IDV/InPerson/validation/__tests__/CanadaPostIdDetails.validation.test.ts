@@ -69,9 +69,6 @@ describe("getCanadaPostIdDetailsValidation", () => {
 
     expect(result.isFormValid).toBe(false);
     expect(result.errorCodes).toEqual({
-      idExpiryDate: "required",
-      documentOptionId: "required",
-      country: "required",
       province: "required",
       firstName: "required_or_invalid",
       lastName: "required_or_invalid",
@@ -80,6 +77,21 @@ describe("getCanadaPostIdDetailsValidation", () => {
       cityTown: "required",
       postalCode: "required_or_invalid",
     });
+  });
+
+  it("does not require fields omitted from the form", () => {
+    const result = getCanadaPostIdDetailsValidation(
+      {
+        ...VALID_FORM,
+        idExpiryDate: "",
+        documentOptionId: "",
+        country: "",
+      },
+      { showCountry: true, showProvince: true },
+      TODAY,
+    );
+
+    expect(result).toEqual({ isFormValid: true, errorCodes: {} });
   });
 
   it("ignores country and province when they are not displayed", () => {

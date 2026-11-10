@@ -107,22 +107,6 @@ export const getCanadaPostIdDetailsValidation = (
 ): CanadaPostIdDetailsValidationResult => {
   const errorCodes: CanadaPostIdDetailsErrorCodes = {};
 
-  const idExpiryError = getIdExpiryValidationError(
-    formData.idExpiryDate,
-    today,
-  );
-  if (idExpiryError) {
-    errorCodes.idExpiryDate = idExpiryError;
-  }
-
-  if (!isNonEmptyTrimmed(formData.documentOptionId)) {
-    errorCodes.documentOptionId = "required";
-  }
-
-  if (showCountry && !isNonEmptyTrimmed(formData.country)) {
-    errorCodes.country = "required";
-  }
-
   if (showProvince && !isNonEmptyTrimmed(formData.province)) {
     errorCodes.province = "required";
   }
