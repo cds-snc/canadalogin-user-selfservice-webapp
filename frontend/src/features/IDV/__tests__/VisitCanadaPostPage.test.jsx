@@ -306,7 +306,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     },
   );
 
-  it("does not require proof of address for the Secure Certificate of Indian Status", async () => {
+  it("requires proof of address for the Secure Certificate of Indian Status when the API requires it", async () => {
     const document = { ...PASSPORT, key: "INDIAN_STATUS_CARD" };
     mockGetIdentityDocuments.mockResolvedValue([document]);
     render(<VisitCanadaPost />);
@@ -316,7 +316,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
 
     await waitFor(() =>
       expect(mockNavigate).toHaveBeenCalledWith(
-        "/en/identity-verification/start/in-person/canada-post/id-details",
+        "/en/identity-verification/start/in-person/canada-post/proof-of-address",
         { state: { document } },
       ),
     );

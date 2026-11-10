@@ -25,7 +25,6 @@ import {
   getIdDetailsFormVariant,
   getLocalizedName,
   isProvinceScopedDocument,
-  isProofOfAddressRequired,
   sortOptionsByLabel,
 } from "../data/identityDocuments";
 import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
@@ -209,10 +208,7 @@ export default function CanadaPostIdDetailsPage() {
     }
 
     if (
-      isProofOfAddressRequired(
-        selectedDocument.key,
-        selectedOption?.requires_proof ?? false,
-      ) &&
+      selectedOption?.requires_proof &&
       !locationState?.proofOfAddressAcknowledged
     ) {
       navigate(

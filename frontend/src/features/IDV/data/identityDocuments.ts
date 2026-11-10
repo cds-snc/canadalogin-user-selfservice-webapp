@@ -10,11 +10,6 @@ export type IdDetailsFormVariant = "passport" | "driverLicence" | "default";
 
 type Language = "en" | "fr";
 
-export const isProofOfAddressRequired = (
-  documentType: IdentityDocumentType,
-  optionRequiresProof: boolean,
-): boolean => documentType !== "INDIAN_STATUS_CARD" && optionRequiresProof;
-
 // Radio options (and their order) on the "Select your ID" page. The selected
 // type is sent to the identity documents API on submit.
 export const SELECTABLE_DOCUMENT_TYPES: IdentityDocumentType[] = [

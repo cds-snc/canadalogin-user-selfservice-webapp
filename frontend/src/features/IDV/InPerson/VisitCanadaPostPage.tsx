@@ -28,7 +28,6 @@ import {
 import {
   getDocumentHintKey,
   getDocumentLabelKey,
-  isProofOfAddressRequired,
   NO_IDS_VALUE,
   SELECTABLE_DOCUMENT_TYPES,
 } from "../data/identityDocuments";
@@ -143,9 +142,8 @@ export default function VisitCanadaPost() {
         return;
       }
 
-      const nextPage = isProofOfAddressRequired(
-        selectedDocument.key,
-        selectedDocument.options.every((option) => option.requires_proof),
+      const nextPage = selectedDocument.options.every(
+        (option) => option.requires_proof,
       )
         ? PAGES.idvCanadaPostProofOfAddressPage
         : PAGES.idvCanadaPostIdDetailsPage;
