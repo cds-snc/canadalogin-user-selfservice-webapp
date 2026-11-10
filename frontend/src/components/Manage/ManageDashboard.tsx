@@ -149,6 +149,18 @@ export default function ManageDashboard() {
             </li>
           </ul>
         </GcdsCard>
+        <GcdsCard
+          className="dashboard-card"
+          cardTitle={t("ManageDashboard.helpAndSupport")}
+          cardTitleTag="h3"
+          href={helpAndSupportLink}
+          onGcdsClick={handleHelpAndSupportClick}
+          imgSrc={imgHelpAndSupport}
+        >
+          <GcdsText marginBottom="0">
+            {t("ManageDashboard.helpAndSupportDescription")}
+          </GcdsText>
+        </GcdsCard>
         {DEV_ONLY_FEATURE && (
           <GcdsCard
             className="dashboard-card"
@@ -163,18 +175,6 @@ export default function ManageDashboard() {
             </GcdsText>
           </GcdsCard>
         )}
-        <GcdsCard
-          className="dashboard-card"
-          cardTitle={t("ManageDashboard.helpAndSupport")}
-          cardTitleTag="h3"
-          href={helpAndSupportLink}
-          onGcdsClick={handleHelpAndSupportClick}
-          imgSrc={imgHelpAndSupport}
-        >
-          <GcdsText marginBottom="0">
-            {t("ManageDashboard.helpAndSupportDescription")}
-          </GcdsText>
-        </GcdsCard>
       </GcdsGrid>
     </GcdsContainer>
   );
