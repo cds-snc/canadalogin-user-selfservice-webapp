@@ -28,7 +28,7 @@ export interface CanadaPostIdDetailsFormData {
 }
 
 export interface CanadaPostIdDetailsFieldVisibility {
-  // showCountry: boolean;
+  showCountry: boolean;
   showProvince: boolean;
 }
 
