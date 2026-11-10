@@ -28,7 +28,7 @@ export interface CanadaPostIdDetailsFormData {
 }
 
 export interface CanadaPostIdDetailsFieldVisibility {
-  showCountry: boolean;
+  // showCountry: boolean;
   showProvince: boolean;
 }
 
@@ -102,7 +102,7 @@ export const isValidCanadianPostalCode = (value: string): boolean =>
 
 export const getCanadaPostIdDetailsValidation = (
   formData: CanadaPostIdDetailsFormData,
-  { showCountry, showProvince }: CanadaPostIdDetailsFieldVisibility,
+  { showProvince }: CanadaPostIdDetailsFieldVisibility,
   today: Date = new Date(),
 ): CanadaPostIdDetailsValidationResult => {
   const errorCodes: CanadaPostIdDetailsErrorCodes = {};
