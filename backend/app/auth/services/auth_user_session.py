@@ -7,7 +7,7 @@ from typing import AsyncGenerator
 
 from fastapi import Request
 from fastapi.responses import StreamingResponse
-from starsessions.session import get_session_metadata
+from starsessions.session import get_session_id, get_session_metadata
 from authlib.integrations.starlette_client import OAuthError
 
 from app.config import get_configuration
@@ -18,6 +18,10 @@ from app.auth.schemas import SSEventData, KeepAliveData
 from app.utils.schemas import ResponseModel
 from app.utils.redis import get_redis_client
 from app.constants.redis_keys import RedisKeys
+from app.auth.services.auth_session_index import (
+    associate_oidc_session,
+    get_logout_marker_key,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -109,9 +113,7 @@ async def ensure_user_token(request: Request):
             raise OAuthError("user token has expired")
         user_token = await refresh_user_token(refresh_token)
         update_session_tokens(request, user_token)
-        userinfo = user_token.get("userinfo")
-        sid = userinfo.get("sid") if userinfo else None
-        logger.info(f"User token refreshed and session updated. sid: {sid}")
+        logger.info("User token refreshed and session updated")
     return user_token
 
 
@@ -202,13 +204,12 @@ async def get_session_data_by_id(request: Request, session_id: str):
     # Try to get Redis client from the application state
     session_data = None
     redis_client = get_redis_client(request)
-    logger.debug(f"get session by sid: {session_id}")
     # read the session from Redis for the given session_id
     cache_key = f"{RedisKeys.REDIS_SESSION_KEY.value}{session_id}"
     session = await redis_client.get(cache_key)
     session_data = session if session else None
     if session_data is None:
-        logger.debug(f"No session found for session_id: {session_id}")
+        logger.debug("No session found")
         return None
     # Convert bytes to dict if necessary
     if isinstance(session_data, bytes):
@@ -242,8 +243,9 @@ async def session_event_sse_generator(request: Request):
         )
 
     sid = user_info.get("sid") if user_info else None
-    if sid is None:
-        logger.error("No sid found in user info")
+    app_session_id = get_session_id(request)
+    if sid is None or app_session_id is None:
+        logger.error("Session identity not found")
         return StreamingResponse(
             [
                 f"event: error\ndata: {SSEventData(status='error', error='No sid found').model_dump_json()}\n\n"
@@ -267,7 +269,7 @@ async def session_event_sse_generator(request: Request):
         """
         try:
             while True:
-                session_data = await get_session_data_by_id(request, session_id)
+                session_data = await get_session_data_by_id(request, app_session_id)
                 if session_data is None:
                     logger.info("Session expired or terminated")
                     backchannellogout = await is_backchannel_logout(request, session_id)
@@ -331,9 +333,9 @@ async def session_extend(request: Request):
         return ResponseModel(
             success=False, message="User not authenticated", data=session_status
         )
-    # Get session ID from user info
-    session_id = user_info.get("sid")
-    if not session_id:
+    sid = user_info.get("sid")
+    app_session_id = get_session_id(request)
+    if not sid or not app_session_id:
         session_status = KeepAliveData(status="non-authenticated", login="re-login")
         return ResponseModel(
             success=False, message="User not authenticated", data=session_status
@@ -359,6 +361,8 @@ async def session_extend(request: Request):
             success=False, message="Session terminated", data=session_status
         )
 
+    await associate_oidc_session(request, sid, app_session_id)
+
     # Session is valid, auto extend last access time
     session_status = KeepAliveData(status="active", expire=int(session_expire))
     return ResponseModel(success=True, message="Session is active", data=session_status)
@@ -382,6 +386,11 @@ async def is_backchannel_logout(request: Request, sid: str) -> bool:
     redis_client = get_redis_client(request)
 
     # Use Redis to check if token was processed
-    cache_key = f"{RedisKeys.REDIS_LOGOUT_SESSION_KEY.value}{sid}"
-    result = await redis_client.get(cache_key)
-    return result is not None and result.decode("utf-8") == "backchannel_logout"
+    result = await redis_client.get(get_logout_marker_key(sid))
+    if result is None:
+        legacy_cache_key = f"{RedisKeys.REDIS_LOGOUT_SESSION_KEY.value}{sid}"
+        result = await redis_client.get(legacy_cache_key)
+
+    if isinstance(result, bytes):
+        result = result.decode("utf-8")
+    return result == "backchannel_logout"

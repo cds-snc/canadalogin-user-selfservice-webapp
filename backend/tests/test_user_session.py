@@ -269,6 +269,16 @@ async def test_session_extend_active():
             "app.auth.services.auth_user_session.get_session_metadata",
             return_value={"last_access": 1000, "created": datetime.now().timestamp()},
         ),
+        patch(
+            "app.auth.services.auth_user_session.get_session_id",
+            return_value="app-session-id",
+            create=True,
+        ),
+        patch(
+            "app.auth.services.auth_user_session.associate_oidc_session",
+            new_callable=AsyncMock,
+            create=True,
+        ) as mock_associate,
     ):
         with patch(
             "app.auth.services.auth_user_session.get_configuration",
@@ -278,6 +288,9 @@ async def test_session_extend_active():
             assert resp.success is True
             assert resp.message == "Session is active"
             mock_get_user_info.assert_called_once_with(mock_request)
+            mock_associate.assert_awaited_once_with(
+                mock_request, "s1", "app-session-id"
+            )
 
 
 @pytest.mark.asyncio
@@ -296,9 +309,14 @@ async def test_session_event_stream_active_and_expired():
             new=MagicMock(return_value={"sid": "s1"}),
         ),
         patch(
+            "app.auth.services.auth_user_session.get_session_id",
+            return_value="app-session-id",
+            create=True,
+        ),
+        patch(
             "app.auth.services.auth_user_session.get_session_data_by_id",
             new=AsyncMock(side_effect=[{"__metadata__": {"last_access": 100}}, None]),
-        ),
+        ) as mock_get_session_data,
         patch(
             "app.auth.services.auth_user_session.is_backchannel_logout",
             new=AsyncMock(return_value=False),
@@ -322,6 +340,7 @@ async def test_session_event_stream_active_and_expired():
         joined = "".join(c.decode() if isinstance(c, bytes) else c for c in collected)
         assert "event: notification" in joined
         assert "event: expired" in joined
+        mock_get_session_data.assert_awaited_with(mock_request, "app-session-id")
 
 
 @pytest.mark.asyncio
@@ -337,6 +356,11 @@ async def test_session_event_stream_terminated_on_backchannel():
         patch(
             "app.auth.services.auth_user_session.get_session_user_info",
             new=MagicMock(return_value={"sid": "s1"}),
+        ),
+        patch(
+            "app.auth.services.auth_user_session.get_session_id",
+            return_value="app-session-id",
+            create=True,
         ),
         patch(
             "app.auth.services.auth_user_session.get_session_data_by_id",
@@ -374,6 +398,11 @@ async def test_session_event_stream_handles_internal_error():
         patch(
             "app.auth.services.auth_user_session.get_session_user_info",
             new=MagicMock(return_value={"sid": "s1"}),
+        ),
+        patch(
+            "app.auth.services.auth_user_session.get_session_id",
+            return_value="app-session-id",
+            create=True,
         ),
         patch(
             "app.auth.services.auth_user_session.get_session_data_by_id",

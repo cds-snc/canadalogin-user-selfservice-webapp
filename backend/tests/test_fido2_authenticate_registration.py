@@ -1307,6 +1307,7 @@ class TestSubmitAssertionResultEdgeCases:
         mock_http_client,
         mock_request,
         mock_assertion_request,
+        caplog,
     ):
         """
         The merged session must preserve the original id_token and sid from the OIDC
@@ -1320,6 +1321,8 @@ class TestSubmitAssertionResultEdgeCases:
         can verify step-up authentication was completed.
         """
         from app.constants.session_keys import SessionKeys
+
+        caplog.set_level("INFO")
 
         original_id_token = "original.oidc.idtoken"
 
@@ -1412,6 +1415,8 @@ class TestSubmitAssertionResultEdgeCases:
         assert token_data["userinfo"]["sid"] == "original-sid-from-oidc-login"
         assert token_data["userinfo"]["sub"] == "user-123"
         assert token_data["userinfo"]["email"] == "user@example.com"
+        assert "original-sid-from-oidc-login" not in caplog.text
+        assert "new-combined-sid-different-from-original" not in caplog.text
 
         # AMR is updated to reflect the elevated step-up authentication
         assert token_data["userinfo"]["amr"] == ["password", "fido2"]

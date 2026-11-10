@@ -22,6 +22,7 @@ QUERY_STRING_BLACKLIST = [
     "code",
     "claims",
 ]
+QUERY_STRING_REDACTED_PARAMS = {"sid"}
 
 
 class StandardizedLogging:
@@ -33,7 +34,9 @@ class StandardizedLogging:
         processed = {}
 
         for key, value in query_params.items():
-            if key in QUERY_STRING_BLACKLIST and value:
+            if key.lower() in QUERY_STRING_REDACTED_PARAMS:
+                processed[key] = "<redacted>"
+            elif key in QUERY_STRING_BLACKLIST and value:
                 # Hash the value
                 processed[key] = hashlib.sha256(str(value).encode("utf-8")).hexdigest()
             else:
