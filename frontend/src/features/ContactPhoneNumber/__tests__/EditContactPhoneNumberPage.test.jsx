@@ -151,12 +151,15 @@ vi.mock("../components/ConfirmUpdate", () => ({
 }));
 
 vi.mock("../components/SuccessfullyUpdated", () => ({
-  default: ({ onNext, phoneFormData }) => (
+  default: ({ onNext, onCancel, phoneFormData }) => (
     <div data-testid="successfully-updated">
       <h2>Successfully Updated</h2>
       <p>New phone: {phoneFormData?.phoneNumber}</p>
-      <button data-testid="done-btn" onClick={onNext}>
-        Done
+      <button data-testid="back-to-profile-btn" onClick={onNext}>
+        Back to profile
+      </button>
+      <button data-testid="sign-out-btn" onClick={onCancel}>
+        Sign out
       </button>
     </div>
   ),
@@ -450,12 +453,16 @@ describe("EditContactPhoneNumberPage Component", () => {
       expect(screen.getByTestId("successfully-updated")).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByTestId("done-btn"));
+    fireEvent.click(screen.getByTestId("back-to-profile-btn"));
+
+    expect(mockNavigate).toHaveBeenCalledWith("/en/profile");
+    expect(mockAuthService.logout).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByTestId("sign-out-btn"));
 
     await waitFor(() => {
       expect(mockAuthService.logout).toHaveBeenCalledTimes(1);
     });
-    expect(mockNavigate).not.toHaveBeenCalledWith("/en/profile");
   });
 
   it("shows rate-limit error when phone verification change limit is reached", async () => {
