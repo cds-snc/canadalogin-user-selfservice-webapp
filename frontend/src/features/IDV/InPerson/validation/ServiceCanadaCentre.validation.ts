@@ -28,7 +28,6 @@ export interface ServiceCanadaCentreFormData {
 
 export interface ServiceCanadaCentreSummaryErrorCodes extends InPersonSharedSummaryErrorCodes {
   idType?: RequiredValidationError;
-  idExpiryDate?: RequiredValidationError;
   firstName?: NameValidationError;
   lastName?: NameValidationError;
 }
@@ -56,10 +55,6 @@ export const getServiceCanadaCentreValidation = (
 
   if (!hasSelectedIdType) {
     summaryErrorCodes.idType = "required";
-  }
-
-  if (hasSelectedIdType && !isNonEmptyTrimmed(formData.idExpiryDate)) {
-    summaryErrorCodes.idExpiryDate = "required";
   }
 
   if (hasSelectedIdType && !isValidName(formData.firstName)) {
