@@ -82,9 +82,9 @@ async def get_my_profile(
         context={"allow_invalid_profile_name": True},
     )
     settings = get_configuration()
-    idv_access_group_ids = settings.idv_feature_access_group_ids
-    has_idv_access = any(
-        group.id in idv_access_group_ids for group in profile_response.groups or []
+    idv_feature_flag_group_id = settings.IDV_FEATURE_FLAG_GROUP_ID.strip()
+    has_idv_access = bool(idv_feature_flag_group_id) and any(
+        group.id == idv_feature_flag_group_id for group in profile_response.groups or []
     )
 
     return MyProfileResponse(

@@ -8,12 +8,12 @@ from app.identity_verification.dependencies import require_idv_feature_access
 from app.users.schemas import IBMVerifyUserProfileSchema
 
 
-def build_request(environment: str, group_ids: set[str]) -> Request:
+def build_request(environment: str, group_id: str) -> Request:
     app = SimpleNamespace(
         state=SimpleNamespace(
             config=SimpleNamespace(
                 ENVIRONMENT=environment,
-                idv_feature_access_group_ids=group_ids,
+                IDV_FEATURE_FLAG_GROUP_ID=group_id,
             ),
             request_client=object(),
         )
@@ -36,7 +36,7 @@ async def test_idv_access_forbids_users_outside_configured_groups(
 
     with pytest.raises(HTTPException) as error:
         await require_idv_feature_access(
-            build_request(environment, {"8160000157"}),
+            build_request(environment, "8160000157"),
             user_access_token="user-token",
         )
 
@@ -58,8 +58,29 @@ async def test_idv_access_allows_configured_group_member(environment, monkeypatc
     )
 
     await require_idv_feature_access(
-        build_request(environment, {"8160000157", "second-group"}),
+        build_request(environment, "second-group"),
         user_access_token="user-token",
     )
 
     profile_lookup.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_idv_access_denies_when_group_id_is_not_configured(monkeypatch):
+    profile_lookup = AsyncMock(
+        return_value=IBMVerifyUserProfileSchema.model_construct(
+            groups=[SimpleNamespace(id="")]
+        )
+    )
+    monkeypatch.setattr(
+        "app.identity_verification.dependencies.dispatch_get_my_profile_from_ibm",
+        profile_lookup,
+    )
+
+    with pytest.raises(HTTPException) as error:
+        await require_idv_feature_access(
+            build_request("test", ""),
+            user_access_token="user-token",
+        )
+
+    assert error.value.status_code == 403

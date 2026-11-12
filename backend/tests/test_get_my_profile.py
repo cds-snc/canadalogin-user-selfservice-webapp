@@ -18,29 +18,10 @@ GET_PROFILE_DISPATCH_FROM_IBM_IMPORT_PATH = (
 )
 
 
-@pytest.mark.parametrize(
-    ("environment", "expected_group_ids"),
-    [
-        ("local", {"dev-group", "8160000157"}),
-        ("dev", {"dev-group", "8160000157"}),
-        ("test", {"test-group"}),
-        ("staging", {"staging-group"}),
-        ("prod", {"prod-group"}),
-        ("unknown", set()),
-    ],
-)
-def test_idv_feature_access_group_ids_selects_environment_list(
-    environment, expected_group_ids
-):
-    configuration = Configuration.model_construct(
-        ENVIRONMENT=environment,
-        IDV_FEATURE_ACCESS_GROUP_IDS_DEV="dev-group, 8160000157, ,",
-        IDV_FEATURE_ACCESS_GROUP_IDS_TEST=" test-group ",
-        IDV_FEATURE_ACCESS_GROUP_IDS_STAGING="staging-group",
-        IDV_FEATURE_ACCESS_GROUP_IDS_PROD="prod-group",
-    )
+def test_idv_feature_flag_group_id_defaults_to_fail_closed():
+    configuration = Configuration.model_construct(IDV_FEATURE_FLAG_GROUP_ID="")
 
-    assert configuration.idv_feature_access_group_ids == expected_group_ids
+    assert configuration.IDV_FEATURE_FLAG_GROUP_ID == ""
 
 
 @pytest.mark.asyncio
@@ -84,12 +65,13 @@ async def test_my_profile_success(mock_dispatch_get, mock_mask_profile):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    ("groups", "configured_group_ids", "expected_access"),
+    ("groups", "configured_group_id", "expected_access"),
     [
-        ([{"id": "8160000157"}], {"8160000157"}, True),
-        ([{"id": "another-group"}], {"8160000157"}, False),
-        ([], {"8160000157"}, False),
-        ([{"id": "second-group"}], {"8160000157", "second-group"}, True),
+        ([{"id": "8160000157"}], "8160000157", True),
+        ([{"id": "another-group"}], "8160000157", False),
+        ([], "8160000157", False),
+        ([{"id": "second-group"}], "second-group", True),
+        ([{"id": ""}], "", False),
     ],
 )
 @patch("app.users.services.get_my_profile.mask_profile_details")
@@ -99,7 +81,7 @@ async def test_my_profile_sets_idv_feature_from_configured_groups(
     mock_mask_profile,
     monkeypatch,
     groups,
-    configured_group_ids,
+    configured_group_id,
     expected_access,
 ):
     profile_data = {
@@ -118,7 +100,7 @@ async def test_my_profile_sets_idv_feature_from_configured_groups(
     mock_mask_profile.return_value = profile_data
     monkeypatch.setattr(
         "app.users.services.get_my_profile.get_configuration",
-        lambda: Mock(idv_feature_access_group_ids=configured_group_ids),
+        lambda: Mock(IDV_FEATURE_FLAG_GROUP_ID=configured_group_id),
     )
 
     response = await my_profile(AsyncClient(), user_access_token="mock-token")
