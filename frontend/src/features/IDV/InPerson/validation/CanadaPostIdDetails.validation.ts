@@ -30,8 +30,6 @@ export interface CanadaPostIdDetailsFormData {
 export interface CanadaPostIdDetailsFieldVisibility {
   showCountry: boolean;
   showProvince: boolean;
-  requireIdExpiry?: boolean;
-  requireAddress?: boolean;
 }
 
 export type IdExpiryValidationError = "required" | "invalid" | "too_soon";
@@ -104,24 +102,17 @@ export const isValidCanadianPostalCode = (value: string): boolean =>
 
 export const getCanadaPostIdDetailsValidation = (
   formData: CanadaPostIdDetailsFormData,
-  {
-    showCountry,
-    showProvince,
-    requireIdExpiry = true,
-    requireAddress = true,
-  }: CanadaPostIdDetailsFieldVisibility,
+  { showCountry, showProvince }: CanadaPostIdDetailsFieldVisibility,
   today: Date = new Date(),
 ): CanadaPostIdDetailsValidationResult => {
   const errorCodes: CanadaPostIdDetailsErrorCodes = {};
 
-  if (requireIdExpiry) {
-    const idExpiryError = getIdExpiryValidationError(
-      formData.idExpiryDate,
-      today,
-    );
-    if (idExpiryError) {
-      errorCodes.idExpiryDate = idExpiryError;
-    }
+  const idExpiryError = getIdExpiryValidationError(
+    formData.idExpiryDate,
+    today,
+  );
+  if (idExpiryError) {
+    errorCodes.idExpiryDate = idExpiryError;
   }
 
   if (!isNonEmptyTrimmed(formData.documentOptionId)) {
@@ -149,18 +140,16 @@ export const getCanadaPostIdDetailsValidation = (
     errorCodes.dateOfBirth = dateOfBirthError;
   }
 
-  if (requireAddress) {
-    if (!isNonEmptyTrimmed(formData.address)) {
-      errorCodes.address = "required";
-    }
+  if (!isNonEmptyTrimmed(formData.address)) {
+    errorCodes.address = "required";
+  }
 
-    if (!isNonEmptyTrimmed(formData.cityTown)) {
-      errorCodes.cityTown = "required";
-    }
+  if (!isNonEmptyTrimmed(formData.cityTown)) {
+    errorCodes.cityTown = "required";
+  }
 
-    if (!isValidCanadianPostalCode(formData.postalCode)) {
-      errorCodes.postalCode = "required_or_invalid";
-    }
+  if (!isValidCanadianPostalCode(formData.postalCode)) {
+    errorCodes.postalCode = "required_or_invalid";
   }
 
   return {

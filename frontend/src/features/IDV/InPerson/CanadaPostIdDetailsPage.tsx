@@ -1,8 +1,10 @@
 import {
   GcdsButton,
   GcdsContainer,
+  GcdsDateInput,
   GcdsGrid,
   GcdsHeading,
+  GcdsInput,
   GcdsSelect,
 } from "@gcds-core/components-react";
 import { useMemo, useState } from "react";
@@ -26,7 +28,6 @@ import {
   sortOptionsByLabel,
 } from "../data/identityDocuments";
 import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
-import IdentityApplicantFields from "./IdentityApplicantFields";
 import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.validation";
 import {
   type CanadaPostIdDetailsErrorCodes,
@@ -352,50 +353,117 @@ export default function CanadaPostIdDetailsPage() {
           </GcdsContainer>
 
           <GcdsContainer>
-            <IdentityApplicantFields
-              formData={formData}
-              currentLanguage={currentLanguage}
-              labels={{
-                idExpiry: t("CanadaPostIdDetails.idExpiryLabel"),
-                idExpiryHint: t("CanadaPostIdDetails.idExpiryHint"),
-                firstName: t("VisitCanadaPost.givenNameLabel"),
-                firstNameHint: t("VisitCanadaPost.givenNameHint"),
-                lastName: t("VisitCanadaPost.familyNameLabel"),
-                lastNameHint: t("VisitCanadaPost.familyNameHint"),
-                dateOfBirth: t("VisitCanadaPost.dobLabel"),
-                address: t("VisitCanadaPost.addressLabel"),
-                addressHint: t("VisitCanadaPost.addressHint"),
-                cityTown: t("VisitCanadaPost.cityTownLabel"),
-                postalCode: t("VisitCanadaPost.postalcodeLabel"),
-                postalCodeHint: t("CanadaPostIdDetails.postalCodeHint"),
-              }}
-              fieldError={fieldError}
-              dateOfBirthError={
+            <GcdsDateInput
+              id={FIELD_IDS.idExpiryDate}
+              name={FIELD_IDS.idExpiryDate}
+              legend={t("CanadaPostIdDetails.idExpiryLabel")}
+              hint={t("CanadaPostIdDetails.idExpiryHint")}
+              format="full"
+              lang={currentLanguage}
+              value={formData.idExpiryDate}
+              required
+              errorMessage={fieldError("idExpiryDate")}
+              onGcdsChange={updateField("idExpiryDate")}
+            />
+
+            {variant === "default" ? (
+              issuerIsProvince ? (
+                <>
+                  {countrySelect}
+                  {issuerSelect}
+                </>
+              ) : (
+                <>
+                  {issuerSelect}
+                  {provinceSelect}
+                </>
+              )
+            ) : (
+              issuerSelect
+            )}
+
+            <GcdsInput
+              id={FIELD_IDS.firstName}
+              inputId={FIELD_IDS.firstName}
+              name={FIELD_IDS.firstName}
+              lang={currentLanguage}
+              label={t("VisitCanadaPost.givenNameLabel")}
+              hint={t("VisitCanadaPost.givenNameHint")}
+              value={formData.firstName}
+              required
+              errorMessage={fieldError("firstName")}
+              onGcdsChange={updateField("firstName")}
+            />
+
+            <GcdsInput
+              id={FIELD_IDS.lastName}
+              inputId={FIELD_IDS.lastName}
+              name={FIELD_IDS.lastName}
+              lang={currentLanguage}
+              label={t("VisitCanadaPost.familyNameLabel")}
+              hint={t("VisitCanadaPost.familyNameHint")}
+              value={formData.lastName}
+              required
+              errorMessage={fieldError("lastName")}
+              onGcdsChange={updateField("lastName")}
+            />
+
+            <GcdsDateInput
+              id={FIELD_IDS.dateOfBirth}
+              name={FIELD_IDS.dateOfBirth}
+              legend={t("VisitCanadaPost.dobLabel")}
+              format="full"
+              lang={currentLanguage}
+              value={formData.dateOfBirth}
+              required
+              errorMessage={
                 hasSubmitted && errorCodes.dateOfBirth
                   ? dobMessages[errorCodes.dateOfBirth].inline
                   : ""
               }
-              updateField={updateField}
-              provinceField={
-                variant !== "default" && showProvince ? provinceSelect : null
-              }
-            >
-              {variant === "default" ? (
-                issuerIsProvince ? (
-                  <>
-                    {countrySelect}
-                    {issuerSelect}
-                  </>
-                ) : (
-                  <>
-                    {issuerSelect}
-                    {provinceSelect}
-                  </>
-                )
-              ) : (
-                issuerSelect
-              )}
-            </IdentityApplicantFields>
+              onGcdsChange={updateField("dateOfBirth")}
+            />
+
+            <GcdsInput
+              id={FIELD_IDS.address}
+              inputId={FIELD_IDS.address}
+              name={FIELD_IDS.address}
+              lang={currentLanguage}
+              label={t("VisitCanadaPost.addressLabel")}
+              hint={t("VisitCanadaPost.addressHint")}
+              value={formData.address}
+              required
+              errorMessage={fieldError("address")}
+              onGcdsChange={updateField("address")}
+            />
+
+            <GcdsInput
+              id={FIELD_IDS.cityTown}
+              inputId={FIELD_IDS.cityTown}
+              name={FIELD_IDS.cityTown}
+              lang={currentLanguage}
+              label={t("VisitCanadaPost.cityTownLabel")}
+              value={formData.cityTown}
+              required
+              errorMessage={fieldError("cityTown")}
+              onGcdsChange={updateField("cityTown")}
+            />
+
+            {variant !== "default" && showProvince ? provinceSelect : null}
+
+            <GcdsInput
+              id={FIELD_IDS.postalCode}
+              inputId={FIELD_IDS.postalCode}
+              name={FIELD_IDS.postalCode}
+              lang={currentLanguage}
+              label={t("VisitCanadaPost.postalcodeLabel")}
+              hint={t("CanadaPostIdDetails.postalCodeHint")}
+              value={formData.postalCode}
+              autocomplete="postal-code"
+              required
+              errorMessage={fieldError("postalCode")}
+              onGcdsChange={updateField("postalCode")}
+            />
           </GcdsContainer>
 
           <GcdsGrid
