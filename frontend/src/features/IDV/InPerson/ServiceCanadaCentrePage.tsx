@@ -28,7 +28,6 @@ import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
 import { APPROVED_DOCUMENT_VALUES } from "../data/approvedDocuments";
 import {
   getFirstNameRequiredOrInvalidMessage,
-  getIdExpiryRequiredMessage,
   getIdTypeRequiredMessage,
   getLastNameRequiredOrInvalidMessage,
   getSharedDateOfBirthMessages,
@@ -136,10 +135,6 @@ export default function ServiceCanadaCentrePage() {
     summaryErrors["#selectId"] = getIdTypeRequiredMessage(t);
   }
 
-  if (summaryErrorCodes.idExpiryDate) {
-    summaryErrors["#id-expiration-date-input"] = getIdExpiryRequiredMessage(t);
-  }
-
   if (summaryErrorCodes.firstName) {
     summaryErrors["#first-name-input"] =
       getFirstNameRequiredOrInvalidMessage(t);
@@ -156,11 +151,6 @@ export default function ServiceCanadaCentrePage() {
 
   const idTypeErrorMessage =
     hasSubmitted && summaryErrorCodes.idType ? getIdTypeRequiredMessage(t) : "";
-
-  const idExpiryErrorMessage =
-    hasSubmitted && summaryErrorCodes.idExpiryDate
-      ? getIdExpiryRequiredMessage(t)
-      : "";
 
   const firstNameErrorMessage =
     hasSubmitted && summaryErrorCodes.firstName
@@ -318,16 +308,6 @@ export default function ServiceCanadaCentrePage() {
 
             {hasSelectedIdType && (
               <>
-                <GcdsDateInput
-                  id="id-expiration-date-input"
-                  legend={t("ServiceCanadaCentre.idExpirationLabel")}
-                  name="id-expiration-date-input"
-                  lang={currentLanguage}
-                  format="full"
-                  required
-                  errorMessage={idExpiryErrorMessage}
-                  onGcdsChange={createChangeHandler("idExpiryDate")}
-                />
                 <GcdsInput
                   required
                   id="first-name-input"

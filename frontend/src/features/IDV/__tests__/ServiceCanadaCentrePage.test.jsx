@@ -283,7 +283,9 @@ describe("ServiceCanadaCentrePage", () => {
       target: { value: "passport" },
     });
 
-    expect(screen.getByTestId("id-expiration-date-input")).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("id-expiration-date-input"),
+    ).not.toBeInTheDocument();
     expect(screen.getByTestId("first-name-input")).toBeInTheDocument();
     expect(screen.getByTestId("last-name-input")).toBeInTheDocument();
     expect(screen.getByTestId("date-of-birth-input")).toBeInTheDocument();
@@ -327,9 +329,6 @@ describe("ServiceCanadaCentrePage", () => {
     fireEvent.change(screen.getByTestId("selectId"), {
       target: { value: "passport" },
     });
-    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
-      target: { value: "2026-12-31" },
-    });
     fireEvent.change(screen.getByTestId("first-name-input"), {
       target: { value: "Jane" },
     });
@@ -354,7 +353,7 @@ describe("ServiceCanadaCentrePage", () => {
             lastName: "Doe",
             dateOfBirth: "January 1, 1990",
             idType: "passport",
-            idExpiryDate: "2026-12-31",
+            idExpiryDate: "",
           }),
         }),
       );
@@ -389,9 +388,6 @@ describe("ServiceCanadaCentrePage", () => {
 
     fireEvent.change(screen.getByTestId("selectId"), {
       target: { value: "passport" },
-    });
-    fireEvent.change(screen.getByTestId("id-expiration-date-input"), {
-      target: { value: "2026-12-31" },
     });
     fireEvent.change(screen.getByTestId("first-name-input"), {
       target: { value: "Jane123" },
