@@ -48,13 +48,6 @@ class CreateInPersonIdentityVerificationRequest(BaseModel):
             raise ValueError(
                 "applicant.address is required when verification_provider is canada_post"
             )
-        if (
-            self.verification_provider == InPersonVerificationProvider.canada_post
-            and self.applicant.id_expiry_date is None
-        ):
-            raise ValueError(
-                "applicant.id_expiry_date is required when verification_provider is canada_post"
-            )
         return self
 
 
