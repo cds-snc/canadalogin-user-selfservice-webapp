@@ -43,9 +43,7 @@
     "indianStatusOption": "Certificat sécurisé de statut d’Indien",
     "noIds": "Je ne possède aucun des documents d’identité ci-dessus",
     "idHint": "Vous devrez vous munir de ce document d’identité lors de votre rendez-vous",
-    "idExpirationLabel": "Date d’expiration",
-    "idExpiryHint": "Le document doit être valide pendant au moins 1 mois à partir d’aujourd’hui",
-    "backButton": "Précédent",
+    "idExpirationLabel": "Date d'expiration",
     "enterDetailsIdHeading": "Enter your details as shown on the ID",
     "firstNameLabel": "Prénom",
     "firstNameHint": "Doit correspondre à ce qui apparaît sur votre document d’identité officiel",
@@ -56,8 +54,7 @@
     "addressHint": "Entrez votre adresse",
     "cityTownLabel": "Ville, village ou communauté",
     "provinceLabel": "Province/territoire",
-    "postalcodeLabel": "Code postal",
-    "postalcodeHint": "Par exemple, A1A 1A1"
+    "postalcodeLabel": "Code postal"
   },
   "ServiceCanadaCentreCode": {
     "heading": "Votre code unique pour la confirmation d’identité dans un centre Service Canada",

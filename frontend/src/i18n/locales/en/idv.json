@@ -61,7 +61,7 @@
     "cityTownLabel": "City, town, or community",
     "provinceLabel": "Province/ Territory",
     "postalcodeLabel": "Postal Code",
-    "postalcodeHint": "For example, A1A 1A1"
+    "postalcodeHint": "Enter your postal code"
   },
   "ServiceCanadaCentreCode": {
     "heading": "Take your CanadaLogin code to a Service Canada Centre",
