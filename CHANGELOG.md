@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.39.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.39.1...v1.39.2) (2026-11-12)
+
+
+### Code Refactoring
+
+* update the idv route to include the test environment ([#2532](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2532)) ([9c40a5a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9c40a5ad3681b75f50b9c9e672eaa10e6c5a9513))
+
 ## [1.39.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.39.0...v1.39.1) (2026-11-12)
 
 
