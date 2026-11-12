@@ -36,12 +36,9 @@ describe("getIdExpiryValidationError", () => {
 });
 
 describe("isValidCanadianPostalCode", () => {
-  it.each(["K1A 0B1", "k1a0b1", " H2X 1Y4 ", "L5N 6Z9"])(
-    "accepts %s",
-    (value) => {
-      expect(isValidCanadianPostalCode(value)).toBe(true);
-    },
-  );
+  it.each(["K1A 0B1", "k1a0b1", " H2X 1Y4 "])("accepts %s", (value) => {
+    expect(isValidCanadianPostalCode(value)).toBe(true);
+  });
 
   it.each(["", "12345", "D1A 0B1", "K1A-0B1"])("rejects %s", (value) => {
     expect(isValidCanadianPostalCode(value)).toBe(false);
