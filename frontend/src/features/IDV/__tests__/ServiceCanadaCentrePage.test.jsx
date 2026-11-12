@@ -499,6 +499,13 @@ describe("ServiceCanadaCentre pages", () => {
     fireEvent.change(screen.getByTestId("date-of-birth-input"), {
       target: { value: "1990-01-01" },
     });
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("continue-button"));
+    });
+
+    expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+    expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
+
     fireEvent.change(screen.getByTestId("address-input"), {
       target: { value: "123 Main Street" },
     });

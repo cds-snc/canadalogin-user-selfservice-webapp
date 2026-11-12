@@ -110,15 +110,18 @@ export default function ServiceCanadaCentreIdDetailsPage() {
     isDriverLicence ||
     idType === "photoIDHealthCard" ||
     idType === "photoIDServiceCard";
-  const { isFormValid, errorCodes } = getCanadaPostIdDetailsValidation(
-    formData,
-    {
-      showCountry: false,
-      showProvince: isDriverLicence,
-      requireIdExpiry: false,
-      requireAddress: isDriverLicence,
-    },
-  );
+  const { errorCodes } = getCanadaPostIdDetailsValidation(formData, {
+    showCountry: false,
+    showProvince: isDriverLicence,
+  });
+  // Service Canada does not collect expiry dates and only requires driver addresses.
+  delete errorCodes.idExpiryDate;
+  if (!isDriverLicence) {
+    delete errorCodes.address;
+    delete errorCodes.cityTown;
+    delete errorCodes.postalCode;
+  }
+  const isFormValid = Object.keys(errorCodes).length === 0;
   const dobMessages = getSharedDateOfBirthMessages(t);
   const errorMessages: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
     idExpiryDate:
