@@ -5,11 +5,13 @@ from urllib.parse import quote, urlparse
 from typing import Optional
 from fastapi import HTTPException, Request
 from fastapi.responses import RedirectResponse
+from starsessions import regenerate_session_id
 from starsessions.session import get_session_handler
 from app.auth.services.oidc_config import oauth
 from app.config import get_configuration
 from app.constants.session_keys import SessionKeys
 from app.auth.services.auth_user_session import update_session_tokens
+from app.auth.services.auth_session_index import associate_oidc_session
 from authlib.integrations.starlette_client import OAuthError
 
 logger = logging.getLogger(__name__)
@@ -233,10 +235,9 @@ async def callback_handler(request: Request):
             description="Required sid claim is missing",
         )
 
-    # Get the handler and set your sid as session id. sid is uuid passed in id_token
-    handler = get_session_handler(request)
-    new_session_id = oidc_session_id
-    handler.session_id = new_session_id
+    await get_session_handler(request).destroy()
+    new_session_id = regenerate_session_id(request)
+    await associate_oidc_session(request, oidc_session_id, new_session_id)
 
     update_session_tokens(request, oidc_response)
 
