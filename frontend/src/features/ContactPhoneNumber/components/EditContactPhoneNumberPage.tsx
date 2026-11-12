@@ -575,8 +575,8 @@ export default function EditContactPhoneNumberPage() {
     success: (
       <SuccessfullyUpdated
         phoneFormData={phoneFormData}
-        onNext={handleSignOut}
-        onCancel={handleBackToProfile}
+        onNext={handleBackToProfile}
+        onCancel={handleSignOut}
       />
     ),
   };
