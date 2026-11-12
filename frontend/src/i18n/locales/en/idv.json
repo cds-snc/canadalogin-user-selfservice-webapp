@@ -48,6 +48,8 @@
     "noIds": "I don’t have any of these IDs",
     "idHint": "You will need to bring this ID to your in-person visit",
     "idExpirationLabel": "When does it expire?",
+    "idExpiryHint": "Must be valid for at least 1 month from today",
+    "backButton": "Back",
     "enterDetailsIdHeading": "Enter your details as shown on the ID",
     "firstNameLabel": "First Name",
     "firstNameHint": "Must match what is on your official ID",
@@ -59,7 +61,7 @@
     "cityTownLabel": "City, town, or community",
     "provinceLabel": "Province/ Territory",
     "postalcodeLabel": "Postal Code",
-    "postalcodeHint": "Enter your postal code"
+    "postalcodeHint": "For example, A1A 1A1"
   },
   "ServiceCanadaCentreCode": {
     "heading": "Your unique code for identity proofing at Service Canada Centre",

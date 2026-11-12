@@ -57,6 +57,7 @@ export const pageIds = [
   "DeleteFIDO2PasskeyConfirm",
   "DeleteFIDO2PasskeySuccess",
   "IdvServiceCanadaCentrePage",
+  "IdvServiceCanadaCentreIdDetailsPage",
   "IdvVisitCanadaPostPage",
   "IdvCanadaPostIdDetailsPage",
   "IdvCanadaPostProofOfAddressPage",
