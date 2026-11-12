@@ -267,52 +267,6 @@ export default function CanadaPostIdDetailsPage() {
         ? "CanadaPostIdDetails.driverLicenceHeading"
         : "CanadaPostIdDetails.defaultHeading";
 
-  /* const issuerLabel =
-    variant === "passport"
-      ? t("CanadaPostIdDetails.passportCountryLabel")
-      : issuerIsProvince
-        ? t("CanadaPostIdDetails.provinceLabel")
-        : t("CanadaPostIdDetails.countryLabel"); */
-
-  /* const issuerSelect = (
-    <GcdsSelect
-      id={FIELD_IDS.documentOptionId}
-      selectId={FIELD_IDS.documentOptionId}
-      name={FIELD_IDS.documentOptionId}
-      label={issuerLabel}
-      lang={currentLanguage}
-      value={formData.documentOptionId}
-      defaultValue={t("CanadaPostIdDetails.selectDefaultValue")}
-      required
-      errorMessage={fieldError("documentOptionId")}
-      onGcdsChange={updateField("documentOptionId")}
-    >
-      {sortOptionsByLabel(selectedDocument.options, currentLanguage).map(
-        (option) => (
-          <option key={option.id} value={String(option.id)}>
-            {getLocalizedName(option, currentLanguage)}
-          </option>
-        ),
-      )}
-    </GcdsSelect>
-  ); */
-
-  /* const countrySelect = (
-    <GcdsSelect
-      id={FIELD_IDS.country}
-      selectId={FIELD_IDS.country}
-      name={FIELD_IDS.country}
-      label={t("CanadaPostIdDetails.countryLabel")}
-      lang={currentLanguage}
-      value={formData.country}
-      required
-      errorMessage={fieldError("country")}
-      onGcdsChange={updateField("country")}
-    >
-      <option value={CANADA_COUNTRY_CODE}>Canada</option>
-    </GcdsSelect>
-  ); */
-
   const provinceSelect = (
     <GcdsSelect
       id={FIELD_IDS.province}
@@ -352,35 +306,6 @@ export default function CanadaPostIdDetailsPage() {
         </GcdsContainer>
 
         <GcdsContainer>
-          {/* <GcdsDateInput
-            id={FIELD_IDS.idExpiryDate}
-            name={FIELD_IDS.idExpiryDate}
-            legend={t("CanadaPostIdDetails.idExpiryLabel")}
-            hint={t("CanadaPostIdDetails.idExpiryHint")}
-            format="full"
-            lang={currentLanguage}
-            value={formData.idExpiryDate}
-            required
-            errorMessage={fieldError("idExpiryDate")}
-            onGcdsChange={updateField("idExpiryDate")}
-          /> */}
-
-          {/* {variant === "default" ? (
-            issuerIsProvince ? (
-              <>
-                {countrySelect}
-                {issuerSelect}
-              </>
-            ) : (
-              <>
-                {issuerSelect}
-                {provinceSelect}
-              </>
-            )
-          ) : (
-            issuerSelect
-          )} */}
-
           <GcdsInput
             id={FIELD_IDS.firstName}
             inputId={FIELD_IDS.firstName}
