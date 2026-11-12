@@ -110,13 +110,12 @@ export default function ServiceCanadaCentreIdDetailsPage() {
     isDriverLicence ||
     idType === "photoIDHealthCard" ||
     idType === "photoIDServiceCard";
-  const requiresIdExpiry = !isDriverLicence && !isPassport;
   const { isFormValid, errorCodes } = getCanadaPostIdDetailsValidation(
     formData,
     {
       showCountry: false,
       showProvince: isDriverLicence,
-      requireIdExpiry: requiresIdExpiry,
+      requireIdExpiry: false,
       requireAddress: isDriverLicence,
     },
   );
@@ -182,7 +181,6 @@ export default function ServiceCanadaCentreIdDetailsPage() {
                 },
               }
             : {}),
-          ...(requiresIdExpiry ? { idExpiryDate: formData.idExpiryDate } : {}),
           idType,
         },
       });
@@ -220,9 +218,6 @@ export default function ServiceCanadaCentreIdDetailsPage() {
       errorMessage={isDriverLicence ? fieldError("province") : ""}
       onGcdsChange={updateField("province")}
     >
-      <option value="">
-        {t("ServiceCanadaCentre.selectIdDropdownDefaultValue")}
-      </option>
       {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
         <option key={province.code} value={province.code}>
           {province.labels[currentLanguage]}
@@ -278,7 +273,7 @@ export default function ServiceCanadaCentreIdDetailsPage() {
                   ? dobMessages[errorCodes.dateOfBirth].inline
                   : ""
               }
-              showIdExpiry={requiresIdExpiry}
+              showIdExpiry={false}
               showAddressFields={showAddressFields}
               requireAddressFields={isDriverLicence}
               updateField={updateField}

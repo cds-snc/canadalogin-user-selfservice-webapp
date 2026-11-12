@@ -131,6 +131,41 @@ class TestCreateInPersonIdentityVerificationRequestSchema:
 
         assert request.applicant.address is not None
 
+    def test_requires_id_expiry_date_for_canada_post(self):
+        from app.identity_verification.schemas import (
+            CreateInPersonIdentityVerificationRequest,
+        )
+
+        with pytest.raises(ValidationError, match="id_expiry_date is required"):
+            CreateInPersonIdentityVerificationRequest(
+                verification_provider="canada_post",
+                applicant={
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "date_of_birth": "1990-05-15",
+                    "id_type": "driverLicence",
+                    "address": {},
+                },
+            )
+
+    def test_accepts_service_canada_without_id_expiry_date(self):
+        from app.identity_verification.schemas import (
+            CreateInPersonIdentityVerificationRequest,
+        )
+
+        request = CreateInPersonIdentityVerificationRequest(
+            verification_provider="service_canada",
+            applicant={
+                "first_name": "Jane",
+                "last_name": "Doe",
+                "date_of_birth": "1990-05-15",
+                "id_type": "driverLicence",
+                "address": {},
+            },
+        )
+
+        assert request.applicant.id_expiry_date is None
+
 
 class TestCreateInPersonIdentityVerificationCase:
     @pytest.mark.asyncio

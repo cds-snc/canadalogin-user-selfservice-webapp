@@ -27,7 +27,7 @@ class InPersonApplicantRequest(BaseModel):
     date_of_birth: date
     address: InPersonApplicantAddressRequest | None = None
     id_type: str
-    id_expiry_date: date
+    id_expiry_date: date | None = None
 
 
 class CreateInPersonIdentityVerificationRequest(BaseModel):
@@ -47,6 +47,13 @@ class CreateInPersonIdentityVerificationRequest(BaseModel):
         ):
             raise ValueError(
                 "applicant.address is required when verification_provider is canada_post"
+            )
+        if (
+            self.verification_provider == InPersonVerificationProvider.canada_post
+            and self.applicant.id_expiry_date is None
+        ):
+            raise ValueError(
+                "applicant.id_expiry_date is required when verification_provider is canada_post"
             )
         return self
 

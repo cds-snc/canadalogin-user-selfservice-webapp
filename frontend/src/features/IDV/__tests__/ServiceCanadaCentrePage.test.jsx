@@ -174,6 +174,11 @@ vi.mock("@gcds-core/components-react", () => ({
           }}
           {...props}
         >
+          {defaultValue ? (
+            <option value="" disabled>
+              {defaultValue}
+            </option>
+          ) : null}
           {children}
         </select>
         {errorMessage ? <div>{errorMessage}</div> : null}
@@ -411,6 +416,7 @@ describe("ServiceCanadaCentre pages", () => {
     expect(
       screen.queryByTestId("id-expiry-date-input"),
     ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
     expect(screen.queryByTestId("address-input")).not.toBeInTheDocument();
     expect(screen.queryByTestId("city-town-input")).not.toBeInTheDocument();
     expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
@@ -476,6 +482,9 @@ describe("ServiceCanadaCentre pages", () => {
     );
     expect(screen.getByTestId("city-town-input")).toBeInTheDocument();
     expect(screen.getByTestId("select-province")).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("option", { name: "Select option" }),
+    ).toHaveLength(1);
     expect(screen.getByTestId("postal-code-input")).toHaveAttribute(
       "hint",
       "For example, A1A 1A1",
@@ -500,7 +509,7 @@ describe("ServiceCanadaCentre pages", () => {
       target: { value: "ON" },
     });
     fireEvent.change(screen.getByTestId("postal-code-input"), {
-      target: { value: "K1A 0B1" },
+      target: { value: "L5N 6Z9" },
     });
 
     await act(async () => {
@@ -518,7 +527,7 @@ describe("ServiceCanadaCentre pages", () => {
             streetAddress: "123 Main Street",
             locality: "Ottawa",
             region: "ON",
-            postalCode: "K1A 0B1",
+            postalCode: "L5N 6Z9",
             country: "CA",
           },
           idType: "driverLicence",
@@ -527,14 +536,17 @@ describe("ServiceCanadaCentre pages", () => {
     });
   });
 
-  it("uses the original expiry form for other IDs with optional address fields", async () => {
+  it("omits expiry date for other IDs with optional address fields", async () => {
     mockLocationState.idType = "photoIDHealthCard";
     render(<ServiceCanadaCentreIdDetailsPage />);
 
     expect(
       screen.getByRole("heading", { name: "Enter your ID details" }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId("id-expiry-date-input")).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("id-expiry-date-input"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
     expect(screen.getByTestId("address-input")).not.toBeRequired();
     expect(screen.getByTestId("city-town-input")).not.toBeRequired();
     expect(screen.getByTestId("select-province")).not.toBeRequired();
@@ -543,5 +555,31 @@ describe("ServiceCanadaCentre pages", () => {
       "hint",
       "Must match what is on your official ID",
     );
+
+    fireEvent.change(screen.getByTestId("first-name-input"), {
+      target: { value: "Jane" },
+    });
+    fireEvent.change(screen.getByTestId("last-name-input"), {
+      target: { value: "Doe" },
+    });
+    fireEvent.change(screen.getByTestId("date-of-birth-input"), {
+      target: { value: "1990-01-01" },
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("continue-button"));
+    });
+
+    await waitFor(() => {
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalledWith({
+        verificationProvider: "service_canada",
+        applicant: {
+          firstName: "Jane",
+          lastName: "Doe",
+          dateOfBirth: "1990-01-01",
+          idType: "photoIDHealthCard",
+        },
+      });
+    });
   });
 });

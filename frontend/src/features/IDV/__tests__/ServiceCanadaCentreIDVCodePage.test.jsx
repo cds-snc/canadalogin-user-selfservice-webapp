@@ -63,6 +63,9 @@ vi.mock("@gcds-core/components-react", () => ({
       </Tag>
     );
   },
+  GcdsIcon: ({ name, ...props }) => (
+    <span data-testid={`gcds-icon-${name}`} {...props} />
+  ),
   GcdsText: ({ children, ...props }) => (
     <p data-testid="gcds-text" {...props}>
       {children}
@@ -256,6 +259,31 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
     expect(screen.queryByText("passport")).not.toBeInTheDocument();
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
+  });
+
+  it("renders the next steps for completing identity proofing", () => {
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Next steps" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Find a Service Canada Centre near you."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Bring your code and the original, valid ID you selected.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "A service agent will verify your identity. Then sign back in to your account to continue.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("falls back to the raw id type when it is not a known approved document key", () => {

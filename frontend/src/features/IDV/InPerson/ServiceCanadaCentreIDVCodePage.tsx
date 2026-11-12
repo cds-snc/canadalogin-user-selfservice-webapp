@@ -159,9 +159,14 @@ export default function ServiceCanadaCentreIDVCodePage() {
               {formattedIdvCode}
             </GcdsHeading>
             <GcdsText marginBottom="0">
-              {formattedExpiryDate
-                ? <>Code expires <strong>{formattedExpiryDate}</strong> and has been emailed to <strong>{email}</strong>.</>
-                : `${codeValidityText} `}
+              {formattedExpiryDate ? (
+                <>
+                  Code expires <strong>{formattedExpiryDate}</strong> and has
+                  been emailed to <strong>{email}</strong>.
+                </>
+              ) : (
+                `${codeValidityText} `
+              )}
               {!formattedExpiryDate && <strong>{email}</strong>}
               {!formattedExpiryDate && "."}
             </GcdsText>
@@ -193,10 +198,28 @@ export default function ServiceCanadaCentreIDVCodePage() {
               target="_blank"
               rel="noreferrer"
               className="service-canada-print-hide"
-              marginTop="200"
             >
               {t("ServiceCanadaCentreCode.findCentreButton")}
             </GcdsButton>
+          </section>
+
+          <section className="service-canada-code-section">
+            <GcdsHeading
+              tag="h2"
+              marginTop="0"
+              className="service-canada-code-section-title"
+            >
+              {t("ServiceCanadaCentreCode.nextStepsHeading")}
+            </GcdsHeading>
+            <GcdsText marginBottom="0">
+              <ol>
+                <li>{t("ServiceCanadaCentreCode.nextStepsFindCentre")}</li>
+                <li>{t("ServiceCanadaCentreCode.nextStepsBringCodeAndId")}</li>
+                <li>
+                  {t("ServiceCanadaCentreCode.nextStepsAfterVerification")}
+                </li>
+              </ol>
+            </GcdsText>
           </section>
 
           <section className="service-canada-code-section">
