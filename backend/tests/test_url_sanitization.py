@@ -20,6 +20,7 @@ def test_sanitize_url_for_logging_redacts_tokens_and_secrets():
         "https://example.com/oauth2/token"
         "?access_token=abc123"
         "&client_secret=my-secret"
+        "&sid=oidc-sid-value"
         "&foo=bar"
     )
 
@@ -27,8 +28,10 @@ def test_sanitize_url_for_logging_redacts_tokens_and_secrets():
 
     assert "abc123" not in sanitized_url
     assert "my-secret" not in sanitized_url
+    assert "oidc-sid-value" not in sanitized_url
     assert "access_token=%3Credacted%3E" in sanitized_url
     assert "client_secret=%3Credacted%3E" in sanitized_url
+    assert "sid=%3Credacted%3E" in sanitized_url
     assert "foo=bar" in sanitized_url
 
 

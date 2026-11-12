@@ -100,7 +100,7 @@ class FakeConfig:
 
 class FakeSessionHandler:
     def __init__(self):
-        self.session_id = None
+        self.destroy = AsyncMock()
 
 
 class FakeVerifyClient:
@@ -191,15 +191,21 @@ def app(monkeypatch, mock_token_transport):
         lambda: FakeConfig(env="prod", domain="pm.example.com"),
         raising=True,
     )
-
-    # Provide a fake session handler factory
-    def fake_get_session_handler(request: Request):
-        return FakeSessionHandler()
-
-    # auth.py imported: from starsessions.session import get_session_handler
-    # we monkeypatch the imported symbol inside auth_module
     monkeypatch.setattr(
-        auth_module, "get_session_handler", fake_get_session_handler, raising=True
+        auth_module,
+        "regenerate_session_id",
+        lambda _request: "generated-app-session-id",
+        raising=False,
+    )
+    monkeypatch.setattr(
+        auth_module, "associate_oidc_session", AsyncMock(), raising=False
+    )
+    session_handler = FakeSessionHandler()
+    monkeypatch.setattr(
+        auth_module,
+        "get_session_handler",
+        lambda _request: session_handler,
+        raising=False,
     )
 
     # Provide a no-op update_session_tokens that records call and writes to session
@@ -273,6 +279,7 @@ def app(monkeypatch, mock_token_transport):
     # Expose useful bits for assertions
     base.state.oauth_verify = fake_verify
     base.state.update_called = called
+    base.state.session_handler = session_handler
 
     return base
 
@@ -496,23 +503,32 @@ async def test_callback_ignores_language_root_return_to_page(app, client):
 async def test_callback_handler_sets_new_session_id_and_updates_tokens(
     app, client, monkeypatch
 ):
-    # Replace get_session_handler to expose the handler so we can assert session_id was set
-    handler_holder = {}
-
-    def fake_get_session_handler(request: Request):
-        handler_holder["h"] = FakeSessionHandler()
-        return handler_holder["h"]
-
+    generated_session_id = "generated-app-session-id"
+    events = []
+    app.state.session_handler.destroy.side_effect = lambda: events.append("destroy")
+    regenerate_session_id = Mock(
+        side_effect=lambda _request: events.append("regenerate") or generated_session_id
+    )
+    associate_oidc_session = AsyncMock()
     monkeypatch.setattr(
-        auth_module, "get_session_handler", fake_get_session_handler, raising=True
+        auth_module, "regenerate_session_id", regenerate_session_id, raising=False
+    )
+    monkeypatch.setattr(
+        auth_module, "associate_oidc_session", associate_oidc_session, raising=False
     )
 
     await client.get("/seed-session", params={"path": "/home"})
     resp = await client.get("/auth/callback", follow_redirects=False)
     assert resp.status_code in (302, 307)
 
-    # Ensure session handler got a new session id from userinfo.sid
-    assert handler_holder["h"].session_id == "test-session-id"
+    regenerate_session_id.assert_called_once()
+    app.state.session_handler.destroy.assert_awaited_once()
+    assert events == ["destroy", "regenerate"]
+    associate_oidc_session.assert_awaited_once()
+    assert associate_oidc_session.await_args.args[1:] == (
+        "test-session-id",
+        generated_session_id,
+    )
 
     # Ensure update_session_tokens was called and access_token stored into session (via our monkeypatch)
     dump = await client.get("/session-dump")
@@ -541,12 +557,6 @@ async def test_callback_handler_raises_oauth_error_when_sid_missing(monkeypatch)
                 )
             )
         ),
-        raising=True,
-    )
-    monkeypatch.setattr(
-        auth_module,
-        "get_session_handler",
-        lambda _request: FakeSessionHandler(),
         raising=True,
     )
     monkeypatch.setattr(
@@ -586,12 +596,6 @@ async def test_callback_handler_reraises_unexpected_oauth_token_exception(monkey
     )
     monkeypatch.setattr(
         auth_module,
-        "get_session_handler",
-        lambda _request: FakeSessionHandler(),
-        raising=True,
-    )
-    monkeypatch.setattr(
-        auth_module,
         "update_session_tokens",
         lambda _request, _oidc_response: None,
         raising=True,
@@ -620,12 +624,6 @@ async def test_callback_handler_logs_exception_for_unexpected_token_error(monkey
                 authorize_access_token=AsyncMock(side_effect=RuntimeError("boom"))
             )
         ),
-        raising=True,
-    )
-    monkeypatch.setattr(
-        auth_module,
-        "get_session_handler",
-        lambda _request: FakeSessionHandler(),
         raising=True,
     )
     monkeypatch.setattr(

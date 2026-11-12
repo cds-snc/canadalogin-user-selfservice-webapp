@@ -53,8 +53,8 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </button>
   ),
-  GcdsNotice: ({ children, noticeTitle }) => (
-    <div data-testid="gcds-notice">
+  GcdsNotice: ({ children, noticeTitle, className }) => (
+    <div data-testid="gcds-notice" className={className}>
       <h2>{noticeTitle}</h2>
       {children}
     </div>
@@ -72,6 +72,10 @@ describe("PartnerLinkSuccessPage", () => {
 
   it("renders BC Service Card partner success content", () => {
     render(<PartnerLinkSuccessPage />);
+
+    const notice = screen.getByTestId("gcds-notice");
+
+    expect(notice).toHaveClass("notice-heading-no-character-limit");
 
     expect(
       screen.getByRole("heading", {
