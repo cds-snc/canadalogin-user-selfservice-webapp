@@ -14,11 +14,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
-import {
-  AVAILABLE_LANGUAGES,
-  DEV_ONLY_FEATURE,
-  PAGES,
-} from "../../../utils/constants";
+import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
 import {
@@ -157,10 +153,6 @@ export default function VisitCanadaPost() {
       setIsLoading(false);
     }
   };
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   if (isLoading) {
     return <Loader text={t("CanadaPostSelectId.loading")} />;

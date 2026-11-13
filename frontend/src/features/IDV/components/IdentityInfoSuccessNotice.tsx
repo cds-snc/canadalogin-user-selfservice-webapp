@@ -1,7 +1,7 @@
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 
-import { DEV_ONLY_FEATURE } from "../../../utils/constants";
+import { useIdvFeatureAccess } from "../../../hooks/useIdvFeatureAccess";
 
 interface IdentityInfoSuccessNoticeProps {
   showIDVSuccessNotice?: boolean;
@@ -10,9 +10,10 @@ interface IdentityInfoSuccessNoticeProps {
 export default function IdentityInfoSuccessNotice({
   showIDVSuccessNotice = false,
 }: IdentityInfoSuccessNoticeProps) {
+  const idvFeatureEnabled = useIdvFeatureAccess();
   const { t } = useTranslation("profile");
 
-  if (!showIDVSuccessNotice || !DEV_ONLY_FEATURE) {
+  if (!showIDVSuccessNotice || !idvFeatureEnabled) {
     return null;
   }
 

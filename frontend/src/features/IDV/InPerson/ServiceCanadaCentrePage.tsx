@@ -20,7 +20,6 @@ import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/Err
 import {
   AVAILABLE_LANGUAGES,
   CANADIAN_PROVINCES_AND_TERRITORIES,
-  DEV_ONLY_FEATURE,
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
@@ -237,10 +236,6 @@ export default function ServiceCanadaCentrePage() {
       },
     });
   };
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main">

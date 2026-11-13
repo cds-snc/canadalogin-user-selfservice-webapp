@@ -233,12 +233,4 @@ describe("ProveIdentityOnlinePage", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("/en/manage-account/idv/");
   });
-
-  it("does not render when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
-
-    const { container } = render(<ProveIdentityOnlinePage />);
-
-    expect(container.firstChild).toBeNull();
-  });
 });

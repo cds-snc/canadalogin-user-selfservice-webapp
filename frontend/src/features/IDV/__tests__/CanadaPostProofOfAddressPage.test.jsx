@@ -10,7 +10,6 @@ const mockLocation = {
     formData: { firstName: "Jane", lastName: "Doe" },
   },
 };
-const mockFlags = vi.hoisted(() => ({ devOnlyFeature: true }));
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -19,16 +18,6 @@ vi.mock("react-router", async () => {
     useNavigate: () => mockNavigate,
     useLocation: () => mockLocation,
     useParams: () => ({ language: "en", journeyType: "start" }),
-  };
-});
-
-vi.mock("../../../utils/constants", async () => {
-  const actual = await vi.importActual("../../../utils/constants");
-  return {
-    ...actual,
-    get DEV_ONLY_FEATURE() {
-      return mockFlags.devOnlyFeature;
-    },
   };
 });
 
@@ -80,19 +69,10 @@ vi.mock("@gcds-core/components-react", () => ({
 describe("CanadaPostProofOfAddressPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFlags.devOnlyFeature = true;
     mockLocation.state = {
       document: { key: "PERMANENT_RESIDENT_CARD", options: [] },
       formData: { firstName: "Jane", lastName: "Doe" },
     };
-  });
-
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockFlags.devOnlyFeature = false;
-
-    const { container } = render(<CanadaPostProofOfAddressPage />);
-
-    expect(container).toBeEmptyDOMElement();
   });
 
   it("renders the proof-of-address selector and its options", () => {

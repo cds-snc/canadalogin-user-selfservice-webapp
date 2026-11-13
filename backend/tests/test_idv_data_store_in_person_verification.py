@@ -1,6 +1,7 @@
 """Unit tests for in-person identity verification service and router endpoints."""
 
 import importlib
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -20,6 +21,7 @@ get_last_email_sent = identity_verification_module.get_last_email_sent
 base_module = importlib.import_module(
     "app.identity_verification.services.base_idv_data_store_service"
 )
+tls_module = importlib.import_module("app.utils.tls")
 
 MOCK_CONFIGURATION = MagicMock()
 MOCK_CONFIGURATION.idv_data_store_identity_verification_in_person_endpoint = (
@@ -34,6 +36,32 @@ MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_IDENTITY_VERIFICATION_SC
 MOCK_CONFIGURATION.idv_data_store_config.IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES = (
     "idv:in-person-verification:send"
 )
+
+
+@pytest.mark.parametrize(
+    ("environment", "allow_insecure_loopback", "endpoint", "expected"),
+    [
+        ("local", False, "https://127.0.0.1:8100/claims", True),
+        ("prod", False, "https://127.0.0.1:8100/claims", False),
+        ("prod", True, "https://127.0.0.1:8100/claims", True),
+        ("prod", True, "https://idv.example.com/claims", False),
+    ],
+)
+def test_loopback_tls_verification_policy(
+    monkeypatch, environment, allow_insecure_loopback, endpoint, expected
+):
+    monkeypatch.setattr(
+        tls_module,
+        "get_configuration",
+        lambda: SimpleNamespace(
+            ENVIRONMENT=environment,
+            idv_data_store_config=SimpleNamespace(
+                IDV_DATA_STORE_ALLOW_INSECURE_LOOPBACK_TLS=allow_insecure_loopback
+            ),
+        ),
+    )
+
+    assert tls_module.should_disable_tls_verify_for_localhost(endpoint) is expected
 
 
 @pytest.fixture

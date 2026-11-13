@@ -38,6 +38,7 @@ import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
 import IdentityVerificationSuccess from "./features/IDV/Online/IdentityVerificationSuccess";
 import ConnectedServicesPage from "./features/ConnectedServices/components/ConnectedServicesPage";
+import IdvFeatureRoute from "./features/IDV/IdvFeatureRoute";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -150,104 +151,105 @@ export const appRoutes: RouteObject[] = [
                       element: <ConnectedServicesPage />,
                       handle: { id: PAGES.connectedServices },
                     },
-                    {
-                      path: "identity-verification/:journeyType?",
-                      handle: {
-                        id: PAGES.idvStartIdentityProofingPage,
-                        breadcrumbId: "pageTitle",
-                      },
-                      children: [
-                        {
-                          index: true,
-                          element: <StartIdentityProofingPage />,
-                        },
-                        {
-                          path: "not-ready",
-                          element: <CompleteIdentityProofingPage />,
-                          handle: { id: PAGES.idvCompleteIdentityProofingPage },
-                        },
-                        {
-                          path: "in-person",
-                          element: <ProveIdentityInPersonPage />,
-                          handle: { id: PAGES.idvProveIdentityInPersonPage },
-                        },
-                        {
-                          path: "in-person/canada-post",
-                          element: <VisitCanadaPost />,
-                          handle: { id: PAGES.idvVisitCanadaPostPage },
-                        },
-                        {
-                          path: "in-person/canada-post/id-details",
-                          element: <CanadaPostIdDetailsPage />,
-                          handle: { id: PAGES.idvCanadaPostIdDetailsPage },
-                        },
-                        {
-                          path: "in-person/canada-post/proof-of-address",
-                          element: <CanadaPostProofOfAddressPage />,
-                          handle: {
-                            id: PAGES.idvCanadaPostProofOfAddressPage,
-                          },
-                        },
-                        {
-                          path: "in-person/canada-post/idv-code",
-                          element: <ProofingBarcodeCanadaPostPage />,
-                          handle: {
-                            id: PAGES.idvProofingBarcodeCanadaPostPage,
-                          },
-                        },
-                        {
-                          path: "in-person/pending",
-                          element: <InPersonProofingInProgress />,
-                          handle: {
-                            id: PAGES.idvInPersonProofingInProgressPage,
-                          },
-                        },
-                        {
-                          path: "in-person/service-canada-centre",
-                          element: <ServiceCanadaCentrePage />,
-                          handle: { id: PAGES.idvServiceCanadaCentrePage },
-                        },
-                        {
-                          path: "in-person/service-canada-centre/idv-code",
-                          element: <ServiceCanadaCentreIDVCodePage />,
-                          handle: { id: PAGES.idvServiceCanadaCentreCodePage },
-                        },
-                        {
-                          path: "online",
-                          element: <ProveIdentityOnlinePage />,
-                          handle: { id: PAGES.idvProveIdentityOnlinePage },
-                        },
-                        {
-                          path: "online/identity-verification-info",
-                          element: <OnlineVerificationInfo />,
-                          handle: { id: PAGES.idvOnlineVerificationInfoPage },
-                        },
-                        {
-                          path: "online/provincial",
-                          element: <ProvincialVerificationPage />,
-                          handle: { id: PAGES.idvProvincialVerificationPage },
-                        },
-                        {
-                          path: "online/provincial/link/:partnerId/success",
-                          element: <PartnerLinkSuccessPage />,
-                          handle: { id: PAGES.idvPartnerLinkSuccessPage },
-                        },
-                        {
-                          path: "online/bluink/confirmation",
-                          element: <IdentityVerificationSuccess />,
-                          handle: {
-                            id: PAGES.idvIdentityVerificationSuccessPage,
-                          },
-                        },
-                        {
-                          path: "details-confirmation",
-                          element: <ConfirmIdentityDetails />,
-                          handle: { id: PAGES.idvDetailsConfirmationPage },
-                        },
-                      ],
-                    },
                   ]
                 : []),
+              {
+                path: "identity-verification/:journeyType?",
+                element: <IdvFeatureRoute />,
+                handle: {
+                  id: PAGES.idvStartIdentityProofingPage,
+                  breadcrumbId: "pageTitle",
+                },
+                children: [
+                  {
+                    index: true,
+                    element: <StartIdentityProofingPage />,
+                  },
+                  {
+                    path: "not-ready",
+                    element: <CompleteIdentityProofingPage />,
+                    handle: { id: PAGES.idvCompleteIdentityProofingPage },
+                  },
+                  {
+                    path: "in-person",
+                    element: <ProveIdentityInPersonPage />,
+                    handle: { id: PAGES.idvProveIdentityInPersonPage },
+                  },
+                  {
+                    path: "in-person/canada-post",
+                    element: <VisitCanadaPost />,
+                    handle: { id: PAGES.idvVisitCanadaPostPage },
+                  },
+                  {
+                    path: "in-person/canada-post/id-details",
+                    element: <CanadaPostIdDetailsPage />,
+                    handle: { id: PAGES.idvCanadaPostIdDetailsPage },
+                  },
+                  {
+                    path: "in-person/canada-post/proof-of-address",
+                    element: <CanadaPostProofOfAddressPage />,
+                    handle: {
+                      id: PAGES.idvCanadaPostProofOfAddressPage,
+                    },
+                  },
+                  {
+                    path: "in-person/canada-post/idv-code",
+                    element: <ProofingBarcodeCanadaPostPage />,
+                    handle: {
+                      id: PAGES.idvProofingBarcodeCanadaPostPage,
+                    },
+                  },
+                  {
+                    path: "in-person/pending",
+                    element: <InPersonProofingInProgress />,
+                    handle: {
+                      id: PAGES.idvInPersonProofingInProgressPage,
+                    },
+                  },
+                  {
+                    path: "in-person/service-canada-centre",
+                    element: <ServiceCanadaCentrePage />,
+                    handle: { id: PAGES.idvServiceCanadaCentrePage },
+                  },
+                  {
+                    path: "in-person/service-canada-centre/idv-code",
+                    element: <ServiceCanadaCentreIDVCodePage />,
+                    handle: { id: PAGES.idvServiceCanadaCentreCodePage },
+                  },
+                  {
+                    path: "online",
+                    element: <ProveIdentityOnlinePage />,
+                    handle: { id: PAGES.idvProveIdentityOnlinePage },
+                  },
+                  {
+                    path: "online/identity-verification-info",
+                    element: <OnlineVerificationInfo />,
+                    handle: { id: PAGES.idvOnlineVerificationInfoPage },
+                  },
+                  {
+                    path: "online/provincial",
+                    element: <ProvincialVerificationPage />,
+                    handle: { id: PAGES.idvProvincialVerificationPage },
+                  },
+                  {
+                    path: "online/provincial/link/:partnerId/success",
+                    element: <PartnerLinkSuccessPage />,
+                    handle: { id: PAGES.idvPartnerLinkSuccessPage },
+                  },
+                  {
+                    path: "online/bluink/confirmation",
+                    element: <IdentityVerificationSuccess />,
+                    handle: {
+                      id: PAGES.idvIdentityVerificationSuccessPage,
+                    },
+                  },
+                  {
+                    path: "details-confirmation",
+                    element: <ConfirmIdentityDetails />,
+                    handle: { id: PAGES.idvDetailsConfirmationPage },
+                  },
+                ],
+              },
             ],
           },
           { path: "*", element: <ManageDashboard /> },

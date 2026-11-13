@@ -78,15 +78,32 @@ CONTACT_INFO = {
     "email": configuration.app_info.email,
 }
 
-redis_url = configuration.session_config.SESSION_REDIS_URL
+
+def _build_redis_url(app_configuration) -> str:
+    configured_url = app_configuration.session_config.SESSION_REDIS_URL
+    if configured_url:
+        return configured_url
+
+    if app_configuration.ENVIRONMENT != "local":
+        session_config = app_configuration.session_config
+        return (
+            f"rediss://:{session_config.REDIS_AUTH_SECRET}"
+            f"@{session_config.REDIS_DOMAIN}:{session_config.REDIS_PORT}"
+            "?ssl_cert_reqs=none"
+        )
+
+    return "redis://localhost:6379/0"
+
+
+redis_url = _build_redis_url(configuration)
 is_local_environment = configuration.ENVIRONMENT == "local"
 
-if configuration.ENVIRONMENT != "local":
-    # Construct the Redis URL with TLS and authentication for non-local environments
-    redis_url = f"rediss://:{configuration.session_config.REDIS_AUTH_SECRET}@{configuration.session_config.REDIS_DOMAIN}:{configuration.session_config.REDIS_PORT}?ssl_cert_reqs=none"
+if configuration.session_config.SESSION_REDIS_URL:
+    logger.info("Using configured Redis URL")
+elif configuration.ENVIRONMENT != "local":
     logger.info(f"Redis instance {configuration.session_config.REDIS_DOMAIN}")
 else:
-    logger.info(f"Redis instance {redis_url}")
+    logger.info("Using local Redis instance")
 redis_client = Redis.from_url(redis_url)
 
 
@@ -222,15 +239,11 @@ def create_app():
         tags=["FIDO2"],
     )
 
-    if configuration.ENVIRONMENT in {"local", "dev", "test"}:
-        logger.info(
-            "Running in local, dev or test environment, Identity Verification routes will be included"
-        )
-        app.include_router(
-            v1_identity_verification_router.router,
-            prefix=f"{configuration.V1_API_VERSION}/identity-verification",
-            tags=["Identity Verification"],
-        )
+    app.include_router(
+        v1_identity_verification_router.router,
+        prefix=f"{configuration.V1_API_VERSION}/identity-verification",
+        tags=["Identity Verification"],
+    )
 
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(OAuthError, oauth_error_handler)
