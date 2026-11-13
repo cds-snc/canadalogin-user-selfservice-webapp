@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.40.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.39.2...v1.40.0) (2026-11-13)
+
+
+### Features
+
+* **identity-verification:** Add Proof of Address selector screen ([#2507](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2507)) ([367d90e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/367d90ee0115f298186e8af9d601a376c59dccb6))
+* Service Canada Center: Enter Passport detail ([#2521](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2521)) ([8eeebac](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/8eeebaccacdd80756a6decf359154c72c92b5fd2))
+
 ## [1.39.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.39.1...v1.39.2) (2026-11-12)
 
 
