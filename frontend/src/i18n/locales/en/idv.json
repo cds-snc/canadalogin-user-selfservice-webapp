@@ -132,7 +132,7 @@
       },
       "PROVINCIAL_HEALTH_CARD": {
         "label": "Health card",
-        "hint": "Only valid for Quebec"
+        "hint": "Only valid for Quebec and British Columbia"
       },
       "PERMANENT_RESIDENT_CARD": {
         "label": "Canadian PR card"
@@ -142,7 +142,7 @@
       },
       "COMBO_CARD": {
         "label": "Combo card",
-        "hint": "Only valid for BC and Alberta"
+        "hint": "Only valid for Alberta and British Columbia"
       }
     },
     "noIds": "I don't have any of those IDs"
@@ -163,53 +163,30 @@
   },
   "CanadaPostProofOfAddress": {
     "heading": "You must bring a proof of address",
-    "intro": "Since the ID you selected does not have an address on it, you will need to bring in one of the documents listed below:",
-    "warningTitle": "You must bring a proof of address",
-    "warningMessage": "Only continue if you have one of the documents listed above. Otherwise, you will not be able to prove your identity.",
-    "groups": {
-      "governmentId": {
-        "title": "Government ID with address",
-        "items": [
-          "Provincial/Territorial Driver’s licence",
-          "Provincial/Territorial Photo ID/Service card"
-        ]
-      },
-      "financial": {
-        "title": "Financial",
-        "items": [
-          "Bank or credit card statement",
-          "Income tax assessment",
-          "Pension statement (CPP/QPP)"
-        ]
-      },
-      "billsHousing": {
-        "title": "Bills & Housing",
-        "items": [
-          "Utility bill (phone, cable, hydro, gas, water)",
-          "Lease, mortgage statement, or purchase agreement",
-          "Municipal tax notice",
-          "Insurance policy (home, auto, etc.)"
-        ]
-      },
-      "governmentBenefits": {
-        "title": "Government Benefits",
-        "items": [
-          "Child Tax Benefit statement",
-          "Old Age Security or CPP benefits statement",
-          "Employment Insurance statement",
-          "Disability or social assistance statement"
-        ]
-      },
-      "other": {
-        "title": "Other",
-        "items": [
-          "Government cheque or stub",
-          "School report card or transcript",
-          "Vehicle registration",
-          "Proof of residence letter (from a shelter, care facility, or similar)",
-          "Delivery notice with your name and address (for package pickups only)"
-        ]
-      }
+    "intro": "Since the ID you selected does not have an address on it, you will need to bring one of the documents listed below:",
+    "selectLabel": "Select your proof of address (required)",
+    "selectHint": "The document must reflect your current address",
+    "selectDefaultValue": "Select option",
+    "selectError": "Select an option to continue.",
+    "options": {
+      "deliveryNotice": "Delivery Notice Card / Final Notice Card",
+      "municipalTaxNotice": "Municipal tax notice",
+      "leaseMortgageOrPurchaseAgreement": "Lease, mortgage or purchase agreement",
+      "insurancePolicy": "Insurance policy",
+      "vehicleOwnershipOrInsurance": "Vehicle ownership or insurance document",
+      "bankOrCreditCardStatement": "Bank or credit card statement",
+      "recentUtilityBill": "Recent utility bill",
+      "childTaxBenefitStatement": "Canada Child Tax Benefit statement",
+      "incomeTaxAssessment": "Income tax assessment",
+      "governmentChequeOrStub": "Government cheque or cheque stub",
+      "employmentInsuranceStatement": "Employment Insurance Benefits statement (T4E)",
+      "cppQppStatement": "CPP/QPP statement of contributions",
+      "workplaceSafetyOrInsuranceBenefits": "Provincial workplace safety or insurance benefits statement",
+      "provincialDisabilityOrWorksBenefits": "Provincial works or disability support direct deposit statement",
+      "attestationOfResidence": "Attestation of residence",
+      "privatePostOfficeBoxRentalAgreement": "Private post office box rental agreement",
+      "oldAgeSecurityOrCppBenefits": "Old Age Security (T4A) or CPP benefits (T4AP) statement",
+      "noneOfThese": "I don’t have any of these"
     },
     "continueButton": "Continue",
     "backButton": "Back"

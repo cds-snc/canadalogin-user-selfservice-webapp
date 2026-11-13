@@ -109,6 +109,46 @@
     "moreInfoTitle": "Renseignements supplémentaires",
     "learnMoreLink": "Apprenez-en davantage sur la confirmation d’identité dans un bureau Postes Canada"
   },
+  "CanadaPostSelectId": {
+    "documents": {
+      "PROVINCIAL_HEALTH_CARD": {
+        "hint": "Only valid for Quebec and British Columbia"
+      },
+      "COMBO_CARD": {
+        "hint": "Only valid for Alberta and British Columbia"
+      }
+    }
+  },
+  "CanadaPostProofOfAddress": {
+    "heading": "You must bring a proof of address",
+    "intro": "Since the ID you selected does not have an address on it, you will need to bring one of the documents listed below:",
+    "selectLabel": "Select your proof of address (required)",
+    "selectHint": "The document must reflect your current address",
+    "selectDefaultValue": "Select option",
+    "selectError": "Select an option to continue.",
+    "options": {
+      "deliveryNotice": "Delivery Notice Card / Final Notice Card",
+      "municipalTaxNotice": "Municipal tax notice",
+      "leaseMortgageOrPurchaseAgreement": "Lease, mortgage or purchase agreement",
+      "insurancePolicy": "Insurance policy",
+      "vehicleOwnershipOrInsurance": "Vehicle ownership or insurance document",
+      "bankOrCreditCardStatement": "Bank or credit card statement",
+      "recentUtilityBill": "Recent utility bill",
+      "childTaxBenefitStatement": "Canada Child Tax Benefit statement",
+      "incomeTaxAssessment": "Income tax assessment",
+      "governmentChequeOrStub": "Government cheque or cheque stub",
+      "employmentInsuranceStatement": "Employment Insurance Benefits statement (T4E)",
+      "cppQppStatement": "CPP/QPP statement of contributions",
+      "workplaceSafetyOrInsuranceBenefits": "Provincial workplace safety or insurance benefits statement",
+      "provincialDisabilityOrWorksBenefits": "Provincial works or disability support direct deposit statement",
+      "attestationOfResidence": "Attestation of residence",
+      "privatePostOfficeBoxRentalAgreement": "Private post office box rental agreement",
+      "oldAgeSecurityOrCppBenefits": "Old Age Security (T4A) or CPP benefits (T4AP) statement",
+      "noneOfThese": "I don’t have any of these"
+    },
+    "continueButton": "Continue",
+    "backButton": "Back"
+  },
   "ProofingBarcodeCanadaPost": {
     "heading": "Rendez-vous dans un bureau Postes Canada et munissez-vous de votre code-barres de confirmation",
     "barcodeAriaLabel": "Barcode for code {{code}}",
