@@ -155,11 +155,13 @@
     "idExpiryHint": "Must be valid for at least 1 month from today",
     "passportCountryLabel": "What country issued the passport?",
     "countryLabel": "Country",
-    "provinceLabel": "Province/ Territory",
+    "provinceLabel": "Province/ Territory/ State",
     "selectDefaultValue": "Select option",
     "postalCodeHint": "For example, A1A 1A1",
     "continueButton": "Continue",
-    "backButton": "Back"
+    "backButton": "Back",
+    "whatIsYourAddress": "What is your address",
+    "whatIsYourAddressHint": "Must match what is on your proof of address."
   },
   "CanadaPostProofOfAddress": {
     "heading": "You must bring a proof of address",

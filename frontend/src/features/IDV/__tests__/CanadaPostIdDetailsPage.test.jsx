@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import CanadaPostIdDetailsPage from "../InPerson/CanadaPostIdDetailsPage";
 import {
   getIdExpiryRequiredMessage,
-  getIdExpiryTooSoonMessage,
   getPostalCodeRequiredOrInvalidMessage,
 } from "../InPerson/validation/ErrorsDefinition";
 import i18n from "../../../i18n/test";
@@ -52,6 +51,7 @@ vi.mock("@gcds-core/components-react", () => {
       const Tag = tag ?? "h2";
       return <Tag>{children}</Tag>;
     },
+    GcdsText: ({ children }) => <p>{children}</p>,
     GcdsErrorSummary: ({ id, errorLinks }) => (
       <div id={id} data-testid="errorSummary">
         {Object.entries(errorLinks ?? {}).map(([href, message]) => (
@@ -199,8 +199,21 @@ const renderPage = (document, state = {}) =>
 const change = (testId, value) =>
   fireEvent.change(screen.getByTestId(testId), { target: { value } });
 
+const validFormData = (overrides = {}) => ({
+  idExpiryDate: "2099-01-01",
+  documentOptionId: "10",
+  country: "",
+  province: "ON",
+  firstName: "Jane",
+  lastName: "Doe",
+  dateOfBirth: "1990-05-15",
+  address: "123 Main St",
+  cityTown: "Ottawa",
+  postalCode: "K1A 0B1",
+  ...overrides,
+});
+
 const fillCommonFields = () => {
-  change("id-expiry-date-input", "2099-01-01");
   change("first-name-input", "Jane");
   change("last-name-input", "Doe");
   change("date-of-birth-input", "1990-05-15");
@@ -244,22 +257,23 @@ describe("CanadaPostIdDetailsPage", () => {
     expect(screen.getByText("select id page")).toBeInTheDocument();
   });
 
-  it("renders the passport form with API countries and a static province", () => {
+  it("renders the passport form with its visible address fields", () => {
     renderPage(PASSPORT);
 
     expect(
       screen.getByRole("heading", { name: "Enter your passport details" }),
     ).toBeInTheDocument();
-    const issuer = screen.getByLabelText("What country issued the passport?");
-    expect(
-      Array.from(issuer.querySelectorAll("option")).map((o) => o.textContent),
-    ).toEqual(["-", "Canada", "France"]);
     expect(screen.getByTestId("select-province")).toBeInTheDocument();
-    expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("id-expiry-date-input"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("select-document-option"),
+    ).not.toBeInTheDocument();
     expect(screen.getByTestId("postal-code-input")).toBeInTheDocument();
   });
 
-  it("renders the driver's licence form with API provinces only", () => {
+  it("renders the driver's licence form without hidden issuer controls", () => {
     renderPage(DRIVERS_LICENCE);
 
     expect(
@@ -267,29 +281,32 @@ describe("CanadaPostIdDetailsPage", () => {
         name: "Enter your driver's licence details",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("Province/ Territory")).toHaveAttribute(
-      "data-testid",
-      "select-document-option",
-    );
+    expect(
+      screen.queryByTestId("select-document-option"),
+    ).not.toBeInTheDocument();
     expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
     expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
   });
 
-  it("renders the default form with a country select and preselects a single option", () => {
+  it("renders the default form without hidden issuer controls", () => {
     renderPage(HEALTH_CARD);
 
     expect(
       screen.getByRole("heading", { name: "Enter your ID details" }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId("select-country")).toHaveValue("CA");
-    expect(screen.getByTestId("select-document-option")).toHaveValue("20");
+    expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("select-document-option"),
+    ).not.toBeInTheDocument();
   });
 
-  it("renders the default form with a static province for non-province documents", () => {
+  it("renders the default form without hidden issuer controls", () => {
     renderPage(PR_CARD);
 
-    expect(screen.getByTestId("select-document-option")).toHaveValue("30");
-    expect(screen.getByTestId("select-province")).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("select-document-option"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
     expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
   });
 
@@ -299,28 +316,32 @@ describe("CanadaPostIdDetailsPage", () => {
     fireEvent.click(screen.getByTestId("continue-button"));
 
     const summary = screen.getByTestId("errorSummary");
-    expect(summary).toHaveTextContent(getIdExpiryRequiredMessage(t));
+    expect(summary).not.toHaveTextContent(getIdExpiryRequiredMessage(t));
     expect(summary).toHaveTextContent(getPostalCodeRequiredOrInvalidMessage(t));
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("rejects IDs expiring in less than one month", () => {
-    renderPage(DRIVERS_LICENCE);
+  it("does not validate expiry dates when the expiry field is omitted", async () => {
+    renderPage(DRIVERS_LICENCE, {
+      formData: validFormData({
+        idExpiryDate: new Date().toISOString().slice(0, 10),
+      }),
+    });
     fillCommonFields();
-    change("select-document-option", "10");
-    change("id-expiry-date-input", new Date().toISOString().slice(0, 10));
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(screen.getByTestId("errorSummary")).toHaveTextContent(
-      getIdExpiryTooSoonMessage(t),
+    expect(screen.queryByTestId("errorSummary")).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockSendInPersonVerificationCode).toHaveBeenCalled(),
     );
   });
 
   it("navigates to the proof of address page when the option requires proof", () => {
-    renderPage(PASSPORT);
+    renderPage(PASSPORT, {
+      formData: validFormData({ documentOptionId: "2" }),
+    });
     fillCommonFields();
-    change("select-document-option", "2");
     change("select-province", "ON");
 
     fireEvent.click(screen.getByTestId("continue-button"));
@@ -331,18 +352,7 @@ describe("CanadaPostIdDetailsPage", () => {
       {
         state: {
           document: PASSPORT,
-          formData: {
-            idExpiryDate: "2099-01-01",
-            documentOptionId: "2",
-            country: "",
-            province: "ON",
-            firstName: "Jane",
-            lastName: "Doe",
-            dateOfBirth: "1990-05-15",
-            address: "123 Main St",
-            cityTown: "Ottawa",
-            postalCode: "K1A 0B1",
-          },
+          formData: validFormData({ documentOptionId: "2" }),
         },
       },
     );
@@ -382,9 +392,10 @@ describe("CanadaPostIdDetailsPage", () => {
   });
 
   it("creates a case and navigates to the barcode when proof of address is not required", async () => {
-    renderPage(DRIVERS_LICENCE);
+    renderPage(DRIVERS_LICENCE, {
+      formData: validFormData(),
+    });
     fillCommonFields();
-    change("select-document-option", "10");
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
@@ -425,9 +436,11 @@ describe("CanadaPostIdDetailsPage", () => {
   });
 
   it("creates a case and navigates to the barcode after proof of address is acknowledged", async () => {
-    renderPage(PR_CARD, { proofOfAddressAcknowledged: true });
+    renderPage(PR_CARD, {
+      proofOfAddressAcknowledged: true,
+      formData: validFormData({ documentOptionId: "30" }),
+    });
     fillCommonFields();
-    change("select-province", "ON");
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
@@ -463,9 +476,10 @@ describe("CanadaPostIdDetailsPage", () => {
       success: false,
       message: "Could not create case",
     });
-    renderPage(DRIVERS_LICENCE);
+    renderPage(DRIVERS_LICENCE, {
+      formData: validFormData(),
+    });
     fillCommonFields();
-    change("select-document-option", "10");
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
@@ -476,16 +490,17 @@ describe("CanadaPostIdDetailsPage", () => {
   });
 
   it("checks a foreign licence option separately from domestic licences", () => {
-    renderPage({
+    const foreignLicence = option(12, "Foreign licence", {
+      requires_proof: true,
+    });
+    const document = {
       ...DRIVERS_LICENCE,
-      options: [
-        ...DRIVERS_LICENCE.options,
-        option(12, "Foreign licence", { requires_proof: true }),
-      ],
+      options: [...DRIVERS_LICENCE.options, foreignLicence],
+    };
+    renderPage(document, {
+      formData: validFormData({ documentOptionId: "12" }),
     });
     fillCommonFields();
-    change("select-document-option", "12");
-    change("select-province", "ON");
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
@@ -494,52 +509,18 @@ describe("CanadaPostIdDetailsPage", () => {
       "/en/identity-verification/start/in-person/canada-post/proof-of-address",
       {
         state: {
-          document: {
-            ...DRIVERS_LICENCE,
-            options: [
-              ...DRIVERS_LICENCE.options,
-              option(12, "Foreign licence", { requires_proof: true }),
-            ],
-          },
-          formData: {
-            idExpiryDate: "2099-01-01",
-            documentOptionId: "12",
-            country: "",
-            province: "ON",
-            firstName: "Jane",
-            lastName: "Doe",
-            dateOfBirth: "1990-05-15",
-            address: "123 Main St",
-            cityTown: "Ottawa",
-            postalCode: "K1A 0B1",
-          },
+          document,
+          formData: validFormData({ documentOptionId: "12" }),
         },
       },
     );
   });
 
   it("restores form values provided in navigation state", () => {
-    const formData = {
-      idExpiryDate: "2099-01-01",
-      documentOptionId: "2",
-      country: "",
-      province: "ON",
-      firstName: "Jane",
-      lastName: "Doe",
-      dateOfBirth: "1990-05-15",
-      address: "123 Main St",
-      cityTown: "Ottawa",
-      postalCode: "K1A 0B1",
-    };
+    const formData = validFormData({ documentOptionId: "2" });
 
     renderPage(PASSPORT, { formData });
 
-    expect(screen.getByTestId("id-expiry-date-input")).toHaveValue(
-      formData.idExpiryDate,
-    );
-    expect(screen.getByTestId("select-document-option")).toHaveValue(
-      formData.documentOptionId,
-    );
     expect(screen.getByTestId("select-province")).toHaveValue(
       formData.province,
     );
