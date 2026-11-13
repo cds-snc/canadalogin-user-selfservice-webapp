@@ -27,7 +27,7 @@ class InPersonApplicantRequest(BaseModel):
     date_of_birth: date
     address: InPersonApplicantAddressRequest | None = None
     id_type: str
-    id_expiry_date: date
+    id_expiry_date: date | None = None
 
 
 class CreateInPersonIdentityVerificationRequest(BaseModel):

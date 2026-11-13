@@ -63,6 +63,9 @@ vi.mock("@gcds-core/components-react", () => ({
       </Tag>
     );
   },
+  GcdsIcon: ({ name, ...props }) => (
+    <span data-testid={`gcds-icon-${name}`} {...props} />
+  ),
   GcdsText: ({ children, ...props }) => (
     <p data-testid="gcds-text" {...props}>
       {children}
@@ -169,9 +172,9 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
 
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "Your unique code for identity proofing at Service Canada Centre",
-      ),
+      screen.getByRole("heading", {
+        name: "Take your CanadaLogin code to a Service Canada Centre",
+      }),
     ).toBeInTheDocument();
   });
 
@@ -221,7 +224,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the code validity and visit instruction text", () => {
+  it("renders the code validity and what-to-bring details", () => {
     render(
       <TestWrapper>
         <ServiceCanadaCentreIDVCodePage />
@@ -232,9 +235,13 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       screen.getByText(/This code is valid for 30 days/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/has been emailed to/i)).toBeInTheDocument();
+    expect(screen.getByText("What to bring")).toBeInTheDocument();
+    expect(
+      screen.getByText("Your code (printed or on your phone) within 30 days"),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Visit a Service Canada Centre with your code and your .*Passport\./,
+        "Your valid and original Canadian and International Passport",
       ),
     ).toBeInTheDocument();
   });
@@ -246,7 +253,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText("Your information")).toBeInTheDocument();
+    expect(screen.getByText("Check your information")).toBeInTheDocument();
     expect(screen.getByText("First name")).toBeInTheDocument();
     expect(screen.getByText("Last name")).toBeInTheDocument();
     expect(screen.getByText("Date of birth")).toBeInTheDocument();
@@ -258,6 +265,31 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });
 
+  it("renders the next steps for completing identity proofing", () => {
+    render(
+      <TestWrapper>
+        <ServiceCanadaCentreIDVCodePage />
+      </TestWrapper>,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Next steps" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Find a Service Canada Centre near you."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Bring your code and the original, valid ID you selected.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "A service agent will verify your identity. Then sign back in to your account to continue.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("falls back to the raw id type when it is not a known approved document key", () => {
     mockLocationState.idType = "Employee ID";
 
@@ -267,7 +299,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText("Your information")).toBeInTheDocument();
+    expect(screen.getByText("Check your information")).toBeInTheDocument();
     expect(screen.getByText("First name")).toBeInTheDocument();
     expect(screen.getByText("Last name")).toBeInTheDocument();
     expect(screen.getByText("Date of birth")).toBeInTheDocument();
@@ -285,7 +317,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       </TestWrapper>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Update information" }));
+    fireEvent.click(screen.getByRole("button", { name: "Update" }));
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/update/in-person/service-canada-centre",
@@ -310,7 +342,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     );
   });
 
-  it("renders print page button, calls window.print, and does not navigate", () => {
+  it("renders print page link, calls window.print, and does not navigate", () => {
     const printSpy = vi.spyOn(window, "print").mockImplementation(() => {});
 
     render(
@@ -319,10 +351,10 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       </TestWrapper>,
     );
 
-    const printButton = screen.getByRole("button", { name: "Print page" });
-    expect(printButton).toBeInTheDocument();
+    const printLink = screen.getByRole("link", { name: "Print page" });
+    expect(printLink).toBeInTheDocument();
 
-    fireEvent.click(printButton);
+    fireEvent.click(printLink);
     expect(printSpy).toHaveBeenCalledTimes(1);
     expect(mockNavigate).not.toHaveBeenCalled();
   });

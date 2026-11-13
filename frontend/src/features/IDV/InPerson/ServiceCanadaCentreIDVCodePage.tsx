@@ -1,16 +1,18 @@
 import {
   GcdsButton,
   GcdsHeading,
+  GcdsIcon,
   GcdsLink,
   GcdsText,
   GcdsContainer,
   GcdsGrid,
 } from "@gcds-core/components-react";
 
-import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 import { useUser } from "../../../components/Providers/useUser";
+import { authService } from "../../../services/authService";
 import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
 import {
   APPROVED_DOCUMENT_VALUES,
@@ -18,6 +20,7 @@ import {
 } from "../data/approvedDocuments";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+import "./css/ServiceCanadaCentreIDVCodePage.css";
 import "./css/ServiceCanadaCentreIDVCodePage.print.css";
 
 type ServiceCanadaCentreIDVCodePageLocationState = {
@@ -47,6 +50,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation("idv");
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const serviceCanadaCentrePage = path(PAGES.idvServiceCanadaCentrePage, {
     language,
@@ -80,9 +84,8 @@ export default function ServiceCanadaCentreIDVCodePage() {
     : null;
 
   const codeValidityText = formattedExpiryDate
-    ? t("ServiceCanadaCentreCode.codeValidDaysDynamic", {
+    ? t("ServiceCanadaCentreCode.codeExpiresOn", {
         expiryDate: formattedExpiryDate,
-        validityDays: verificationValidityDays ?? 30,
       })
     : t("ServiceCanadaCentreCode.codeValidDays", {
         validityDays: verificationValidityDays ?? 30,
@@ -90,6 +93,20 @@ export default function ServiceCanadaCentreIDVCodePage() {
 
   const handlePrintPage = () => {
     window.print();
+  };
+
+  const handleSignOut = async (event: Event) => {
+    event.preventDefault();
+    setIsSigningOut(true);
+
+    try {
+      const response = await authService.logout();
+      if (!response?.data?.redirect_url) {
+        window.location.href = "/";
+      }
+    } catch {
+      window.location.href = "/";
+    }
   };
 
   if (!DEV_ONLY_FEATURE) {
@@ -102,133 +119,177 @@ export default function ServiceCanadaCentreIDVCodePage() {
 
   return (
     <GcdsContainer role="main" className="service-canada-idv-code-page">
-      <GcdsGrid columns="1" gap="450">
-        <div className="service-canada-print-banner">
-          <img
-            src={governmentBannerImage}
-            alt={t("ServiceCanadaCentreCode.printBannerAlt")}
-            className="service-canada-print-banner-image"
-          />
-        </div>
+      <section className="service-canada-code-card">
+        <div className="service-canada-code-content">
+          <div className="service-canada-print-banner">
+            <img
+              src={governmentBannerImage}
+              alt={t("ServiceCanadaCentreCode.printBannerAlt")}
+              className="service-canada-print-banner-image"
+            />
+          </div>
 
-        <GcdsHeading tag="h1" marginTop="0">
-          {t("ServiceCanadaCentreCode.heading")}
-        </GcdsHeading>
-
-        <GcdsHeading tag="h2" marginBottom="0" marginTop="0">
-          <strong>{formattedIdvCode}</strong>
-        </GcdsHeading>
-        <GcdsContainer>
-          <GcdsText>
-            {codeValidityText} <strong>{email}</strong>.
-          </GcdsText>
-          <GcdsText marginBottom="0">
-            {t("ServiceCanadaCentreCode.visitInstruction", {
-              idSelected: idSelectedText,
-            })}
-          </GcdsText>
-        </GcdsContainer>
-
-        <GcdsContainer>
-          <GcdsHeading tag="h2" marginTop="0">
-            {t("ServiceCanadaCentreCode.yourInformationHeading")}
+          <GcdsHeading
+            tag="h1"
+            marginTop="0"
+            className="service-canada-code-title"
+          >
+            {t("ServiceCanadaCentreCode.heading")}
           </GcdsHeading>
 
-          <GcdsContainer>
+          <section
+            className="service-canada-code-notice"
+            aria-labelledby="service-canada-code-label"
+          >
+            <GcdsIcon
+              name="info-circle"
+              size="h4"
+              aria-hidden="true"
+              className="service-canada-code-info-icon"
+            />
+            <GcdsText id="service-canada-code-label" marginBottom="0">
+              <strong>{t("ServiceCanadaCentreCode.codeLabel")}</strong>
+            </GcdsText>
+            <GcdsHeading
+              tag="h2"
+              marginBottom="0"
+              marginTop="0"
+              className="service-canada-code-value"
+            >
+              {formattedIdvCode}
+            </GcdsHeading>
+            <GcdsText marginBottom="0">
+              {formattedExpiryDate ? (
+                <>
+                  Code expires <strong>{formattedExpiryDate}</strong> and has
+                  been emailed to <strong>{email}</strong>.
+                </>
+              ) : (
+                `${codeValidityText} `
+              )}
+              {!formattedExpiryDate && <strong>{email}</strong>}
+              {!formattedExpiryDate && "."}
+            </GcdsText>
+          </section>
+
+          <section className="service-canada-code-section">
+            <GcdsHeading
+              tag="h2"
+              marginTop="0"
+              className="service-canada-code-section-title"
+            >
+              {t("ServiceCanadaCentreCode.whatToBringHeading")}
+            </GcdsHeading>
+            <GcdsText marginBottom="0">
+              <ul>
+                <li>{t("ServiceCanadaCentreCode.whatToBringCode")}</li>
+                <li>
+                  {t("ServiceCanadaCentreCode.whatToBringId", {
+                    idSelected: idSelectedText,
+                  })}
+                </li>
+              </ul>
+            </GcdsText>
+            <GcdsButton
+              buttonRole="primary"
+              type="link"
+              size="small"
+              href="https://offices.service.canada.ca/en"
+              target="_blank"
+              rel="noreferrer"
+              className="service-canada-print-hide"
+            >
+              {t("ServiceCanadaCentreCode.findCentreButton")}
+            </GcdsButton>
+          </section>
+
+          <section className="service-canada-code-section">
+            <GcdsHeading
+              tag="h2"
+              marginTop="0"
+              className="service-canada-code-section-title"
+            >
+              {t("ServiceCanadaCentreCode.nextStepsHeading")}
+            </GcdsHeading>
+            <GcdsText marginBottom="0">
+              <ol>
+                <li>{t("ServiceCanadaCentreCode.nextStepsFindCentre")}</li>
+                <li>{t("ServiceCanadaCentreCode.nextStepsBringCodeAndId")}</li>
+                <li>
+                  {t("ServiceCanadaCentreCode.nextStepsAfterVerification")}
+                </li>
+              </ol>
+            </GcdsText>
+          </section>
+
+          <section className="service-canada-code-section">
+            <GcdsHeading
+              tag="h2"
+              marginTop="0"
+              marginBottom="0"
+              className="service-canada-code-section-title"
+            >
+              {t("ServiceCanadaCentreCode.yourInformationHeading")}
+            </GcdsHeading>
+            <GcdsText marginBottom="0">
+              {t("ServiceCanadaCentreCode.checkInformationHint")}
+            </GcdsText>
+
             <GcdsGrid columns="1" gap="150">
-              <div>
-                <GcdsText marginTop="0" marginBottom="0">
-                  <strong>{t("ServiceCanadaCentreCode.firstName")}</strong>
-                </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {firstName}
-                </GcdsText>
-              </div>
-
-              <div className="separator" style={{ margin: "0" }} />
-
-              <div>
-                <GcdsText marginTop="0" marginBottom="0">
-                  <strong>{t("ServiceCanadaCentreCode.lastName")}</strong>
-                </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {lastName}
-                </GcdsText>
-              </div>
-
-              <div className="separator" style={{ margin: "0" }} />
-
-              <div>
-                <GcdsText marginTop="0" marginBottom="0">
-                  <strong>{t("ServiceCanadaCentreCode.dateOfBirth")}</strong>
-                </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {dateOfBirth}
-                </GcdsText>
-              </div>
-
-              <div className="separator" style={{ margin: "0" }} />
-
-              <div>
-                <GcdsText marginTop="0" marginBottom="0">
-                  <strong>{t("ServiceCanadaCentreCode.idSelected")}</strong>
-                </GcdsText>
-                <GcdsText marginTop="200" marginBottom="0">
-                  {idSelectedText}
-                </GcdsText>
-              </div>
-
-              <div className="separator" style={{ margin: "0" }} />
-
-              <div
-                className="service-canada-print-hide"
-                style={{ marginTop: "1.5rem" }}
-              >
-                <GcdsGrid
-                  columns="1"
-                  columnsDesktop="max-content max-content"
-                  gap="200"
-                >
-                  <GcdsButton
-                    buttonRole="primary"
-                    type="button"
-                    onGcdsClick={handlePrintPage}
-                  >
-                    {t("ServiceCanadaCentreCode.printPageButton")}
-                  </GcdsButton>
-                  <GcdsButton
-                    buttonRole="secondary"
-                    type="button"
-                    onGcdsClick={(event) => {
-                      event.preventDefault();
-                      navigate(serviceCanadaCentrePage);
-                    }}
-                  >
-                    {t("ServiceCanadaCentreCode.updateInformationButton")}
-                  </GcdsButton>
-                </GcdsGrid>
-              </div>
+              {[
+                ["firstName", firstName],
+                ["lastName", lastName],
+                ["dateOfBirth", dateOfBirth],
+                ["idSelected", idSelectedText],
+              ].map(([label, value]) => (
+                <div className="service-canada-code-detail" key={label}>
+                  <GcdsText marginTop="0" marginBottom="0">
+                    <strong>{t(`ServiceCanadaCentreCode.${label}`)}</strong>
+                  </GcdsText>
+                  <GcdsText marginTop="200" marginBottom="0">
+                    {value}
+                  </GcdsText>
+                </div>
+              ))}
             </GcdsGrid>
-          </GcdsContainer>
-        </GcdsContainer>
 
-        <AccessibleNotice
-          noticeRole="info"
-          noticeTitleTag="h2"
-          noticeTitle={t("ServiceCanadaCentreCode.findNearestTitle")}
-        >
-          <GcdsText marginBottom="0">
-            {t("ServiceCanadaCentreCode.findNearestBody")}{" "}
-            {
-              //TODO: populate with real URL once available
-            }
-            <GcdsLink href="#" external style={{ textDecoration: "underline" }}>
-              {t("ServiceCanadaCentreCode.findNearestLink")}
-            </GcdsLink>
-            .
-          </GcdsText>
-        </AccessibleNotice>
-      </GcdsGrid>
+            <div className="service-canada-code-actions service-canada-print-hide">
+              <GcdsButton
+                buttonRole="secondary"
+                size="small"
+                type="button"
+                className="service-canada-small-button"
+                onGcdsClick={(event) => {
+                  event.preventDefault();
+                  navigate(serviceCanadaCentrePage);
+                }}
+              >
+                {t("ServiceCanadaCentreCode.updateButton")}
+              </GcdsButton>
+              <GcdsLink
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handlePrintPage();
+                }}
+              >
+                {t("ServiceCanadaCentreCode.printPageButton")}
+              </GcdsLink>
+            </div>
+
+            <GcdsButton
+              buttonRole="danger"
+              size="small"
+              type="button"
+              disabled={isSigningOut}
+              onGcdsClick={handleSignOut}
+              className="service-canada-small-button service-canada-print-hide"
+            >
+              {t("ServiceCanadaCentreCode.signOut")}
+            </GcdsButton>
+          </section>
+        </div>
+      </section>
     </GcdsContainer>
   );
 }

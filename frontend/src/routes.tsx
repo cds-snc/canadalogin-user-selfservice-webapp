@@ -22,6 +22,7 @@ import EditEmailAddressPage from "./features/EmailAddress/EditEmailAddressPage";
 import AddFIDO2PasskeyPage from "./features/ManageFIDO2/components/AddFIDO2Passkey/AddFIDO2PasskeyPage";
 import DeleteFIDO2PasskeyPage from "./features/ManageFIDO2/components/DeleteFIDO2Passkey/DeleteFIDO2PasskeyPage";
 import ServiceCanadaCentrePage from "./features/IDV/InPerson/ServiceCanadaCentrePage";
+import ServiceCanadaCentreIdDetailsPage from "./features/IDV/InPerson/ServiceCanadaCentreIdDetailsPage";
 import ServiceCanadaCentreIDVCodePage from "./features/IDV/InPerson/ServiceCanadaCentreIDVCodePage";
 import VisitCanadaPost from "./features/IDV/InPerson/VisitCanadaPostPage";
 import CanadaPostIdDetailsPage from "./features/IDV/InPerson/CanadaPostIdDetailsPage";
@@ -206,6 +207,13 @@ export const appRoutes: RouteObject[] = [
                           path: "in-person/service-canada-centre",
                           element: <ServiceCanadaCentrePage />,
                           handle: { id: PAGES.idvServiceCanadaCentrePage },
+                        },
+                        {
+                          path: "in-person/service-canada-centre/id-details",
+                          element: <ServiceCanadaCentreIdDetailsPage />,
+                          handle: {
+                            id: PAGES.idvServiceCanadaCentreIdDetailsPage,
+                          },
                         },
                         {
                           path: "in-person/service-canada-centre/idv-code",
