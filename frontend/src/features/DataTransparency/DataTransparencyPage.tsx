@@ -47,8 +47,12 @@ export default function DataTransparencyPage() {
   const backToProfilePage = path(PAGES.ProfileHome, { language });
 
   const handleContinue = () => {
-    if (hasRelyingParty) {
-      window.location.href = relyingPartyUrl || "/";
+    if (hasRelyingParty && relyingPartyUrl) {
+      const redirectUrl = new URL(
+        "/terms",
+        new URL(relyingPartyUrl, window.location.href),
+      );
+      window.location.href = redirectUrl.href;
     } else {
       navigate(backToProfilePage);
     }
