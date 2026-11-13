@@ -67,21 +67,16 @@ afterEach(() => {
 
 describe("DataTransparencyPage RP redirect", () => {
   it.each([
-    [
-      "https://rp.example/callback",
-      "https://rp.example/callback?verified=true",
-    ],
+    ["https://rp.example", "https://rp.example/terms"],
+    ["https://rp.example/", "https://rp.example/terms"],
+    ["https://rp.example/callback", "https://rp.example/terms"],
     [
       "https://rp.example/callback?state=abc#details",
-      "https://rp.example/callback?state=abc&verified=true#details",
+      "https://rp.example/terms",
     ],
-    [
-      "https://rp.example/callback?verified=false",
-      "https://rp.example/callback?verified=true",
-    ],
-    ["/callback", "https://login.example/callback?verified=true"],
-    ["", "https://login.example/?verified=true"],
-  ])("adds verified=true to %s", (url, expected) => {
+    ["https://rp.example/callback?verified=false", "https://rp.example/terms"],
+    ["/callback", "https://login.example/terms"],
+  ])("redirects %s to the RP terms page", (url, expected) => {
     mocks.relyingParty.relyingPartyUrl = url;
     render(<DataTransparencyPage />);
 
@@ -91,15 +86,23 @@ describe("DataTransparencyPage RP redirect", () => {
     expect(mocks.navigate).not.toHaveBeenCalled();
   });
 
-  it("returns to the profile without an RP", () => {
-    mocks.relyingParty.hasRelyingParty = false;
-    render(<DataTransparencyPage />);
+  it.each([
+    [false, "https://rp.example/callback"],
+    [true, ""],
+    [true, undefined],
+  ])(
+    "returns to the profile with hasRelyingParty=%s and URL=%s",
+    (hasRP, url) => {
+      mocks.relyingParty.hasRelyingParty = hasRP;
+      mocks.relyingParty.relyingPartyUrl = url;
+      render(<DataTransparencyPage />);
 
-    fireEvent.click(screen.getByRole("button"));
+      fireEvent.click(screen.getByRole("button"));
 
-    expect(mocks.navigate).toHaveBeenCalledWith("/en/profile");
-    expect(window.location.href).toBe(
-      "https://login.example/en/data-transparency",
-    );
-  });
+      expect(mocks.navigate).toHaveBeenCalledWith("/en/profile");
+      expect(window.location.href).toBe(
+        "https://login.example/en/data-transparency",
+      );
+    },
+  );
 });
