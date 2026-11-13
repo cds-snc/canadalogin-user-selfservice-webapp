@@ -153,9 +153,11 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(
       screen.getByText("Canadian and international accepted"),
     ).toBeInTheDocument();
-    expect(screen.getByText("Only valid for Quebec")).toBeInTheDocument();
     expect(
-      screen.getByText("Only valid for BC and Alberta"),
+      screen.getByText("Only valid for Quebec and British Columbia"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Only valid for Alberta and British Columbia"),
     ).toBeInTheDocument();
     expect(
       screen.getByLabelText("I don't have any of those IDs"),
@@ -277,12 +279,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     );
   });
 
-  it.each([
-    "PASSPORT",
-    "PERMANENT_RESIDENT_CARD",
-    "INDIAN_STATUS_CARD",
-    "PROVINCIAL_HEALTH_CARD",
-  ])(
+  it.each(["PASSPORT", "PERMANENT_RESIDENT_CARD", "PROVINCIAL_HEALTH_CARD"])(
     "shows proof of address for a single %s option requiring proof",
     async (key) => {
       const document = { ...PASSPORT, key };
@@ -300,6 +297,22 @@ describe("VisitCanadaPost (Select your ID)", () => {
       );
     },
   );
+
+  it("requires proof of address for the Secure Certificate of Indian Status when the API requires it", async () => {
+    const document = { ...PASSPORT, key: "INDIAN_STATUS_CARD" };
+    mockGetIdentityDocuments.mockResolvedValue([document]);
+    render(<VisitCanadaPost />);
+
+    fireEvent.click(screen.getByDisplayValue("INDIAN_STATUS_CARD"));
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "/en/identity-verification/start/in-person/canada-post/proof-of-address",
+        { state: { document } },
+      ),
+    );
+  });
 
   it.each([
     ["all options require proof", [true, true], "proof-of-address"],

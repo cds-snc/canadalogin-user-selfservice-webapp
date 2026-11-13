@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.39.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.39.1...v1.39.2) (2026-11-12)
+
+
+### Code Refactoring
+
+* update the idv route to include the test environment ([#2532](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2532)) ([9c40a5a](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/9c40a5ad3681b75f50b9c9e672eaa10e6c5a9513))
+
+## [1.39.1](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.39.0...v1.39.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* **frontend:** aria-describedby attribute on the password input element ([#2515](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2515)) ([ffcf92f](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/ffcf92f1e5ff7af2ada7a341ad4bca77a4702fa2))
+* **frontend:** update SuccessfullyUpdated component to switch onNext and onCancel handlers ([#2518](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2518)) ([49ed9f9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/49ed9f9d9c5fd68a60d759bfee69208f92b2d03e))
+
+
+### Code Refactoring
+
+* DEV Feature in TEST environment ([#2520](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2520)) ([6ddb8a9](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/6ddb8a9e1b8fd00f9bb7707f46dedb8807b9400d))
+
 ## [1.39.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.38.0...v1.39.0) (2026-11-10)
 
 

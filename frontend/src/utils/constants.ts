@@ -263,7 +263,9 @@ export const VITE_ENVIRONMENTS = {
   prod: "prod",
 } as const;
 
-export const DEV_ONLY_FEATURE = config.environment === VITE_ENVIRONMENTS.dev;
+export const DEV_ONLY_FEATURE =
+  config.environment === VITE_ENVIRONMENTS.dev ||
+  config.environment === VITE_ENVIRONMENTS.test; // Temporarily enable DEV-only features in the TEST environment. Going forward, IDV feature will be controlled using group feature flags.
 
 export const NON_PROD_ENVIRONMENT =
   config.environment === VITE_ENVIRONMENTS.dev ||

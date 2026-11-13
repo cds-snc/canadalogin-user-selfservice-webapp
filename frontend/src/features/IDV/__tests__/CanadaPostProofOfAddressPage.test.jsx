@@ -1,11 +1,15 @@
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import CanadaPostProofOfAddressPage from "../InPerson/CanadaPostProofOfAddressPage";
 
 const mockNavigate = vi.fn();
-const mockLocation = { state: null };
-const mockFlags = vi.hoisted(() => ({ devOnlyFeature: true }));
+const mockLocation = {
+  state: {
+    document: { key: "PERMANENT_RESIDENT_CARD", options: [] },
+    formData: { firstName: "Jane", lastName: "Doe" },
+  },
+};
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -17,16 +21,6 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("../../../utils/constants", async () => {
-  const actual = await vi.importActual("../../../utils/constants");
-  return {
-    ...actual,
-    get DEV_ONLY_FEATURE() {
-      return mockFlags.devOnlyFeature;
-    },
-  };
-});
-
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
@@ -35,7 +29,31 @@ vi.mock("@gcds-core/components-react", () => ({
     return <Tag {...props}>{children}</Tag>;
   },
   GcdsText: ({ children, ...props }) => <div {...props}>{children}</div>,
-  GcdsIcon: ({ name, ...props }) => <span data-icon={name} {...props} />,
+  GcdsSelect: ({
+    selectId,
+    label,
+    hint,
+    value,
+    defaultValue,
+    children,
+    errorMessage,
+    onGcdsChange,
+  }) => (
+    <div>
+      <label htmlFor={selectId}>{label}</label>
+      {hint ? <span>{hint}</span> : null}
+      <select
+        id={selectId}
+        data-testid={selectId}
+        value={value}
+        onChange={(event) => onGcdsChange?.(event)}
+      >
+        <option value="">{defaultValue}</option>
+        {children}
+      </select>
+      {errorMessage ? <span>{errorMessage}</span> : null}
+    </div>
+  ),
   GcdsButton: ({ children, buttonRole, onGcdsClick }) => (
     <button
       data-testid={
@@ -51,11 +69,13 @@ vi.mock("@gcds-core/components-react", () => ({
 describe("CanadaPostProofOfAddressPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFlags.devOnlyFeature = true;
-    mockLocation.state = null;
+    mockLocation.state = {
+      document: { key: "PERMANENT_RESIDENT_CARD", options: [] },
+      formData: { firstName: "Jane", lastName: "Doe" },
+    };
   });
 
-  it("renders the heading, intro and every document group", () => {
+  it("renders the proof-of-address selector and its options", () => {
     render(<CanadaPostProofOfAddressPage />);
 
     expect(
@@ -65,78 +85,64 @@ describe("CanadaPostProofOfAddressPage", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Since the ID you selected does not have an address/),
-    ).toBeInTheDocument();
-    [
-      "Government ID with address",
-      "Financial",
-      "Bills & Housing",
-      "Government Benefits",
-      "Other",
-    ].forEach((title) => {
-      expect(screen.getByText(title).tagName).toBe("STRONG");
-    });
-    expect(screen.getAllByRole("listitem")).toHaveLength(18);
-    expect(
-      within(screen.getAllByRole("list")[0]).getByText(
-        "Provincial/Territorial Photo ID/Service card",
+      screen.getByText(
+        "Since the ID you selected does not have an address on it, you will need to bring one of the documents listed below:",
       ),
     ).toBeInTheDocument();
-  });
-
-  it("warns users to bring one of the listed proof-of-address documents", () => {
-    render(<CanadaPostProofOfAddressPage />);
-
-    const warningSection = screen.getByRole("region", {
-      name: "You must bring a proof of address",
-    });
-    expect(warningSection).toHaveClass("canada-post-proof-warning");
-    expect(warningSection).toHaveTextContent(
-      "Only continue if you have one of the documents listed above. Otherwise, you will not be able to prove your identity.",
-    );
     expect(
-      warningSection.querySelector('[data-icon="warning-triangle"]'),
+      screen.getByLabelText("Select your proof of address (required)"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("The document must reflect your current address"),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole("option")).toHaveLength(19);
+    expect(
+      screen.getByRole("option", {
+        name: "Old Age Security (T4A) or CPP benefits (T4AP) statement",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "I don’t have any of these" }),
     ).toBeInTheDocument();
   });
 
-  it("does nothing on continue and goes back with the back button", () => {
+  it("requires a proof-of-address option before continuing", () => {
     render(<CanadaPostProofOfAddressPage />);
 
     fireEvent.click(screen.getByTestId("continue-button"));
-    expect(mockNavigate).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByTestId("back-button"));
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    expect(
+      screen.getByText("Select an option to continue."),
+    ).toBeInTheDocument();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("continues to ID details with the selected document and acknowledgement", () => {
-    const document = { key: "PERMANENT_RESIDENT_CARD", options: [] };
-    const formData = {
-      idExpiryDate: "2099-01-01",
-      documentOptionId: "30",
-      country: "",
-      province: "ON",
-      firstName: "Jane",
-      lastName: "Doe",
-      dateOfBirth: "1990-05-15",
-      address: "123 Main St",
-      cityTown: "Ottawa",
-      postalCode: "K1A 0B1",
-    };
-    mockLocation.state = { document, formData };
+  it("continues to ID details with the selected proof and acknowledgement", () => {
     render(<CanadaPostProofOfAddressPage />);
 
+    fireEvent.change(screen.getByTestId("proof-of-address-select"), {
+      target: { value: "Bank or credit card statement" },
+    });
     fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/start/in-person/canada-post/id-details",
       {
         state: {
-          document,
-          formData,
+          document: mockLocation.state.document,
+          formData: mockLocation.state.formData,
           proofOfAddressAcknowledged: true,
+          proofOfAddress: "Bank or credit card statement",
         },
       },
     );
+  });
+
+  it("goes back to the previous screen", () => {
+    render(<CanadaPostProofOfAddressPage />);
+
+    fireEvent.click(screen.getByTestId("back-button"));
+
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 });
