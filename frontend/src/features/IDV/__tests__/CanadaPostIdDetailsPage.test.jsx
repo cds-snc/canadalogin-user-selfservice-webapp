@@ -349,6 +349,38 @@ describe("CanadaPostIdDetailsPage", () => {
     expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
   });
 
+  it("requires proof of address for the Secure Certificate of Indian Status when the API requires it", () => {
+    const indianStatusCard = { ...PR_CARD, key: "INDIAN_STATUS_CARD" };
+    renderPage(indianStatusCard);
+    fillCommonFields();
+    change("select-document-option", "30");
+    change("select-province", "ON");
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/start/in-person/canada-post/proof-of-address",
+      {
+        state: {
+          document: indianStatusCard,
+          formData: {
+            idExpiryDate: "2099-01-01",
+            documentOptionId: "30",
+            country: "",
+            province: "ON",
+            firstName: "Jane",
+            lastName: "Doe",
+            dateOfBirth: "1990-05-15",
+            address: "123 Main St",
+            cityTown: "Ottawa",
+            postalCode: "K1A 0B1",
+          },
+        },
+      },
+    );
+    expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
+  });
+
   it("creates a case and navigates to the barcode when proof of address is not required", async () => {
     renderPage(DRIVERS_LICENCE);
     fillCommonFields();
