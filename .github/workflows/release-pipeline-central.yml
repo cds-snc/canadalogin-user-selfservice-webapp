@@ -36,7 +36,7 @@ permissions:
 
 jobs:
   release:
-    uses: cds-snc/canadalogin-release-pipeline/.github/workflows/release__release-pipeline.yml@4bdc2bfa86b44e6e3df1d86e8c49992160e49f32 # v2.0.0 + ECS metadata fix
+    uses: cds-snc/canadalogin-release-pipeline/.github/workflows/release__release-pipeline.yml@26f5e7a3d500cc7c5ca89ad7ac651072e10c6578 # v2.0.0 + ECS metadata fix
     with:
       environment: ${{ inputs.environment || 'dev' }}
       rebuild: ${{ inputs.rebuild || false }}
