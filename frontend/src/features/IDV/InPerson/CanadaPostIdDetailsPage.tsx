@@ -78,6 +78,7 @@ export interface CanadaPostIdDetailsLocationState {
   document?: IdentityDocument;
   formData?: CanadaPostIdDetailsFormData;
   proofOfAddressAcknowledged?: boolean;
+  proofOfAddress?: string;
 }
 
 export default function CanadaPostIdDetailsPage() {

@@ -258,6 +258,30 @@ describe("Password Component", () => {
         expect(screen.getByText("/ 12", { exact: false })).toBeInTheDocument();
       });
     });
+
+    it("associates the password field with a live character counter", async () => {
+      renderComponent();
+
+      const passwordInput = screen.getByTestId("password-input");
+      const counter = document.getElementById("password-length-counter");
+
+      expect(counter).toBeInTheDocument();
+      expect(counter).toHaveAttribute("id", "password-length-counter");
+      expect(counter).toHaveAttribute("role", "status");
+      expect(counter).toHaveAttribute("aria-live", "polite");
+      expect(passwordInput).toHaveAttribute(
+        "aria-describedby",
+        "password-length-counter",
+      );
+
+      fireEvent.change(passwordInput, {
+        target: { value: "test123456789" },
+      });
+
+      await waitFor(() => {
+        expect(counter).toHaveTextContent("13");
+      });
+    });
   });
 
   describe("Password Input", () => {
