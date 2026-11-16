@@ -59,22 +59,6 @@ export default function InPersonProofingInProgress() {
     navigate(startIdentityProofingPage);
   };
 
-  const handleResendEmail = async () => {
-    const response =
-      await inPersonIdentityVerificationApi.resendInPersonVerificationCode();
-
-    if (!response?.success) {
-      return;
-    }
-
-    const sentAt = response.sentAt;
-    const parsedSentAt = sentAt ? new Date(sentAt) : null;
-
-    if (parsedSentAt && !Number.isNaN(parsedSentAt.getTime())) {
-      setSendEmailDate(formatDisplayDate(parsedSentAt, i18n.language));
-    }
-  };
-
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
@@ -124,16 +108,6 @@ export default function InPersonProofingInProgress() {
             }}
           >
             {t("InPersonProofingInProgress.resetButton")}
-          </GcdsButton>
-          <GcdsButton
-            type="button"
-            buttonRole="secondary"
-            onGcdsClick={(event: Event) => {
-              event.preventDefault();
-              handleResendEmail();
-            }}
-          >
-            {t("InPersonProofingInProgress.resendButton")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>

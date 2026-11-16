@@ -145,25 +145,4 @@ export const inPersonIdentityVerificationApi = {
       handleApiError(error as ApiErrorLike);
     }
   },
-
-  /**
-   * Resends the in-person verification code without requiring full applicant data.
-   */
-  resendInPersonVerificationCode: async () => {
-    try {
-      const response = await axios.post(
-        `${config.apiUrl}/v1/identity-verification/in-person/resend-verification-code`,
-      );
-
-      const responseData = response.data as LastEmailSentResponse;
-
-      return {
-        success: responseData.success,
-        message: responseData.message,
-        sentAt: responseData.data?.last_email_sent,
-      };
-    } catch (error) {
-      handleApiError(error as ApiErrorLike);
-    }
-  },
 };

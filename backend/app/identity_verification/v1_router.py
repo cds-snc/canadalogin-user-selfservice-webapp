@@ -129,23 +129,6 @@ async def get_in_person_last_email_sent(
     )
 
 
-@router.post(
-    "/in-person/resend-verification-code",
-    response_model=ResponseModel,
-    status_code=status.HTTP_200_OK,
-    tags=["Identity Verification"],
-    summary="Resend in-person verification code",
-    description="Resends the in-person verification code to the user's email without requiring full applicant data.",
-)
-async def resend_in_person_verification_code(
-    request: Request,
-    user_access_token: str = Depends(get_users_current_session),
-):
-    return await get_last_email_sent(
-        request.app.state.request_client, user_access_token
-    )
-
-
 @router.get(
     "/identity-documents",
     response_model=ResponseModel,

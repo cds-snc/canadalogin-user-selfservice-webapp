@@ -3,6 +3,7 @@ import axios from "axios";
 import {
   inPersonIdentityVerificationApi,
   type InPersonVerificationCodeResponse,
+  type SendInPersonVerificationCodeRequest,
 } from "../inPersonIdentityVerificationApi";
 import { handleApiError } from "../../../../utils/apiErrorHandler";
 
@@ -29,7 +30,7 @@ describe("inPersonIdentityVerificationApi", () => {
     expect(mockedAxios.defaults.withCredentials).toBe(true);
   });
 
-  it.skip("calls POST /v1/identity-verification/in-person and maps generated verification fields", async () => {
+  it("calls POST /v1/identity-verification/in-person and maps generated verification fields", async () => {
     mockedAxios.post.mockResolvedValue({
       data: {
         success: true,
@@ -43,12 +44,32 @@ describe("inPersonIdentityVerificationApi", () => {
       },
     });
 
+    const payload: SendInPersonVerificationCodeRequest = {
+      applicant: {
+        firstName: "John",
+        lastName: "Doe",
+        dateOfBirth: "1990-01-01",
+      },
+    };
+
     const result =
-      (await inPersonIdentityVerificationApi.sendInPersonVerificationCode()) as InPersonVerificationCodeResponse;
+      (await inPersonIdentityVerificationApi.sendInPersonVerificationCode(
+        payload,
+      )) as InPersonVerificationCodeResponse;
 
     expect(mockedAxios.post).toHaveBeenCalledWith(
       "http://localhost:8000/v1/identity-verification/in-person",
-      {},
+      {
+        verification_provider: "service_canada",
+        applicant: {
+          first_name: "John",
+          last_name: "Doe",
+          date_of_birth: "1990-01-01",
+          address: undefined,
+          id_type: undefined,
+          id_expiry_date: undefined,
+        },
+      },
     );
     expect(result).toEqual({
       success: true,
@@ -150,12 +171,17 @@ describe("inPersonIdentityVerificationApi", () => {
     });
   });
 
-  it.skip("calls handleApiError and returns undefined when request fails", async () => {
+  it("calls handleApiError and returns undefined when request fails", async () => {
     const error = new Error("Network Error");
     mockedAxios.post.mockRejectedValue(error);
 
-    const result =
-      await inPersonIdentityVerificationApi.sendInPersonVerificationCode();
+    const result = await inPersonIdentityVerificationApi.sendInPersonVerificationCode({
+      applicant: {
+        firstName: "John",
+        lastName: "Doe",
+        dateOfBirth: "1990-01-01",
+      },
+    });
 
     expect(handleApiError).toHaveBeenCalledWith(error);
     expect(result).toBeUndefined();
