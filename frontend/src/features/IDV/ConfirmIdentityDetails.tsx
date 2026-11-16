@@ -22,13 +22,15 @@ import {
 import VerifiedBadge from "../../components/Badges/VerifiedBadge";
 import { mockIdentityClaims } from "./data/mockIdentityClaims";
 
-type VerificationMethod = "bluink" | "provincial" | "canada_post" | "service_canada";
+type VerificationMethod =
+  "bluink" | "provincial" | "canada_post" | "service_canada";
 
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const isMockProofing = DEV_ONLY_FEATURE && state?.mockProofing === true;
-  const verificationMethod = state?.verificationMethod as VerificationMethod | null;
+  const verificationMethod =
+    state?.verificationMethod as VerificationMethod | null;
   const { t, i18n } = useTranslation(["idv", "profile"]);
   const { language, journeyType } = useParams();
   const { relyingPartyName, hasRelyingParty } = useRelyingPartyInfo();
@@ -77,7 +79,10 @@ export default function ConfirmIdentityDetails() {
       case "canada_post":
         return t("IDVInProgress.methodCanadaPost", "Canada Post verification");
       case "service_canada":
-        return t("IDVInProgress.methodServiceCanada", "Service Canada Centre verification");
+        return t(
+          "IDVInProgress.methodServiceCanada",
+          "Service Canada Centre verification",
+        );
       default:
         return t("IDVInProgress.methodUnknown", "Identity verification");
     }
@@ -122,7 +127,9 @@ export default function ConfirmIdentityDetails() {
             <GcdsText>
               {t(successNoticeDescriptionKey).replace(
                 "[proofing method]",
-                verificationMethod ? getMethodDisplayName(verificationMethod) : "[proofing method]"
+                verificationMethod
+                  ? getMethodDisplayName(verificationMethod)
+                  : "[proofing method]",
               )}
             </GcdsText>
           </AccessibleNotice>

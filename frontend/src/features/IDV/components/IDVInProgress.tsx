@@ -12,7 +12,8 @@ import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 
-type VerificationMethod = "bluink" | "provincial" | "canada_post" | "service_canada";
+type VerificationMethod =
+  "bluink" | "provincial" | "canada_post" | "service_canada";
 
 export default function IDVInProgress() {
   const navigate = useNavigate();
@@ -20,7 +21,9 @@ export default function IDVInProgress() {
   const [searchParams] = useSearchParams();
   const { t } = useTranslation("idv");
 
-  const verificationMethod = searchParams.get("method") as VerificationMethod | null;
+  const verificationMethod = searchParams.get(
+    "method",
+  ) as VerificationMethod | null;
 
   const detailsConfirmationPage = path(PAGES.idvDetailsConfirmationPage, {
     language,
@@ -56,7 +59,11 @@ export default function IDVInProgress() {
           </GcdsText>
         </AccessibleNotice>
 
-        <GcdsGrid columns="1" columnsDesktop="max-content max-content" gap="200">
+        <GcdsGrid
+          columns="1"
+          columnsDesktop="max-content max-content"
+          gap="200"
+        >
           <GcdsButton
             type="button"
             buttonRole="primary"

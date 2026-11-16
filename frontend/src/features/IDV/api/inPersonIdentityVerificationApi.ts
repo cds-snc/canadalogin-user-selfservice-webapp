@@ -67,17 +67,20 @@ export const inPersonIdentityVerificationApi = {
   ) => {
     try {
       if (!payload) {
-        throw new Error("Payload is required for sending in-person verification code");
+        throw new Error(
+          "Payload is required for sending in-person verification code",
+        );
       }
 
       if (!payload.applicant) {
-        throw new Error("Applicant data is required for sending in-person verification code");
+        throw new Error(
+          "Applicant data is required for sending in-person verification code",
+        );
       }
 
       const requestBody = {
         required_by_rp_client_id: payload.requiredByRpClientId,
-        verification_provider:
-          payload.verificationProvider ?? "service_canada",
+        verification_provider: payload.verificationProvider ?? "service_canada",
         applicant: {
           first_name: payload.applicant.firstName,
           last_name: payload.applicant.lastName,

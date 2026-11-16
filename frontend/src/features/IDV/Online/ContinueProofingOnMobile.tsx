@@ -106,11 +106,7 @@ export default function ContinueProofingOnMobile() {
         </GcdsButton>
       </div>
       <GcdsGrid columns="1" columnsDesktop="max-content max-content" gap="200">
-        <GcdsButton
-          type="button"
-          buttonRole="primary"
-          onClick={handleNextStep}
-        >
+        <GcdsButton type="button" buttonRole="primary" onClick={handleNextStep}>
           {t("ContinueProofingOnMobile.nextStepButton")}
         </GcdsButton>
       </GcdsGrid>

@@ -94,10 +94,7 @@ export default function PartnerLinkSuccessPage() {
         </GcdsContainer>
 
         <GcdsGrid columns="max-content" gap="200">
-          <GcdsButton
-            type="button"
-            onClick={handleContinue}
-          >
+          <GcdsButton type="button" onClick={handleContinue}>
             {t("PartnerLinkSuccess.continueButton")}
           </GcdsButton>
         </GcdsGrid>

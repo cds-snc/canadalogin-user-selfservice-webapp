@@ -249,7 +249,11 @@ export default function ProofingBarcodeCanadaPostPage() {
           </GcdsText>
         </AccessibleNotice>
 
-        <GcdsGrid columns="1" columnsDesktop="max-content max-content" gap="200">
+        <GcdsGrid
+          columns="1"
+          columnsDesktop="max-content max-content"
+          gap="200"
+        >
           <GcdsButton
             buttonRole="primary"
             type="button"
