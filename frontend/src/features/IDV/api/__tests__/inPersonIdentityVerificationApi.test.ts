@@ -175,13 +175,14 @@ describe("inPersonIdentityVerificationApi", () => {
     const error = new Error("Network Error");
     mockedAxios.post.mockRejectedValue(error);
 
-    const result = await inPersonIdentityVerificationApi.sendInPersonVerificationCode({
-      applicant: {
-        firstName: "John",
-        lastName: "Doe",
-        dateOfBirth: "1990-01-01",
-      },
-    });
+    const result =
+      await inPersonIdentityVerificationApi.sendInPersonVerificationCode({
+        applicant: {
+          firstName: "John",
+          lastName: "Doe",
+          dateOfBirth: "1990-01-01",
+        },
+      });
 
     expect(handleApiError).toHaveBeenCalledWith(error);
     expect(result).toBeUndefined();
