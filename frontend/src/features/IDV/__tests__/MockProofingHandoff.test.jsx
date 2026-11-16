@@ -228,7 +228,7 @@ describe("ContinueProofingOnMobile", () => {
       screen.getByRole("button", { name: "Choose a different method" }),
     );
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/en/identity-verification/required/ProveIdentityOnlinePage",
+      "/en/identity-verification/required/IdvProveIdentityOnlinePage",
     );
   });
 
