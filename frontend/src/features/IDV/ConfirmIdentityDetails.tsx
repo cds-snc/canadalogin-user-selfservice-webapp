@@ -33,7 +33,7 @@ export default function ConfirmIdentityDetails() {
     state?.verificationMethod as VerificationMethod | null;
   const { t, i18n } = useTranslation(["idv", "profile"]);
   const { language, journeyType } = useParams();
-  const { relyingPartyName, hasRelyingParty } = useRelyingPartyInfo();
+  const { hasRelyingParty } = useRelyingPartyInfo();
 
   const [identityVerificationClaims, setIdentityVerificationClaims] =
     useState<IdentityVerificationClaimsResponse>();

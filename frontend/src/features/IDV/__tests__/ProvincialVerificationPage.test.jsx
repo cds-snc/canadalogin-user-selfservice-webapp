@@ -61,8 +61,8 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </button>
   ),
-  GcdsCard: ({ children, cardTitle, href, imgSrc, imgAlt }) => (
-    <div data-testid="gcds-card">
+  GcdsCard: ({ children, cardTitle, href, onClick, imgSrc, imgAlt }) => (
+    <div data-testid="gcds-card" onClick={onClick}>
       <a href={href}>
         <h3>{cardTitle}</h3>
       </a>

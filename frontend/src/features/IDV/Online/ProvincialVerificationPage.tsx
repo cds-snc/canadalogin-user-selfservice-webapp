@@ -28,6 +28,11 @@ export default function ProvincialVerificationPage() {
   const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
 
+  const inProgressPage = path(PAGES.idvInProgressIDVPage, {
+    language,
+    journeyType,
+  });
+
   const buildPartnerLoginHref = (
     partnerId: (typeof PROVINCIAL_PARTNERS)[keyof typeof PROVINCIAL_PARTNERS],
   ) => {
@@ -52,9 +57,18 @@ export default function ProvincialVerificationPage() {
     return url.toString();
   };
 
-  const bcPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.bc);
-  const abPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.ab);
-  const quebecPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.qc);
+  const handleCardClick = (method: string) => {
+    navigate(inProgressPage, {
+      state: {
+        mockProofing: true,
+        verificationMethod: method,
+      },
+    });
+  };
+
+  const bcPartnerLoginHref = DEV_ONLY_FEATURE ? undefined : buildPartnerLoginHref(PROVINCIAL_PARTNERS.bc);
+  const abPartnerLoginHref = DEV_ONLY_FEATURE ? undefined : buildPartnerLoginHref(PROVINCIAL_PARTNERS.ab);
+  const quebecPartnerLoginHref = DEV_ONLY_FEATURE ? undefined : buildPartnerLoginHref(PROVINCIAL_PARTNERS.qc);
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
@@ -86,6 +100,7 @@ export default function ProvincialVerificationPage() {
           cardTitle={t("ProvincialVerification.bcServicesCard")}
           cardTitleTag="h3"
           href={bcPartnerLoginHref}
+          onClick={() => handleCardClick("provincial")}
           imgSrc={imgBcServicesCard}
           imgAlt="British Columbia Logo"
         ></GcdsCard>
@@ -93,6 +108,7 @@ export default function ProvincialVerificationPage() {
           cardTitle={t("ProvincialVerification.albertaAccount")}
           cardTitleTag="h3"
           href={abPartnerLoginHref}
+          onClick={() => handleCardClick("provincial")}
           imgSrc={imgAlbertaAccount}
           imgAlt="Alberta Logo"
         ></GcdsCard>
@@ -100,6 +116,7 @@ export default function ProvincialVerificationPage() {
           cardTitle={t("ProvincialVerification.quebecAccount")}
           cardTitleTag="h3"
           href={quebecPartnerLoginHref}
+          onClick={() => handleCardClick("provincial")}
           imgSrc={imgQuebecAccount}
           imgAlt="Québec Logo"
         ></GcdsCard>
