@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { QRCodeSVG } from "qrcode.react";
@@ -13,7 +12,6 @@ import {
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import { mockIdentityClaims } from "../data/mockIdentityClaims";
 import "./ContinueProofingOnMobile.css";
 
 const DUMMY_PROOFING_LINK = "canadalogin.ca/prove/daUf30fn2/";
@@ -23,7 +21,6 @@ export default function ContinueProofingOnMobile() {
   const { language, journeyType } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
-  const [error, setError] = useState("");
 
   if (!DEV_ONLY_FEATURE) {
     return null;
@@ -32,11 +29,27 @@ export default function ContinueProofingOnMobile() {
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(DUMMY_PROOFING_URL);
-      setError("");
     } catch (error) {
       console.error("Unable to copy mock handoff link:", error);
-      setError("ContinueProofingOnMobile.copyError");
     }
+  };
+
+  const handleNextStep = () => {
+    navigate(
+      path(PAGES.idvInProgressIDVPage, {
+        language,
+        journeyType,
+      }) + "?method=bluink",
+    );
+  };
+
+  const handleChooseDifferentMethod = () => {
+    navigate(
+      path(PAGES.idvProveIdentityOnlinePage, {
+        language,
+        journeyType,
+      }),
+    );
   };
 
   return (
@@ -52,12 +65,6 @@ export default function ContinueProofingOnMobile() {
       >
         <GcdsText>{t("ContinueProofingOnMobile.returnHere")}</GcdsText>
       </AccessibleNotice>
-
-      {error && (
-        <div role="alert">
-          <GcdsText>{t(error)}</GcdsText>
-        </div>
-      )}
 
       <GcdsHeading tag="h2">
         {t("ContinueProofingOnMobile.scanInstruction")}
@@ -93,20 +100,7 @@ export default function ContinueProofingOnMobile() {
         <GcdsButton
           type="button"
           buttonRole="secondary"
-          onClick={() => {
-            navigate(
-              path(PAGES.idvDetailsConfirmationPage, {
-                language,
-                journeyType,
-              }),
-              {
-                state: {
-                  mockProofing: true,
-                  mockIdentityClaims,
-                },
-              },
-            );
-          }}
+          onClick={handleChooseDifferentMethod}
         >
           {t("OnlineVerificationInfo.chooseDifferentMethodButton")}
         </GcdsButton>
@@ -115,20 +109,7 @@ export default function ContinueProofingOnMobile() {
         <GcdsButton
           type="button"
           buttonRole="primary"
-          onClick={() => {
-            navigate(
-              path(PAGES.idvDetailsConfirmationPage, {
-                language,
-                journeyType,
-              }),
-              {
-                state: {
-                  mockProofing: true,
-                  mockIdentityClaims,
-                },
-              },
-            );
-          }}
+          onClick={handleNextStep}
         >
           {t("ContinueProofingOnMobile.nextStepButton")}
         </GcdsButton>

@@ -61,13 +61,13 @@ export default function InPersonProofingInProgress() {
 
   const handleResendEmail = async () => {
     const response =
-      await inPersonIdentityVerificationApi.sendInPersonVerificationCode();
+      await inPersonIdentityVerificationApi.resendInPersonVerificationCode();
 
     if (!response?.success) {
       return;
     }
 
-    const sentAt = response.data?.sentAt;
+    const sentAt = response.sentAt;
     const parsedSentAt = sentAt ? new Date(sentAt) : null;
 
     if (parsedSentAt && !Number.isNaN(parsedSentAt.getTime())) {

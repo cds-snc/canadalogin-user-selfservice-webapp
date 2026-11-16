@@ -74,6 +74,7 @@ export const pageIds = [
   "IdvCompleteIdentityProofingPage",
   "IdvIdentityVerificationSuccessPage",
   "IdvPartnerLinkSuccessPage",
+  "InProgressIDVPage",
   "DataTransparencyPage",
 ] as const;
 
