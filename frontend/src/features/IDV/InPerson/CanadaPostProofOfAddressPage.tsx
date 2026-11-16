@@ -3,23 +3,36 @@ import {
   GcdsContainer,
   GcdsGrid,
   GcdsHeading,
-  GcdsIcon,
+  GcdsSelect,
   GcdsText,
 } from "@gcds-core/components-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import type { CanadaPostIdDetailsLocationState } from "./CanadaPostIdDetailsPage";
-import "./css/CanadaPostProofOfAddressPage.css";
 
-const PROOF_OF_ADDRESS_GROUPS = [
-  "governmentId",
-  "financial",
-  "billsHousing",
-  "governmentBenefits",
-  "other",
+const PROOF_OF_ADDRESS_OPTIONS = [
+  "deliveryNotice",
+  "municipalTaxNotice",
+  "leaseMortgageOrPurchaseAgreement",
+  "insurancePolicy",
+  "vehicleOwnershipOrInsurance",
+  "bankOrCreditCardStatement",
+  "recentUtilityBill",
+  "childTaxBenefitStatement",
+  "incomeTaxAssessment",
+  "governmentChequeOrStub",
+  "employmentInsuranceStatement",
+  "cppQppStatement",
+  "workplaceSafetyOrInsuranceBenefits",
+  "provincialDisabilityOrWorksBenefits",
+  "attestationOfResidence",
+  "privatePostOfficeBoxRentalAgreement",
+  "oldAgeSecurityOrCppBenefits",
+  "noneOfThese",
 ] as const;
 
 export default function CanadaPostProofOfAddressPage() {
@@ -31,10 +44,17 @@ export default function CanadaPostProofOfAddressPage() {
     location.state as CanadaPostIdDetailsLocationState | null;
   const selectedDocument = locationState?.document;
   const formData = locationState?.formData;
+  const [selectedProof, setSelectedProof] = useState("");
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const currentLanguage = language === "fr" ? "fr" : "en";
 
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
+
+  const proofOfAddressOptions = PROOF_OF_ADDRESS_OPTIONS.map((option) =>
+    t(`CanadaPostProofOfAddress.options.${option}`),
+  );
 
   return (
     <GcdsContainer role="main">
@@ -44,44 +64,32 @@ export default function CanadaPostProofOfAddressPage() {
             {t("CanadaPostProofOfAddress.heading")}
           </GcdsHeading>
           <GcdsText>{t("CanadaPostProofOfAddress.intro")}</GcdsText>
-
-          {PROOF_OF_ADDRESS_GROUPS.map((group) => {
-            const items = t(`CanadaPostProofOfAddress.groups.${group}.items`, {
-              returnObjects: true,
-            }) as string[];
-
-            return (
-              <section key={group}>
-                <GcdsText characterLimit={false}>
-                  <strong>
-                    {t(`CanadaPostProofOfAddress.groups.${group}.title`)}
-                  </strong>
-                </GcdsText>
-                <GcdsText>
-                  <ul>
-                    {items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </GcdsText>
-              </section>
-            );
-          })}
-
-          <section
-            className="canada-post-proof-warning"
-            aria-labelledby="canada-post-proof-warning-heading"
+          <GcdsSelect
+            id="proof-of-address-select"
+            selectId="proof-of-address-select"
+            name="proof-of-address"
+            label={t("CanadaPostProofOfAddress.selectLabel")}
+            hint={t("CanadaPostProofOfAddress.selectHint")}
+            lang={currentLanguage}
+            value={selectedProof}
+            defaultValue={t("CanadaPostProofOfAddress.selectDefaultValue")}
+            required
+            errorMessage={
+              hasSubmitted && !selectedProof
+                ? t("CanadaPostProofOfAddress.selectError")
+                : ""
+            }
+            onGcdsChange={(event: CustomEvent) => {
+              const target = event.target as HTMLSelectElement | null;
+              setSelectedProof(target?.value ?? "");
+            }}
           >
-            <GcdsIcon name="warning-triangle" size="h2" aria-hidden="true" />
-            <div>
-              <GcdsText id="canada-post-proof-warning-heading">
-                <strong>{t("CanadaPostProofOfAddress.warningTitle")}</strong>
-              </GcdsText>
-              <GcdsText>
-                {t("CanadaPostProofOfAddress.warningMessage")}
-              </GcdsText>
-            </div>
-          </section>
+            {proofOfAddressOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </GcdsSelect>
         </GcdsContainer>
 
         <GcdsGrid
@@ -93,6 +101,11 @@ export default function CanadaPostProofOfAddressPage() {
             type="button"
             onGcdsClick={(event: Event) => {
               event.preventDefault();
+              setHasSubmitted(true);
+              if (!selectedProof) {
+                return;
+              }
+
               if (selectedDocument) {
                 navigate(
                   path(PAGES.idvCanadaPostIdDetailsPage, {
@@ -104,6 +117,7 @@ export default function CanadaPostProofOfAddressPage() {
                       document: selectedDocument,
                       formData,
                       proofOfAddressAcknowledged: true,
+                      proofOfAddress: selectedProof,
                     },
                   },
                 );

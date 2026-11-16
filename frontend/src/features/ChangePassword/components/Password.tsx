@@ -186,6 +186,7 @@ export default function Password({
         <GcdsContainer>
           <GcdsInput
             inputId="input-password"
+            aria-describedby="password-length-counter"
             label={t("Password.label")}
             name="password"
             hint={t("Password.placeholder")}
@@ -207,7 +208,11 @@ export default function Password({
             onGcdsChange={() => setCheckedValue(!checkedValue)}
           ></GcdsCheckboxes>
 
-          <GcdsText>
+          <GcdsText
+            id="password-length-counter"
+            role="status"
+            aria-live="polite"
+          >
             <span>{t("Password.minimumLength")}</span>{" "}
             <strong>{passwordStrength}</strong> / {passwordPolicy.min}{" "}
             <span>{t("Password.characters")}</span>
