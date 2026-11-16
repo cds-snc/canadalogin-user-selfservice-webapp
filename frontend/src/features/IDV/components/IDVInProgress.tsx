@@ -22,28 +22,18 @@ export default function IDVInProgress() {
 
   const verificationMethod = searchParams.get("method") as VerificationMethod | null;
 
-  const iDVSuccessPage = path(PAGES.idvDetailsConfirmationPage, {
+  const detailsConfirmationPage = path(PAGES.idvDetailsConfirmationPage, {
     language,
     journeyType,
   });
 
-  const getMethodDisplayName = (method: VerificationMethod | null): string => {
-    switch (method) {
-      case "bluink":
-        return t("IDVInProgress.methodBluink", "Bluink verification");
-      case "provincial":
-        return t("IDVInProgress.methodProvincial", "Provincial verification");
-      case "canada_post":
-        return t("IDVInProgress.methodCanadaPost", "Canada Post verification");
-      case "service_canada":
-        return t("IDVInProgress.methodServiceCanada", "Service Canada Centre verification");
-      default:
-        return t("IDVInProgress.methodUnknown", "Identity verification");
-    }
-  };
-
   const handleContinue = async () => {
-    navigate(iDVSuccessPage);
+    navigate(detailsConfirmationPage, {
+      state: {
+        mockProofing: true,
+        verificationMethod,
+      },
+    });
   };
 
   return (
@@ -52,12 +42,6 @@ export default function IDVInProgress() {
         <GcdsHeading tag="h1">
           {t("IDVInProgress.heading", "Identity verification in progress")}
         </GcdsHeading>
-
-        <GcdsContainer>
-          <GcdsText>
-            {t("IDVInProgress.methodInfo", "Verification method:")} {getMethodDisplayName(verificationMethod)}
-          </GcdsText>
-        </GcdsContainer>
 
         <AccessibleNotice
           noticeRole="info"
