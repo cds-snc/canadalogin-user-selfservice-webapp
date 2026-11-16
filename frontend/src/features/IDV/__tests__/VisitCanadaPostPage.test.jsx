@@ -120,6 +120,13 @@ const PASSPORT = {
 
 describe("VisitCanadaPost (Select your ID)", () => {
   const t = i18n.getFixedT("en", "idv");
+  const selectYesToNonExpiredId = () => {
+    fireEvent.click(
+      screen.getByRole("radio", {
+        name: t("VisitCanadaPost.yesOption"),
+      }),
+    );
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -236,6 +243,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
   it("requires an ID selection before continuing", () => {
     render(<VisitCanadaPost />);
 
+    selectYesToNonExpiredId();
     fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(screen.getByTestId("errorSummary")).toHaveTextContent(
@@ -246,9 +254,25 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
+  it("requires an answer to the non-expired ID question before continuing", () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(screen.getByTestId("errorSummary")).toHaveTextContent(
+      t("ErrorsDefinition.selectOptionRequired"),
+    );
+    expect(screen.getByTestId("radios-error")).toHaveTextContent(
+      t("ErrorsDefinition.selectOptionRequired"),
+    );
+    expect(mockGetIdentityDocuments).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
   it("navigates back to the method selection when the user has none of the IDs", () => {
     render(<VisitCanadaPost />);
 
+    selectYesToNonExpiredId();
     fireEvent.click(screen.getByLabelText("I don't have any of those IDs"));
     fireEvent.click(screen.getByTestId("continue-button"));
 
@@ -268,6 +292,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(screen.getByLabelText("Passport"));
+    selectYesToNonExpiredId();
     fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(mockGetIdentityDocuments).toHaveBeenCalledWith(["PASSPORT"]);
@@ -295,6 +320,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
       render(<VisitCanadaPost />);
 
       fireEvent.click(screen.getByDisplayValue(key));
+      selectYesToNonExpiredId();
       fireEvent.click(screen.getByTestId("continue-button"));
 
       await waitFor(() =>
@@ -312,6 +338,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(screen.getByDisplayValue("INDIAN_STATUS_CARD"));
+    selectYesToNonExpiredId();
     fireEvent.click(screen.getByTestId("continue-button"));
 
     await waitFor(() =>
@@ -340,6 +367,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(screen.getByLabelText("Passport"));
+    selectYesToNonExpiredId();
     fireEvent.click(screen.getByTestId("continue-button"));
 
     await waitFor(() =>
@@ -371,6 +399,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(screen.getByLabelText("Passport"));
+    selectYesToNonExpiredId();
     fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(

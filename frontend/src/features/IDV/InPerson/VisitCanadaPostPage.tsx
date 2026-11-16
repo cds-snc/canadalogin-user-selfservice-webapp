@@ -95,8 +95,14 @@ export default function VisitCanadaPost() {
     },
   ];
 
-  const showError = hasSubmitted && !selectedValue;
-  const idTypeErrorMessage = showError ? getIdTypeRequiredMessage(t) : "";
+  const nonExpiredIdError =
+    hasSubmitted && !nonExpiredIdAnswer
+      ? t("ErrorsDefinition.selectOptionRequired")
+      : "";
+  const idTypeErrorMessage =
+    hasSubmitted && nonExpiredIdAnswer === "yes" && !selectedValue
+      ? getIdTypeRequiredMessage(t)
+      : "";
 
   const onNonExpiredIdChange = (event: CustomEvent<string>) => {
     setNonExpiredIdAnswer(
@@ -106,6 +112,11 @@ export default function VisitCanadaPost() {
 
   const onContinue = async () => {
     setHasSubmitted(true);
+
+    if (!nonExpiredIdAnswer) {
+      setSummaryFocusTrigger((previous) => previous + 1);
+      return;
+    }
 
     if (nonExpiredIdAnswer === "no") {
       navigate(completeIdentityProofingPage);
@@ -173,12 +184,23 @@ export default function VisitCanadaPost() {
           <GcdsContainer>
             <GcdsHeading tag="h1">{t("VisitCanadaPost.heading")}</GcdsHeading>
 
-            {showError ? (
+            {nonExpiredIdError || idTypeErrorMessage ? (
               <ErrorSummaryWithFocus
                 key={summaryFocusTrigger}
                 id={ERROR_SUMMARY_ID}
                 errorMessage={getValidationSummaryHeading(t)}
-                errorLinks={{ [`#${RADIOS_ID}`]: getIdTypeRequiredMessage(t) }}
+                errorLinks={Object.fromEntries(
+                  [
+                    nonExpiredIdError
+                      ? [`#${NON_EXPIRED_ID_RADIOS_ID}`, nonExpiredIdError]
+                      : null,
+                    idTypeErrorMessage
+                      ? [`#${RADIOS_ID}`, idTypeErrorMessage]
+                      : null,
+                  ].filter(
+                    (entry): entry is [string, string] => entry !== null,
+                  ),
+                )}
                 language={currentLanguage}
               />
             ) : null}
@@ -235,6 +257,8 @@ export default function VisitCanadaPost() {
               legend={t("VisitCanadaPost.nonExpiredIdTitle")}
               hint={t("VisitCanadaPost.nonExpiredIdHint")}
               options={nonExpiredIdRadioOptions}
+              required
+              errorMessage={nonExpiredIdError}
               value={nonExpiredIdAnswer}
               onGcdsChange={onNonExpiredIdChange}
             />
