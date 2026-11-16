@@ -79,7 +79,7 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsButton: ({ children, onGcdsClick, buttonRole, buttonId }) => (
+  GcdsButton: ({ children, onGcdsClick, buttonId }) => (
     <button
       data-testid={buttonId ?? "reset-method-button"}
       onClick={(e) => onGcdsClick?.(e)}
