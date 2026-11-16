@@ -267,9 +267,6 @@ describe("CanadaPostIdDetailsPage", () => {
     expect(
       screen.queryByTestId("id-expiry-date-input"),
     ).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId("select-document-option"),
-    ).not.toBeInTheDocument();
     expect(screen.getByTestId("postal-code-input")).toBeInTheDocument();
   });
 
@@ -281,9 +278,6 @@ describe("CanadaPostIdDetailsPage", () => {
         name: "Enter your driver's licence details",
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByTestId("select-document-option"),
-    ).not.toBeInTheDocument();
     expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
     expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
   });
@@ -295,17 +289,11 @@ describe("CanadaPostIdDetailsPage", () => {
       screen.getByRole("heading", { name: "Enter your ID details" }),
     ).toBeInTheDocument();
     expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId("select-document-option"),
-    ).not.toBeInTheDocument();
   });
 
   it("renders the default form without hidden issuer controls", () => {
     renderPage(PR_CARD);
 
-    expect(
-      screen.queryByTestId("select-document-option"),
-    ).not.toBeInTheDocument();
     expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
     expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
   });
@@ -361,10 +349,10 @@ describe("CanadaPostIdDetailsPage", () => {
 
   it("requires proof of address for the Secure Certificate of Indian Status when the API requires it", () => {
     const indianStatusCard = { ...PR_CARD, key: "INDIAN_STATUS_CARD" };
-    renderPage(indianStatusCard);
+    renderPage(indianStatusCard, {
+      formData: validFormData({ documentOptionId: "30" }),
+    });
     fillCommonFields();
-    change("select-document-option", "30");
-    change("select-province", "ON");
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
