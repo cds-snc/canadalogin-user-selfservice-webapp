@@ -66,9 +66,15 @@ export default function ProvincialVerificationPage() {
     });
   };
 
-  const bcPartnerLoginHref = DEV_ONLY_FEATURE ? undefined : buildPartnerLoginHref(PROVINCIAL_PARTNERS.bc);
-  const abPartnerLoginHref = DEV_ONLY_FEATURE ? undefined : buildPartnerLoginHref(PROVINCIAL_PARTNERS.ab);
-  const quebecPartnerLoginHref = DEV_ONLY_FEATURE ? undefined : buildPartnerLoginHref(PROVINCIAL_PARTNERS.qc);
+  const bcPartnerLoginHref = DEV_ONLY_FEATURE
+    ? undefined
+    : buildPartnerLoginHref(PROVINCIAL_PARTNERS.bc);
+  const abPartnerLoginHref = DEV_ONLY_FEATURE
+    ? undefined
+    : buildPartnerLoginHref(PROVINCIAL_PARTNERS.ab);
+  const quebecPartnerLoginHref = DEV_ONLY_FEATURE
+    ? undefined
+    : buildPartnerLoginHref(PROVINCIAL_PARTNERS.qc);
   if (!DEV_ONLY_FEATURE) {
     return null;
   }
