@@ -1,0 +1,38 @@
+meta {
+  name: Exchange User Token
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{ibmVerifyTenantUrl}}/oauth2/token
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:form-urlencoded {
+  grant_type: urn:ietf:params:oauth:grant-type:token-exchange
+  client_id: {{stsClientId}}
+  client_secret: {{stsClientSecret}}
+  subject_token: {{subjectToken}}
+  subject_token_type: urn:ietf:params:oauth:token-type:access_token
+  requested_token_type: urn:ietf:params:oauth:token-type:access_token
+  scope: {{idvDataStoreScope}}
+}
+
+script:post-response {
+  if (
+    res.status !== 200 ||
+    !res.body ||
+    typeof res.body.access_token !== "string" ||
+    res.body.access_token.length === 0
+  ) {
+    throw new Error("Token exchange did not return an access_token");
+  }
+
+  bru.setVar("idvDataStoreAccessToken", res.body.access_token);
+}

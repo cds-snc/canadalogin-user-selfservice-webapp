@@ -150,14 +150,6 @@ class IdvDataStoreConfig(BaseSettings):
             "approved identity documents catalog."
         ),
     )
-    IDV_DATA_STORE_AUTH_USERINFO_SCOPES: str = Field(
-        default="idv:auth:userinfo",
-        description=(
-            "Space-separated list of idv-data-store scopes requested from the "
-            "IBM Verify STS client (token exchange) when fetching delegated "
-            "userinfo claims."
-        ),
-    )
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )
@@ -277,11 +269,6 @@ class Configuration(BaseSettings):
     def idv_data_store_online_session_endpoint(self, case_id: str) -> str:
         """idv-data-store's endpoint for reissuing an online verification session URL."""
         return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/identity-verifications/{case_id}/online-session"
-
-    @property
-    def idv_data_store_userinfo_endpoint(self) -> str:
-        """idv-data-store's endpoint for fetching delegated userinfo for an exchanged access token."""
-        return f"{self.idv_data_store_config.IDV_DATA_STORE_BASE_URL}/v1/auth/userinfo"
 
 
 @lru_cache
