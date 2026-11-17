@@ -30,7 +30,7 @@
     "name": "Legal name",
     "dateOfBirth": "Date of birth",
     "idDocument": "Source of information",
-    "updateInfo": "To update this information, you'll need to complete identity proofing again.",
+    "updateInfo": "To update this information you will need to verify your identity again.",
     "updateButton": "Update information",
     "sourceOfInformation": "Source of information"
   },
