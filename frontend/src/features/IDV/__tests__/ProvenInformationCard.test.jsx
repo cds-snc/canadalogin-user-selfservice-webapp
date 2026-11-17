@@ -193,7 +193,7 @@ describe("ProvenInformationCard", () => {
     );
     expect(
       screen.getByText(
-        "To update this information, you'll need to complete identity proofing again.",
+        "To update this information you will need to verify your identity again.",
       ),
     ).toBeInTheDocument();
   });
