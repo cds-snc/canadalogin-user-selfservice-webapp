@@ -1,9 +1,7 @@
 import type { AppLanguage } from "./utils";
 
 export type LanguagePreferenceWizardStep =
-  | "editLanguage"
-  | "confirmUpdate"
-  | "success";
+  "editLanguage" | "confirmUpdate" | "success";
 
 export type LanguagePreferencePageContent = Record<string, string>;
 

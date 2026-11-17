@@ -26,6 +26,7 @@ from app.utils.phone_mfa_rate_limit import (
     consume_transient_send_daily_quota,
     record_contact_phone_update_event,
     record_phone_mfa_registration_event,
+    release_otp_send_daily_quota,
 )
 
 
@@ -206,7 +207,7 @@ async def test_otp_send_daily_bucket_is_shared_with_session_fallback(
 
 
 @pytest.mark.asyncio
-async def test_otp_send_daily_session_window_resets_after_15_minutes_in_non_prod(
+async def test_otp_send_daily_session_window_resets_after_30_minutes_in_non_prod(
     monkeypatch,
 ):
     monkeypatch.setattr(
@@ -235,6 +236,51 @@ async def test_otp_send_daily_session_window_resets_after_15_minutes_in_non_prod
     )
     entry = request.session[OTP_SEND_DAILY_SESSION_KEY][user_key]
     assert entry[OTP_SEND_FIELD] == 1
+
+
+@pytest.mark.asyncio
+async def test_otp_send_daily_session_release_returns_failed_send_slot(
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        phone_mfa_rate_limit_module,
+        "get_configuration",
+        lambda: SimpleNamespace(
+            ENVIRONMENT="test",
+            session_config=SimpleNamespace(REDIS_AUTH_SECRET="rate-secret"),
+        ),
+    )
+    request = _build_request_with_session(redis_client=None)
+
+    await consume_mfa_send_daily_quota(request, "user@example.com")
+    await release_otp_send_daily_quota(request, "user@example.com")
+
+    user_key = phone_mfa_rate_limit_module._hash_user_id_for_rate_limit(
+        "user@example.com"
+    )
+    entry = request.session[OTP_SEND_DAILY_SESSION_KEY][user_key]
+    assert entry[OTP_SEND_FIELD] == 0
+
+
+@pytest.mark.asyncio
+async def test_otp_send_daily_redis_release_returns_failed_send_slot(monkeypatch):
+    monkeypatch.setattr(
+        phone_mfa_rate_limit_module,
+        "get_configuration",
+        lambda: SimpleNamespace(
+            ENVIRONMENT="prod",
+            session_config=SimpleNamespace(REDIS_AUTH_SECRET="rate-secret"),
+        ),
+    )
+    redis_client = AsyncMock()
+    redis_client.decr.return_value = 0
+    request = _build_request_with_session(redis_client=redis_client)
+
+    await release_otp_send_daily_quota(request, "user@example.com")
+
+    key = phone_mfa_rate_limit_module._build_otp_send_daily_key("user@example.com")
+    redis_client.decr.assert_awaited_once_with(key)
+    redis_client.delete.assert_awaited_once_with(key)
 
 
 def test_otp_send_daily_redis_key_is_hmac_derived(monkeypatch):
@@ -322,6 +368,7 @@ async def test_otp_send_daily_redis_block_includes_retry_after(monkeypatch):
     redis_client = AsyncMock()
     redis_client.incr.return_value = OTP_SEND_DAILY_LIMIT + 1
     redis_client.ttl.return_value = 120
+    redis_client.decr.return_value = OTP_SEND_DAILY_LIMIT
     request = _build_request_with_session(redis_client=redis_client)
 
     with pytest.raises(HTTPException) as exc_info:
@@ -330,6 +377,7 @@ async def test_otp_send_daily_redis_block_includes_retry_after(monkeypatch):
     assert exc_info.value.status_code == 429
     assert exc_info.value.detail == OTP_SEND_DAILY_ERROR_CODE
     assert exc_info.value.headers["Retry-After"] == "120"
+    redis_client.decr.assert_awaited_once()
 
 
 @pytest.mark.asyncio

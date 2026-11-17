@@ -7,8 +7,8 @@ Implement a per-account daily send limit for OTP send endpoints:
 - `/v1/otp/mfa/send`, `/v1/otp/transient/send`, and `/v1/password/update/initiate`: a shared maximum of 30 sends per account per day
 
 The limit is shared across all three endpoints. Any combination of MFA,
-transient, and change-password sends counts toward the same 30-send quota, and
-the 31st request is blocked.
+transient, and change-password sends that IBM Verify accepts counts toward the
+same 30-send quota, and the 31st accepted send is blocked.
 
 This guide is written so a developer or coding agent can implement the change step by step.
 
@@ -59,13 +59,14 @@ Why this model:
 
 - Keeps key cardinality low (1 key per active user, not multiple keys per endpoint/day)
 - Keeps MFA and transient sends in one shared bucket
-- Enables atomic operations in one Lua script
+- Uses one shared expiring counter for all OTP send flows
 
 ## 2) Window semantics
 
-Use rolling 24-hour windows:
+Use rolling windows:
 
-- Window length: 86400 seconds
+- Production/staging window length: 86400 seconds
+- Local/dev/test window length: 1800 seconds
 - Daily limit: 30
 
 Why rolling window:
@@ -75,12 +76,13 @@ Why rolling window:
 
 ## 3) Atomicity and race-safety
 
-Use a Lua script for check-and-increment in one operation.
+Use Redis `INCR` for the reservation and release the reservation when the
+provider call fails.
 
 Why:
 
-- Prevents race conditions at high concurrency
-- Avoids non-atomic GET then INCR patterns
+- Keeps reservation updates atomic under concurrent requests
+- Avoids counting provider-rejected requests as successful sends
 
 ## 4) Security posture on Redis failures
 
@@ -114,14 +116,15 @@ Why:
 
 ## Step-by-step implementation
 
-## Step 1: Add constants and endpoint bucket enum
+## Step 1: Add constants and shared counter
 
 File: `backend/app/utils/phone_mfa_rate_limit.py`
 
 Add constants near existing limiter constants:
 
 - `OTP_SEND_DAILY_LIMIT = 30`
-- `OTP_SEND_DAILY_WINDOW_SECONDS = 24 * 60 * 60`
+- `OTP_SEND_DAILY_WINDOW_SECONDS_PROD = 24 * 60 * 60`
+- `OTP_SEND_DAILY_WINDOW_SECONDS_NON_PROD = 30 * 60`
 - `OTP_SEND_DAILY_REDIS_KEY_PREFIX = "rate_limit:otp_send_daily:"`
 - `OTP_SEND_DAILY_ERROR_CODE = "otp_send_daily_limit"`
 - `OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE = "otp_send_limiter_unavailable"`
@@ -152,24 +155,13 @@ Example output key:
 
 - `rate_limit:otp_send_daily:0f4c1a...`
 
-## Step 3: Add Lua script for atomic consume
+## Step 3: Add reservation and release behavior
 
 File: `backend/app/utils/phone_mfa_rate_limit.py`
 
-Add a script constant, for example `OTP_SEND_DAILY_CONSUME_SCRIPT`, that:
-
-1. Reads `window_start`
-2. Resets hash fields if window expired
-3. Reads the endpoint-specific count field
-4. If count >= limit, returns blocked + retry_after
-5. Otherwise increments count and sets key TTL
-6. Returns allowed + new count + remaining
-
-Suggested TTL policy:
-
-- `EXPIRE key window_seconds + 3600`
-
-The +3600 buffer prevents accidental early eviction if clocks drift slightly.
+Reserve one shared slot before dispatching to IBM Verify. Release the slot when
+the provider call fails or returns a non-success response. Keep the reservation
+when the provider accepts the OTP request.
 
 ## Step 4: Add a generic consume function
 
@@ -184,8 +176,8 @@ Behavior:
 1. Get Redis client from request state (reuse existing helper)
 2. If Redis unavailable:
    - prod/staging: raise `HTTPException(503, detail=OTP_SEND_LIMITER_UNAVAILABLE_ERROR_CODE)`
-   - local/dev/test: fallback to session implementation (optional), with same 30/24h logic
-3. Run Lua script via `redis.eval`
+   - local/dev/test: fallback to session implementation (optional), with the same 30-send limit and configured 30-minute window
+3. Reserve one shared send slot
 4. If blocked, raise `HTTPException(429, detail=OTP_SEND_DAILY_ERROR_CODE)`
    - include `Retry-After` header if retry_after is returned
 
@@ -210,40 +202,42 @@ Both wrappers call the generic consume function against the same shared
 
 File: `backend/app/otp/services/send_mfa_otp.py`
 
-1. Import `consume_mfa_send_daily_quota`
-2. In `handle_send_mfa_otp`, after profile/user_id is resolved and before dispatch call:
+1. Reserve a shared slot after profile/user_id is resolved and before dispatch:
    - `await consume_mfa_send_daily_quota(request, user_id)` when `request` is not `None`
+2. Release the slot if the provider call fails:
+   - `await release_otp_send_daily_quota(request, user_id)`
 3. Keep existing business-specific phone-change limiter behavior unchanged
 
 Result:
 
-- Every `/mfa/send` request consumes from the shared OTP daily send bucket
+- Every provider-accepted `/mfa/send` request consumes from the shared OTP daily send bucket
 
 ## Step 7: Integrate transient send endpoint
 
 File: `backend/app/otp/services/send_transient_otp.py`
 
-1. Import `consume_transient_send_daily_quota`
-2. In `handle_otp_send`, after user_id is resolved and before dispatch call:
+1. Reserve a shared slot after user_id is resolved and before dispatch:
    - `await consume_transient_send_daily_quota(request, user_id)` when `request` is not `None`
+2. Release the slot if the provider call or response validation fails:
+   - `await release_otp_send_daily_quota(request, user_id)`
 3. Keep existing contact-phone-update limiter behavior unchanged
 
 Result:
 
-- Every `/transient/send` request consumes from the shared OTP daily send bucket
+- Every provider-accepted `/transient/send` request consumes from the shared OTP daily send bucket
 
 ## Step 8: Integrate change-password OTP initiation
 
 File: `backend/app/password/services/first_step_update_password.py`
 
 1. Pass the request from `/v1/password/update/initiate` into the service
-2. After the authenticated profile is resolved and before calling IBM Verify's password resetter:
+2. Reserve a shared slot after the authenticated profile is resolved and before calling IBM Verify's password resetter:
    - `await consume_mfa_send_daily_quota(request, user_profile_response.id)` when `request` is not `None`
-3. Count repeated initiation requests as new sends; do not count OTP validation or password completion
+3. Release the slot if the provider call fails; do not count OTP validation or password completion
 
 Result:
 
-- Every `/v1/password/update/initiate` request consumes from the shared OTP daily send bucket
+- Every provider-accepted `/v1/password/update/initiate` request consumes from the shared OTP daily send bucket
 
 ## Step 9: Preserve HTTPException headers in global handler
 
@@ -259,25 +253,25 @@ Why:
 
 - `Retry-After` should reach clients and observability tooling
 
-## Step 9: Add/adjust tests for new limiter utility
+## Step 10: Add/adjust tests for new limiter utility
 
 File: `backend/tests/test_phone_mfa_rate_limit.py`
 
 Add tests for:
 
-1. Endpoint bucket independence in same user key
-   - 30 MFA sends does not block transient sends
-2. MFA bucket blocks on 31st consume
-3. Transient bucket blocks on 31st consume
+1. Shared bucket across MFA, transient, and change-password sends
+   - 29 accepted sends plus one accepted send through another flow blocks the next send
+2. Failed provider responses release their reserved slot
+3. The shared bucket blocks the 31st accepted send
 4. Redis key format does not expose raw user ID/email
-5. Window reset after 24h
+5. Window reset after 24h in production/staging and 30 minutes in local/dev/test
 6. Redis unavailable behavior:
    - prod/staging fail closed
    - local/dev/test fallback path (if implemented)
 
-If using Lua script, mock `redis.eval` return values and cover blocked/allowed branches.
+Cover allowed, blocked, reservation-release, and Redis-unavailable branches.
 
-## Step 10: Add/adjust service tests
+## Step 11: Add/adjust service tests
 
 Files:
 
@@ -295,7 +289,7 @@ Add at least one test per service for blocked behavior:
 - mock consume function raising `HTTPException(429, detail="otp_send_daily_limit")`
 - assert response message code is preserved through error pipeline
 
-## Step 11: Frontend error message plumbing
+## Step 12: Frontend error message plumbing
 
 Files:
 
@@ -312,7 +306,7 @@ Suggested English copy:
 
 French locale policy in this repo currently allows English placeholder until official French copy is provided.
 
-## Step 12: Telemetry and logging (PII-safe)
+## Step 13: Telemetry and logging (PII-safe)
 
 Add warning-level log on limit block in utility function with fields:
 
@@ -322,7 +316,7 @@ Add warning-level log on limit block in utility function with fields:
 
 Do not log raw email, phone, OTP destination, or token data.
 
-## Step 13: Verification commands
+## Step 14: Verification commands
 
 Backend targeted tests:
 
@@ -358,7 +352,7 @@ Use this checklist before merging:
 
 ## Capacity planning notes
 
-With one key per active sender in a 24h window:
+With one key per active sender in a 24-hour production/staging window:
 
 - key count ~= active users who hit send OTP in last 24h
 - each key stores 3 small hash fields and short key name
@@ -401,8 +395,8 @@ Optional safer rollout:
 
 Implementation is complete when all are true:
 
-1. A single account can make at most 30 combined `/v1/otp/mfa/send`, `/v1/otp/transient/send`, and `/v1/password/update/initiate` calls in 24h
-2. The 31st send is blocked regardless of which endpoint receives it
+1. A single account can make at most 30 combined provider-accepted sends in the configured window
+2. The 31st accepted send is blocked regardless of which endpoint receives it
 3. MFA, transient, and change-password sends use the same expiring, PII-safe Redis key
 4. Enforcement is race-safe under concurrent requests
 5. Redis keys are bounded, expiring, and PII-safe

@@ -8,6 +8,7 @@ This is the FastAPI application for the CanadaLogin back-end API.
 
 - Docker installed on your machine (use Colima if on a CDS MacBook)
 - Python 3.14 (if running locally without Docker)
+- [pipx](https://pipx.pypa.io/stable/installation/) (for `make check-local-state`, which runs Semgrep in an isolated environment to avoid conflicts with backend dependencies)
 - Redis server running locally (required for session management)
 - `.env` file with required environment variables
 

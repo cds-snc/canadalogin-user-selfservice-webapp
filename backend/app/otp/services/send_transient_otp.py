@@ -15,6 +15,7 @@ from app.utils.phone_mfa_rate_limit import (
     assert_contact_phone_update_rate_limit_not_exceeded,
     consume_transient_send_daily_quota,
     record_contact_phone_update_event,
+    release_otp_send_daily_quota,
 )
 from app.utils.helpers import (
     prepare_pydantic_phone_number_for_verify,
@@ -274,15 +275,20 @@ async def handle_otp_send(
         and _should_record_contact_phone_rate_limit_event(request, user_otp_info)
     )
 
-    http_client_response = await dispatch_otp(
-        global_http_client, user_otp_info, user_access_token, user_language
-    )
-    duration = (datetime.now() - start_time).total_seconds()
-    logger.info(
-        f"{user_otp_info.otpType} OTP send request response received in {duration:.2f} seconds"
-    )
+    try:
+        http_client_response = await dispatch_otp(
+            global_http_client, user_otp_info, user_access_token, user_language
+        )
+        duration = (datetime.now() - start_time).total_seconds()
+        logger.info(
+            f"{user_otp_info.otpType} OTP send request response received in {duration:.2f} seconds"
+        )
 
-    response_json = await _validate_otp_send_response(http_client_response)
+        response_json = await _validate_otp_send_response(http_client_response)
+    except Exception:
+        if request is not None:
+            await release_otp_send_daily_quota(request, user_id)
+        raise
 
     if should_apply_contact_phone_rate_limit:
         _mark_destination_as_sent(request, user_otp_info.destination)

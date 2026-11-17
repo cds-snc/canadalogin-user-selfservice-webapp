@@ -1,10 +1,7 @@
 type TranslateFn = (key: string) => string;
 
 export type SharedDateOfBirthErrorCode =
-  | "required"
-  | "invalid"
-  | "year"
-  | "future";
+  "required" | "invalid" | "year" | "future";
 
 export interface SharedDateOfBirthMessage {
   inline: string;
@@ -64,3 +61,15 @@ export const getIdExpiryRequiredMessage = (t: TranslateFn): string =>
 
 export const getSelectOptionRequiredMessage = (t: TranslateFn): string =>
   t("ErrorsDefinition.selectOptionRequired");
+
+export const getIdExpiryInvalidMessage = (t: TranslateFn): string =>
+  t("ErrorsDefinition.idExpiryInvalid");
+
+export const getIdExpiryTooSoonMessage = (t: TranslateFn): string =>
+  t("ErrorsDefinition.idExpiryTooSoon");
+
+export const getCityRequiredMessage = (t: TranslateFn): string =>
+  t("ErrorsDefinition.cityRequired");
+
+export const getPostalCodeRequiredOrInvalidMessage = (t: TranslateFn): string =>
+  t("ErrorsDefinition.postalCodeRequiredOrInvalid");

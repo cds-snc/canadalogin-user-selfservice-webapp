@@ -23,6 +23,10 @@
     "step2": "Recevez par courriel un code unique, valide pour une durée de 30 jours.",
     "step3": "Rendez-vous dans n’importe quel centre Service Canada et munissez-vous de votre code et du document d’identité avec photo que vous avez sélectionné.",
     "step4": "Un agent ou une agente de service vérifiera votre identité. Après cela, connectez-vous à nouveau à {{rpName}} pour continuer.",
+    "nonExpiredIdTitle": "Can you bring a non-expired ID?",
+    "nonExpiredIdHint": "ID must be valid when you visit the Service Canada Centre",
+    "yesOption": "Yes",
+    "noOption": "No",
     "fallbackRpName": "RP Name",
     "enterDetailsHeading": "Saisissez les renseignements de votre document d’identité",
     "continueButton": "Continuer",
@@ -39,7 +43,7 @@
     "indianStatusOption": "Certificat sécurisé de statut d’Indien",
     "noIds": "Je ne possède aucun des documents d’identité ci-dessus",
     "idHint": "Vous devrez vous munir de ce document d’identité lors de votre rendez-vous",
-    "idExpirationLabel": "Date d’expiration",
+    "idExpirationLabel": "Date d'expiration",
     "enterDetailsIdHeading": "Enter your details as shown on the ID",
     "firstNameLabel": "Prénom",
     "firstNameHint": "Doit correspondre à ce qui apparaît sur votre document d’identité officiel",
@@ -76,6 +80,10 @@
     "step2": "Recevez par courriel un code unique, valide pour une durée de 30 jours.",
     "step3": "Rendez-vous dans n’importe quel bureau Postes Canada et munissez-vous de votre code et du document d’identité avec photo que vous avez sélectionné.",
     "step4": "Un agent ou une agente de service vérifiera votre identité. Après cela, connectez-vous à nouveau à {{rpName}} pour continuer.",
+    "nonExpiredIdTitle": "Can you bring a non-expired ID?",
+    "nonExpiredIdHint": "ID must be valid when you visit the Canada Post.",
+    "yesOption": "Yes",
+    "noOption": "No",
     "listOfIds": "List of acceptable IDs",
     "selectIdLabel": "Quel type de document d’identité avez-vous",
     "selectIdDropdownDefaultValue": "Sélectionnez une option",
@@ -100,6 +108,46 @@
     "differentMethodButton": "Choisir une autre méthode",
     "moreInfoTitle": "Renseignements supplémentaires",
     "learnMoreLink": "Apprenez-en davantage sur la confirmation d’identité dans un bureau Postes Canada"
+  },
+  "CanadaPostSelectId": {
+    "documents": {
+      "PROVINCIAL_HEALTH_CARD": {
+        "hint": "Only valid for Quebec and British Columbia"
+      },
+      "COMBO_CARD": {
+        "hint": "Only valid for Alberta and British Columbia"
+      }
+    }
+  },
+  "CanadaPostProofOfAddress": {
+    "heading": "You must bring a proof of address",
+    "intro": "Since the ID you selected does not have an address on it, you will need to bring one of the documents listed below:",
+    "selectLabel": "Select your proof of address (required)",
+    "selectHint": "The document must reflect your current address",
+    "selectDefaultValue": "Select option",
+    "selectError": "Select an option to continue.",
+    "options": {
+      "deliveryNotice": "Delivery Notice Card / Final Notice Card",
+      "municipalTaxNotice": "Municipal tax notice",
+      "leaseMortgageOrPurchaseAgreement": "Lease, mortgage or purchase agreement",
+      "insurancePolicy": "Insurance policy",
+      "vehicleOwnershipOrInsurance": "Vehicle ownership or insurance document",
+      "bankOrCreditCardStatement": "Bank or credit card statement",
+      "recentUtilityBill": "Recent utility bill",
+      "childTaxBenefitStatement": "Canada Child Tax Benefit statement",
+      "incomeTaxAssessment": "Income tax assessment",
+      "governmentChequeOrStub": "Government cheque or cheque stub",
+      "employmentInsuranceStatement": "Employment Insurance Benefits statement (T4E)",
+      "cppQppStatement": "CPP/QPP statement of contributions",
+      "workplaceSafetyOrInsuranceBenefits": "Provincial workplace safety or insurance benefits statement",
+      "provincialDisabilityOrWorksBenefits": "Provincial works or disability support direct deposit statement",
+      "attestationOfResidence": "Attestation of residence",
+      "privatePostOfficeBoxRentalAgreement": "Private post office box rental agreement",
+      "oldAgeSecurityOrCppBenefits": "Old Age Security (T4A) or CPP benefits (T4AP) statement",
+      "noneOfThese": "I don’t have any of these"
+    },
+    "continueButton": "Continue",
+    "backButton": "Back"
   },
   "ProofingBarcodeCanadaPost": {
     "heading": "Rendez-vous dans un bureau Postes Canada et munissez-vous de votre code-barres de confirmation",
@@ -190,15 +238,15 @@
   "StartIdentityProofing": {
     "pageTitle": "{{rpName}} vous demande de prouver votre identité",
     "proveYourIdentity": "Prouvez votre identité en ligne",
-    "heading": "Le processus de confirmation d’identité prouve qui vous êtes, vous protège contre la fraude et vous permet de récupérer votre identifiant {{appName}} en cas de besoin.",
+    "heading": "Le processus de confirmation d’identité prouve qui vous êtes, vous protège contre la fraude et vous permet de récupérer votre identifiant ConnexionCanada en cas de besoin. ",
     "learnMoreDescription": "En savoir plus sur la confirmation d’identité",
     "howToProveHeading": "Comment souhaitez-vous prouver votre identité?",
-    "onlineInstantOption": "Confirmation d’identité en ligne et accès immédiat",
-    "onlineInstantHint": "Prenez un égoportrait et une photo de votre document d’identité avec votre téléphone ou connectez-vous avec votre compte provincial (C.-B., AB, QC).",
+    "onlineInstantOption": "Prouvez votre identité en ligne et bénéficiez d’un accès immédiat",
+    "onlineInstantHint": "Prenez un égoportrait et une photo de votre document d’identité ou connectez-vous avec votre compte provincial (C.-B., AB, QC).",
     "inPersonSignBackInOption": "Confirmation d’identité en personne suivie d’une reconnexion",
-    "inPersonSignBackInHint": "Prévoyez une visite dans un bureau Postes Canada ou dans un centre Service Canada et munissez-vous d’un document d’identité gouvernemental valide.",
-    "cantProveNowOption": "Confirmation d’identité plus tard ou d’une manière différente",
-    "cantProveNowHint": "Déconnectez-vous et connectez-vous à nouveau lorsque vous serez prêt ou prête, ou découvrez les autres manières d’accéder à {{rpName}}.",
+    "inPersonSignBackInHint": "Prévoyez une visite dans un bureau Postes Canada ou dans un centre Service Canada et munissez-vous d’un document d’identité délivré par un gouvernement et en cours de validité.",
+    "cantProveNowOption": "Prouver mon identité plus tard ou d’une manière différente",
+    "cantProveNowHint": "Déconnectez-vous et connectez-vous à nouveau lorsque vous serez prêt ou prête, ou découvrez les autres manières d’accéder à.",
     "radioOnlineLabel": "Do it online",
     "documentScanningOption": "Égoportrait et photo de votre document d’identité",
     "hintDocumentScanningOption": "Il vous sera demandé d’utiliser la caméra de votre téléphone prendre une photo de vous et de votre document d’identité avec photo délivré par un gouvernement.",
@@ -242,8 +290,8 @@
     "noIds": "Je n'ai aucune de ces pièces d'identité"
   },
   "ConfirmIdentityDetails": {
-    "pageTitle": "Confirmez les éléments qui seront associés à votre identifiant ConnexionCanada",
-    "description": "Passez en revue les éléments qui seront associés à votre identifiant ConnexionCanada. Vous pouvez modifier la plupart des renseignements ici ou les mettre à jour plus tard.",
+    "pageTitle": "Ajouté à votre identifiant ConnexionCanada",
+    "description": "Passez en revue les éléments ajoutés à votre identifiant ConnexionCanada.",
     "identityProofingDetails": "Détails de la confirmation de l’identité",
     "name": "Nom",
     "dateOfBirth": "Date de naissance",
@@ -256,8 +304,8 @@
     "phoneNumber": "Phone number",
     "communication": "Communication",
     "confirmAndContinue": "Continuer",
-    "successNoticeTitle": "Vos renseignements d’identité ont bien été vérifiés et la confirmation a été effectuée.",
-    "successNoticeDescription": "Le processus est presque terminé. Confirmez vos renseignements et ajoutez-les à votre identifiant ConnexionCanada, puis transmettez les renseignements demandés {{appName}} pour obtenir votre accès.",
+    "successNoticeTitle": "Opération réussie",
+    "successNoticeDescription": "Vous avez confirmé votre identité avec [méthode de confirmation].",
     "successNoticeTitleWithoutRp": "Your CanadaLogin has succesfully saved your changes",
     "successNoticeDescriptionWithoutRp": "Continue with accessing the service",
     "verifiedBadgeText": "Identité confirmée le 27 janvier 2026"

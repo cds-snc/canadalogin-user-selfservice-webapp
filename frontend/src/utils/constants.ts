@@ -132,6 +132,7 @@ export const PAGES = {
   manageDashboard: "ManageDashboard",
   ProfileHome: "ProfileHome",
   connectedServices: "ConnectedServices",
+  helpAndSupport: "HelpAndSupport",
   profileUpdateNameSuccess: "ProfileUpdateNameSuccess",
   profileUpdateNameConfirmUpdate: "ProfileUpdateNameConfirmUpdate",
   profileUpdateName: "ProfileUpdateName",
@@ -172,7 +173,10 @@ export const PAGES = {
   deleteFIDO2PasskeyConfirm: "DeleteFIDO2PasskeyConfirm",
   deleteFIDO2PasskeySuccess: "DeleteFIDO2PasskeySuccess",
   idvServiceCanadaCentrePage: "IdvServiceCanadaCentrePage",
+  idvServiceCanadaCentreIdDetailsPage: "IdvServiceCanadaCentreIdDetailsPage",
   idvVisitCanadaPostPage: "IdvVisitCanadaPostPage",
+  idvCanadaPostIdDetailsPage: "IdvCanadaPostIdDetailsPage",
+  idvCanadaPostProofOfAddressPage: "IdvCanadaPostProofOfAddressPage",
   idvServiceCanadaCentreCodePage: "IdvServiceCanadaCentreCodePage",
   idvProofingBarcodeCanadaPostPage: "IdvProofingBarcodeCanadaPostPage",
   idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
@@ -258,7 +262,9 @@ export const VITE_ENVIRONMENTS = {
   prod: "prod",
 } as const;
 
-export const DEV_ONLY_FEATURE = config.environment === VITE_ENVIRONMENTS.dev;
+export const DEV_ONLY_FEATURE =
+  config.environment === VITE_ENVIRONMENTS.dev ||
+  config.environment === VITE_ENVIRONMENTS.test; // Temporarily enable DEV-only features in the TEST environment. Going forward, IDV feature will be controlled using group feature flags.
 
 export const NON_PROD_ENVIRONMENT =
   config.environment === VITE_ENVIRONMENTS.dev ||
@@ -627,5 +633,12 @@ export const gcHelpCentreLinks = {
   learnAboutPasskeys: {
     en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/get-started/two-step-verification-methods/#passkeys`,
     fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/se-lancer-connexioncanada/verification-deux-etapes/#cles-acces`,
+  },
+} as const;
+
+export const manageDashboardLinks = {
+  helpAndSupport: {
+    en: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainEN}/users/`,
+    fr: `${EXTERNAL_NAVIGATION_LINKS.CanadaLoginWebsiteProdDomainFR}/utilisateurs/`,
   },
 } as const;

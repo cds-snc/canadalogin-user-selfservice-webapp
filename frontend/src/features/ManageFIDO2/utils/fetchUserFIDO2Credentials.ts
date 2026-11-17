@@ -24,8 +24,7 @@ export const fetchUserFIDO2Credentials = async ({
 
   try {
     const response = (await fido2Api.getUserFIDO2Credentials()) as
-      | { success?: boolean; data?: { fido2?: unknown[] } }
-      | undefined;
+      { success?: boolean; data?: { fido2?: unknown[] } } | undefined;
     if (response && response?.success) {
       setData((response?.data?.fido2 || []) as Fido2Credential[]);
     }

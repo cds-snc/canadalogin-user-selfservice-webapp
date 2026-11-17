@@ -9,6 +9,8 @@
     "securitySettingsPasskey": "Clé d’accès",
     "connectedServices": "Connected Services",
     "connectedServicesDescription": "View the services currently connected with your CanadaLogin and other available government programs.",
+    "helpAndSupport": "Aide et soutien technique",
+    "helpAndSupportDescription": "Obtenez de l’aide concernant l’utilisation de ConnexionCanada et la façon de communiquer avec l’équipe de soutien.",
     "pageTitle": "Gérer ConnexionCanada"
   }
 }

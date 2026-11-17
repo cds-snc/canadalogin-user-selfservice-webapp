@@ -9,6 +9,8 @@
     "securitySettingsPasskey": "Passkey",
     "connectedServices": "Connected services",
     "connectedServicesDescription": "View the services currently connected with your CanadaLogin and other available government programs.",
+    "helpAndSupport": "Help and support",
+    "helpAndSupportDescription": "Get help on how to use CanadaLogin and how to contact support.",
     "pageTitle": "Manage CanadaLogin"
   }
 }

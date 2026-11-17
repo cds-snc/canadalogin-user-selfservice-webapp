@@ -12,6 +12,7 @@ from app.utils.phone_mfa_rate_limit import (
     assert_phone_mfa_registration_rate_limit_not_exceeded,
     consume_mfa_send_daily_quota,
     record_phone_mfa_registration_event,
+    release_otp_send_daily_quota,
 )
 from app.utils.schemas import ResponseModel
 from fastapi import HTTPException, Request, status
@@ -146,13 +147,18 @@ async def handle_send_mfa_otp(
             or verification_request.id not in sent_factor_ids
         )
 
-    http_client_response = await dispatch_send_mfa_otp(
-        global_http_client,
-        verification_request,
-        otp_type,
-        user_access_token,
-        user_language,
-    )
+    try:
+        http_client_response = await dispatch_send_mfa_otp(
+            global_http_client,
+            verification_request,
+            otp_type,
+            user_access_token,
+            user_language,
+        )
+    except Exception:
+        if request is not None:
+            await release_otp_send_daily_quota(request, user_id)
+        raise
 
     if should_enforce_phone_rate_limit:
         _mark_factor_id_as_sent(request, verification_request.id)

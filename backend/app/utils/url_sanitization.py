@@ -10,6 +10,7 @@ SENSITIVE_QUERY_PARAM_KEYS = {
     "password",
     "search",
     "secret",
+    "sid",
     "token",
     "username",
 }

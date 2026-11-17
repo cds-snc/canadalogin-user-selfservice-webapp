@@ -88,10 +88,7 @@ export const formatDateOfBirthForDisplay = (
 };
 
 export type DateOfBirthValidationError =
-  | "required"
-  | "invalid"
-  | "year"
-  | "future";
+  "required" | "invalid" | "year" | "future";
 
 export const getDateOfBirthValidationError = (
   value: string,

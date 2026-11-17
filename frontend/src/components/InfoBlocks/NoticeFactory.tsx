@@ -5,10 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { ReactElement } from "react";
 
 export type NoticeType =
-  | "mfaDeleted"
-  | "mfaAdded"
-  | "passkeyAdded"
-  | "passkeyDeleted";
+  "mfaDeleted" | "mfaAdded" | "passkeyAdded" | "passkeyDeleted";
 
 interface NoticeFactoryProps {
   noticeType: NoticeType;

@@ -79,6 +79,7 @@ export default function PartnerLinkSuccessPage() {
             noticeTitle={t("PartnerLinkSuccess.noticeTitle", {
               partnerName,
             })}
+            className="notice-heading-no-character-limit"
           >
             <GcdsText>
               {t("PartnerLinkSuccess.noticeText", {

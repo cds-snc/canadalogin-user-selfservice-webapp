@@ -5,18 +5,10 @@ export type AppLanguage = "en" | "fr";
 export type ProfileLanguageCode = "en-ca" | "fr-ca";
 
 export type FlowType =
-  | "smsotp"
-  | "voiceotp"
-  | "email"
-  | "dashboard"
-  | "profile"
-  | "manage";
+  "smsotp" | "voiceotp" | "email" | "dashboard" | "profile" | "manage";
 
 export type NoticeType =
-  | "mfaAdded"
-  | "mfaDeleted"
-  | "passkeyAdded"
-  | "passkeyDeleted";
+  "mfaAdded" | "mfaDeleted" | "passkeyAdded" | "passkeyDeleted";
 
 export const pageIds = [
   "Verification",
@@ -65,7 +57,10 @@ export const pageIds = [
   "DeleteFIDO2PasskeyConfirm",
   "DeleteFIDO2PasskeySuccess",
   "IdvServiceCanadaCentrePage",
+  "IdvServiceCanadaCentreIdDetailsPage",
   "IdvVisitCanadaPostPage",
+  "IdvCanadaPostIdDetailsPage",
+  "IdvCanadaPostProofOfAddressPage",
   "IdvServiceCanadaCentreCodePage",
   "IdvProofingBarcodeCanadaPostPage",
   "IdvStartIdentityProofingPage",

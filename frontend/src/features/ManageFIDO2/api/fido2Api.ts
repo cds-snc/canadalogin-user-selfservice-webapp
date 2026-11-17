@@ -8,9 +8,7 @@ interface AssertionOptionsRequest {
 }
 
 type DeleteRegistrationAction =
-  | "verify"
-  | "commit"
-  | "commit_with_verification";
+  "verify" | "commit" | "commit_with_verification";
 
 type OtpVerificationPayload = {
   otp: string;
