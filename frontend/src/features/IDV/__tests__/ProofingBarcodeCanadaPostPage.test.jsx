@@ -173,7 +173,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     );
 
     expect(
-      screen.getByText("Take your proofing barcode to Canada Post"),
+      screen.getByText("Take your CanadaLogin barcode to a Canada Post"),
     ).toBeInTheDocument();
   });
 
