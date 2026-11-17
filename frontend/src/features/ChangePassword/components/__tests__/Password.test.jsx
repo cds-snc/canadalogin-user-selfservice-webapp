@@ -235,6 +235,7 @@ describe("Password Component", () => {
       expect(
         screen.getByText("You have verified your CanadaLogin"),
       ).toBeInTheDocument();
+      expect(notice).toHaveAttribute("data-page-focus-target", "true");
     });
 
     it("renders the password change form", async () => {
