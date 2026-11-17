@@ -1,5 +1,5 @@
 import { BrowserRouter } from "react-router";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { FLOW_TYPES } from "../../../utils/constants";
 import OtpVerification from "../components/OtpVerification";
@@ -87,6 +87,12 @@ vi.mock("@gcds-core/components-react", () => ({
     <a data-testid="gcds-link" onClick={onGcdsClick} {...props}>
       {children}
     </a>
+  ),
+  GcdsNotice: ({ children, noticeTitle, ...props }) => (
+    <div {...props} data-testid="notice">
+      <div>{noticeTitle}</div>
+      {children}
+    </div>
   ),
 }));
 
@@ -189,6 +195,33 @@ describe("OtpVerification Component", () => {
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "Check your phone",
+    );
+  });
+
+  it("sets the resend success notice as the page focus target", async () => {
+    mockRequestNewOtpCode.mockResolvedValue(true);
+
+    render(
+      <TestWrapper>
+        <OtpVerification
+          {...defaultProps}
+          phoneFormData={{
+            ...defaultProps.phoneFormData,
+            expiry: "2000-01-01T00:00:00.000Z",
+          }}
+        />
+      </TestWrapper>,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Request a new code" }),
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId("notice")).toHaveAttribute(
+        "data-page-focus-target",
+        "true",
+      ),
     );
   });
 

@@ -29,12 +29,13 @@ vi.mock("@gcds-core/components-react", () => ({
     );
   },
   GcdsText: ({ children }) => <div data-testid="gcds-text">{children}</div>,
-  GcdsNotice: ({ children, noticeRole, noticeTitleTag, noticeTitle }) => (
+  GcdsNotice: ({ children, noticeRole, noticeTitleTag, noticeTitle, ...props }) => (
     <div
       data-testid="gcds-notice"
       data-notice-role={noticeRole}
       data-notice-title-tag={noticeTitleTag}
       data-notice-title={noticeTitle}
+      {...props}
     >
       {children}
     </div>
@@ -119,6 +120,7 @@ describe("AddSecondMFA Unit Tests", () => {
       expect(notice).toHaveAttribute("data-notice-role", "success");
       expect(notice).toHaveAttribute("data-notice-title-tag", "h2");
       expect(notice).toHaveAttribute("data-notice-title", "Success");
+      expect(notice).toHaveAttribute("data-page-focus-target", "true");
 
       // Check grid component
       const grid = screen.getByTestId("gcds-grid");

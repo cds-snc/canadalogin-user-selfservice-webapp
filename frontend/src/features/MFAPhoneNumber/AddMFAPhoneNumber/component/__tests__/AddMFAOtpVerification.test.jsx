@@ -683,6 +683,7 @@ describe("AddMFAOtpVerification Unit Tests", () => {
       expect(successNotice).toBeInTheDocument();
       expect(successNotice).toHaveTextContent("Success");
       expect(successNotice).toHaveTextContent("We have sent you a new code");
+      expect(successNotice).toHaveAttribute("data-page-focus-target", "true");
     });
 
     it("should hide success notice when an error message is displayed", async () => {

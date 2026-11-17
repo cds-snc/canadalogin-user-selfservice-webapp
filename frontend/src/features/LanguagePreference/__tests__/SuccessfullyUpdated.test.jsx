@@ -91,11 +91,12 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsNotice: ({ children, noticeRole, noticeTitle, noticeTitleTag }) => (
+  GcdsNotice: ({ children, noticeRole, noticeTitle, noticeTitleTag, ...props }) => (
     <div
       data-testid="gcds-notice"
       data-notice-role={noticeRole}
       style={{ noticeTitle: noticeTitle, noticeTitleTag: noticeTitleTag }}
+      {...props}
     >
       {noticeTitle && <div data-testid="notice-title">{noticeTitle}</div>}
       {children}
@@ -186,6 +187,7 @@ describe("SuccessfullyUpdatedLanguage Component", () => {
       const notices = screen.getAllByTestId("gcds-notice");
       expect(notices).toHaveLength(2);
       expect(notices[0]).toHaveAttribute("data-notice-role", "success");
+      expect(notices[0]).toHaveAttribute("data-page-focus-target", "true");
       expect(notices[1]).toHaveAttribute("data-notice-role", "warning");
     });
 
