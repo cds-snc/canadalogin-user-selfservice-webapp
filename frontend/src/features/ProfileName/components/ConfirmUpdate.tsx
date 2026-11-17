@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams } from "react-router";
 import {
   GcdsButton,
@@ -31,6 +32,10 @@ export default function ConfirmUpdate({
   errorMessage,
   localLoading,
 }: ProfileNameConfirmProps) {
+  useEffect(() => {
+    document.getElementById("profile-name-confirmation-heading")?.focus();
+  }, []);
+
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
 
@@ -54,7 +59,11 @@ export default function ConfirmUpdate({
       <ErrorMessage errorMessage={errorMessage} />
       <GcdsContainer role="main">
         <GcdsGrid columns="1" gap="300">
-          <GcdsHeading tag="h1">
+          <GcdsHeading
+            tag="h1"
+            id="profile-name-confirmation-heading"
+            tabIndex={-1}
+          >
             {t("ProfileUpdateNameConfirmUpdate.title")}
           </GcdsHeading>
           <div>

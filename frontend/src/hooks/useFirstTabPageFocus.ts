@@ -242,6 +242,17 @@ export const useFirstTabPageFocus = ({
       }
 
       const activeElement = document.activeElement;
+      const mainContent = document.getElementById(mainContentId);
+
+      if (
+        activeElement &&
+        mainContent &&
+        activeElement === getPreferredFocusTarget(mainContent)
+      ) {
+        shouldHandleFirstTabRef.current = false;
+        forceInterceptNextTabRef.current = false;
+        return;
+      }
 
       // If focus is already somewhere meaningful, do not override the user's context.
       if (
