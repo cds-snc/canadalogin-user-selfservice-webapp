@@ -254,6 +254,23 @@ describe("ConfirmUpdate Component Tests", () => {
     expect(screen.getByText(/John Doe/)).toBeInTheDocument();
   });
 
+  it("focuses the confirmation heading on mount", async () => {
+    await act(async () => {
+      render(
+        <TestWrapper>
+          <ConfirmUpdate {...defaultProps} />
+        </TestWrapper>,
+      );
+    });
+
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Are you sure you want to update your name?",
+      }),
+    ).toHaveFocus();
+  });
+
   it("calls onConfirm when Yes, update button is clicked", async () => {
     await act(async () => {
       render(

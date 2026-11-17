@@ -22,7 +22,7 @@ import PhoneMfaIcon from "../../../assets/icons/phone_mfa_icon.svg?react";
 import FIDOPasskeyCollage from "../../../assets/icons/passkey_collage.svg?react";
 import type { NoticeType } from "../../InfoBlocks/NoticeFactory";
 import type { OtpFactorReference } from "../../../types/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getErrorMessage } from "../../../utils/errorUtils";
 import ErrorSummaryWithFocus from "../../ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 
@@ -50,6 +50,7 @@ interface Manage2FANoticeState {
   phoneNumber?: string;
   otpType?: string;
   passkeyName?: string;
+  focusManage2FAHeading?: boolean;
 }
 
 function SectionHeader({ icon, title }: SectionHeaderProps) {
@@ -81,6 +82,11 @@ export default function Manage2FAVerifications() {
     useState<Manage2FANoticeState | null>(
       (location.state as Manage2FANoticeState | null) || null,
     );
+  const hasFocusedManageHeading = useRef(false);
+
+  const shouldFocusManageHeading = Boolean(
+    (location.state as Manage2FANoticeState | null)?.focusManage2FAHeading,
+  );
 
   useEffect(() => {
     const locationState = location.state as Manage2FANoticeState | null;
@@ -106,6 +112,23 @@ export default function Manage2FAVerifications() {
       enabled: true,
       setErrorCode: () => {},
     });
+
+  useEffect(() => {
+    if (
+      !shouldFocusManageHeading ||
+      localLoading ||
+      passkeyLoading ||
+      hasFocusedManageHeading.current
+    ) {
+      return;
+    }
+
+    const heading = document.getElementById("manage-2fa-page-heading");
+    if (heading) {
+      heading.focus();
+      hasFocusedManageHeading.current = true;
+    }
+  }, [localLoading, passkeyLoading, shouldFocusManageHeading]);
 
   const fullPhoneFactorsMap = userPhoneFactorsMap as Record<
     string,
@@ -134,7 +157,13 @@ export default function Manage2FAVerifications() {
         />
       )}
 
-      <GcdsHeading tag="h1">{t("Manage2FAVerifications.title")}</GcdsHeading>
+      <GcdsHeading
+        tag="h1"
+        id="manage-2fa-page-heading"
+        tabIndex={shouldFocusManageHeading ? -1 : undefined}
+      >
+        {t("Manage2FAVerifications.title")}
+      </GcdsHeading>
       <GcdsText>{t("Manage2FAVerifications.description")}</GcdsText>
 
       <GcdsHeading tag="h2">
