@@ -213,9 +213,7 @@ describe("OtpVerification Component", () => {
       </TestWrapper>,
     );
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "Request a new code" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Request a new code" }));
 
     await waitFor(() =>
       expect(screen.getByTestId("notice")).toHaveAttribute(
