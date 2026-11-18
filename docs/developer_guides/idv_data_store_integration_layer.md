@@ -115,7 +115,6 @@ Scopes are configured in `IdvDataStoreConfig` (read from env):
 | `IDV_DATA_STORE_IN_PERSON_VERIFICATION_SCOPES` | `idv:in-person-verification:send` | `InPersonIdentityVerificationClient.get_last_email_sent` |
 | `IDV_DATA_STORE_ONLINE_VERIFICATION_SCOPES`    | `idv:auth:verified-claims`        | `OnlineIdentityVerificationClient` (both methods)        |
 | `IDV_DATA_STORE_IDENTITY_DOCUMENTS_SCOPES`     | `idv:identity-documents:read`     | `IdentityDocumentsClient.list_documents`                 |
-| `IDV_DATA_STORE_AUTH_USERINFO_SCOPES`          | `idv:auth:userinfo`               | Reserved — not yet wired to a client                     |
 
 ## Active Endpoints
 
@@ -128,4 +127,3 @@ Resolved from `Configuration` properties using `IDV_DATA_STORE_BASE_URL`:
 | `idv_data_store_online_verification_endpoint`               | `/v1/identity-verifications/online`                   |
 | `idv_data_store_online_session_endpoint(case_id)`           | `/v1/identity-verifications/{case_id}/online-session` |
 | `idv_data_store_identity_documents_endpoint`                | `/v1/identity-documents`                              |
-| `idv_data_store_userinfo_endpoint`                          | `/v1/auth/userinfo`                                   |
