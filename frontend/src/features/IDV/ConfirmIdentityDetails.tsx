@@ -22,13 +22,18 @@ import {
 import VerifiedBadge from "../../components/Badges/VerifiedBadge";
 import { mockIdentityClaims } from "./data/mockIdentityClaims";
 
+type VerificationMethod =
+  "bluink" | "provincial" | "canada_post" | "service_canada";
+
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const isMockProofing = DEV_ONLY_FEATURE && state?.mockProofing === true;
+  const verificationMethod =
+    state?.verificationMethod as VerificationMethod | null;
   const { t, i18n } = useTranslation(["idv", "profile"]);
   const { language, journeyType } = useParams();
-  const { relyingPartyName, hasRelyingParty } = useRelyingPartyInfo();
+  const { hasRelyingParty } = useRelyingPartyInfo();
 
   const [identityVerificationClaims, setIdentityVerificationClaims] =
     useState<IdentityVerificationClaimsResponse>();
@@ -74,6 +79,24 @@ export default function ConfirmIdentityDetails() {
     ? "ConfirmIdentityDetails.successNoticeDescription"
     : "ConfirmIdentityDetails.successNoticeDescriptionWithoutRp";
 
+  const getMethodDisplayName = (method: VerificationMethod | null): string => {
+    switch (method) {
+      case "bluink":
+        return t("IDVInProgress.methodBluink", "Bluink verification");
+      case "provincial":
+        return t("IDVInProgress.methodProvincial", "Provincial verification");
+      case "canada_post":
+        return t("IDVInProgress.methodCanadaPost", "Canada Post verification");
+      case "service_canada":
+        return t(
+          "IDVInProgress.methodServiceCanada",
+          "Service Canada Centre verification",
+        );
+      default:
+        return t("IDVInProgress.methodUnknown", "Identity verification");
+    }
+  };
+
   const handleContinue = async () => {
     navigate(
       dataTransparencyPage,
@@ -111,7 +134,12 @@ export default function ConfirmIdentityDetails() {
             noticeTitle={t(successNoticeTitleKey)}
           >
             <GcdsText>
-              {t(successNoticeDescriptionKey, { appName: relyingPartyName })}
+              {t(successNoticeDescriptionKey).replace(
+                "[proofing method]",
+                verificationMethod
+                  ? getMethodDisplayName(verificationMethod)
+                  : "[proofing method]",
+              )}
             </GcdsText>
           </AccessibleNotice>
         </GcdsContainer>
@@ -123,7 +151,7 @@ export default function ConfirmIdentityDetails() {
 
           <GcdsText>{t("ConfirmIdentityDetails.description")}</GcdsText>
 
-          {DEV_ONLY_FEATURE && verifiedClaims && (
+          {verifiedClaims && (
             <GcdsContainer>
               <GcdsGrid columns="1fr auto" className="gridInline">
                 <GcdsHeading tag="h2" marginTop="0">

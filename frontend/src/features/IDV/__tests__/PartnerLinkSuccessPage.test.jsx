@@ -139,7 +139,7 @@ describe("PartnerLinkSuccessPage", () => {
     fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/manage-account/details-confirmation",
+      "/en/identity-verification/manage-account/details-confirmation?method=provincial",
     );
   });
 
