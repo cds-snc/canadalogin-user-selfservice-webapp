@@ -16,29 +16,36 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   reporter: isCI
     ? [
+        ["list"],
         ["github"],
         ["html", { open: "never" }],
         ["junit", { outputFile: "test-results/junit.xml" }],
       ]
     : [["list"], ["html", { open: "never" }]],
   use: {
+    // Applies to every project, including setup: the API's load balancer rejects
+    // Playwright's default headless user agent ("HeadlessChrome") with a 403.
+    ...devices["Desktop Chrome"],
     baseURL: env.baseURL,
     ignoreHTTPSErrors: env.ignoreHttpsErrors,
     locale: "en-CA",
     timezoneId: env.timezone,
-    trace: "on-first-retry",
+    // Traces and videos capture network traffic (session cookies). CI artifacts are
+    // downloadable from this public repo, so only keep them for local runs.
+    trace: isCI ? "off" : "on-first-retry",
+    video: isCI ? "off" : "retain-on-failure",
     screenshot: "only-on-failure",
-    video: "retain-on-failure",
   },
   projects: [
     {
       name: "setup",
       testMatch: /.*\.setup\.ts/,
+      // Sign-in posts the test users' passwords: never record it.
+      use: { trace: "off", video: "off", screenshot: "off" },
     },
     {
       name: "idv",
       testMatch: /idv\/.*\.spec\.ts/,
-      use: { ...devices["Desktop Chrome"] },
       dependencies: ["setup"],
     },
   ],

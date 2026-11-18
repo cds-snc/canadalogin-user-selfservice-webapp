@@ -12,6 +12,7 @@ e2e/
 ├── pages/              # Page objects (one class per screen)
 │   └── components/     # Sections shared by several screens
 ├── support/            # env, test users, i18n copy, API and navigation helpers
+├── ci/                 # CI workflow scaffold (not enabled yet; see "CI")
 └── tests/
     ├── auth.setup.ts   # signs each test user in once and saves the session to .auth/
     └── idv/            # IDV journeys
@@ -22,7 +23,7 @@ Assertions use the frontend's own translation files (`frontend/src/i18n/locales`
 ## Prerequisites
 
 - The target frontend must have the IDV routes enabled (`VITE_ENVIRONMENT=dev` or `test`).
-- The OIDC application used by the target environment must have **no access policy** so test users aren't prompted for OTP/MFA.
+- Test users must not be prompted for OTP/MFA. In dev/test tenants, add them to an MFA-exempt group (e.g. `MFA_Exempt`) that the self-service app's access policy allows without MFA, rather than removing the policy for everyone.
 - Two test users in the target IBM Verify tenant:
   - **User A** (`E2E_PROVEN_USER_*`) has completed fake ID proofing.
   - **User B** (`E2E_UNPROVEN_USER_*`) has no ID proofing data.
@@ -62,6 +63,25 @@ npm run typecheck
 
 Tests run serially (`workers: 1`) because they share test accounts whose IDV state is changed by the journeys. Give each journey its own user before enabling parallel runs.
 
+## CI
+
+Not enabled yet. The suite runs locally only for now.
+
+A workflow scaffold is kept in [`ci/`](./ci) for a later task:
+
+- [`ci/e2e-tests.yml`](./ci/e2e-tests.yml): runs on PRs that change `e2e/**`, after each dev deployment, nightly, and manually (dev or test). GitHub ignores it until it's moved to `.github/workflows/`.
+- [`ci/setup-e2e-environments.sh`](./ci/setup-e2e-environments.sh): creates the dedicated `e2e-dev` / `e2e-test` GitHub environments and sets their variables, prompting for secrets. Requires repository admin access.
+
+To enable it, have an admin run the setup script, then `git mv e2e/ci/e2e-tests.yml .github/workflows/e2e-tests.yml`.
+
+This repository is public, so workflow artifacts can be downloaded by any GitHub user. The config already disables traces and videos in CI and never records the sign-in step.
+
+## Troubleshooting
+
+- **403 from the API:** the API's load balancer rejects non-browser user agents, including Playwright's default `HeadlessChrome`. Every project uses the `Desktop Chrome` device profile for this reason (see `playwright.config.ts`); keep it when adding projects.
+- **`E2E_BASE_URL`** must be the frontend origin without a path (e.g. `https://app.dev.login-connexion.alpha.canada.ca`, not `.../en`).
+- **`E2E_IDV_DATA_STORE_URL`** needs a hostname with a valid TLS certificate; a raw AWS load balancer hostname fails certificate checks.
+
 ## Writing tests
 
 - Add a page object in `pages/` for each new screen; keep selectors there, not in specs.
@@ -69,3 +89,4 @@ Tests run serially (`workers: 1`) because they share test accounts whose IDV sta
 - Cover both `en` and `fr` by looping over `LANGUAGES`.
 - Wait for the API call a page depends on (see `gotoAndWaitForClaims` in `support/navigation.ts`) before asserting that something is absent.
 - Never commit credentials or anything under `.auth/` (saved sessions contain live cookies).
+- Never pass secrets to `fill()`, `type()` or `keyboard.insertText()`: their values appear in step titles and reports.

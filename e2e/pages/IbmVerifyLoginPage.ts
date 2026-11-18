@@ -34,12 +34,28 @@ export class IbmVerifyLoginPage {
       await this.signInChoiceButton.click();
     }
     if (await this.emailInput.isVisible()) {
-      await this.emailInput.fill(email);
+      await fillWithoutLogging(this.emailInput, email);
       await this.emailContinueButton.click();
     }
 
     await expect(this.passwordInput).toBeVisible();
-    await this.passwordInput.fill(password);
+    await fillWithoutLogging(this.passwordInput, password);
     await this.submitButton.click();
   }
+}
+
+/**
+ * `locator.fill(value)` puts the value in the step title (e.g. `Fill "<password>"`),
+ * which ends up in HTML reports and CI artifacts. Setting the value via `evaluate`
+ * keeps credentials out of them; the input/change events let the GCDS component
+ * pick up the value exactly as it does for typed input.
+ */
+async function fillWithoutLogging(input: Locator, value: string) {
+  await input.focus();
+  await input.evaluate((element, text) => {
+    const field = element as HTMLInputElement;
+    field.value = text;
+    field.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
+    field.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
+  }, value);
 }
