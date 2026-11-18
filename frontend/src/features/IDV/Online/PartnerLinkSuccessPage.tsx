@@ -58,10 +58,14 @@ export default function PartnerLinkSuccessPage() {
       : AVAILABLE_LANGUAGES.en;
   const partnerName =
     PARTNER_DISPLAY_NAMES[normalizedPartnerId][currentLanguage];
-  const detailsConfirmationPage = path(PAGES.idvDetailsConfirmationPage, {
+  const idvInProgressPage = path(PAGES.idvInProgressIDVPage, {
     language,
     journeyType,
   });
+
+  const handleContinue = () => {
+    navigate(idvInProgressPage + "?method=provincial");
+  };
 
   return (
     <GcdsContainer role="main">
@@ -90,12 +94,7 @@ export default function PartnerLinkSuccessPage() {
         </GcdsContainer>
 
         <GcdsGrid columns="max-content" gap="200">
-          <GcdsButton
-            type="button"
-            onClick={() => {
-              navigate(detailsConfirmationPage);
-            }}
-          >
+          <GcdsButton type="button" onClick={handleContinue}>
             {t("PartnerLinkSuccess.continueButton")}
           </GcdsButton>
         </GcdsGrid>
