@@ -118,7 +118,9 @@ export default function InPersonProofingInProgress() {
           <AccessibleNotice
             noticeRole="success"
             noticeTitleTag="h2"
-            noticeTitle={t("InPersonProofingInProgress.resendEmailSuccessTitle")}
+            noticeTitle={t(
+              "InPersonProofingInProgress.resendEmailSuccessTitle",
+            )}
           >
             <GcdsText>
               {t("InPersonProofingInProgress.resendEmailSuccess", {
