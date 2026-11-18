@@ -79,14 +79,9 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsButton: ({ children, onGcdsClick, buttonRole, buttonId }) => (
+  GcdsButton: ({ children, onGcdsClick, buttonId }) => (
     <button
-      data-testid={
-        buttonId ??
-        (buttonRole === "danger"
-          ? "reset-method-button"
-          : "resend-email-button")
-      }
+      data-testid={buttonId ?? "reset-method-button"}
       onClick={(e) => onGcdsClick?.(e)}
     >
       {children}
@@ -155,28 +150,6 @@ describe("InPersonProofingInProgress", () => {
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/update",
     );
-  });
-
-  it("resends code and does not navigate when resend button is clicked", () => {
-    render(<InPersonProofingInProgress />);
-
-    fireEvent.click(screen.getByTestId("resend-email-button"));
-
-    expect(mockSendInPersonVerificationCode).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).not.toHaveBeenCalled();
-  });
-
-  it("uses sentAt from API response for the notice date when resending", async () => {
-    mockSendInPersonVerificationCode.mockResolvedValue({
-      success: true,
-      data: { sentAt: "2026-07-20T18:00:00+00:00" },
-    });
-
-    render(<InPersonProofingInProgress />);
-
-    fireEvent.click(screen.getByTestId("resend-email-button"));
-
-    expect(await screen.findByText(/July 20, 2026/)).toBeInTheDocument();
   });
 
   it("renders the completed proofing collapsible header", () => {

@@ -92,8 +92,17 @@ export default function ProofingBarcodeCanadaPostPage() {
         validityDays: verificationValidityDays ?? 30,
       });
 
+  const idvInProgressPage = path(PAGES.idvInProgressIDVPage, {
+    language,
+    journeyType,
+  });
+
   const handlePrintPage = () => {
     window.print();
+  };
+
+  const handleNextStep = () => {
+    navigate(idvInProgressPage + "?method=canada_post");
   };
 
   if (!DEV_ONLY_FEATURE) {
@@ -239,6 +248,21 @@ export default function ProofingBarcodeCanadaPostPage() {
             .
           </GcdsText>
         </AccessibleNotice>
+
+        <GcdsGrid
+          columns="1"
+          columnsDesktop="max-content max-content"
+          gap="200"
+        >
+          <GcdsButton
+            buttonRole="primary"
+            type="button"
+            onGcdsClick={handleNextStep}
+            className="visit-canada-post-print-hide"
+          >
+            {t("ProofingBarcodeCanadaPost.nextStepButton", "Next step")}
+          </GcdsButton>
+        </GcdsGrid>
       </GcdsGrid>
     </GcdsContainer>
   );
