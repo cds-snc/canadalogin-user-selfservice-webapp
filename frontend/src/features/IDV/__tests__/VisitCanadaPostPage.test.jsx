@@ -2,7 +2,10 @@ import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import VisitCanadaPost from "../InPerson/VisitCanadaPostPage";
-import { getIdTypeRequiredMessage, getSelectOptionRequiredMessage } from "../InPerson/validation/ErrorsDefinition";
+import {
+  getIdTypeRequiredMessage,
+  getSelectOptionRequiredMessage,
+} from "../InPerson/validation/ErrorsDefinition";
 import i18n from "../../../i18n/test";
 
 const mockNavigate = vi.fn();
@@ -279,11 +282,13 @@ describe("VisitCanadaPost (Select your ID)", () => {
     const errorSummary = screen.getByTestId("errorSummary");
     expect(errorSummary).toHaveTextContent(getIdTypeRequiredMessage(t));
     expect(errorSummary).toHaveTextContent(getSelectOptionRequiredMessage(t));
-  
+
     const radiosErrors = screen.getAllByTestId("radios-error");
     expect(radiosErrors).toHaveLength(2);
     expect(radiosErrors[0]).toHaveTextContent(getIdTypeRequiredMessage(t));
-    expect(radiosErrors[1]).toHaveTextContent(getSelectOptionRequiredMessage(t));
+    expect(radiosErrors[1]).toHaveTextContent(
+      getSelectOptionRequiredMessage(t),
+    );
     expect(mockGetIdentityDocuments).not.toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
   });
