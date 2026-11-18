@@ -66,31 +66,38 @@ export const inPersonIdentityVerificationApi = {
     payload?: SendInPersonVerificationCodeRequest,
   ) => {
     try {
-      const requestBody = payload
-        ? {
-            required_by_rp_client_id: payload.requiredByRpClientId,
-            verification_provider:
-              payload.verificationProvider ?? "service_canada",
-            applicant: payload.applicant
-              ? {
-                  first_name: payload.applicant.firstName,
-                  last_name: payload.applicant.lastName,
-                  date_of_birth: payload.applicant.dateOfBirth,
-                  address: payload.applicant.address
-                    ? {
-                        street_address: payload.applicant.address.streetAddress,
-                        locality: payload.applicant.address.locality,
-                        region: payload.applicant.address.region,
-                        postal_code: payload.applicant.address.postalCode,
-                        country: payload.applicant.address.country,
-                      }
-                    : undefined,
-                  id_type: payload.applicant.idType,
-                  id_expiry_date: payload.applicant.idExpiryDate,
-                }
-              : undefined,
-          }
-        : {};
+      if (!payload) {
+        throw new Error(
+          "Payload is required for sending in-person verification code",
+        );
+      }
+
+      if (!payload.applicant) {
+        throw new Error(
+          "Applicant data is required for sending in-person verification code",
+        );
+      }
+
+      const requestBody = {
+        required_by_rp_client_id: payload.requiredByRpClientId,
+        verification_provider: payload.verificationProvider ?? "service_canada",
+        applicant: {
+          first_name: payload.applicant.firstName,
+          last_name: payload.applicant.lastName,
+          date_of_birth: payload.applicant.dateOfBirth,
+          address: payload.applicant.address
+            ? {
+                street_address: payload.applicant.address.streetAddress,
+                locality: payload.applicant.address.locality,
+                region: payload.applicant.address.region,
+                postal_code: payload.applicant.address.postalCode,
+                country: payload.applicant.address.country,
+              }
+            : undefined,
+          id_type: payload.applicant.idType,
+          id_expiry_date: payload.applicant.idExpiryDate,
+        },
+      };
 
       const response = await axios.post(
         `${config.apiUrl}/v1/identity-verification/in-person`,
