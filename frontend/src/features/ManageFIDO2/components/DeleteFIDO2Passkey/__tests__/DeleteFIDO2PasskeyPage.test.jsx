@@ -651,7 +651,9 @@ describe("DeleteFIDO2PasskeyPage", () => {
   it("calls navigate on next from deleteFIDO2PasskeySuccess", async () => {
     renderPage({ step: "deleteFIDO2PasskeySuccess" });
     await userEvent.click(screen.getByTestId("success-next"));
-    expect(mockNavigate).toHaveBeenCalledWith("/en/mock-path");
+    expect(mockNavigate).toHaveBeenCalledWith("/en/mock-path", {
+      state: { focusManage2FAHeading: true },
+    });
   });
 
   // ── OTP send ─────────────────────────────────────────────────────────

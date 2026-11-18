@@ -197,6 +197,7 @@ export default function OtpVerification({
     <GcdsContainer role="main">
       {shouldShowSuccessNotice ? (
         <AccessibleNotice
+          focusOnMount
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("Verification.successTitle")}
