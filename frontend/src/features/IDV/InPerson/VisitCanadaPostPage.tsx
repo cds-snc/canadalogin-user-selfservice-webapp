@@ -33,6 +33,7 @@ import {
 } from "../data/identityDocuments";
 import {
   getIdTypeRequiredMessage,
+  getSelectOptionRequiredMessage,
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
 
@@ -61,7 +62,7 @@ export default function VisitCanadaPost() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
 
-  const radioOptions = [
+  const idTypeRadioOptions = [
     ...SELECTABLE_DOCUMENT_TYPES.map((documentType) => {
       const hintKey = getDocumentHintKey(documentType);
       return {
@@ -95,15 +96,13 @@ export default function VisitCanadaPost() {
     },
   ];
 
+  const idTypeErrorMessage =
+    hasSubmitted && !selectedValue ? getIdTypeRequiredMessage(t) : "";
+
   const nonExpiredIdError =
     hasSubmitted && !nonExpiredIdAnswer
-      ? t("ErrorsDefinition.selectOptionRequired")
+      ? getSelectOptionRequiredMessage(t)
       : "";
-const idTypeErrorMessage =
-  hasSubmitted && !selectedValue
-    ? getIdTypeRequiredMessage(t)
-    : "";
-
 
   const onNonExpiredIdChange = (event: CustomEvent<string>) => {
     setNonExpiredIdAnswer(
@@ -114,19 +113,13 @@ const idTypeErrorMessage =
   const onContinue = async () => {
     setHasSubmitted(true);
 
-    if (!nonExpiredIdAnswer) {
+    if (!selectedValue || !nonExpiredIdAnswer) {
       setSummaryFocusTrigger((previous) => previous + 1);
       return;
     }
 
     if (nonExpiredIdAnswer === "no") {
       navigate(completeIdentityProofingPage);
-      return;
-    }
-
-    if (!selectedValue) {
-      // Re-trigger focus/scroll if user submits invalid data multiple times.
-      setSummaryFocusTrigger((previous) => previous + 1);
       return;
     }
 
@@ -190,10 +183,14 @@ const idTypeErrorMessage =
                 key={summaryFocusTrigger}
                 id={ERROR_SUMMARY_ID}
                 errorMessage={getValidationSummaryHeading(t)}
-errorLinks={
-  ...(nonExpiredIdError && { [`#${NON_EXPIRED_ID_RADIOS_ID}`]: nonExpiredIdError }),
-  ...(idTypeErrorMessage && { [`#${RADIOS_ID}`]: idTypeErrorMessage }),
-}
+                errorLinks={{
+                  ...(nonExpiredIdError && {
+                    [`#${NON_EXPIRED_ID_RADIOS_ID}`]: nonExpiredIdError,
+                  }),
+                  ...(idTypeErrorMessage && {
+                    [`#${RADIOS_ID}`]: idTypeErrorMessage,
+                  }),
+                }}
                 language={currentLanguage}
               />
             ) : null}
@@ -234,7 +231,7 @@ errorLinks={
               legend={t("CanadaPostSelectId.legend")}
               hint={t("VisitCanadaPost.idHint")}
               lang={currentLanguage}
-              options={radioOptions}
+              options={idTypeRadioOptions}
               value={selectedValue}
               required
               errorMessage={idTypeErrorMessage}

@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import VisitCanadaPost from "../InPerson/VisitCanadaPostPage";
-import { getIdTypeRequiredMessage } from "../InPerson/validation/ErrorsDefinition";
+import { getIdTypeRequiredMessage, getSelectOptionRequiredMessage } from "../InPerson/validation/ErrorsDefinition";
 import i18n from "../../../i18n/test";
 
 const mockNavigate = vi.fn();
@@ -207,6 +207,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
   it("navigates to the complete identity proofing page when No is selected and Continue is clicked", () => {
     render(<VisitCanadaPost />);
 
+    fireEvent.click(screen.getByLabelText("Passport"));
     fireEvent.click(
       screen.getByRole("radio", {
         name: t("VisitCanadaPost.noOption"),
@@ -254,17 +255,35 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("requires an answer to the non-expired ID question before continuing", () => {
+  it("requires an ID selection when No is selected for the non-expired ID question", () => {
+    render(<VisitCanadaPost />);
+
+    fireEvent.click(
+      screen.getByRole("radio", {
+        name: t("VisitCanadaPost.noOption"),
+      }),
+    );
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(screen.getByTestId("errorSummary")).toHaveTextContent(
+      getIdTypeRequiredMessage(t),
+    );
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("requires both radio group answers before continuing", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(screen.getByTestId("continue-button"));
 
-    expect(screen.getByTestId("errorSummary")).toHaveTextContent(
-      t("ErrorsDefinition.selectOptionRequired"),
-    );
-    expect(screen.getByTestId("radios-error")).toHaveTextContent(
-      t("ErrorsDefinition.selectOptionRequired"),
-    );
+    const errorSummary = screen.getByTestId("errorSummary");
+    expect(errorSummary).toHaveTextContent(getIdTypeRequiredMessage(t));
+    expect(errorSummary).toHaveTextContent(getSelectOptionRequiredMessage(t));
+  
+    const radiosErrors = screen.getAllByTestId("radios-error");
+    expect(radiosErrors).toHaveLength(2);
+    expect(radiosErrors[0]).toHaveTextContent(getIdTypeRequiredMessage(t));
+    expect(radiosErrors[1]).toHaveTextContent(getSelectOptionRequiredMessage(t));
     expect(mockGetIdentityDocuments).not.toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();
   });
