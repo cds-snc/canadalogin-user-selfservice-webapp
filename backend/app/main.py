@@ -222,7 +222,7 @@ def create_app():
         tags=["FIDO2"],
     )
 
-    if configuration.ENVIRONMENT in {"local", "dev", "test"}:
+    if configuration.ENVIRONMENT in {"local", "dev", "test", "dev2"}:
         logger.info(
             "Running in local, dev or test environment, Identity Verification routes will be included"
         )
