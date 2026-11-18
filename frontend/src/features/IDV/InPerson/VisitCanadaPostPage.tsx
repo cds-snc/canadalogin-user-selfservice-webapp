@@ -99,10 +99,11 @@ export default function VisitCanadaPost() {
     hasSubmitted && !nonExpiredIdAnswer
       ? t("ErrorsDefinition.selectOptionRequired")
       : "";
-  const idTypeErrorMessage =
-    hasSubmitted && nonExpiredIdAnswer === "yes" && !selectedValue
-      ? getIdTypeRequiredMessage(t)
-      : "";
+const idTypeErrorMessage =
+  hasSubmitted && !selectedValue
+    ? getIdTypeRequiredMessage(t)
+    : "";
+
 
   const onNonExpiredIdChange = (event: CustomEvent<string>) => {
     setNonExpiredIdAnswer(
