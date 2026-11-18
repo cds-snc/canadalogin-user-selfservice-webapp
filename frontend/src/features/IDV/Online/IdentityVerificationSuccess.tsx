@@ -25,18 +25,9 @@ export default function IdentityVerificationSuccess() {
     journeyType,
   });
 
-  const dataTransparencyPage = path(PAGES.dataTransparencyPage, {
-    language,
-    journeyType,
-  });
-
   const handleContinue = () => {
-    const targetPage =
-      journeyType === "required"
-        ? dataTransparencyPage
-        : detailsConfirmationPage;
     navigate(
-      targetPage,
+      detailsConfirmationPage,
       isMockProofing ? { state: { mockProofing: true } } : undefined,
     );
   };

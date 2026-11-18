@@ -95,6 +95,15 @@ export default function ServiceCanadaCentreIDVCodePage() {
     window.print();
   };
 
+  const idvInProgressPage = path(PAGES.idvInProgressIDVPage, {
+    language,
+    journeyType,
+  });
+
+  const handleNextStep = () => {
+    navigate(idvInProgressPage + "?method=service_canada");
+  };
+
   const handleSignOut = async (event: Event) => {
     event.preventDefault();
     setIsSigningOut(true);
@@ -267,6 +276,16 @@ export default function ServiceCanadaCentreIDVCodePage() {
               className="service-canada-small-button service-canada-print-hide"
             >
               {t("ServiceCanadaCentreCode.signOut")}
+            </GcdsButton>
+
+            <GcdsButton
+              buttonRole="primary"
+              size="small"
+              type="button"
+              onGcdsClick={handleNextStep}
+              className="service-canada-small-button service-canada-print-hide"
+            >
+              {t("ServiceCanadaCentreCode.nextStepButton", "Next step")}
             </GcdsButton>
           </section>
         </div>
