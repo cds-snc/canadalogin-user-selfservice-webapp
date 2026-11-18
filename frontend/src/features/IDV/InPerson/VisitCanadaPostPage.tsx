@@ -190,18 +190,10 @@ const idTypeErrorMessage =
                 key={summaryFocusTrigger}
                 id={ERROR_SUMMARY_ID}
                 errorMessage={getValidationSummaryHeading(t)}
-                errorLinks={Object.fromEntries(
-                  [
-                    nonExpiredIdError
-                      ? [`#${NON_EXPIRED_ID_RADIOS_ID}`, nonExpiredIdError]
-                      : null,
-                    idTypeErrorMessage
-                      ? [`#${RADIOS_ID}`, idTypeErrorMessage]
-                      : null,
-                  ].filter(
-                    (entry): entry is [string, string] => entry !== null,
-                  ),
-                )}
+errorLinks={
+  ...(nonExpiredIdError && { [`#${NON_EXPIRED_ID_RADIOS_ID}`]: nonExpiredIdError }),
+  ...(idTypeErrorMessage && { [`#${RADIOS_ID}`]: idTypeErrorMessage }),
+}
                 language={currentLanguage}
               />
             ) : null}
