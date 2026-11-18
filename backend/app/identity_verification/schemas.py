@@ -37,13 +37,13 @@ class CreateInPersonIdentityVerificationRequest(BaseModel):
     verification_provider: InPersonVerificationProvider = (
         InPersonVerificationProvider.service_canada
     )
-    applicant: InPersonApplicantRequest
+    applicant: InPersonApplicantRequest | None = None
 
     @model_validator(mode="after")
     def validate_canada_post_address(self):
         if (
             self.verification_provider == InPersonVerificationProvider.canada_post
-            and self.applicant.address is None
+            and (self.applicant is None or self.applicant.address is None)
         ):
             raise ValueError(
                 "applicant.address is required when verification_provider is canada_post"

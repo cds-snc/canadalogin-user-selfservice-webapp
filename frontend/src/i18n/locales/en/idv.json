@@ -291,6 +291,13 @@
     "changedMindText": "Changed your mind about in-person proofing at Canada Post? You can reset and choose a different method instead.",
     "resetButton": "Reset and choose another method",
     "resendButton": "Resend email",
+    "resendingButton": "Sending...",
+    "resendButtonAriaLabel": "Resend email",
+    "resendingAriaLabel": "Sending email, please wait",
+    "resendEmailErrorTitle": "Could not resend email",
+    "resendEmailError": "We were unable to send your email. Please try again or choose a different method.",
+    "resendEmailSuccessTitle": "Email sent",
+    "resendEmailSuccess": "Your email was sent on {{date}}.",
     "completedProofingLabel": "Already completed proofing in-person?"
   },
   "StartIdentityProofing": {
