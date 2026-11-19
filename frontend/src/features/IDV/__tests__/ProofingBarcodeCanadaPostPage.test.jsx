@@ -159,7 +159,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
       </TestWrapper>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Update information" }));
+    fireEvent.click(screen.getByRole("button", { name: "Update" }));
     expect(mockNavigate).toHaveBeenCalledWith(
       `/en/${PAGES.idvVisitCanadaPostPage}`,
     );
@@ -173,7 +173,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     );
 
     expect(
-      screen.getByText("Take your proofing barcode to Canada Post"),
+      screen.getByText("Take your CanadaLogin barcode to a Canada Post"),
     ).toBeInTheDocument();
   });
 
@@ -269,7 +269,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText("Update information")).toBeInTheDocument();
+    expect(screen.getByText("Update")).toBeInTheDocument();
     expect(
       screen.getByText("Find your nearest Canada Post"),
     ).toBeInTheDocument();
