@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 import BarcodeDisplay from "../helpers/BarcodeDisplay";
 import { useUser } from "../../../components/Providers/useUser";
+import { authService } from "../../../services/authService";
 import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
