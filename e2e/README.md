@@ -14,7 +14,7 @@ e2e/
 ├── support/            # env, test users, i18n copy, API and navigation helpers
 ├── ci/                 # CI workflow scaffold (not enabled yet; see "CI")
 └── tests/
-    ├── auth.setup.ts   # signs each test user in once and saves the session to .auth/
+    ├── auth.setup.ts   # signs in, opens /en/profile from the dashboard, checks Identity details, saves the session
     └── idv/            # IDV journeys
 ```
 
@@ -26,25 +26,20 @@ Assertions use the frontend's own translation files (`frontend/src/i18n/locales`
 - Test users must not be prompted for OTP/MFA. In dev/test tenants, add them to an MFA-exempt group (e.g. `MFA_Exempt`) that the self-service app's access policy allows without MFA, rather than removing the policy for everyone.
 - Two test users in the target IBM Verify tenant:
   - **User A** (`E2E_PROVEN_USER_*`) has completed fake ID proofing.
-  - **User B** (`E2E_UNPROVEN_USER_*`) has no ID proofing data.
+  - **User B** (`E2E_UNPROVEN_USER_*`) has no ID proofing data. The tests assume this and don't reset it, so don't use this account to complete ID proofing.
 
 ## Environment variables
 
 Set these in your shell, in CI secrets, or in an untracked `e2e/.env` file (git-ignored, loaded automatically).
 
-| Variable                                        | Required                             | Description                                                                 |
-| ----------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------- |
-| `E2E_BASE_URL`                                  | No (default `http://localhost:3000`) | Frontend URL, e.g. `https://local.dev.login-connexion.alpha.canada.ca:3000` |
-| `E2E_API_URL`                                   | No (default `http://localhost:8000`) | Backend URL; must match the frontend's `VITE_BACKEND_API_URL`               |
-| `E2E_IGNORE_HTTPS_ERRORS`                       | No                                   | `true` for self-signed local certificates                                   |
-| `E2E_TIMEZONE`                                  | No (default `America/Toronto`)       | Browser timezone, also used to compute expected dates                       |
-| `E2E_PROVEN_USER_EMAIL` / `_PASSWORD` / `_ID`   | Yes                                  | User A's credentials and IBM Verify user id                                 |
-| `E2E_UNPROVEN_USER_EMAIL` / `_PASSWORD` / `_ID` | Yes                                  | User B's credentials and IBM Verify user id                                 |
-| `E2E_IDP_URL`                                   | No                                   | IBM Verify tenant URL, used to get an admin token                           |
-| `E2E_IDV_DATA_STORE_URL`                        | No                                   | idv-data-store base URL                                                     |
-| `E2E_IDV_ADMIN_CLIENT_ID` / `_SECRET`           | No                                   | Client credentials with the `idv:admin` scope                               |
-
-When all four `E2E_IDP_URL` / `E2E_IDV_*` variables are set, User B's IDV data is reset before the tests (`DELETE /v1/users/{id}` on idv-data-store). The client must be one idv-data-store trusts (`IDP_CLIENT_ID` or `IDV_DATA_STORE_STS_CLIENT_ID`). Without them, the tests check User B's state and fail with a clear message if it isn't clean.
+| Variable                                | Required                             | Description                                                                 |
+| --------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------- |
+| `E2E_BASE_URL`                          | No (default `http://localhost:3000`) | Frontend URL, e.g. `https://local.dev.login-connexion.alpha.canada.ca:3000` |
+| `E2E_API_URL`                           | No (default `http://localhost:8000`) | Backend URL; must match the frontend's `VITE_BACKEND_API_URL`               |
+| `E2E_IGNORE_HTTPS_ERRORS`               | No                                   | `true` for self-signed local certificates                                   |
+| `E2E_TIMEZONE`                          | No (default `America/Toronto`)       | Browser timezone, also used to compute expected dates                       |
+| `E2E_PROVEN_USER_EMAIL` / `_PASSWORD`   | Yes                                  | User A's credentials                                                        |
+| `E2E_UNPROVEN_USER_EMAIL` / `_PASSWORD` | Yes                                  | User B's credentials                                                        |
 
 ## Running
 
@@ -80,7 +75,7 @@ This repository is public, so workflow artifacts can be downloaded by any GitHub
 
 - **403 from the API:** the API's load balancer rejects non-browser user agents, including Playwright's default `HeadlessChrome`. Every project uses the `Desktop Chrome` device profile for this reason (see `playwright.config.ts`); keep it when adding projects.
 - **`E2E_BASE_URL`** must be the frontend origin without a path (e.g. `https://app.dev.login-connexion.alpha.canada.ca`, not `.../en`).
-- **`E2E_IDV_DATA_STORE_URL`** needs a hostname with a valid TLS certificate; a raw AWS load balancer hostname fails certificate checks.
+- **User B tests fail because the Identity details card is shown:** User B's account has ID proofing data. Use an account that has never completed ID proofing.
 
 ## Writing tests
 

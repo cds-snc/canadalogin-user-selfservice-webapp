@@ -1,6 +1,12 @@
 import { expect, type Locator, type Page } from "@playwright/test";
-import { copy, formatProvenDate, type Language } from "../../support/i18n";
+import {
+  copy,
+  formatBirthDate,
+  formatProvenDate,
+  type Language,
+} from "../../support/i18n";
 import type { IdvClaims } from "../../support/idvApi";
+import type { IdentityDetails } from "../../support/testUsers";
 
 /**
  * "Identity details" heading + verified badge + ProvenInformationCard.
@@ -9,6 +15,7 @@ import type { IdvClaims } from "../../support/idvApi";
 export class ProvenInformationSection {
   readonly heading: Locator;
   readonly verifiedBadge: Locator;
+  readonly updateInformationLink: Locator;
   private readonly t: (typeof copy)[Language];
 
   constructor(
@@ -28,6 +35,10 @@ export class ProvenInformationSection {
       .locator("gcds-grid.gridInline")
       .filter({ has: this.heading })
       .locator(".verifiedBadge");
+    this.updateInformationLink = page.getByRole("link", {
+      name: this.t.profile.ProvenInformationCard.updateButton,
+      exact: true,
+    });
   }
 
   /** Value rendered in the <gcds-text> that follows an <h3> label in the card. */
@@ -48,26 +59,62 @@ export class ProvenInformationSection {
     return this.field(this.t.profile.ProvenInformationCard.name);
   }
 
+  get dateOfBirth() {
+    return this.field(this.t.profile.ProvenInformationCard.dateOfBirth);
+  }
+
+  get sourceOfInformation() {
+    return this.field(this.t.profile.ProvenInformationCard.sourceOfInformation);
+  }
+
   async expectPopulated(claims: IdvClaims) {
     const verificationTime = claims.verified_claims?.verification?.time;
-    const { given_name, family_name } = claims.verified_claims?.claims ?? {};
+    const { given_name, family_name, birthdate } =
+      claims.verified_claims?.claims ?? {};
+    const source =
+      claims.source_display?.documents?.[0]?.display_name?.[this.language];
     expect(
       verificationTime,
       "Test data problem: claims have no verification time",
     ).toBeTruthy();
 
+    await this.expectDetails({
+      verifiedOn: formatProvenDate(verificationTime!, this.language),
+      legalName: [given_name, family_name].filter(Boolean).join(" "),
+      dateOfBirth: birthdate
+        ? formatBirthDate(birthdate, this.language)
+        : undefined,
+      sourceOfInformation: source ?? undefined,
+    });
+  }
+
+  /** Checks the card shows exactly these values. */
+  async expectDetails(expected: IdentityDetails) {
     await expect(this.heading).toBeVisible();
     await expect(this.verifiedBadge).toHaveText(
-      `${this.badgePrefix} ${formatProvenDate(verificationTime!, this.language)}`,
+      `${this.badgePrefix} ${expected.verifiedOn}`,
     );
-    await expect(this.legalName).toHaveText(
-      [given_name, family_name].filter(Boolean).join(" "),
-    );
+    await expect(this.legalName).toHaveText(expected.legalName);
+    // The card hides these rows when the data is missing, so mirror that.
+    if (expected.dateOfBirth) {
+      await expect(this.dateOfBirth).toHaveText(expected.dateOfBirth);
+    } else {
+      await expect(this.dateOfBirth).toHaveCount(0);
+    }
+    if (expected.sourceOfInformation) {
+      await expect(this.sourceOfInformation).toHaveText(
+        expected.sourceOfInformation,
+      );
+    } else {
+      await expect(this.sourceOfInformation).toHaveCount(0);
+    }
+    await expect(this.updateInformationLink).toBeVisible();
   }
 
   async expectAbsent() {
     await expect(this.heading).toHaveCount(0);
     await expect(this.verifiedBadge).toHaveCount(0);
     await expect(this.legalName).toHaveCount(0);
+    await expect(this.updateInformationLink).toHaveCount(0);
   }
 }

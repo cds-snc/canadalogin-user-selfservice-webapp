@@ -65,15 +65,8 @@ jobs:
       E2E_API_URL: ${{ vars.E2E_API_URL }}
       E2E_PROVEN_USER_EMAIL: ${{ secrets.E2E_PROVEN_USER_EMAIL }}
       E2E_PROVEN_USER_PASSWORD: ${{ secrets.E2E_PROVEN_USER_PASSWORD }}
-      E2E_PROVEN_USER_ID: ${{ secrets.E2E_PROVEN_USER_ID }}
       E2E_UNPROVEN_USER_EMAIL: ${{ secrets.E2E_UNPROVEN_USER_EMAIL }}
       E2E_UNPROVEN_USER_PASSWORD: ${{ secrets.E2E_UNPROVEN_USER_PASSWORD }}
-      E2E_UNPROVEN_USER_ID: ${{ secrets.E2E_UNPROVEN_USER_ID }}
-      # Optional: resets User B's IDV data before the tests.
-      E2E_IDP_URL: ${{ vars.E2E_IDP_URL }}
-      E2E_IDV_DATA_STORE_URL: ${{ vars.E2E_IDV_DATA_STORE_URL }}
-      E2E_IDV_ADMIN_CLIENT_ID: ${{ secrets.E2E_IDV_ADMIN_CLIENT_ID }}
-      E2E_IDV_ADMIN_CLIENT_SECRET: ${{ secrets.E2E_IDV_ADMIN_CLIENT_SECRET }}
 
     steps:
       - name: Checkout repository

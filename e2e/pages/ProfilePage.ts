@@ -26,6 +26,10 @@ export class ProfilePage {
 
   async goto() {
     await gotoAndWaitForClaims(this.page, `/${this.language}/profile`);
+    await this.expectLoaded();
+  }
+
+  async expectLoaded() {
     await expect(this.pageHeading).toBeVisible();
   }
 }

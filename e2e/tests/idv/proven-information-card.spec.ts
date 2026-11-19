@@ -1,17 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 import type { ProvenInformationSection } from "../../pages/components/ProvenInformationSection";
 import { DetailsConfirmationPage } from "../../pages/DetailsConfirmationPage";
+import { ManageDashboardPage } from "../../pages/ManageDashboardPage";
 import { ProfilePage } from "../../pages/ProfilePage";
 import { LANGUAGES, type Language } from "../../support/i18n";
-import {
-  getIdvClaims,
-  resetIdvData,
-  type IdvClaims,
-} from "../../support/idvApi";
+import { getIdvClaims, type IdvClaims } from "../../support/idvApi";
 import { TEST_USERS } from "../../support/testUsers";
 
 // The details confirmation screen is populated for User A and empty for User B,
-// and the proven information card shows the verified date.
+// and the "Identity details" card on the profile page shows the proven information.
 const screens: {
   name: string;
   open: (page: Page, language: Language) => Promise<ProvenInformationSection>;
@@ -25,11 +22,15 @@ const screens: {
     },
   },
   {
-    name: "profile",
+    // Same path a user takes: dashboard -> "Personal information" card -> /profile.
+    name: "profile (via dashboard)",
     open: async (page, language) => {
-      const screen = new ProfilePage(page, language);
-      await screen.goto();
-      return screen.provenInformation;
+      const dashboard = new ManageDashboardPage(page, language);
+      await dashboard.goto();
+      await dashboard.openPersonalInformation();
+      const profile = new ProfilePage(page, language);
+      await profile.expectLoaded();
+      return profile.provenInformation;
     },
   },
 ];
@@ -51,7 +52,7 @@ test.describe("Proven information card", () => {
 
     for (const { name, open } of screens) {
       for (const language of LANGUAGES) {
-        test(`${name}: shows legal name and verified date [${language}]`, async ({
+        test(`${name}: shows the Identity details card [${language}]`, async ({
           page,
         }) => {
           const provenInformation = await open(page, language);
@@ -61,28 +62,10 @@ test.describe("Proven information card", () => {
     }
   });
 
+  // Assumes User B's account has no ID proofing data.
   test.describe("user without ID proofing (User B)", () => {
     const user = TEST_USERS.unproven;
     test.use({ storageState: user.storageState });
-
-    test.beforeAll(async () => {
-      const wasReset = await resetIdvData(user);
-      if (!wasReset) {
-        test.info().annotations.push({
-          type: "warning",
-          description:
-            "IDV admin credentials not set; relying on existing test data for User B.",
-        });
-      }
-    });
-
-    test.beforeEach(async ({ page }) => {
-      const claims = await getIdvClaims(page.request);
-      expect(
-        claims.status,
-        `Test data problem: ${user.key} must not have completed ID proofing. Set the E2E_IDV_ADMIN_* variables to reset it automatically.`,
-      ).not.toBe("verified");
-    });
 
     for (const { name, open } of screens) {
       for (const language of LANGUAGES) {

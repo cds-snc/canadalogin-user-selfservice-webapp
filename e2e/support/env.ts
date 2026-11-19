@@ -23,13 +23,6 @@ export function required(name: string): string {
 
 const trimSlash = (url: string) => url.replace(/\/+$/, "");
 
-const IDV_ADMIN_VARS = [
-  "E2E_IDP_URL",
-  "E2E_IDV_DATA_STORE_URL",
-  "E2E_IDV_ADMIN_CLIENT_ID",
-  "E2E_IDV_ADMIN_CLIENT_SECRET",
-] as const;
-
 export const env = {
   /** Self-service frontend (where the React app is served). */
   baseURL: trimSlash(optional("E2E_BASE_URL", "http://localhost:3000")),
@@ -38,16 +31,6 @@ export const env = {
   ignoreHttpsErrors: optional("E2E_IGNORE_HTTPS_ERRORS", "false") === "true",
   /** Browser timezone; also used to compute expected dates. */
   timezone: optional("E2E_TIMEZONE", "America/Toronto"),
-
-  /** Optional credentials used to reset IDV data in idv-data-store before tests. */
-  idvAdmin: {
-    isConfigured: () =>
-      IDV_ADMIN_VARS.every((name) => !!process.env[name]?.trim()),
-    idpURL: () => trimSlash(required("E2E_IDP_URL")),
-    dataStoreURL: () => trimSlash(required("E2E_IDV_DATA_STORE_URL")),
-    clientId: () => required("E2E_IDV_ADMIN_CLIENT_ID"),
-    clientSecret: () => required("E2E_IDV_ADMIN_CLIENT_SECRET"),
-  },
 };
 
 export const AUTH_DIR = path.join(E2E_ROOT, ".auth");

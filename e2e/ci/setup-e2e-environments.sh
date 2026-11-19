@@ -16,14 +16,13 @@ done
 # Non-secret variables for dev.
 gh variable set E2E_BASE_URL --env e2e-dev --repo "${REPO}" --body "https://app.dev.login-connexion.alpha.canada.ca"
 gh variable set E2E_API_URL --env e2e-dev --repo "${REPO}" --body "https://api.dev.login-connexion.alpha.canada.ca"
-gh variable set E2E_IDP_URL --env e2e-dev --repo "${REPO}" --body "https://auth.dev.login-connexion.alpha.canada.ca"
 echo "Set e2e-dev variables"
 
 # Secrets: gh prompts for each value with hidden input, so they never appear in
 # shell history or this file.
 for SECRET in \
-  E2E_PROVEN_USER_EMAIL E2E_PROVEN_USER_PASSWORD E2E_PROVEN_USER_ID \
-  E2E_UNPROVEN_USER_EMAIL E2E_UNPROVEN_USER_PASSWORD E2E_UNPROVEN_USER_ID; do
+  E2E_PROVEN_USER_EMAIL E2E_PROVEN_USER_PASSWORD \
+  E2E_UNPROVEN_USER_EMAIL E2E_UNPROVEN_USER_PASSWORD; do
   echo "Enter ${SECRET} for e2e-dev:"
   gh secret set "${SECRET}" --env e2e-dev --repo "${REPO}"
 done
