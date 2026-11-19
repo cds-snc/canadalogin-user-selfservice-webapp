@@ -22,11 +22,9 @@
   },
   "ServiceCanadaCentre": {
     "heading": "Get ready to visit a Service Canada Centre",
-    "followSteps": "Follow the steps to complete the process",
-    "step1": "Select your ID type and enter the details.",
-    "step2": "Get a unique code sent to your email, valid for 30 days.",
-    "step3": "Bring your code and selected photo ID to any Service Canada Centre.",
-    "step4": "A service agent will verify your identity, once done, sign back in to {{rpName}} to continue.",
+    "intro1": "Choose your ID and enter your details to get a verification code which is valid for 30 days.",
+    "intro2": "Bring the code and your ID to any Service Canada Centre, where an agent will check your identity.",
+    "intro3": "Sign back in to {{rpName}} once done to access the service.",
     "nonExpiredIdTitle": "Can you bring a non-expired ID?",
     "nonExpiredIdHint": "ID must be valid when you visit the Service Canada Centre",
     "yesOption": "Yes",
@@ -35,18 +33,36 @@
     "enterDetailsHeading": "Enter your ID details",
     "continueButton": "Continue",
     "chooseDifferentMethodButton": "Choose a different method",
-    "moreInfoTitle": "For more information",
-    "learnMoreLink": "Learn more about Service Canada Centre identity proofing",
-    "selectIdLabel": "What ID do you have?",
+    "learnMoreLink": "Learn more about verifying at Service Canada Centre.",
+    "selectIdLabel": "Select your ID",
     "selectIdDropdownDefaultValue": "Select option",
-    "driverLicenceOption": "Provincial/Territorial Driver’s Licence",
-    "photoIDHealthCardOption": "Provincial/Territorial Photo ID Health Card",
-    "photoIDServiceCardOption": "Provincial/Territorial Photo ID/Service Card",
-    "passportOption": "Canadian and International Passport",
-    "canadianPRCardOption": "Canadian PR Cards",
-    "indianStatusOption": "Secure Certificate of Indian Status",
-    "noIds": "I don’t have any of these IDs",
-    "idHint": "You will need to bring this ID to your in-person visit",
+    "noIds": "I don't have any of these IDs",
+    "idHint": "You must bring the valid and original ID",
+    "documents": {
+      "passport": {
+        "label": "Canadian passport"
+      },
+      "driverLicence": {
+        "label": "Provincial/Territorial driver's licence"
+      },
+      "photoIDServiceCard": {
+        "label": "Provincial/Territorial photo ID or service card"
+      },
+      "photoIDHealthCard": {
+        "label": "Provincial/Territorial Health card",
+        "hint": "Only valid for Quebec and British Columbia"
+      },
+      "canadianPRCard": {
+        "label": "Permanent resident card"
+      },
+      "indianStatus": {
+        "label": "Secure Certificate of Indian Status"
+      },
+      "COMBO_CARD": {
+        "label": "Provincial/Territorial combination driver's licence/health cards",
+        "hint": "Only valid for Alberta and British Columbia"
+      }
+    },
     "idExpirationLabel": "When does it expire?",
     "idExpiryHint": "Must be valid for at least 1 month from today",
     "backButton": "Back",
@@ -358,6 +374,7 @@
     "passport": "Canadian and International Passport",
     "canadianPRCard": "Canadian PR Card",
     "indianStatus": "Secure Certificate of Indian Status",
+    "COMBO_CARD": "Provincial/Territorial combination driver's licence/health cards",
     "noIds": "I don't have any of these IDs"
   },
   "ConfirmIdentityDetails": {
