@@ -169,6 +169,20 @@ describe("RootLayout keyboard focus behavior", () => {
     expect(heading).toHaveFocus();
   });
 
+  it("preserves Tab behavior when the page heading is already focused", async () => {
+    const { router } = setup();
+
+    await act(() => router.navigate("/step-two"));
+    const heading = await screen.findByRole("heading", { name: "Step Two" });
+    heading.setAttribute("tabindex", "-1");
+    heading.focus();
+
+    const wasIntercepted = !fireEvent.keyDown(window, { key: "Tab" });
+
+    expect(wasIntercepted).toBe(false);
+    expect(heading).toHaveFocus();
+  });
+
   it.each([false, true])(
     "scrolls new pages to the top without moving focus (replace: %s)",
     async (replace) => {

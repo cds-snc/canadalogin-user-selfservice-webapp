@@ -10,7 +10,7 @@
  * These tests are more reliable than snapshot tests as they focus on
  * behavior and content rather than exact DOM structure.
  */
-import { render, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom/vitest";
@@ -23,7 +23,10 @@ vi.mock("@gcds-core/components-react", () => ({
     <button onClick={onGcdsClick ?? onClick}>{children}</button>
   ),
   GcdsContainer: ({ children }) => <div>{children}</div>,
-  GcdsHeading: ({ children }) => <div>{children}</div>,
+  GcdsHeading: ({ children, tag = "h1", ...props }) => {
+    const Heading = tag;
+    return <Heading {...props}>{children}</Heading>;
+  },
   GcdsText: ({ children }) => <span>{children}</span>,
   GcdsLink: ({ children, href }) => <a href={href || "#"}>{children}</a>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
@@ -108,7 +111,10 @@ vi.mock("../../../../features/ManageFIDO2/api/fido2Api", () => ({
 vi.mock("@gcds-core/components-react", () => ({
   GcdsContainer: ({ children }) => <div>{children}</div>,
   GcdsGrid: ({ children }) => <div>{children}</div>,
-  GcdsHeading: ({ children }) => <div>{children}</div>,
+  GcdsHeading: ({ children, tag = "h1", ...props }) => {
+    const Heading = tag;
+    return <Heading {...props}>{children}</Heading>;
+  },
   GcdsText: ({ children }) => <div>{children}</div>,
   GcdsButton: ({ children, onGcdsClick, onClick, id }) => (
     <button id={id} onClick={onGcdsClick ?? onClick}>
@@ -235,6 +241,18 @@ describe("Manage2FAVerifications Component Unit Tests", () => {
       expect(getByText("5551234567")).toBeInTheDocument();
       expect(getByText("Text message (SMS)")).toBeInTheDocument();
       expect(getByText("Voice call")).toBeInTheDocument();
+    });
+  });
+
+  it("focuses the page heading when returning from passkey deletion", async () => {
+    mockUseLocation.mockReturnValue({
+      state: { focusManage2FAHeading: true },
+    });
+
+    render(<Manage2FAVerifications />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { level: 1 })).toHaveFocus();
     });
   });
 

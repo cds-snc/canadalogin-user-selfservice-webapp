@@ -75,6 +75,7 @@ export default function SuccessfullyUpdated({
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("ProfileUpdateNameSuccess.successTitle")}
+          focusOnMount
         >
           <GcdsText>
             {t("ProfileUpdateNameSuccess.nameUpdatedTo")}{" "}
