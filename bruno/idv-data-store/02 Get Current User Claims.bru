@@ -1,0 +1,15 @@
+meta {
+  name: Get Current User Claims
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{idvDataStoreBaseUrl}}/v1/users/me/identity-verification/claims
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Authorization: Bearer {{idvDataStoreAccessToken}}
+}

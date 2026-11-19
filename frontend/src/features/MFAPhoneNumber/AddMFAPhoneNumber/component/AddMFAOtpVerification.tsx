@@ -195,6 +195,7 @@ export default function AddMFAOtpVerification({
       <GcdsGrid columns="1" gap="300">
         {shouldShowSuccessNotice && (
           <AccessibleNotice
+            focusOnMount
             noticeRole="success"
             noticeTitleTag="h2"
             noticeTitle={t("Verification.successTitle")}

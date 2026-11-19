@@ -152,6 +152,7 @@ export default function Password({
   return (
     <GcdsContainer role="main">
       <AccessibleNotice
+        focusOnMount
         noticeRole="success"
         noticeTitleTag="h2"
         noticeTitle={t("Password.otpVerifiedNoticeTitle")}

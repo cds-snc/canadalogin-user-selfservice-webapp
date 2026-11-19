@@ -95,9 +95,9 @@
   },
   "VisitCanadaPost": {
     "heading": "Get ready to visit a Canada Post location",
-    "followSteps": "Follow the steps to complete the process",
-    "step1": "Select your ID type and enter the details.",
-    "step2": "Get a unique code sent to your email, valid for 30 days.",
+    "verificationBarcodeInstructions": "Choose your ID and enter your details to get a verification barcode which is valid for 30 days. ",
+    "canadaPostVisitInstruction": "Bring the barcode, your ID and proof of address to any Canada Post, where an agent will check your identity.",
+    "returnToServiceInstructions": "Sign back in to {{rpName}} once done to access the service.",
     "step3": "Bring your code and selected photo ID to any Canada Post.",
     "step4": "A service agent will verify your identity, once done, sign back in to {{rpName}} to continue.",
     "nonExpiredIdTitle": "Can you bring a non-expired ID?",

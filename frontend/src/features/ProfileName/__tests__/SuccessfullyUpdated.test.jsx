@@ -115,7 +115,21 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsDetails: ({ children, ...props }) => (
     <details {...props}>{children}</details>
   ),
-  GcdsNotice: ({ children }) => <div>{children}</div>,
+  GcdsNotice: ({
+    children,
+    noticeRole,
+    noticeTitle,
+    noticeTitleTag,
+    ...props
+  }) => {
+    const TitleComponent = noticeTitleTag || "h2";
+    return (
+      <div {...props} data-notice-role={noticeRole}>
+        {noticeTitle ? <TitleComponent>{noticeTitle}</TitleComponent> : null}
+        {children}
+      </div>
+    );
+  },
   GcdsLink: ({ children, ...props }) => <a {...props}>{children}</a>,
 }));
 
@@ -220,6 +234,31 @@ describe("SuccessfullyUpdatedName", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Sign out")).toBeInTheDocument();
     expect(screen.getByText("Back to profile")).toBeInTheDocument();
+  });
+
+  it("focuses and labels the success notice on mount", async () => {
+    render(
+      <TestWrapper>
+        <SuccessfullyUpdatedName
+          nameFormData={{ formatted: "John Doe" }}
+          onBackToProfile={mockOnBackToProfile}
+        />
+      </TestWrapper>,
+    );
+
+    await act(async () => {
+      vi.runOnlyPendingTimers();
+    });
+
+    const successNotice = screen
+      .getByText("Your name has been updated to")
+      .closest("[data-page-focus-target]");
+
+    expect(successNotice).toHaveFocus();
+    expect(successNotice).toHaveAttribute(
+      "aria-label",
+      expect.stringContaining("John Doe"),
+    );
   });
 
   it("renders with empty name when nameFormData is null", () => {
