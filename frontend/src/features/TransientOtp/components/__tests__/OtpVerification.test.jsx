@@ -183,8 +183,13 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </a>
   ),
-  GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag }) => (
-    <div data-testid="notice" data-type={type} data-title-tag={noticeTitleTag}>
+  GcdsNotice: ({ children, type, noticeTitle, noticeTitleTag, ...props }) => (
+    <div
+      {...props}
+      data-testid="notice"
+      data-type={type}
+      data-title-tag={noticeTitleTag}
+    >
       <div data-testid="notice-title">{noticeTitle}</div>
       {children}
     </div>
@@ -705,6 +710,10 @@ describe("OtpVerification Component", () => {
       expect(screen.getByTestId("notice-title")).toHaveTextContent("Success");
       expect(screen.getByTestId("notice")).toHaveTextContent(
         "We have sent you a new code",
+      );
+      expect(screen.getByTestId("notice")).toHaveAttribute(
+        "data-page-focus-target",
+        "true",
       );
     });
 

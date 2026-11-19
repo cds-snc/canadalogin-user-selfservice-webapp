@@ -1,0 +1,6 @@
+{
+  "version": "1",
+  "name": "IDV Data Store",
+  "type": "collection",
+  "ignore": [".git", ".DS_Store"]
+}

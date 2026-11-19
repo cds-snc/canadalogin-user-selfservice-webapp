@@ -190,6 +190,7 @@ export default function OtpVerification({
           noticeTitleTag="h2"
           noticeTitle={t("Verification.newCodeSent")}
           data-testid="linkSuccess"
+          focusOnMount
         >
           &nbsp;
         </AccessibleNotice>

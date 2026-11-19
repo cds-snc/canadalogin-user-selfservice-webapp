@@ -48,6 +48,7 @@ export default function AddSecondMFA({
     <GcdsContainer role="main">
       <section>
         <AccessibleNotice
+          focusOnMount
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("NoticeFactory.notice_title_success", { ns: "otp" })}

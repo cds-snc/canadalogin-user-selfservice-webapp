@@ -80,6 +80,7 @@ export default function SuccessfullyUpdated({
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="300">
         <AccessibleNotice
+          focusOnMount
           noticeRole="success"
           noticeTitleTag="h2"
           noticeTitle={t("SuccessfullyUpdatedLanguage.successTitle")}

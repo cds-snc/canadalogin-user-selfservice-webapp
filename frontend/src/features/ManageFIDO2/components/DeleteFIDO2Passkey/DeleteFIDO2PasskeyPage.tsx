@@ -581,7 +581,11 @@ export default function DeleteFIDO2PasskeyPage({
     ),
     deleteFIDO2PasskeySuccess: (
       <DeleteFIDO2PasskeySuccess
-        onNext={() => navigate(backToManage2FAVerificationsPage)}
+        onNext={() =>
+          navigate(backToManage2FAVerificationsPage, {
+            state: { focusManage2FAHeading: true },
+          })
+        }
       />
     ),
   };
