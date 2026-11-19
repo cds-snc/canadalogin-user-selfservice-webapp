@@ -222,7 +222,7 @@
     "whatToBringProofOfAddress": "Proof of address",
     "visitInstruction": "Visit a Canada Post before",
     "visitInstructionCont": "with your proofing barcode and your {{idSelected}}.",
-    "listOfIds": "Acceptable proof of address documents",
+    "listOfProofOfAddressDocuments": "Acceptable proof of address documents",
     "acceptableIdOption1": "Canadian passport",
     "acceptableIdOption2": "Provincial or territorial driver's licence",
     "acceptableIdOption3": "Permanent resident card",

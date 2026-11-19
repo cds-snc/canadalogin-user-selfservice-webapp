@@ -231,11 +231,16 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     expect(
       screen.getByText("Canadian and International Passport"),
     ).toBeInTheDocument();
-    expect(screen.getByText("Passport")).toBeInTheDocument();
     expect(
       screen.getByText("You must bring a proof of address"),
     ).toBeInTheDocument();
-    expect(screen.getByText("Driver's licence")).toBeInTheDocument();
+    expect(
+      screen.getByText("Acceptable proof of address documents"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Bank or credit card statement"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Driver's licence")).not.toBeInTheDocument();
   });
 
   it("preserves verification details when changing the page language", () => {

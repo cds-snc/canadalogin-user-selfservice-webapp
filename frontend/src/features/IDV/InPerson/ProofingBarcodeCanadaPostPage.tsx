@@ -14,7 +14,7 @@ import { useUser } from "../../../components/Providers/useUser";
 import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
 import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
-import AcceptableIdsDetails from "../components/AcceptableIdsDetails";
+import AcceptableProofOfAddressDocuments from "../components/AcceptableProofOfAddressDocuments";
 import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.validation";
 import {
   APPROVED_DOCUMENT_VALUES,
@@ -31,7 +31,6 @@ type ProofingBarcodeCanadaPostState = {
   lastName?: string;
   dateOfBirth?: string;
   idSelected?: string;
-  acceptableIds?: string[];
   verificationExpiresAt?: string;
   verificationValidityDays?: number;
   proofOfAddressRequired?: boolean;
@@ -76,8 +75,6 @@ export default function ProofingBarcodeCanadaPostPage() {
       ? t(`ApprovedDocuments.${rawIdSelected}`)
       : rawIdSelected
     : "--";
-
-  const acceptableIds = locationState?.acceptableIds;
 
   const formattedExpiryDate = verificationExpiresAt
     ? new Intl.DateTimeFormat("en-CA", {
@@ -209,9 +206,11 @@ export default function ProofingBarcodeCanadaPostPage() {
                   </GcdsText>
                 </section>
                 <div style={{ marginTop: "1rem" }} />
-                <AcceptableIdsDetails
-                  detailsTitle={t("ProofingBarcodeCanadaPost.listOfIds")}
-                  acceptableIds={acceptableIds}
+
+                <AcceptableProofOfAddressDocuments
+                  detailsTitle={t(
+                    "ProofingBarcodeCanadaPost.listOfProofOfAddressDocuments",
+                  )}
                 />
                 <div style={{ marginBottom: "1rem" }} />
               </div>
