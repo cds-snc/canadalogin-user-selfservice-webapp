@@ -158,7 +158,7 @@
     "codeValidityDate": "24 juillet 2027",
     "visitInstruction": "Rendez-vous dans un bureau Postes Canada avant le",
     "visitInstructionCont": "et munissez-vous de votre code-barres de confirmation et de votre {{idSelected}}.",
-    "listOfProofOfAddressDocuments": "Documents acceptés comme preuve d’adresse",
+    "listOfProofOfAddressDocuments": "Acceptable proof of address documents",
     "acceptableIdOption1": "Canadian passport",
     "acceptableIdOption2": "Provincial or territorial driver's licence",
     "acceptableIdOption3": "Permanent resident card",
