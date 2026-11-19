@@ -222,13 +222,19 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     expect(
       screen.getByText("user@example.com", { exact: false }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/This code is valid for 14 days/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/This code is valid for 14 days/),
+    ).toBeInTheDocument();
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Lastname")).toBeInTheDocument();
     expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
-    expect(screen.getByText("Canadian and International Passport")).toBeInTheDocument();
+    expect(
+      screen.getByText("Canadian and International Passport"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Passport")).toBeInTheDocument();
-    expect(screen.getByText("You must bring a proof of address")).toBeInTheDocument();
+    expect(
+      screen.getByText("You must bring a proof of address"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Driver's licence")).toBeInTheDocument();
   });
 
@@ -276,7 +282,11 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     expect(
       screen.getByRole("button", { name: "Find a Canada Post location" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Print page" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Print page" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Sign out" }),
+    ).toBeInTheDocument();
   });
 });

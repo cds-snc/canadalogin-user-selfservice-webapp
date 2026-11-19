@@ -145,7 +145,7 @@ export default function ProofingBarcodeCanadaPostPage() {
           />
 
           <section
-            className="canada-post-code-notice"
+            className="canada-post-code-notice canada-post-code-notice-bg"
             aria-labelledby="canada-post-code-label"
           >
             <GcdsIcon
@@ -190,14 +190,14 @@ export default function ProofingBarcodeCanadaPostPage() {
             {proofOfAddressRequired && (
               <div>
                 <section
-                  className="canada-post-code-notice"
+                  className="canada-post-code-notice canada-post-warning-notice-bg"
                   aria-labelledby="canada-post-code-label"
                 >
                   <GcdsIcon
                     name="warning-triangle"
                     size="h4"
                     aria-hidden="true"
-                    className="canada-post-code-info-icon"
+                    className="canada-post-warning-icon"
                   />
                   <GcdsText id="canada-post-code-label" marginBottom="0">
                     <strong>
@@ -221,7 +221,7 @@ export default function ProofingBarcodeCanadaPostPage() {
               buttonRole="primary"
               type="link"
               size="small"
-              href="https://offices.service.canada.ca/en"
+              href={t("ProofingBarcodeCanadaPost.findNearestPostOfficeLink")}
               target="_blank"
               rel="noreferrer"
               className="canada-post-print-hide"
@@ -251,8 +251,6 @@ export default function ProofingBarcodeCanadaPostPage() {
                 {givenName}
               </GcdsText>
             </div>
-
-            {/* <div className="separator" style={{ margin: "0" }} /> */}
 
             <div>
               <GcdsText marginTop="0" marginBottom="0">

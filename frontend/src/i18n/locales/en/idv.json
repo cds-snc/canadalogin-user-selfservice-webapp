@@ -237,6 +237,7 @@
     "update": "Update",
     "printPageButton": "Print page",
     "findNearestTitle": "Find a Canada Post location",
+    "findNearestPostOfficeLink": "https://www.canadapost-postescanada.ca/cpc/en/tools/find-a-post-office.page",
     "findNearestBody": "Complete your identity proofing at an available",
     "findNearestLink": "Canada Post near you",
     "signOut": "Sign out"

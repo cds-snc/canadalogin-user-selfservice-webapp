@@ -172,6 +172,7 @@
     "updateInformationButton": "Mettre à jour les renseignements",
     "printPageButton": "Imprimer la page",
     "findNearestTitle": "Trouvez le bureau Postes Canada le plus proche",
+    "findNearestPostOfficeLink": "https://www.canadapost-postescanada.ca/scp/fr/outils/trouver-un-bureau-de-poste.page",
     "findNearestBody": "Confirmez votre identité dans un",
     "findNearestLink": "bureau Postes Canada proche de chez vous"
   },

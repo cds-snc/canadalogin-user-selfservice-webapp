@@ -38,7 +38,14 @@
   gap: 0.375rem;
   padding: 0.75rem;
   border-radius: 0.5rem;
+}
+
+.canada-post-code-notice-bg {
   background: #d6e4f5;
+}
+
+.canada-post-warning-notice-bg {
+  background: #fcefcf;
 }
 
 .canada-post-code-value {
@@ -55,6 +62,10 @@
 
 .canada-post-code-info-icon {
   color: #2e6ca3;
+}
+
+.canada-post-warning-icon {
+  color: #a87c0b;
 }
 
 .canada-post-code-section {
