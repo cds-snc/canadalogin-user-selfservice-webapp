@@ -163,7 +163,12 @@ export default function ProofingBarcodeCanadaPostPage() {
           </section>
 
           <section className="canada-post-code-section">
-            <GcdsHeading marginTop="0" marginBottom="0" tag="h2" className="canada-post-code-section-title">
+            <GcdsHeading
+              marginTop="0"
+              marginBottom="0"
+              tag="h2"
+              className="canada-post-code-section-title"
+            >
               {t("ProofingBarcodeCanadaPost.whatToBringHeading")}
             </GcdsHeading>
             <GcdsText>
