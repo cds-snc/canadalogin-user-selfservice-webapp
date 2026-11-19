@@ -6,7 +6,16 @@ import {
   type Language,
 } from "../../support/i18n";
 import type { IdvClaims } from "../../support/idvApi";
-import type { IdentityDetails } from "../../support/testUsers";
+
+/** Text expected in the "Identity details" card. */
+export type IdentityDetails = {
+  /** Date in the badge, without the "Verified on" prefix. */
+  verifiedOn: string;
+  legalName: string;
+  /** Omit when the card should not show the row. */
+  dateOfBirth?: string;
+  sourceOfInformation?: string;
+};
 
 /**
  * "Identity details" heading + verified badge + ProvenInformationCard.
@@ -15,6 +24,7 @@ import type { IdentityDetails } from "../../support/testUsers";
 export class ProvenInformationSection {
   readonly heading: Locator;
   readonly verifiedBadge: Locator;
+  readonly updateInformationText: Locator;
   readonly updateInformationLink: Locator;
   private readonly t: (typeof copy)[Language];
 
@@ -35,6 +45,11 @@ export class ProvenInformationSection {
       .locator("gcds-grid.gridInline")
       .filter({ has: this.heading })
       .locator(".verifiedBadge");
+    // "To update this information, you'll need to complete identity proofing again."
+    this.updateInformationText = page.getByText(
+      this.t.profile.ProvenInformationCard.updateInfo,
+      { exact: true },
+    );
     this.updateInformationLink = page.getByRole("link", {
       name: this.t.profile.ProvenInformationCard.updateButton,
       exact: true,
