@@ -33,6 +33,7 @@ import {
 } from "../data/identityDocuments";
 import {
   getIdTypeRequiredMessage,
+  getSelectOptionRequiredMessage,
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
 
@@ -61,7 +62,7 @@ export default function VisitCanadaPost() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
 
-  const radioOptions = [
+  const idTypeRadioOptions = [
     ...SELECTABLE_DOCUMENT_TYPES.map((documentType) => {
       const hintKey = getDocumentHintKey(documentType);
       return {
@@ -95,8 +96,13 @@ export default function VisitCanadaPost() {
     },
   ];
 
-  const showError = hasSubmitted && !selectedValue;
-  const idTypeErrorMessage = showError ? getIdTypeRequiredMessage(t) : "";
+  const idTypeErrorMessage =
+    hasSubmitted && !selectedValue ? getIdTypeRequiredMessage(t) : "";
+
+  const nonExpiredIdError =
+    hasSubmitted && !nonExpiredIdAnswer
+      ? getSelectOptionRequiredMessage(t)
+      : "";
 
   const onNonExpiredIdChange = (event: CustomEvent<string>) => {
     setNonExpiredIdAnswer(
@@ -107,14 +113,13 @@ export default function VisitCanadaPost() {
   const onContinue = async () => {
     setHasSubmitted(true);
 
-    if (nonExpiredIdAnswer === "no") {
-      navigate(completeIdentityProofingPage);
+    if (!selectedValue || !nonExpiredIdAnswer) {
+      setSummaryFocusTrigger((previous) => previous + 1);
       return;
     }
 
-    if (!selectedValue) {
-      // Re-trigger focus/scroll if user submits invalid data multiple times.
-      setSummaryFocusTrigger((previous) => previous + 1);
+    if (nonExpiredIdAnswer === "no") {
+      navigate(completeIdentityProofingPage);
       return;
     }
 
@@ -173,12 +178,19 @@ export default function VisitCanadaPost() {
           <GcdsContainer>
             <GcdsHeading tag="h1">{t("VisitCanadaPost.heading")}</GcdsHeading>
 
-            {showError ? (
+            {nonExpiredIdError || idTypeErrorMessage ? (
               <ErrorSummaryWithFocus
                 key={summaryFocusTrigger}
                 id={ERROR_SUMMARY_ID}
                 errorMessage={getValidationSummaryHeading(t)}
-                errorLinks={{ [`#${RADIOS_ID}`]: getIdTypeRequiredMessage(t) }}
+                errorLinks={{
+                  ...(nonExpiredIdError && {
+                    [`#${NON_EXPIRED_ID_RADIOS_ID}`]: nonExpiredIdError,
+                  }),
+                  ...(idTypeErrorMessage && {
+                    [`#${RADIOS_ID}`]: idTypeErrorMessage,
+                  }),
+                }}
                 language={currentLanguage}
               />
             ) : null}
@@ -219,7 +231,7 @@ export default function VisitCanadaPost() {
               legend={t("CanadaPostSelectId.legend")}
               hint={t("VisitCanadaPost.idHint")}
               lang={currentLanguage}
-              options={radioOptions}
+              options={idTypeRadioOptions}
               value={selectedValue}
               required
               errorMessage={idTypeErrorMessage}
@@ -235,6 +247,8 @@ export default function VisitCanadaPost() {
               legend={t("VisitCanadaPost.nonExpiredIdTitle")}
               hint={t("VisitCanadaPost.nonExpiredIdHint")}
               options={nonExpiredIdRadioOptions}
+              required
+              errorMessage={nonExpiredIdError}
               value={nonExpiredIdAnswer}
               onGcdsChange={onNonExpiredIdChange}
             />
