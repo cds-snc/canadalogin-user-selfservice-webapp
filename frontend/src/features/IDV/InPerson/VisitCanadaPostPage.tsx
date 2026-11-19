@@ -196,16 +196,13 @@ export default function VisitCanadaPost() {
             ) : null}
 
             <GcdsText>
-              <strong>{t("VisitCanadaPost.followSteps")}</strong>
+              {t("VisitCanadaPost.verificationBarcodeInstructions")}
             </GcdsText>
-
             <GcdsText>
-              <ol>
-                <li>{t("VisitCanadaPost.step1")}</li>
-                <li>{t("VisitCanadaPost.step2")}</li>
-                <li>{t("VisitCanadaPost.step3")}</li>
-                <li>{t("VisitCanadaPost.step4", { rpName })}</li>
-              </ol>
+              {t("VisitCanadaPost.canadaPostVisitInstruction")}
+            </GcdsText>
+            <GcdsText>
+              {t("VisitCanadaPost.returnToServiceInstructions", { rpName })}
             </GcdsText>
             <GcdsText>
               <GcdsLink href="#" external={true}>
