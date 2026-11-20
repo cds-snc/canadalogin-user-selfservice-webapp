@@ -23,6 +23,9 @@
     "step2": "Recevez par courriel un code unique, valide pour une durée de 30 jours.",
     "step3": "Rendez-vous dans n’importe quel centre Service Canada et munissez-vous de votre code et du document d’identité avec photo que vous avez sélectionné.",
     "step4": "Un agent ou une agente de service vérifiera votre identité. Après cela, connectez-vous à nouveau à {{rpName}} pour continuer.",
+    "intro1": "Choose your ID and enter your details to get a verification code which is valid for 30 days.",
+    "intro2": "Bring the code and your ID to any Service Canada Centre, where an agent will check your identity.",
+    "intro3": "Sign back in to {{rpName}} once done to access the service.",
     "nonExpiredIdTitle": "Can you bring a non-expired ID?",
     "nonExpiredIdHint": "ID must be valid when you visit the Service Canada Centre",
     "yesOption": "Yes",
@@ -32,8 +35,8 @@
     "continueButton": "Continuer",
     "chooseDifferentMethodButton": "Choisir une autre méthode",
     "moreInfoTitle": "Renseignements supplémentaires",
-    "learnMoreLink": "Apprenez-en davantage sur la confirmation d’identité en centre Service Canada",
-    "selectIdLabel": "Quel type de document d’identité avez-vous",
+    "learnMoreLink": "Learn more about verifying at Service Canada Centre.",
+    "selectIdLabel": "Select your ID",
     "selectIdDropdownDefaultValue": "Sélectionnez une option",
     "driverLicenceOption": "Permis de conduire provincial/territorial",
     "photoIDHealthCardOption": "Carte d’assurance maladie provinciale/territoriale avec photo",
@@ -42,7 +45,32 @@
     "canadianPRCardOption": "Carte de résident permanent canadienne",
     "indianStatusOption": "Certificat sécurisé de statut d’Indien",
     "noIds": "Je ne possède aucun des documents d’identité ci-dessus",
-    "idHint": "Vous devrez vous munir de ce document d’identité lors de votre rendez-vous",
+    "idHint": "You must bring the valid and original ID",
+    "documents": {
+      "passport": {
+        "label": "Canadian passport"
+      },
+      "driverLicence": {
+        "label": "Provincial/Territorial driver's licence"
+      },
+      "photoIDServiceCard": {
+        "label": "Provincial/Territorial photo ID or service card"
+      },
+      "photoIDHealthCard": {
+        "label": "Provincial/Territorial Health card",
+        "hint": "Only valid for Quebec and British Columbia"
+      },
+      "canadianPRCard": {
+        "label": "Permanent resident card"
+      },
+      "indianStatus": {
+        "label": "Secure Certificate of Indian Status"
+      },
+      "COMBO_CARD": {
+        "label": "Provincial/Territorial combination driver's licence/health cards",
+        "hint": "Only valid for Alberta and British Columbia"
+      }
+    },
     "idExpirationLabel": "Date d'expiration",
     "enterDetailsIdHeading": "Enter your details as shown on the ID",
     "firstNameLabel": "Prénom",
@@ -288,6 +316,7 @@
     "passport": "Passeport canadien et international",
     "canadianPRCard": "Carte de résidence permanente canadienne",
     "indianStatus": "Certificat de statut d'Indien sécurisé",
+    "COMBO_CARD": "Provincial/Territorial combination driver's licence/health cards",
     "noIds": "Je n'ai aucune de ces pièces d'identité"
   },
   "ConfirmIdentityDetails": {

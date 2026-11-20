@@ -5,6 +5,7 @@ export type ApprovedDocumentValue =
   | "passport"
   | "canadianPRCard"
   | "indianStatus"
+  | "COMBO_CARD"
   | "noIds";
 
 export const APPROVED_DOCUMENT_VALUES: ApprovedDocumentValue[] = [
