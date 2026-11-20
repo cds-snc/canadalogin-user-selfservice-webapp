@@ -102,26 +102,10 @@ export const isValidCanadianPostalCode = (value: string): boolean =>
 
 export const getCanadaPostIdDetailsValidation = (
   formData: CanadaPostIdDetailsFormData,
-  { showCountry, showProvince }: CanadaPostIdDetailsFieldVisibility,
-  today: Date = new Date(),
+  { showProvince }: CanadaPostIdDetailsFieldVisibility,
+  _today: Date = new Date(),
 ): CanadaPostIdDetailsValidationResult => {
   const errorCodes: CanadaPostIdDetailsErrorCodes = {};
-
-  const idExpiryError = getIdExpiryValidationError(
-    formData.idExpiryDate,
-    today,
-  );
-  if (idExpiryError) {
-    errorCodes.idExpiryDate = idExpiryError;
-  }
-
-  if (!isNonEmptyTrimmed(formData.documentOptionId)) {
-    errorCodes.documentOptionId = "required";
-  }
-
-  if (showCountry && !isNonEmptyTrimmed(formData.country)) {
-    errorCodes.country = "required";
-  }
 
   if (showProvince && !isNonEmptyTrimmed(formData.province)) {
     errorCodes.province = "required";
