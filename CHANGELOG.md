@@ -1,5 +1,41 @@
 # Changelog
 
+## [1.40.0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.39.2...v1.40.0) (2026-11-20)
+
+
+### Features
+
+* identity verification e2e proven information card is populated ([#2562](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2562)) ([4fcad32](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/4fcad325439433a872e186c7c1fdb644a6aa8f74))
+* **identity-verification:** Add Proof of Address selector screen ([#2507](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2507)) ([367d90e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/367d90ee0115f298186e8af9d601a376c59dccb6))
+* Service Canada Center: Enter Passport detail ([#2521](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2521)) ([8eeebac](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/8eeebaccacdd80756a6decf359154c72c92b5fd2))
+
+
+### Bug Fixes
+
+* **frontend:** focus title on steps and after delete passkey ([#2555](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2555)) ([0f82d2b](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0f82d2b37c3ff4e44975ef3a744c9cb7096a1af0))
+* **frontend:** step component focusOnMount ([#2556](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2556)) ([0e66874](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0e66874a7de6b5eeba5b7a969f1827f748a72961))
+* **identity-verification:** (Canada Post) Add required attribute to "Can you bring a non-expired ID? radio button ([#2546](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2546)) ([297b304](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/297b3049bcd4904b3d315fd4d5dbab20e71ef331))
+* **identity-verification:** update instructions on the "Get ready to visit a Canada Post location" page ([#2560](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2560)) ([b831e98](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/b831e983a46d126f9ac65c4d1c4ddf80b9f73d21))
+
+
+### Code Refactoring
+
+* clean up Postman collection and documentation for IDV Data Store integration ([#2548](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2548)) ([061c3ab](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/061c3abc75cd825c95407c29f5285eedae6bfa35))
+* **identity-verifcation:** Content updates to Visit SCC page ([#2561](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2561)) ([0817da0](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/0817da011c8b2335fa561cca62262242b2e81858))
+* Updated take your proofing barcode to Canada Post page to figma design ([#2559](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2559)) ([3947743](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3947743289fae28aa05b5d15d462da6a633fb160))
+
+
+### Miscellaneous Chores
+
+* **deps:** lock file maintenance ([#2541](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2541)) ([c048c19](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/c048c19b5258d1cd0d840610cb7bf32c74dd4397))
+* **deps:** update all non-major github action dependencies ([#2539](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2539)) ([a7bbce6](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/a7bbce64c1fe8cb97be4960a2ad4bd2764bc129c))
+* **deps:** update all patch dependencies ([#2540](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2540)) ([f1daf83](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/f1daf8301be124b1dca94a691e5b08997bac3e19))
+
+
+### Documentation
+
+* document steps on deploying the manage app to a aws environment ([#2459](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/issues/2459)) ([3a1e19e](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/commit/3a1e19e47c98802eac4be15410892e6ca15e4c8c))
+
 ## [1.39.2](https://github.com/cds-snc/canadalogin-user-selfservice-webapp/compare/v1.39.1...v1.39.2) (2026-11-12)
 
 
