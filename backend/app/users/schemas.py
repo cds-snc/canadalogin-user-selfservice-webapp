@@ -114,6 +114,10 @@ class Meta(BaseModel):
     resourceType: str
 
 
+class UserGroup(BaseModel):
+    id: str
+
+
 class UserProfileName(BaseModel):
     """
     User profile name following Canadian naming conventions.
@@ -212,6 +216,7 @@ class IBMVerifyUserProfileSchema(BaseModel):
     active: bool
     id: str
     userName: EmailStr
+    groups: Optional[List[UserGroup]] = Field(default=None, exclude=True)
     phoneNumbers: Optional[List[MetaDataTypeValue]] = None
     details: Optional[SCIMUserDetails] = Field(
         default=None,
@@ -251,6 +256,14 @@ class IBMVerifyUpdateUserProfile(IBMVerifyUserProfileSchema):
 
 class ProfileResponse(ResponseModel):
     data: Optional[IBMVerifyUserProfileSchema] = None
+
+
+class ProfileFeatureFlags(BaseModel):
+    idv: bool = False
+
+
+class MyProfileResponse(ProfileResponse):
+    features: ProfileFeatureFlags
 
 
 class ProfileUpdateWithOtpAction(str, Enum):

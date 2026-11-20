@@ -9,11 +9,7 @@ import {
   GcdsContainer,
 } from "@gcds-core/components-react";
 
-import {
-  AVAILABLE_LANGUAGES,
-  DEV_ONLY_FEATURE,
-  PAGES,
-} from "../../../utils/constants";
+import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import InPersonRadioButtons from "../components/InPersonRadioButtons";
 import { IN_PERSON_METHOD, type InPersonMethod } from "../components/methods";
@@ -76,10 +72,6 @@ export default function ProveIdentityInPersonPage() {
         break;
     }
   };
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main">

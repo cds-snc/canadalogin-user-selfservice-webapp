@@ -8,8 +8,8 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 
 import { useTranslation } from "react-i18next";
-import { DEV_ONLY_FEATURE } from "../../utils/constants";
 import { useUser } from "../Providers/useUser";
+import { useIdvFeatureAccess } from "../../hooks/useIdvFeatureAccess";
 import VerifiedBadge from "../Badges/VerifiedBadge";
 import ViewContactPhoneNumber from "../../features/ContactPhoneNumber/components/ViewContactPhoneNumber";
 import ViewNameCard from "../../features/ProfileName/components/ViewProfileNameCard";
@@ -31,6 +31,7 @@ export default function ProfileHome() {
   const location = useLocation();
   const { t, i18n } = useTranslation("profile");
   const { state } = useUser();
+  const idvFeatureEnabled = useIdvFeatureAccess();
   const phoneNumbers = state?.userProfile?.phoneNumbers || [];
   const [identityVerificationClaims, setIdentityVerificationClaims] =
     useState<IdentityVerificationClaimsResponse>();
@@ -39,7 +40,7 @@ export default function ProfileHome() {
   );
 
   useEffect(() => {
-    if (!DEV_ONLY_FEATURE) {
+    if (!idvFeatureEnabled) {
       return;
     }
 
@@ -47,7 +48,7 @@ export default function ProfileHome() {
       .getClaims()
       .then(setIdentityVerificationClaims)
       .catch(() => undefined);
-  }, []);
+  }, [idvFeatureEnabled]);
 
   const verifiedClaims =
     identityVerificationClaims?.status === "verified"
@@ -68,17 +69,17 @@ export default function ProfileHome() {
         <GcdsHeading tag="h1" marginTop="0">
           {t("ProfileHome.title")}
         </GcdsHeading>
-        {DEV_ONLY_FEATURE && (
+        {idvFeatureEnabled && (
           <IdentityInfoSuccessNotice
             showIDVSuccessNotice={showIDVSuccessNotice}
           />
         )}
-        {DEV_ONLY_FEATURE && !showIDVSuccessNotice && !verifiedClaims && (
+        {idvFeatureEnabled && !showIDVSuccessNotice && !verifiedClaims && (
           <GcdsContainer className="idvNoticeSpacing">
             <CompleteIdentityProofingNotice />
           </GcdsContainer>
         )}
-        {DEV_ONLY_FEATURE && verifiedClaims && (
+        {idvFeatureEnabled && verifiedClaims && (
           <GcdsContainer>
             <GcdsGrid columns="1fr auto" className="gridInline">
               <GcdsHeading tag="h2" marginTop="0">

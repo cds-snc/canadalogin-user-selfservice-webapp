@@ -4,7 +4,8 @@ from httpx import AsyncClient
 
 from app.users.schemas import (
     IBMVerifyUserProfileSchema,
-    ProfileResponse,
+    MyProfileResponse,
+    ProfileFeatureFlags,
 )
 from app.utils.access_token import get_auth_request_headers
 from app.utils.mask_user_profile import mask_profile_details
@@ -52,7 +53,7 @@ async def dispatch_get_my_profile_from_ibm(
 
 async def get_my_profile(
     global_http_client: AsyncClient, user_access_token: str
-) -> ProfileResponse:
+) -> MyProfileResponse:
     """
     Retrieve and return the authenticated user's profile with masked phone numbers.
 
@@ -80,9 +81,15 @@ async def get_my_profile(
         masked_profile_data,
         context={"allow_invalid_profile_name": True},
     )
+    settings = get_configuration()
+    idv_feature_flag_group_id = settings.IDV_FEATURE_FLAG_GROUP_ID.strip()
+    has_idv_access = bool(idv_feature_flag_group_id) and any(
+        group.id == idv_feature_flag_group_id for group in profile_response.groups or []
+    )
 
-    return ProfileResponse(
+    return MyProfileResponse(
         success=True,
         message="User profile retrieved successfully.",
         data=response_data,
+        features=ProfileFeatureFlags(idv=has_idv_access),
     )

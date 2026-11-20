@@ -6,12 +6,17 @@ from app.config import get_configuration
 
 
 def should_disable_tls_verify_for_localhost(endpoint: str) -> bool:
-    """Return true only for local env calls to localhost/127.0.0.1.
+    """Return true only for explicitly allowed localhost/loopback requests.
 
-    This limits self-signed-cert TLS bypass to local developer loopback calls.
+    This limits self-signed-cert TLS bypass to local developer loopback calls,
+    even when other application features are being tested in a non-local env.
     """
     settings = get_configuration()
-    if settings.ENVIRONMENT != "local":
-        return False
     host = urlparse(endpoint).hostname
-    return host in {"localhost", "127.0.0.1"}
+    if host not in {"localhost", "127.0.0.1", "::1"}:
+        return False
+
+    return (
+        settings.ENVIRONMENT == "local"
+        or settings.idv_data_store_config.IDV_DATA_STORE_ALLOW_INSECURE_LOOPBACK_TLS
+    )

@@ -4,12 +4,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import IdentityInfoSuccessNotice from "../components/IdentityInfoSuccessNotice";
 
-let mockDevOnlyFeature = true;
+let mockIdvFeatureAccess = true;
 
-vi.mock("../../../utils/constants", () => ({
-  get DEV_ONLY_FEATURE() {
-    return mockDevOnlyFeature;
-  },
+vi.mock("../../../hooks/useIdvFeatureAccess", () => ({
+  useIdvFeatureAccess: () => mockIdvFeatureAccess,
 }));
 
 vi.mock("react-i18next", () => ({
@@ -45,7 +43,7 @@ vi.mock("@gcds-core/components-react", () => ({
 }));
 
 afterEach(() => {
-  mockDevOnlyFeature = true;
+  mockIdvFeatureAccess = true;
 });
 
 describe("IdentityInfoSuccessNotice", () => {
@@ -72,8 +70,8 @@ describe("IdentityInfoSuccessNotice", () => {
     expect(screen.queryByTestId("success-notice")).toBeNull();
   });
 
-  it("does not render when the dev-only feature is disabled", () => {
-    mockDevOnlyFeature = false;
+  it("does not render when IDV access is disabled", () => {
+    mockIdvFeatureAccess = false;
 
     render(<IdentityInfoSuccessNotice showIDVSuccessNotice={true} />);
 

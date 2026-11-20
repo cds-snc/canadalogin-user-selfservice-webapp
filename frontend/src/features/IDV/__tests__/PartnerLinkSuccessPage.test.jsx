@@ -150,12 +150,4 @@ describe("PartnerLinkSuccessPage", () => {
 
     expect(container).toBeEmptyDOMElement();
   });
-
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
-
-    const { container } = render(<PartnerLinkSuccessPage />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
 });

@@ -33,7 +33,7 @@ Shared base class for all idv-data-store operations. Provides:
 
 - `_get(endpoint, *, scope, context)` / `_post(endpoint, *, scope, context, payload, include_idempotency_key)`
 - `_request(...)` — exchanges the user token via `exchange_token_for_idv_data_store`, builds headers (`Authorization`, `Accept`, optional `Idempotency-Key`), dispatches the request
-- `_dispatch_request(...)` — handles localhost TLS bypass, delegates to the shared `AsyncClient`
+- `_dispatch_request(...)` — delegates to the shared `AsyncClient`; unverified TLS is limited to loopback URLs and is enabled by default only for `ENVIRONMENT=local`. Set `IDV_DATA_STORE_ALLOW_INSECURE_LOOPBACK_TLS=true` in a local debug profile to test other environment behavior against a self-signed loopback service. Remote hosts always use certificate verification.
 
 Every outbound call performs a fresh token exchange. No tokens are cached or reused across operations.
 

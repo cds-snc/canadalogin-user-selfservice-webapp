@@ -9,11 +9,7 @@ import {
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import {
-  AVAILABLE_LANGUAGES,
-  DEV_ONLY_FEATURE,
-  PAGES,
-} from "../../../utils/constants";
+import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
 const PARTNER_DISPLAY_NAMES = {
@@ -41,10 +37,6 @@ export default function PartnerLinkSuccessPage() {
   const navigate = useNavigate();
   const { t } = useTranslation("idv");
   const { language, journeyType, partnerId } = useParams();
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   const normalizedPartnerId = (partnerId ?? "").toUpperCase();
 

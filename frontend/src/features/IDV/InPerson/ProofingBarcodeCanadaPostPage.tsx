@@ -13,7 +13,7 @@ import BarcodeDisplay from "../helpers/BarcodeDisplay";
 import { useUser } from "../../../components/Providers/useUser";
 import { authService } from "../../../services/authService";
 import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import AcceptableProofOfAddressDocuments from "../components/AcceptableProofOfAddressDocuments";
 import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.validation";
@@ -111,10 +111,6 @@ export default function ProofingBarcodeCanadaPostPage() {
   const handlePrintPage = () => {
     window.print();
   };
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main" className="canada-post-idv-code-page">

@@ -104,14 +104,6 @@ describe("InPersonProofingInProgress", () => {
     mockSendInPersonVerificationCode.mockResolvedValue({ success: true });
   });
 
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
-
-    const { container } = render(<InPersonProofingInProgress />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it("renders the heading with relying party name", () => {
     render(<InPersonProofingInProgress />);
 

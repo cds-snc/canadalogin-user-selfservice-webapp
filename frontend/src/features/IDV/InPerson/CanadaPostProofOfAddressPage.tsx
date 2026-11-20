@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import type { CanadaPostIdDetailsLocationState } from "./CanadaPostIdDetailsPage";
 
@@ -47,10 +47,6 @@ export default function CanadaPostProofOfAddressPage() {
   const [selectedProof, setSelectedProof] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const currentLanguage = language === "fr" ? "fr" : "en";
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   const proofOfAddressOptions = PROOF_OF_ADDRESS_OPTIONS.map((option) =>
     t(`CanadaPostProofOfAddress.options.${option}`),

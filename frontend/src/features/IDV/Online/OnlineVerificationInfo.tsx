@@ -11,7 +11,7 @@ import {
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { IDV_JOURNEY_TYPE } from "../constants";
 import {
@@ -46,10 +46,6 @@ export default function OnlineVerificationInfo() {
         navigate(verificationErrorPage);
       });
   };
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main">

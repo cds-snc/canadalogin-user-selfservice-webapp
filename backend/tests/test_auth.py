@@ -311,14 +311,22 @@ def test_get_base_profile_management_url_local(monkeypatch):
     assert auth_module.get_base_profile_management_url() == "pm.local:3000"
 
 
-def test_get_base_profile_management_url_nonlocal(monkeypatch):
+@pytest.mark.parametrize(
+    ("domain", "expected"),
+    [
+        ("pm.example.com", "https://pm.example.com"),
+        ("https://pm.example.com", "https://pm.example.com"),
+        ("http://pm.example.com", "https://pm.example.com"),
+    ],
+)
+def test_get_base_profile_management_url_nonlocal(monkeypatch, domain, expected):
     monkeypatch.setattr(
         auth_module,
         "get_configuration",
-        lambda: FakeConfig(env="prod", domain="pm.example.com"),
+        lambda: FakeConfig(env="prod", domain=domain),
         raising=True,
     )
-    assert auth_module.get_base_profile_management_url() == "https://pm.example.com"
+    assert auth_module.get_base_profile_management_url() == expected
 
 
 @pytest.mark.asyncio
