@@ -156,12 +156,12 @@ export default function CanadaPostIdDetailsPage() {
 
   const dobMessages = getSharedDateOfBirthMessages(t);
   const errorMessages: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
-    idExpiryDate:
+    /* idExpiryDate:
       errorCodes.idExpiryDate === "too_soon"
         ? getIdExpiryTooSoonMessage(t)
         : errorCodes.idExpiryDate === "invalid"
           ? getIdExpiryInvalidMessage(t)
-          : getIdExpiryRequiredMessage(t),
+          : getIdExpiryRequiredMessage(t), */
     documentOptionId: issuerIsProvince
       ? getProvinceRequiredMessage(t)
       : getCountryRequiredMessage(t),
@@ -363,7 +363,6 @@ export default function CanadaPostIdDetailsPage() {
               format="full"
               lang={currentLanguage}
               value={formData.idExpiryDate}
-              required
               errorMessage={fieldError("idExpiryDate")}
               onGcdsChange={updateField("idExpiryDate")}
             />

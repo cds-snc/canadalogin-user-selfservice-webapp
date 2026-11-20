@@ -15,7 +15,7 @@ const CANADIAN_POSTAL_CODE_PATTERN =
 const ISO_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 export interface CanadaPostIdDetailsFormData {
-  idExpiryDate: string;
+  // idExpiryDate: string;
   documentOptionId: string;
   country: string;
   province: string;
@@ -32,11 +32,11 @@ export interface CanadaPostIdDetailsFieldVisibility {
   showProvince: boolean;
 }
 
-export type IdExpiryValidationError = "required" | "invalid" | "too_soon";
+// export type IdExpiryValidationError = "" | "" | "";
 export type PostalCodeValidationError = "required_or_invalid";
 
 export interface CanadaPostIdDetailsErrorCodes {
-  idExpiryDate?: IdExpiryValidationError;
+  // idExpiryDate?: IdExpiryValidationError;
   documentOptionId?: RequiredValidationError;
   country?: RequiredValidationError;
   province?: RequiredValidationError;
@@ -107,13 +107,13 @@ export const getCanadaPostIdDetailsValidation = (
 ): CanadaPostIdDetailsValidationResult => {
   const errorCodes: CanadaPostIdDetailsErrorCodes = {};
 
-  const idExpiryError = getIdExpiryValidationError(
+  /* const idExpiryError = getIdExpiryValidationError(
     formData.idExpiryDate,
     today,
   );
   if (idExpiryError) {
     errorCodes.idExpiryDate = idExpiryError;
-  }
+  } */
 
   if (!isNonEmptyTrimmed(formData.documentOptionId)) {
     errorCodes.documentOptionId = "required";
