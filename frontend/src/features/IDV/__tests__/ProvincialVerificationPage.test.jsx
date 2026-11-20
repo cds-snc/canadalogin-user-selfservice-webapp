@@ -115,7 +115,7 @@ describe("ProvincialVerificationPage", () => {
 
     expect(
       screen.getByText(
-        "Select the appropriate option and follow the steps to sign in and prove your identity",
+        "Select the appropriate option and follow the steps to sign in and verify your identity",
       ),
     ).toBeInTheDocument();
     expect(
