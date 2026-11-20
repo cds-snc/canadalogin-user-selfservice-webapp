@@ -106,7 +106,6 @@
     "signOut": "Sign out",
     "updateInformationButton": "Update information",
     "findNearestTitle": "Find your nearest Service Canada Centre",
-    "findNearestBody": "Complete your identity verification at an available",
     "findNearestLink": "Service Canada Centre near you"
   },
   "VisitCanadaPost": {
@@ -250,11 +249,13 @@
     "address": "Address",
     "idSelected": "ID selected",
     "reProofingRequired": "To update this information, you'll need to complete identity proofing again.",
-    "updateInformationButton": "Update information",
+    "update": "Update",
     "printPageButton": "Print page",
-    "findNearestTitle": "Find your nearest Canada Post",
+    "findNearestTitle": "Find a Canada Post location",
+    "findNearestPostOfficeLink": "https://www.canadapost-postescanada.ca/cpc/en/tools/find-a-post-office.page",
     "findNearestBody": "Complete your identity proofing at an available",
-    "findNearestLink": "Canada Post near you"
+    "findNearestLink": "Canada Post near you",
+    "signOut": "Sign out"
   },
   "ProvincialVerification": {
     "heading": "Get ready for provincial verification",
