@@ -94,19 +94,22 @@ vi.mock("@gcds-core/components-react", () => ({
     <fieldset id={id}>
       <legend>{legend}</legend>
       <p>{hint}</p>
-      {options.map(({ id: optionId, value, label, checked }) => (
-        <label key={optionId} htmlFor={optionId}>
-          <input
-            id={optionId}
-            type="radio"
-            value={value}
-            checked={checked}
-            required={required}
-            onChange={(event) => onGcdsChange?.({ target: event.target })}
-          />
-          {label}
-        </label>
-      ))}
+      {options.map(
+        ({ id: optionId, value, label, hint: optionHint, checked }) => (
+          <label key={optionId} htmlFor={optionId}>
+            <input
+              id={optionId}
+              type="radio"
+              value={value}
+              checked={checked}
+              required={required}
+              onChange={(event) => onGcdsChange?.({ target: event.target })}
+            />
+            {label}
+            {optionHint ? <span>{optionHint}</span> : null}
+          </label>
+        ),
+      )}
       {errorMessage ? <div>{errorMessage}</div> : null}
     </fieldset>
   ),
@@ -232,7 +235,15 @@ vi.mock("@gcds-core/components-react", () => ({
       {errorMessage ? <div>{errorMessage}</div> : null}
     </>
   ),
-  GcdsLink: ({ children, href }) => <a href={href}>{children}</a>,
+  GcdsLink: ({ children, href, external, onGcdsClick }) => (
+    <a
+      href={href}
+      data-external={external}
+      onClick={(event) => onGcdsClick?.(event)}
+    >
+      {children}
+    </a>
+  ),
   GcdsNotice: ({ children, noticeTitle }) => (
     <div data-testid="gcds-notice">
       <span>{noticeTitle}</span>
@@ -277,13 +288,45 @@ describe("ServiceCanadaCentre pages", () => {
     expect(
       screen.getByRole("radio", { name: /passport/i }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /driver/i })).toBeInTheDocument();
     expect(
-      screen.getByRole("radio", { name: /health card/i }),
+      screen.getByRole("radio", {
+        name: "Provincial/Territorial driver's licence",
+      }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("radio", { name: /canadian PR card$/i }),
+      screen.getByText("Provincial/Territorial Health card"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /permanent resident card/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /combination driver's licence/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByRole("radio")
+        .slice(0, 7)
+        .map((radio) => radio.value),
+    ).toEqual([
+      "passport",
+      "driverLicence",
+      "photoIDServiceCard",
+      "photoIDHealthCard",
+      "canadianPRCard",
+      "indianStatus",
+      "COMBO_CARD",
+    ]);
+    expect(
+      screen.getByText("Only valid for Quebec and British Columbia"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Only valid for Alberta and British Columbia"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: "Learn more about verifying at Service Canada Centre.",
+      }),
+    ).toHaveAttribute("data-external", "true");
     expect(
       screen.queryByTestId("id-expiry-date-input"),
     ).not.toBeInTheDocument();
@@ -324,6 +367,21 @@ describe("ServiceCanadaCentre pages", () => {
     expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
   });
 
+  it("passes the combination card selection to the ID details form", () => {
+    render(<ServiceCanadaCentrePage />);
+
+    fireEvent.click(
+      screen.getByRole("radio", { name: /combination driver's licence/i }),
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Yes" }));
+    fireEvent.click(screen.getByTestId("continue-button"));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/in-person/service-canada-centre/id-details",
+      { state: { idType: "COMBO_CARD" } },
+    );
+  });
+
   it("requires an answer to the valid-ID question before continuing", async () => {
     render(<ServiceCanadaCentrePage />);
 
@@ -347,6 +405,21 @@ describe("ServiceCanadaCentre pages", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
+  it("requires an ID selection when the user confirms they can bring valid ID", async () => {
+    render(<ServiceCanadaCentrePage />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("radio", { name: "Yes" }));
+      fireEvent.click(screen.getByTestId("continue-button"));
+    });
+
+    expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+    expect(
+      screen.getAllByText(t("ErrorsDefinition.idTypeRequired")),
+    ).toHaveLength(2);
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
   it("navigates to the not-ready page when the user cannot bring non-expired ID", async () => {
     render(<ServiceCanadaCentrePage />);
 
@@ -366,9 +439,9 @@ describe("ServiceCanadaCentre pages", () => {
   it("returns to method selection when the user has none of the listed IDs", () => {
     render(<ServiceCanadaCentrePage />);
 
-    fireEvent.click(screen.getByRole("radio", { name: /these IDs/i }));
-    fireEvent.click(screen.getByRole("radio", { name: "Yes" }));
-    fireEvent.click(screen.getByTestId("continue-button"));
+    fireEvent.click(
+      screen.getByRole("link", { name: /don't have any of these IDs/i }),
+    );
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/in-person",
@@ -384,13 +457,20 @@ describe("ServiceCanadaCentre pages", () => {
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
-  it("renders French ID labels when language is fr", async () => {
+  it("keeps ID labels in English when French translations were not provided", async () => {
     mockRouteParams.language = "fr";
-    await i18n.changeLanguage("fr");
+    await act(async () => {
+      await i18n.changeLanguage("fr");
+    });
 
     render(<ServiceCanadaCentrePage />);
     expect(
-      screen.getByRole("radio", { name: /passeport/i }),
+      screen.getByRole("heading", {
+        name: "Préparez-vous à vous rendre dans un centre Service Canada",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: "Canadian passport" }),
     ).toBeInTheDocument();
   });
 

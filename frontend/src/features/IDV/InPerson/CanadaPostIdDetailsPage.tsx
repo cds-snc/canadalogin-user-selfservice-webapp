@@ -256,6 +256,7 @@ export default function CanadaPostIdDetailsPage() {
           idSelected: getLocalizedName(selectedDocument, currentLanguage),
           verificationExpiresAt: response.data.verificationExpiresAt,
           verificationValidityDays: response.data.verificationValidityDays,
+          proofOfAddressRequired: selectedOption?.requires_proof === true,
         },
       },
     );
