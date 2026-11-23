@@ -22,11 +22,9 @@
   },
   "ServiceCanadaCentre": {
     "heading": "Get ready to visit a Service Canada Centre",
-    "followSteps": "Follow the steps to complete the process",
-    "step1": "Select your ID type and enter the details.",
-    "step2": "Get a unique code sent to your email, valid for 30 days.",
-    "step3": "Bring your code and selected photo ID to any Service Canada Centre.",
-    "step4": "A service agent will verify your identity, once done, sign back in to {{rpName}} to continue.",
+    "intro1": "Choose your ID and enter your details to get a verification code which is valid for 30 days.",
+    "intro2": "Bring the code and your ID to any Service Canada Centre, where an agent will check your identity.",
+    "intro3": "Sign back in to {{rpName}} once done to access the service.",
     "nonExpiredIdTitle": "Can you bring a non-expired ID?",
     "nonExpiredIdHint": "ID must be valid when you visit the Service Canada Centre",
     "yesOption": "Yes",
@@ -35,18 +33,36 @@
     "enterDetailsHeading": "Enter your ID details",
     "continueButton": "Continue",
     "chooseDifferentMethodButton": "Choose a different method",
-    "moreInfoTitle": "For more information",
-    "learnMoreLink": "Learn more about Service Canada Centre identity proofing",
-    "selectIdLabel": "What ID do you have?",
+    "learnMoreLink": "Learn more about verifying at Service Canada Centre.",
+    "selectIdLabel": "Select your ID",
     "selectIdDropdownDefaultValue": "Select option",
-    "driverLicenceOption": "Provincial/Territorial Driver’s Licence",
-    "photoIDHealthCardOption": "Provincial/Territorial Photo ID Health Card",
-    "photoIDServiceCardOption": "Provincial/Territorial Photo ID/Service Card",
-    "passportOption": "Canadian and International Passport",
-    "canadianPRCardOption": "Canadian PR Cards",
-    "indianStatusOption": "Secure Certificate of Indian Status",
-    "noIds": "I don’t have any of these IDs",
-    "idHint": "You will need to bring this ID to your in-person visit",
+    "noIds": "I don't have any of these IDs",
+    "idHint": "You must bring the valid and original ID",
+    "documents": {
+      "passport": {
+        "label": "Canadian passport"
+      },
+      "driverLicence": {
+        "label": "Provincial/Territorial driver's licence"
+      },
+      "photoIDServiceCard": {
+        "label": "Provincial/Territorial photo ID or service card"
+      },
+      "photoIDHealthCard": {
+        "label": "Provincial/Territorial Health card",
+        "hint": "Only valid for Quebec and British Columbia"
+      },
+      "canadianPRCard": {
+        "label": "Permanent resident card"
+      },
+      "indianStatus": {
+        "label": "Secure Certificate of Indian Status"
+      },
+      "COMBO_CARD": {
+        "label": "Provincial/Territorial combination driver's licence/health cards",
+        "hint": "Only valid for Alberta and British Columbia"
+      }
+    },
     "idExpirationLabel": "When does it expire?",
     "idExpiryHint": "Must be valid for at least 1 month from today",
     "backButton": "Back",
@@ -95,9 +111,9 @@
   },
   "VisitCanadaPost": {
     "heading": "Get ready to visit a Canada Post location",
-    "followSteps": "Follow the steps to complete the process",
-    "step1": "Select your ID type and enter the details.",
-    "step2": "Get a unique code sent to your email, valid for 30 days.",
+    "verificationBarcodeInstructions": "Choose your ID and enter your details to get a verification barcode which is valid for 30 days. ",
+    "canadaPostVisitInstruction": "Bring the barcode, your ID and proof of address to any Canada Post, where an agent will check your identity.",
+    "returnToServiceInstructions": "Sign back in to {{rpName}} once done to access the service.",
     "step3": "Bring your code and selected photo ID to any Canada Post.",
     "step4": "A service agent will verify your identity, once done, sign back in to {{rpName}} to continue.",
     "nonExpiredIdTitle": "Can you bring a non-expired ID?",
@@ -207,30 +223,40 @@
     "backButton": "Back"
   },
   "ProofingBarcodeCanadaPost": {
-    "heading": "Take your proofing barcode to Canada Post",
+    "heading": "Take your CanadaLogin barcode to a Canada Post",
     "barcodeAriaLabel": "Barcode for code {{code}}",
     "printBannerAlt": "Government of Canada",
     "codeValidDaysDynamic": "This code is valid for {{validityDays}} days and has been emailed to",
     "codeValidDays": "This code is valid for {{validityDays}} days and has been emailed to",
     "codeValidityDate": "July 24, 2027",
+    "codeLabel": "Your CanadaLogin barcode for Canada Post",
+    "whatToBringAddress": "You must bring a proof of address",
+    "whatToBringHint": "Since the ID you selected does not have an address on it, you will need to bring in another secondary document that does.",
+    "whatToBringHeading": "What to bring",
+    "whatToBringCode": "Your code (printed or on your phone) within 30 days",
+    "whatToBringId": "Your valid and original {{idSelected}}",
+    "whatToBringProofOfAddress": "Proof of address",
     "visitInstruction": "Visit a Canada Post before",
     "visitInstructionCont": "with your proofing barcode and your {{idSelected}}.",
-    "listOfIds": "List of acceptable IDs",
+    "listOfProofOfAddressDocuments": "Acceptable proof of address documents",
     "acceptableIdOption1": "Canadian passport",
     "acceptableIdOption2": "Provincial or territorial driver's licence",
     "acceptableIdOption3": "Permanent resident card",
-    "yourInformationHeading": "Your information",
+    "yourInformationHeading": "Check your information",
+    "yourInformationHint": "Make sure this matches your ID otherwise update the information before you go.",
     "givenName": "Given name",
     "lastName": "Last name",
     "dateOfBirth": "Date of birth",
     "address": "Address",
     "idSelected": "ID selected",
     "reProofingRequired": "To update this information, you'll need to complete identity proofing again.",
-    "updateInformationButton": "Update information",
+    "update": "Update",
     "printPageButton": "Print page",
-    "findNearestTitle": "Find your nearest Canada Post",
+    "findNearestTitle": "Find a Canada Post location",
+    "findNearestPostOfficeLink": "https://www.canadapost-postescanada.ca/cpc/en/tools/find-a-post-office.page",
     "findNearestBody": "Complete your identity proofing at an available",
-    "findNearestLink": "Canada Post near you"
+    "findNearestLink": "Canada Post near you",
+    "signOut": "Sign out"
   },
   "ProvincialVerification": {
     "heading": "Get ready for provincial verification",
@@ -355,6 +381,7 @@
     "passport": "Canadian and International Passport",
     "canadianPRCard": "Canadian PR Card",
     "indianStatus": "Secure Certificate of Indian Status",
+    "COMBO_CARD": "Provincial/Territorial combination driver's licence/health cards",
     "noIds": "I don't have any of these IDs"
   },
   "ConfirmIdentityDetails": {

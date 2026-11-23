@@ -1,0 +1,21 @@
+{
+  "name": "selfservice-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright end-to-end tests for the CanadaLogin self-service webapp",
+  "scripts": {
+    "test": "playwright test",
+    "test:idv": "playwright test --project=idv",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "install-browsers": "playwright install --with-deps chromium",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^22.20.5",
+    "dotenv": "^18.0.10",
+    "typescript": "~5.9.0"
+  }
+}

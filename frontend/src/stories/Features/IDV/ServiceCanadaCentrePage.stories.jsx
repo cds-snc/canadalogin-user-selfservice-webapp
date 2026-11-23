@@ -9,7 +9,7 @@ export default {
     docs: {
       description: {
         component:
-          "ServiceCanadaCentrePage presents the pre-visit instructions for in-person identity proofing at a Service Canada Centre. It displays a 3-step process overview and prompts the user to continue to receive their unique identification code.",
+          "ServiceCanadaCentrePage explains the in-person identity verification process and lets users select their ID before continuing.",
       },
     },
   },

@@ -1,0 +1,8 @@
+node_modules/
+.env
+# Saved sessions contain live auth cookies.
+.auth/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
