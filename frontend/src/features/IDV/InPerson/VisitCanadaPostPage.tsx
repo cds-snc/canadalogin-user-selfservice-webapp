@@ -17,6 +17,7 @@ import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/Err
 import {
   AVAILABLE_LANGUAGES,
   DEV_ONLY_FEATURE,
+  manageDashboardLinks,
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
@@ -28,7 +29,6 @@ import {
 import {
   getDocumentHintKey,
   getDocumentLabelKey,
-  NO_IDS_VALUE,
   SELECTABLE_DOCUMENT_TYPES,
 } from "../data/identityDocuments";
 import {
@@ -36,6 +36,7 @@ import {
   getSelectOptionRequiredMessage,
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
+
 
 const ERROR_SUMMARY_ID = "visit-canada-post-error-summary";
 const RADIOS_ID = "select-id-radios";
@@ -53,9 +54,15 @@ export default function VisitCanadaPost() {
     PAGES.idvCompleteIdentityProofingPage,
     { language, journeyType },
   );
+  const helpAndSupportLink =
+    language === "fr"
+      ? manageDashboardLinks.helpAndSupport.fr
+      : manageDashboardLinks.helpAndSupport.en;
 
   const { relyingPartyName: rpName } = useRelyingPartyInfo();
-  const [selectedValue, setSelectedValue] = useState("");
+  const [selectedValue, setSelectedValue] = useState<
+    Exclude<IdentityDocumentType, "noIds"> | ""
+  >("");
   const [nonExpiredIdAnswer, setNonExpiredIdAnswer] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -73,12 +80,6 @@ export default function VisitCanadaPost() {
         checked: selectedValue === documentType,
       };
     }),
-    {
-      id: `radio-${NO_IDS_VALUE}`,
-      value: NO_IDS_VALUE,
-      label: t("CanadaPostSelectId.noIds"),
-      checked: selectedValue === NO_IDS_VALUE,
-    },
   ];
 
   const nonExpiredIdRadioOptions = [
@@ -120,13 +121,6 @@ export default function VisitCanadaPost() {
 
     if (nonExpiredIdAnswer === "no") {
       navigate(completeIdentityProofingPage);
-      return;
-    }
-
-    if (selectedValue === NO_IDS_VALUE) {
-      navigate(
-        path(PAGES.idvProveIdentityInPersonPage, { language, journeyType }),
-      );
       return;
     }
 
@@ -175,26 +169,26 @@ export default function VisitCanadaPost() {
     <GcdsContainer role="main">
       <form>
         <GcdsGrid columns="1" gap="450">
+          <GcdsHeading tag="h1">{t("VisitCanadaPost.heading")}</GcdsHeading>
+
+          {nonExpiredIdError || idTypeErrorMessage ? (
+            <ErrorSummaryWithFocus
+              key={summaryFocusTrigger}
+              id={ERROR_SUMMARY_ID}
+              errorMessage={getValidationSummaryHeading(t)}
+              errorLinks={{
+                ...(nonExpiredIdError && {
+                  [`#${NON_EXPIRED_ID_RADIOS_ID}`]: nonExpiredIdError,
+                }),
+                ...(idTypeErrorMessage && {
+                  [`#${RADIOS_ID}`]: idTypeErrorMessage,
+                }),
+              }}
+              language={currentLanguage}
+            />
+          ) : null}
+
           <GcdsContainer>
-            <GcdsHeading tag="h1">{t("VisitCanadaPost.heading")}</GcdsHeading>
-
-            {nonExpiredIdError || idTypeErrorMessage ? (
-              <ErrorSummaryWithFocus
-                key={summaryFocusTrigger}
-                id={ERROR_SUMMARY_ID}
-                errorMessage={getValidationSummaryHeading(t)}
-                errorLinks={{
-                  ...(nonExpiredIdError && {
-                    [`#${NON_EXPIRED_ID_RADIOS_ID}`]: nonExpiredIdError,
-                  }),
-                  ...(idTypeErrorMessage && {
-                    [`#${RADIOS_ID}`]: idTypeErrorMessage,
-                  }),
-                }}
-                language={currentLanguage}
-              />
-            ) : null}
-
             <GcdsText>
               {t("VisitCanadaPost.verificationBarcodeInstructions")}
             </GcdsText>
@@ -205,7 +199,11 @@ export default function VisitCanadaPost() {
               {t("VisitCanadaPost.returnToServiceInstructions", { rpName })}
             </GcdsText>
             <GcdsText>
-              <GcdsLink href="#" external={true}>
+              <GcdsLink
+                href={helpAndSupportLink}
+                external={true}
+                style={{ textDecoration: "underline" }}
+              >
                 {t("VisitCanadaPost.learnMoreLink")}
               </GcdsLink>
             </GcdsText>
@@ -234,10 +232,30 @@ export default function VisitCanadaPost() {
               errorMessage={idTypeErrorMessage}
               onGcdsChange={(event: CustomEvent<string>) => {
                 setSelectedValue(
-                  (event.target as HTMLInputElement | null)?.value ?? "",
+                  ((event.target as HTMLInputElement | null)?.value ?? "") as
+                  Exclude<IdentityDocumentType, "noIds"> | "",
                 );
               }}
             />
+            <GcdsText>
+              <GcdsLink
+                href={path(PAGES.idvProveIdentityInPersonPage, {
+                  language,
+                  journeyType,
+                })}
+                onGcdsClick={(event: Event) => {
+                  event.preventDefault();
+                  navigate(
+                    path(PAGES.idvProveIdentityInPersonPage, {
+                      language,
+                      journeyType,
+                    }),
+                  );
+                }}
+              >
+                {t("CanadaPostSelectId.noIds")}
+              </GcdsLink>
+            </GcdsText>
             <GcdsRadios
               id={NON_EXPIRED_ID_RADIOS_ID}
               name="non-expired-id"
@@ -276,8 +294,8 @@ export default function VisitCanadaPost() {
               {t("VisitCanadaPost.differentMethodButton")}
             </GcdsButton>
           </GcdsGrid>
-        </GcdsGrid>
-      </form>
-    </GcdsContainer>
+        </GcdsGrid >
+      </form >
+    </GcdsContainer >
   );
 }
