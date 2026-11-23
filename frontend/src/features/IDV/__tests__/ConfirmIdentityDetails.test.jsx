@@ -24,26 +24,6 @@ vi.mock("react-router", async () => {
   };
 });
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key, options) => {
-      const translations = {
-        "ConfirmIdentityDetails.successNoticeTitle": "Success",
-        "ConfirmIdentityDetails.successNoticeDescription":
-          "You proved your identity with {{appName}}.",
-        "ConfirmIdentityDetails.pageTitle": "Saved to your CanadaLogin",
-        "ConfirmIdentityDetails.description": "Your information has been saved",
-        "ConfirmIdentityDetails.confirmAndContinue": "Continue",
-      };
-      const text = translations[key];
-      return options?.appName
-        ? text?.replace("{{appName}}", options.appName)
-        : text || key;
-    },
-    i18n: { language: "en" },
-  }),
-}));
-
 vi.mock("../api/identityVerificationApi", () => ({
   identityVerificationApi: {
     getClaims: vi.fn().mockResolvedValue({
@@ -76,22 +56,7 @@ vi.mock("../../../utils/constants", () => ({
     editEmailPage: "EditEmailPage",
     editContactPhoneNumberPage: "EditContactPhoneNumberPage",
     idvStartIdentityProofingPage: "IdvStartIdentityProofingPage",
-    ProfileHome: "ProfileHome",
   },
-}));
-
-vi.mock("../constants", () => ({
-  IDV_JOURNEY_TYPE: {
-    REQUIRED: "required",
-  },
-}));
-
-vi.mock("../../../hooks/useRelyingPartyInfo", () => ({
-  useRelyingPartyInfo: () => ({
-    relyingPartyUrl: "https://rp.example.com/service",
-    relyingPartyName: "CRA",
-    hasRelyingParty: true,
-  }),
 }));
 
 vi.mock("../../../utils/routeHelpers", () => ({
@@ -148,23 +113,6 @@ vi.mock("@gcds-core/components-react", () => ({
   },
 }));
 
-vi.mock("../../../components/InfoBlocks/AccessibleNotice", () => ({
-  default: ({ noticeTitle, children }) => (
-    <div>
-      {noticeTitle && <div>{noticeTitle}</div>}
-      {children}
-    </div>
-  ),
-}));
-
-vi.mock("../../../components/Badges/VerifiedBadge", () => ({
-  default: ({ text }) => <div>{text}</div>,
-}));
-
-vi.mock("../ProvenInformationCard", () => ({
-  default: () => <div>Proven Information Card</div>,
-}));
-
 describe("ConfirmIdentityDetails", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -208,6 +156,31 @@ describe("ConfirmIdentityDetails", () => {
       screen.getByRole("heading", {
         name: "Saved to your CanadaLogin",
       }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the existing RP success notice when RP details are available", () => {
+    render(<ConfirmIdentityDetails />);
+
+    expect(screen.getByText("Success")).toBeInTheDocument();
+    expect(
+      screen.getByText(/^You proved your identity with .+\.$/),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the new no-RP success notice when RP details are missing", () => {
+    mockUserState = {
+      ...mockUserState,
+      relyingPartyInfo: null,
+    };
+
+    render(<ConfirmIdentityDetails />);
+
+    expect(
+      screen.getByText("Your CanadaLogin has succesfully saved your changes"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Continue with accessing the service"),
     ).toBeInTheDocument();
   });
 
