@@ -1,4 +1,4 @@
-name: Release pipeline - dev
+name: Release pipeline - dev & test
 
 on:
   push:
@@ -16,6 +16,7 @@ on:
         type: choice
         options:
           - dev
+          - test
       rebuild:
         description: Rebuild application artifacts during this manual deployment
         required: false
