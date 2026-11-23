@@ -28,7 +28,7 @@ type VerificationMethod =
 export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const isMockProofing = DEV_ONLY_FEATURE && state?.mockProofing === true;
+  const isMockProofing = state?.mockProofing === true;
   const verificationMethod =
     state?.verificationMethod as VerificationMethod | null;
   const { t, i18n } = useTranslation(["idv", "profile"]);
@@ -99,9 +99,7 @@ export default function ConfirmIdentityDetails() {
     return null;
   }
 
-  const reviewClaims = isMockProofing
-    ? mockIdentityClaims
-    : identityVerificationClaims;
+  const reviewClaims = mockIdentityClaims;
   const verifiedClaims =
     reviewClaims?.status === "verified"
       ? reviewClaims.verified_claims
