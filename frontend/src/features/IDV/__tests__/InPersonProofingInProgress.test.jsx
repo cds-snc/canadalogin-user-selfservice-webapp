@@ -176,7 +176,8 @@ describe("InPersonProofingInProgress", () => {
 
     fireEvent.click(screen.getByTestId("resend-email-button"));
 
-    expect(await screen.findByText(/July 20, 2026/)).toBeInTheDocument();
+    const dateTexts = await screen.findAllByText(/July 20, 2026/);
+    expect(dateTexts.length).toBeGreaterThan(0);
   });
 
   it("renders the completed proofing collapsible header", () => {
