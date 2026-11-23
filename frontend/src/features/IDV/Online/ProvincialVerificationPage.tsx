@@ -10,7 +10,7 @@ import {
 
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import imgBcServicesCard from "../../../assets/images/BC_card.png";

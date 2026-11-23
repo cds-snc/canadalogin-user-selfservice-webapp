@@ -35,7 +35,7 @@ export default function ConfirmIdentityDetails() {
   const { language, journeyType } = useParams();
   const { hasRelyingParty } = useRelyingPartyInfo();
 
-  const [identityVerificationClaims, setIdentityVerificationClaims] =
+  const [_identityVerificationClaims, setIdentityVerificationClaims] =
     useState<IdentityVerificationClaimsResponse>();
 
   useEffect(() => {
