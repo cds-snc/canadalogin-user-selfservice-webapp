@@ -10,8 +10,8 @@ import {
 
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
-import { PAGES } from "../../../utils/constants";
+import { useParams, useNavigate } from "react-router";
+import { PAGES, DEV_ONLY_FEATURE } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import imgBcServicesCard from "../../../assets/images/BC_card.png";
 import imgAlbertaAccount from "../../../assets/images/AB_card.png";
@@ -20,6 +20,11 @@ import imgQuebecAccount from "../../../assets/images/QC_card.png";
 export default function ProvincialVerificationPage() {
   const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
+  const navigate = useNavigate();
+
+  if (!DEV_ONLY_FEATURE) {
+    return null;
+  }
 
   const inProgressPage = path(PAGES.idvInProgressIDVPage, {
     language,
@@ -75,7 +80,7 @@ export default function ProvincialVerificationPage() {
           type="button"
           buttonRole="secondary"
           onClick={() => {
-            window.history.back();
+            navigate(-1);
           }}
         >
           {t("ProvincialVerification.chooseDifferentMethodButton")}
