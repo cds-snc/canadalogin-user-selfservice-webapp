@@ -39,4 +39,10 @@ export const TEST_USERS = {
     "E2E_UNPROVEN_USER",
     "has no ID proofing data",
   ),
+  /** Dedicated account for the provider journeys, which create in-person cases. */
+  inPerson: user(
+    "in-person-user",
+    "E2E_IN_PERSON_USER",
+    "dedicated account for in-person journeys",
+  ),
 } satisfies Record<string, TestUser>;

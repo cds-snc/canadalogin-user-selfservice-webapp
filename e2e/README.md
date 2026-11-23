@@ -24,22 +24,24 @@ Assertions use the frontend's own translation files (`frontend/src/i18n/locales`
 
 - The target frontend must have the IDV routes enabled (`VITE_ENVIRONMENT=dev` or `test`).
 - Test users must not be prompted for OTP/MFA. In dev/test tenants, add them to an MFA-exempt group (e.g. `MFA_Exempt`) that the self-service app's access policy allows without MFA, rather than removing the policy for everyone.
-- Two test users in the target IBM Verify tenant:
+- Three dedicated test users in the target IBM Verify tenant:
   - **User A** (`E2E_PROVEN_USER_*`) has completed fake ID proofing.
   - **User B** (`E2E_UNPROVEN_USER_*`) has no ID proofing data. The tests assume this and don't reset it, so don't use this account to complete ID proofing.
+  - **In-person user** (`E2E_IN_PERSON_USER_*`) is reserved for Service Canada and Canada Post journeys. Those tests create in-person cases and send verification-code emails through GC Notify; use a controlled test mailbox and a test Notify service.
 
 ## Environment variables
 
 Set these in your shell, in CI secrets, or in an untracked `e2e/.env` file (git-ignored, loaded automatically).
 
-| Variable                                | Required                             | Description                                                                 |
-| --------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------- |
-| `E2E_BASE_URL`                          | No (default `http://localhost:3000`) | Frontend URL, e.g. `https://local.dev.login-connexion.alpha.canada.ca:3000` |
-| `E2E_API_URL`                           | No (default `http://localhost:8000`) | Backend URL; must match the frontend's `VITE_BACKEND_API_URL`               |
-| `E2E_IGNORE_HTTPS_ERRORS`               | No                                   | `true` for self-signed local certificates                                   |
-| `E2E_TIMEZONE`                          | No (default `America/Toronto`)       | Browser timezone, also used to compute expected dates                       |
-| `E2E_PROVEN_USER_EMAIL` / `_PASSWORD`   | Yes                                  | User A's credentials                                                        |
-| `E2E_UNPROVEN_USER_EMAIL` / `_PASSWORD` | Yes                                  | User B's credentials                                                        |
+| Variable                                 | Required                             | Description                                                                 |
+| ---------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------- |
+| `E2E_BASE_URL`                           | No (default `http://localhost:3000`) | Frontend URL, e.g. `https://local.dev.login-connexion.alpha.canada.ca:3000` |
+| `E2E_API_URL`                            | No (default `http://localhost:8000`) | Backend URL; must match the frontend's `VITE_BACKEND_API_URL`               |
+| `E2E_IGNORE_HTTPS_ERRORS`                | No                                   | `true` for self-signed local certificates                                   |
+| `E2E_TIMEZONE`                           | No (default `America/Toronto`)       | Browser timezone, also used to compute expected dates                       |
+| `E2E_PROVEN_USER_EMAIL` / `_PASSWORD`    | Yes                                  | User A's credentials                                                        |
+| `E2E_UNPROVEN_USER_EMAIL` / `_PASSWORD`  | Yes                                  | User B's credentials                                                        |
+| `E2E_IN_PERSON_USER_EMAIL` / `_PASSWORD` | Yes                                  | Dedicated user for the in-person flows                                      |
 
 ## Running
 
@@ -76,6 +78,8 @@ This repository is public, so workflow artifacts can be downloaded by any GitHub
 - **403 from the API:** the API's load balancer rejects non-browser user agents, including Playwright's default `HeadlessChrome`. Every project uses the `Desktop Chrome` device profile for this reason (see `playwright.config.ts`); keep it when adding projects.
 - **`E2E_BASE_URL`** must be the frontend origin without a path (e.g. `https://app.dev.login-connexion.alpha.canada.ca`, not `.../en`).
 - **User B tests fail because the Identity details card is shown:** User B's account has ID proofing data. Use an account that has never completed ID proofing.
+- **In-person journey tests fail while creating a case:** the backend environment needs a GC Notify test API key and a reachable IDV data store. Each run creates a pending case and sends a verification-code email to the dedicated in-person account.
+- **In-person journey test account:** configure `E2E_IN_PERSON_USER_EMAIL` and `E2E_IN_PERSON_USER_PASSWORD` for a dedicated account. The Service Canada and Canada Post tests create cases for this user; they don't use or modify User A or User B.
 
 ## Writing tests
 

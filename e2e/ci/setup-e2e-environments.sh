@@ -22,7 +22,8 @@ echo "Set e2e-dev variables"
 # shell history or this file.
 for SECRET in \
   E2E_PROVEN_USER_EMAIL E2E_PROVEN_USER_PASSWORD \
-  E2E_UNPROVEN_USER_EMAIL E2E_UNPROVEN_USER_PASSWORD; do
+  E2E_UNPROVEN_USER_EMAIL E2E_UNPROVEN_USER_PASSWORD \
+  E2E_IN_PERSON_USER_EMAIL E2E_IN_PERSON_USER_PASSWORD; do
   echo "Enter ${SECRET} for e2e-dev:"
   gh secret set "${SECRET}" --env e2e-dev --repo "${REPO}"
 done
