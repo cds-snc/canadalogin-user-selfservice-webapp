@@ -10,74 +10,26 @@ import {
 
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate, useParams } from "react-router";
-import {
-  DEV_ONLY_FEATURE,
-  OIDC_REDIRECT,
-  PAGES,
-  PROVINCIAL_PARTNERS,
-} from "../../../utils/constants";
+import { useParams, useNavigate } from "react-router";
+import { PAGES, DEV_ONLY_FEATURE } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import imgBcServicesCard from "../../../assets/images/BC_card.png";
 import imgAlbertaAccount from "../../../assets/images/AB_card.png";
 import imgQuebecAccount from "../../../assets/images/QC_card.png";
 
 export default function ProvincialVerificationPage() {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { language, journeyType } = useParams();
   const { t } = useTranslation("idv");
+  const navigate = useNavigate();
+
+  if (!DEV_ONLY_FEATURE) {
+    return null;
+  }
 
   const inProgressPage = path(PAGES.idvInProgressIDVPage, {
     language,
     journeyType,
   });
-
-  const buildPartnerLoginHref = (
-    partnerId: (typeof PROVINCIAL_PARTNERS)[keyof typeof PROVINCIAL_PARTNERS],
-  ) => {
-    const url = new URL(OIDC_REDIRECT.login, window.location.origin);
-    const filteredSearchParams = new URLSearchParams(location.search);
-    filteredSearchParams.delete("returnToPage");
-    const filteredSearch = filteredSearchParams.toString();
-    const partnerSuccessPage = path(PAGES.idvPartnerLinkSuccessPage, {
-      language,
-      journeyType,
-      partnerId,
-    });
-    const returnToPage = filteredSearch
-      ? `${partnerSuccessPage}?${filteredSearch}`
-      : partnerSuccessPage;
-    url.searchParams.set("returnToPage", returnToPage);
-    url.searchParams.set("partner", partnerId.toLowerCase());
-    if (language === "en" || language === "fr") {
-      url.searchParams.set("lang", language);
-    }
-
-    return url.toString();
-  };
-
-  const handleCardClick = (method: string) => {
-    navigate(inProgressPage, {
-      state: {
-        mockProofing: true,
-        verificationMethod: method,
-      },
-    });
-  };
-
-  const bcPartnerLoginHref = DEV_ONLY_FEATURE
-    ? undefined
-    : buildPartnerLoginHref(PROVINCIAL_PARTNERS.bc);
-  const abPartnerLoginHref = DEV_ONLY_FEATURE
-    ? undefined
-    : buildPartnerLoginHref(PROVINCIAL_PARTNERS.ab);
-  const quebecPartnerLoginHref = DEV_ONLY_FEATURE
-    ? undefined
-    : buildPartnerLoginHref(PROVINCIAL_PARTNERS.qc);
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main">
@@ -105,24 +57,21 @@ export default function ProvincialVerificationPage() {
         <GcdsCard
           cardTitle={t("ProvincialVerification.bcServicesCard")}
           cardTitleTag="h3"
-          href={bcPartnerLoginHref}
-          onClick={() => handleCardClick("provincial")}
+          href={inProgressPage}
           imgSrc={imgBcServicesCard}
           imgAlt="British Columbia Logo"
         ></GcdsCard>
         <GcdsCard
           cardTitle={t("ProvincialVerification.albertaAccount")}
           cardTitleTag="h3"
-          href={abPartnerLoginHref}
-          onClick={() => handleCardClick("provincial")}
+          href={inProgressPage}
           imgSrc={imgAlbertaAccount}
           imgAlt="Alberta Logo"
         ></GcdsCard>
         <GcdsCard
           cardTitle={t("ProvincialVerification.quebecAccount")}
           cardTitleTag="h3"
-          href={quebecPartnerLoginHref}
-          onClick={() => handleCardClick("provincial")}
+          href={inProgressPage}
           imgSrc={imgQuebecAccount}
           imgAlt="Québec Logo"
         ></GcdsCard>
