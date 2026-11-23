@@ -117,7 +117,7 @@ describe("InPersonProofingInProgress", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "RP Service Portal needs you to prove your identity",
+        name: "RP Service Portal needs you to verify your identity",
         level: 1,
       }),
     ).toBeInTheDocument();
@@ -132,17 +132,17 @@ describe("InPersonProofingInProgress", () => {
     );
     expect(
       screen.getByText(
-        "You're partway through proofing in person with Canada Post",
+        "You're partway through verifying your identity in person with Canada Post",
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Look for an email sent by CanadaLogin with instructions to complete proofing your identity at a Canada Post location\./i,
+        /Look for an email sent by CanadaLogin with instructions to verify your identity at a Canada Post location\./i,
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Changed your mind about in-person proofing at Canada Post? You can reset and choose a different method instead.",
+        "Change your mind about verifying your identity at Canada Post? You can reset and choose a different method instead.",
       ),
     ).toBeInTheDocument();
   });
@@ -184,7 +184,7 @@ describe("InPersonProofingInProgress", () => {
     render(<InPersonProofingInProgress />);
 
     expect(
-      screen.getByText("Already completed proofing in-person?"),
+      screen.getByText("Already verified your identity in-person?"),
     ).toBeInTheDocument();
     expect(mockNavigate).not.toHaveBeenCalledWith(
       expect.stringContaining("details-confirmation"),
