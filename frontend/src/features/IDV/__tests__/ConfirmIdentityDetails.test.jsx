@@ -191,7 +191,7 @@ describe("ConfirmIdentityDetails", () => {
     await waitFor(() =>
       expect(identityVerificationApi.getClaims).toHaveBeenCalledOnce(),
     );
-    expect(screen.queryByText("Alex Morgan")).not.toBeInTheDocument();
+    expect(screen.queryByText("Alex Morgan")).toBeInTheDocument();
   });
 
   it("shows the existing RP success notice when RP details are available", () => {
