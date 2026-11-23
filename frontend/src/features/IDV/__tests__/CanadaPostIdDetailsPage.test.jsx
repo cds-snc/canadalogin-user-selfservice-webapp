@@ -410,6 +410,7 @@ describe("CanadaPostIdDetailsPage", () => {
             idSelected: "Driver's licence",
             verificationExpiresAt: "2026-08-12T20:58:26.760127+00:00",
             verificationValidityDays: 30,
+            proofOfAddressRequired: false,
           },
         },
       );

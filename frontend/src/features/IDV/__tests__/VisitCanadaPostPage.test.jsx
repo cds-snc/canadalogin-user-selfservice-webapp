@@ -221,8 +221,8 @@ describe("VisitCanadaPost (Select your ID)", () => {
   it("renders the external learn-more link immediately after the visit steps", () => {
     render(<VisitCanadaPost />);
 
-    const step4 = screen.getByText(
-      t("VisitCanadaPost.step4", { rpName: "RP Name" }),
+    const returnToServiceInstructions = screen.getByText(
+      t("VisitCanadaPost.returnToServiceInstructions", { rpName: "RP Name" }),
     );
     const learnMoreLink = screen.getByRole("link", {
       name: t("VisitCanadaPost.learnMoreLink"),
@@ -231,7 +231,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(learnMoreLink).toHaveAttribute("href", "#");
     expect(learnMoreLink).toHaveAttribute("data-external", "true");
     expect(
-      step4.compareDocumentPosition(learnMoreLink) &
+      returnToServiceInstructions.compareDocumentPosition(learnMoreLink) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });

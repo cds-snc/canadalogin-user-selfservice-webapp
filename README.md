@@ -29,6 +29,10 @@ git clone https://github.com/cds-snc/gc-signin-user-selfservice-webapp.git
 
 - See the [frontend README](frontend/README.md)
 
+#### 3. Run end-to-end tests (optional)
+
+- See the [e2e README](e2e/README.md) for the Playwright suite that signs in through IBM Verify and covers the IDV flows
+
 ### Developer Tooling
 
 #### VS Code Settings

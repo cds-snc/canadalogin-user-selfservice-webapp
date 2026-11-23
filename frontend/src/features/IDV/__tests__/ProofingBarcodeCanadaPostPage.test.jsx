@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom/vitest";
+import React from "react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, it, expect, vi } from "vitest";
@@ -48,6 +49,7 @@ vi.mock("@gcds-core/components-react", () => ({
       </Tag>
     );
   },
+  GcdsIcon: (props) => <span data-testid="gcds-icon" {...props} />,
   GcdsText: ({ children, ...props }) => (
     <p data-testid="gcds-text" {...props}>
       {children}
@@ -159,7 +161,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
       </TestWrapper>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Update information" }));
+    fireEvent.click(screen.getByRole("button", { name: "Update" }));
     expect(mockNavigate).toHaveBeenCalledWith(
       `/en/${PAGES.idvVisitCanadaPostPage}`,
     );
@@ -173,7 +175,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     );
 
     expect(
-      screen.getByText("Take your proofing barcode to Canada Post"),
+      screen.getByText("Take your CanadaLogin barcode to a Canada Post"),
     ).toBeInTheDocument();
   });
 
@@ -185,18 +187,13 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     );
 
     expect(
-      screen.getByRole("img", { name: /Barcode for code/i }),
+      screen.getByRole("img", { name: "Barcode for code CP387DHROGJ" }),
     ).toBeInTheDocument();
     expect(
       screen.getByText("user@example.com", { exact: false }),
     ).toBeInTheDocument();
     expect(screen.getAllByText("--").length).toBeGreaterThan(0);
-    expect(
-      screen.getByText("Provincial/Territorial Driver's Licence"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Secure Certificate of Indian Status"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Your valid and original --")).toBeInTheDocument();
   });
 
   it("renders values passed from previous page using location.state", () => {
@@ -208,8 +205,11 @@ describe("ProofingBarcodeCanadaPostPage", () => {
           givenName: "Name",
           lastName: "Lastname",
           dateOfBirth: "January 1, 1990",
-          idSelected: "Email statement",
+          idSelected: "passport",
           acceptableIds: ["Passport", "Driver's licence"],
+          verificationExpiresAt: "2026-12-01T00:00:00.000Z",
+          verificationValidityDays: 14,
+          proofOfAddressRequired: true,
         }}
       >
         <ProofingBarcodeCanadaPostPage />
@@ -217,16 +217,30 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     );
 
     expect(
-      screen.getByRole("img", { name: /Barcode for code/i }),
+      screen.getByRole("img", { name: "Barcode for code CP12345678" }),
     ).toBeInTheDocument();
     expect(
       screen.getByText("user@example.com", { exact: false }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(/This code is valid for 14 days/),
+    ).toBeInTheDocument();
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Lastname")).toBeInTheDocument();
     expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
-    expect(screen.getByText("Email statement")).toBeInTheDocument();
-    expect(screen.getByText("Passport")).toBeInTheDocument();
+    expect(
+      screen.getByText("Canadian and International Passport"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("You must bring a proof of address"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Acceptable proof of address documents"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Bank or credit card statement"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Driver's licence")).not.toBeInTheDocument();
   });
 
   it("preserves verification details when changing the page language", () => {
@@ -262,19 +276,22 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     );
   });
 
-  it("renders update information button and nearest Canada Post notice", () => {
+  it("renders the update, Canada Post location, print, and sign-out actions", () => {
     render(
       <TestWrapper>
         <ProofingBarcodeCanadaPostPage />
       </TestWrapper>,
     );
 
-    expect(screen.getByText("Update information")).toBeInTheDocument();
+    expect(screen.getByText("Update")).toBeInTheDocument();
     expect(
-      screen.getByText("Find your nearest Canada Post"),
+      screen.getByRole("button", { name: "Find a Canada Post location" }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId("gcds-link")).toHaveTextContent(
-      "Canada Post near you",
-    );
+    expect(
+      screen.getByRole("link", { name: "Print page" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Sign out" }),
+    ).toBeInTheDocument();
   });
 });

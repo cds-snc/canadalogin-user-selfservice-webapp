@@ -8,7 +8,6 @@ import {
   GcdsText,
 } from "@gcds-core/components-react";
 
-import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
@@ -16,10 +15,7 @@ import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/Err
 import { AVAILABLE_LANGUAGES, PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
-import {
-  APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS,
-  type ApprovedDocumentValue,
-} from "../data/approvedDocuments";
+import type { ApprovedDocumentValue } from "../data/approvedDocuments";
 import {
   getIdTypeRequiredMessage,
   getValidationSummaryHeading,
@@ -28,11 +24,31 @@ import {
 const ERROR_SUMMARY_ID = "service-canada-centre-error-summary";
 const NON_EXPIRED_ID_RADIOS_ID = "non-expired-id-radios";
 const ID_RADIOS_ID = "select-id-radios";
+const SERVICE_CANADA_CENTRE_DOCUMENTS: {
+  idType: Exclude<ApprovedDocumentValue, "noIds">;
+  hintKey?: string;
+}[] = [
+  { idType: "passport" },
+  { idType: "driverLicence" },
+  { idType: "photoIDServiceCard" },
+  {
+    idType: "photoIDHealthCard",
+    hintKey: "ServiceCanadaCentre.documents.photoIDHealthCard.hint",
+  },
+  { idType: "canadianPRCard" },
+  { idType: "indianStatus" },
+  {
+    idType: "COMBO_CARD",
+    hintKey: "ServiceCanadaCentre.documents.COMBO_CARD.hint",
+  },
+];
 
 export default function ServiceCanadaCentrePage() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
-  const [selectedIdType, setSelectedIdType] = useState("");
+  const [selectedIdType, setSelectedIdType] = useState<
+    Exclude<ApprovedDocumentValue, "noIds"> | ""
+  >("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
   const [nonExpiredIdAnswer, setNonExpiredIdAnswer] = useState("");
@@ -56,20 +72,15 @@ export default function ServiceCanadaCentrePage() {
       ? AVAILABLE_LANGUAGES.fr
       : AVAILABLE_LANGUAGES.en;
 
-  const idOptions = [
-    ...APPROVED_DOCUMENT_VALUES_WITHOUT_NO_IDS.map((idType) => ({
+  const idOptions = SERVICE_CANADA_CENTRE_DOCUMENTS.map(
+    ({ idType, hintKey }) => ({
       id: `radio-${idType}`,
       value: idType,
-      label: t(`ApprovedDocuments.${idType}`),
+      label: t(`ServiceCanadaCentre.documents.${idType}.label`),
+      ...(hintKey ? { hint: t(hintKey) } : {}),
       checked: selectedIdType === idType,
-    })),
-    {
-      id: "radio-no-ids",
-      value: "noIds",
-      label: t("ServiceCanadaCentre.noIds"),
-      checked: selectedIdType === "noIds",
-    },
-  ];
+    }),
+  );
   const nonExpiredIdRadioOptions = [
     {
       id: "radio-non-expired-id-yes",
@@ -117,15 +128,8 @@ export default function ServiceCanadaCentrePage() {
       return;
     }
 
-    if (selectedIdType === "noIds") {
-      navigate(
-        path(PAGES.idvProveIdentityInPersonPage, { language, journeyType }),
-      );
-      return;
-    }
-
     navigate(serviceCanadaDetailsPage, {
-      state: { idType: selectedIdType as ApprovedDocumentValue },
+      state: { idType: selectedIdType },
     });
   };
 
@@ -153,16 +157,21 @@ export default function ServiceCanadaCentrePage() {
           ) : null}
 
           <GcdsContainer>
+            <GcdsText>{t("ServiceCanadaCentre.intro1")}</GcdsText>
+            <GcdsText>{t("ServiceCanadaCentre.intro2")}</GcdsText>
             <GcdsText>
-              <strong>{t("ServiceCanadaCentre.followSteps")}</strong>
+              {t("ServiceCanadaCentre.intro3", {
+                rpName: rpName || t("ServiceCanadaCentre.fallbackRpName"),
+              })}
             </GcdsText>
             <GcdsText>
-              <ol>
-                <li>{t("ServiceCanadaCentre.step1")}</li>
-                <li>{t("ServiceCanadaCentre.step2")}</li>
-                <li>{t("ServiceCanadaCentre.step3")}</li>
-                <li>{t("ServiceCanadaCentre.step4", { rpName })}</li>
-              </ol>
+              <GcdsLink
+                href="#"
+                external={true}
+                style={{ textDecoration: "underline" }}
+              >
+                {t("ServiceCanadaCentre.learnMoreLink")}
+              </GcdsLink>
             </GcdsText>
           </GcdsContainer>
 
@@ -178,10 +187,31 @@ export default function ServiceCanadaCentrePage() {
             errorMessage={idTypeError}
             onGcdsChange={(event: CustomEvent<string>) => {
               setSelectedIdType(
-                (event.target as HTMLInputElement | null)?.value ?? "",
+                ((event.target as HTMLInputElement | null)?.value ?? "") as
+                  Exclude<ApprovedDocumentValue, "noIds"> | "",
               );
             }}
           />
+
+          <GcdsText>
+            <GcdsLink
+              href={path(PAGES.idvProveIdentityInPersonPage, {
+                language,
+                journeyType,
+              })}
+              onGcdsClick={(event: Event) => {
+                event.preventDefault();
+                navigate(
+                  path(PAGES.idvProveIdentityInPersonPage, {
+                    language,
+                    journeyType,
+                  }),
+                );
+              }}
+            >
+              {t("ApprovedDocuments.noIds")}
+            </GcdsLink>
+          </GcdsText>
 
           <GcdsRadios
             id={NON_EXPIRED_ID_RADIOS_ID}
@@ -212,23 +242,6 @@ export default function ServiceCanadaCentrePage() {
               {t("ServiceCanadaCentre.chooseDifferentMethodButton")}
             </GcdsButton>
           </GcdsGrid>
-
-          <AccessibleNotice
-            noticeRole="info"
-            noticeTitleTag="h2"
-            noticeTitle={t("ServiceCanadaCentre.moreInfoTitle")}
-          >
-            {
-              //TODO: populate with real URL once available
-            }
-            <GcdsLink
-              href={"#"}
-              external={true}
-              style={{ textDecoration: "underline" }}
-            >
-              {t("ServiceCanadaCentre.learnMoreLink")}
-            </GcdsLink>
-          </AccessibleNotice>
         </GcdsGrid>
       </form>
     </GcdsContainer>

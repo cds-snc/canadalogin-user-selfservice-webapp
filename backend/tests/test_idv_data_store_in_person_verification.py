@@ -444,6 +444,45 @@ class TestInPersonVerificationRouterEndpoints:
         )
 
     @pytest.mark.asyncio
+    async def test_send_in_person_verification_endpoint_resend_without_applicant(self):
+        """Test resending email without resubmitting applicant data."""
+        from app.identity_verification.schemas import (
+            CreateInPersonIdentityVerificationRequest,
+        )
+        from app.identity_verification.v1_router import send_in_person_verification
+
+        mock_request = MagicMock()
+        mock_request.app.state.request_client = AsyncMock()
+
+        # Create payload without applicant field (simulates client sending empty body)
+        payload = CreateInPersonIdentityVerificationRequest(
+            verification_provider="service_canada"
+        )
+
+        expected_response = identity_verification_module.ResponseModel(
+            success=True,
+            message="In-person identity verification case created",
+            data={"verification_code": "AB1-2CD-34E"},
+        )
+
+        with patch.object(
+            importlib.import_module("app.identity_verification.v1_router"),
+            "create_in_person_identity_verification_case",
+            AsyncMock(return_value=expected_response),
+        ) as mock_create_case:
+            result = await send_in_person_verification(
+                mock_request, payload, "user-access-token"
+            )
+
+        assert result.data["verification_code"] == "AB1-2CD-34E"
+        # Verify that None applicant is excluded (backend service handles defaults)
+        mock_create_case.assert_awaited_once_with(
+            mock_request.app.state.request_client,
+            "user-access-token",
+            {"verification_provider": "service_canada"},
+        )
+
+    @pytest.mark.asyncio
     async def test_get_in_person_last_email_sent_endpoint(self):
         from app.identity_verification.v1_router import get_in_person_last_email_sent
 

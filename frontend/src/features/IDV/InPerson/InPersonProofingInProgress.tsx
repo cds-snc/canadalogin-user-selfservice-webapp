@@ -28,6 +28,9 @@ export default function InPersonProofingInProgress() {
   const { language, journeyType } = useParams();
   const navigate = useNavigate();
   const [sendEmailDate, setSendEmailDate] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isResending, setIsResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
 
   const { relyingPartyName: rpName } = useRelyingPartyInfo();
 
@@ -60,18 +63,31 @@ export default function InPersonProofingInProgress() {
   };
 
   const handleResendEmail = async () => {
-    const response =
-      await inPersonIdentityVerificationApi.sendInPersonVerificationCode();
+    setError(null);
+    setResendSuccess(false);
+    setIsResending(true);
 
-    if (!response?.success) {
-      return;
-    }
+    try {
+      const response =
+        await inPersonIdentityVerificationApi.sendInPersonVerificationCode();
 
-    const sentAt = response.data?.sentAt;
-    const parsedSentAt = sentAt ? new Date(sentAt) : null;
+      if (!response?.success) {
+        setError(t("InPersonProofingInProgress.resendEmailError"));
+        setIsResending(false);
+        return;
+      }
 
-    if (parsedSentAt && !Number.isNaN(parsedSentAt.getTime())) {
-      setSendEmailDate(formatDisplayDate(parsedSentAt, i18n.language));
+      const sentAt = response.data?.sentAt;
+      const parsedSentAt = sentAt ? new Date(sentAt) : null;
+
+      if (parsedSentAt && !Number.isNaN(parsedSentAt.getTime())) {
+        setSendEmailDate(formatDisplayDate(parsedSentAt, i18n.language));
+        setResendSuccess(true);
+      }
+    } catch {
+      setError(t("InPersonProofingInProgress.resendEmailError"));
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -83,6 +99,32 @@ export default function InPersonProofingInProgress() {
             {t("InPersonProofingInProgress.heading", { rpName })}
           </GcdsHeading>
         </GcdsContainer>
+
+        {error && (
+          <AccessibleNotice
+            noticeRole="danger"
+            noticeTitleTag="h2"
+            noticeTitle={t("InPersonProofingInProgress.resendEmailErrorTitle")}
+          >
+            <GcdsText>{error}</GcdsText>
+          </AccessibleNotice>
+        )}
+
+        {resendSuccess && (
+          <AccessibleNotice
+            noticeRole="success"
+            noticeTitleTag="h2"
+            noticeTitle={t(
+              "InPersonProofingInProgress.resendEmailSuccessTitle",
+            )}
+          >
+            <GcdsText>
+              {t("InPersonProofingInProgress.resendEmailSuccess", {
+                date: sendEmailDate,
+              })}
+            </GcdsText>
+          </AccessibleNotice>
+        )}
 
         <AccessibleNotice
           noticeRole="warning"
@@ -124,12 +166,21 @@ export default function InPersonProofingInProgress() {
           <GcdsButton
             type="button"
             buttonRole="secondary"
+            disabled={isResending}
+            aria-busy={isResending}
+            aria-label={
+              isResending
+                ? t("InPersonProofingInProgress.resendingAriaLabel")
+                : t("InPersonProofingInProgress.resendButtonAriaLabel")
+            }
             onGcdsClick={(event: Event) => {
               event.preventDefault();
               handleResendEmail();
             }}
           >
-            {t("InPersonProofingInProgress.resendButton")}
+            {isResending
+              ? t("InPersonProofingInProgress.resendingButton")
+              : t("InPersonProofingInProgress.resendButton")}
           </GcdsButton>
         </GcdsGrid>
       </GcdsGrid>
