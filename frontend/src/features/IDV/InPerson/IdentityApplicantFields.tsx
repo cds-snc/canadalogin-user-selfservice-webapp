@@ -7,7 +7,7 @@ import type {
 } from "./validation/CanadaPostIdDetails.validation";
 
 const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
-  idExpiryDate: "id-expiry-date-input",
+  // idExpiryDate: "id-expiry-date-input",
   documentOptionId: "select-document-option",
   country: "select-country",
   province: "select-province",
@@ -20,8 +20,8 @@ const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
 };
 
 type IdentityApplicantFieldsLabels = {
-  idExpiry: string;
-  idExpiryHint: string;
+  /* idExpiry: string;
+  idExpiryHint: string; */
   firstName: string;
   firstNameHint: string;
   lastName: string;
@@ -40,7 +40,7 @@ type IdentityApplicantFieldsProps = {
   labels: IdentityApplicantFieldsLabels;
   fieldError: (field: keyof CanadaPostIdDetailsErrorCodes) => string;
   dateOfBirthError: string;
-  showIdExpiry?: boolean;
+  // showIdExpiry?: boolean;
   showAddressFields?: boolean;
   requireAddressFields?: boolean;
   updateField: (
@@ -56,7 +56,7 @@ export default function IdentityApplicantFields({
   labels,
   fieldError,
   dateOfBirthError,
-  showIdExpiry = true,
+  // showIdExpiry = true,
   showAddressFields = true,
   requireAddressFields = true,
   updateField,
@@ -65,7 +65,7 @@ export default function IdentityApplicantFields({
 }: IdentityApplicantFieldsProps) {
   return (
     <>
-      {showIdExpiry ? (
+      {/* {showIdExpiry ? (
         <GcdsDateInput
           id={FIELD_IDS.idExpiryDate}
           name={FIELD_IDS.idExpiryDate}
@@ -78,7 +78,7 @@ export default function IdentityApplicantFields({
           errorMessage={fieldError("idExpiryDate")}
           onGcdsChange={updateField("idExpiryDate")}
         />
-      ) : null}
+      ) : null} */}
       {children}
       <GcdsInput
         id={FIELD_IDS.firstName}

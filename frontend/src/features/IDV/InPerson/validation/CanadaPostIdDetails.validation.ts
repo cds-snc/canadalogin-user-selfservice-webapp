@@ -73,7 +73,7 @@ const toUtcDate = (value: string): Date | null => {
   return date;
 };
 
-export const getIdExpiryValidationError = (
+/* export const getIdExpiryValidationError = (
   value: string,
   today: Date = new Date(),
 ): IdExpiryValidationError | null => {
@@ -95,7 +95,7 @@ export const getIdExpiryValidationError = (
   );
 
   return expiry < minimumExpiry ? "too_soon" : null;
-};
+}; */
 
 export const isValidCanadianPostalCode = (value: string): boolean =>
   CANADIAN_POSTAL_CODE_PATTERN.test(value.trim());
@@ -103,7 +103,7 @@ export const isValidCanadianPostalCode = (value: string): boolean =>
 export const getCanadaPostIdDetailsValidation = (
   formData: CanadaPostIdDetailsFormData,
   { showCountry, showProvince }: CanadaPostIdDetailsFieldVisibility,
-  today: Date = new Date(),
+  // today: Date = new Date(),
 ): CanadaPostIdDetailsValidationResult => {
   const errorCodes: CanadaPostIdDetailsErrorCodes = {};
 

@@ -39,9 +39,9 @@ import {
   getCityRequiredMessage,
   getCountryRequiredMessage,
   getFirstNameRequiredOrInvalidMessage,
-  getIdExpiryInvalidMessage,
+  /* getIdExpiryInvalidMessage,
   getIdExpiryRequiredMessage,
-  getIdExpiryTooSoonMessage,
+  getIdExpiryTooSoonMessage, */
   getLastNameRequiredOrInvalidMessage,
   getPostalCodeRequiredOrInvalidMessage,
   getProvinceRequiredMessage,
@@ -62,7 +62,7 @@ const ID_TYPE_BY_DOCUMENT: Record<IdentityDocument["key"], string> = {
 };
 
 const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
-  idExpiryDate: "id-expiry-date-input",
+  // idExpiryDate: "id-expiry-date-input",
   documentOptionId: "select-document-option",
   country: "select-country",
   province: "select-province",
@@ -107,7 +107,7 @@ export default function CanadaPostIdDetailsPage() {
   const showProvince = !issuerIsProvince;
 
   const [formData, setFormData] = useState<CanadaPostIdDetailsFormData>(() => ({
-    idExpiryDate: "",
+    // idExpiryDate: "",
     documentOptionId:
       selectedDocument?.options.length === 1
         ? String(selectedDocument.options[0].id)
@@ -234,7 +234,7 @@ export default function CanadaPostIdDetailsPage() {
             country: CANADA_COUNTRY_CODE,
           },
           idType: ID_TYPE_BY_DOCUMENT[selectedDocument.key],
-          idExpiryDate: formData.idExpiryDate,
+          // idExpiryDate: formData.idExpiryDate,
         },
       });
 
@@ -355,7 +355,7 @@ export default function CanadaPostIdDetailsPage() {
           </GcdsContainer>
 
           <GcdsContainer>
-            <GcdsDateInput
+            {/* <GcdsDateInput
               id={FIELD_IDS.idExpiryDate}
               name={FIELD_IDS.idExpiryDate}
               legend={t("CanadaPostIdDetails.idExpiryLabel")}
@@ -365,7 +365,7 @@ export default function CanadaPostIdDetailsPage() {
               value={formData.idExpiryDate}
               errorMessage={fieldError("idExpiryDate")}
               onGcdsChange={updateField("idExpiryDate")}
-            />
+            /> */}
 
             {variant === "default" ? (
               issuerIsProvince ? (
