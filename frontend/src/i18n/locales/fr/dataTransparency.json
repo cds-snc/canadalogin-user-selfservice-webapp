@@ -1,0 +1,27 @@
+{
+  "DataTransparencyPage": {
+    "title": "Renseignements partagés avec {{relyingPartyName}}",
+    "descriptionPrefix": "En continuant, CanadaLogin partagera les détails suivants avec ",
+    "descriptionSuffix": ":",
+    "informationSharingTitle": "Comment CanadaLogin partage vos renseignements",
+    "informationSharingDescription": "Les services demandent vos renseignements à CanadaLogin pour connaître votre identité et vous offrir une expérience personnalisée.",
+    "learnMoreLink": "Découvrez comment vos renseignements sont partagés et conservés auprès des services",
+    "continueButton": "Continuer"
+  },
+  "DataInformationCard": {
+    "contactDetailsHeading": "Renseignements de contact",
+    "preferredName": "Nom",
+    "emailAddress": "Adresse électronique",
+    "languagePreference": "Préférence linguistique",
+    "phoneNumber": "Numéro de téléphone",
+    "identityDetailsHeading": "Renseignements d'identité",
+    "legalName": "Nom légal",
+    "dateOfBirth": "Date de naissance",
+    "wrongInformation": "Si vos renseignements sont inexacts",
+    "wrongInformationDescription": "Si vos renseignements ont changé, vous pouvez toujours continuer vers le service et mettre à jour vos renseignements dans vos paramètres CanadaLogin. Vous devrez vous reconnecter au service pour partager vos nouveaux renseignements sauvegardés.",
+    "neverSharedHeading": "Jamais partagé avec aucun service",
+    "neverSharedDescription": "Ces renseignements restent privés dans CanadaLogin:",
+    "passwordDetails": "vos détails de mot de passe ou de clé d'accès",
+    "otherServicesInfo": "vos renseignements provenant d'autres services"
+  }
+}
