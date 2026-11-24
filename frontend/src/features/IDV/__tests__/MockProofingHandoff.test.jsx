@@ -142,7 +142,9 @@ describe("ContinueProofingOnMobile", () => {
       "Example identity proofing QR code",
     );
     expect(container.querySelector("svg path")).not.toBeNull();
-    expect(screen.getByRole("button", { name: "Continue Verification" })).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "Continue Verification" }),
+    ).toBeEnabled();
     expect(mocks.navigate).not.toHaveBeenCalled();
   });
 
@@ -150,7 +152,9 @@ describe("ContinueProofingOnMobile", () => {
     render(<ContinueProofingOnMobile />);
     const link = screen.getByRole("link");
     const copy = screen.getByRole("button", { name: "Copy link" });
-    const continueButton = screen.getByRole("button", { name: "Continue Verification" });
+    const continueButton = screen.getByRole("button", {
+      name: "Continue Verification",
+    });
     const differentMethod = screen.getByRole("button", {
       name: "Choose a different method",
     });
@@ -176,7 +180,9 @@ describe("ContinueProofingOnMobile", () => {
     await act(async () => vi.advanceTimersByTimeAsync(60000));
     expect(mocks.navigate).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole("button", { name: "Continue Verification" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Continue Verification" }),
+    );
     expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith(
       "/en/identity-verification/required/IdvDetailsConfirmationPage",
       {
@@ -192,7 +198,9 @@ describe("ContinueProofingOnMobile", () => {
     mocks.language = "fr";
     mocks.journeyType = "update";
     render(<ContinueProofingOnMobile />);
-    fireEvent.click(screen.getByRole("button", { name: "Continue Verification" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Continue Verification" }),
+    );
     expect(mocks.navigate).toHaveBeenCalledWith(
       "/fr/identity-verification/update/IdvDetailsConfirmationPage",
       {
@@ -229,7 +237,9 @@ describe("ContinueProofingOnMobile", () => {
     });
     render(<ContinueProofingOnMobile />);
     fireEvent.click(screen.getByRole("button", { name: "Copy link" }));
-    fireEvent.click(screen.getByRole("button", { name: "Continue Verification" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Continue Verification" }),
+    );
     expect(mocks.navigate).toHaveBeenCalledWith(
       "/en/identity-verification/required/IdvDetailsConfirmationPage",
       {
