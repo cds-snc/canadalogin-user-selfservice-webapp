@@ -20,7 +20,41 @@ vi.mock("react-router", async (importOriginal) => ({
 }));
 
 vi.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: (key) => key }),
+  useTranslation: () => ({
+    t: (key) => {
+      const translations = {
+        "DataTransparencyPage.title": "Information being shared with {{relyingPartyName}}",
+        "DataTransparencyPage.descriptionPrefix":
+          "By continuing, CanadaLogin will share the following details with ",
+        "DataTransparencyPage.descriptionSuffix": ":",
+        "DataTransparencyPage.informationSharingTitle":
+          "How CanadaLogin shares your information",
+        "DataTransparencyPage.informationSharingDescription":
+          "Services request your details from CanadaLogin to know who you are and to provide a personalized experience.",
+        "DataTransparencyPage.learnMoreLink":
+          "Learn how your information is shared and stored with services",
+        "DataTransparencyPage.continueButton": "Continue",
+        "DataInformationCard.contactDetailsHeading": "Contact details",
+        "DataInformationCard.preferredName": "Name",
+        "DataInformationCard.emailAddress": "Email address",
+        "DataInformationCard.languagePreference": "Language preference",
+        "DataInformationCard.phoneNumber": "Phone number",
+        "DataInformationCard.identityDetailsHeading": "Identity details",
+        "DataInformationCard.legalName": "Legal name",
+        "DataInformationCard.dateOfBirth": "Date of birth",
+        "DataInformationCard.wrongInformation": "If your information is wrong",
+        "DataInformationCard.wrongInformationDescription":
+          "If your details have changed, you can still continue to the service and go to update your information in your CanadaLogin settings. You will need to re-sign into the service again to share your newly saved details.",
+        "DataInformationCard.neverSharedHeading": "Never shared with any service",
+        "DataInformationCard.neverSharedDescription":
+          "This information stays private in CanadaLogin:",
+        "DataInformationCard.passwordDetails": "your password or passkey details",
+        "DataInformationCard.otherServicesInfo":
+          "your information from others services",
+      };
+      return translations[key] || key;
+    },
+  }),
 }));
 
 vi.mock("../../../hooks/useRelyingPartyInfo", () => ({
@@ -30,10 +64,6 @@ vi.mock("../../../hooks/useRelyingPartyInfo", () => ({
 vi.mock("../../../utils/constants", async (importOriginal) => ({
   ...(await importOriginal()),
   DEV_ONLY_FEATURE: false,
-}));
-
-vi.mock("../components/DataInformationCard", () => ({
-  default: () => null,
 }));
 
 vi.mock("../../../components/InfoBlocks/AccessibleNotice", () => ({
@@ -48,6 +78,12 @@ vi.mock("@gcds-core/components-react", () => ({
   GcdsLink: ({ children }) => <a>{children}</a>,
   GcdsButton: ({ children, onGcdsClick }) => (
     <button onClick={onGcdsClick}>{children}</button>
+  ),
+  GcdsDetails: ({ children, detailsTitle }) => (
+    <details>
+      <summary>{detailsTitle}</summary>
+      {children}
+    </details>
   ),
 }));
 
@@ -105,4 +141,89 @@ describe("DataTransparencyPage RP redirect", () => {
       );
     },
   );
+});
+
+describe("DataInformationCard rendering", () => {
+  it("renders data information card with contact details", () => {
+    render(<DataTransparencyPage />);
+
+    expect(
+      screen.getByText((text) => text.includes("Contact details")),
+    ).toBeInTheDocument();
+  });
+
+  it("renders data information card with identity details", () => {
+    render(<DataTransparencyPage />);
+
+    expect(
+      screen.getByText((text) => text.includes("Identity details")),
+    ).toBeInTheDocument();
+  });
+
+  it("renders data information card with never shared section", () => {
+    render(<DataTransparencyPage />);
+
+    expect(
+      screen.getByText((text) => text.includes("Never shared with any service")),
+    ).toBeInTheDocument();
+  });
+
+  it("renders all contact detail fields", () => {
+    render(<DataTransparencyPage />);
+
+    const container = screen.getByText((text) =>
+      text.includes("Contact details"),
+    );
+    expect(container).toBeInTheDocument();
+
+    expect(screen.getByText("canadalogintester@gmail.com")).toBeInTheDocument();
+    expect(screen.getByText("613 284 3847")).toBeInTheDocument();
+    expect(screen.getByText("English")).toBeInTheDocument();
+  });
+
+  it("renders all identity detail fields", () => {
+    render(<DataTransparencyPage />);
+
+    expect(
+      screen.getByText((text) => text.includes("Legal name")),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText((text) => text.includes("Date of birth")),
+    ).toBeInTheDocument();
+  });
+
+  it("renders default mock data with Alex Morgan", () => {
+    render(<DataTransparencyPage />);
+
+    const alexMorganElements = screen.getAllByText(
+      (text) => text === "Alex Morgan",
+    );
+    expect(alexMorganElements.length).toBeGreaterThan(0);
+  });
+
+  it("renders email address canadalogintester@gmail.com", () => {
+    render(<DataTransparencyPage />);
+
+    expect(
+      screen.getByText((text) => text.includes("canadalogintester@gmail.com")),
+    ).toBeInTheDocument();
+  });
+
+  it("renders dropdown for wrong information", () => {
+    render(<DataTransparencyPage />);
+
+    expect(
+      screen.getByText((text) => text.includes("If your information is wrong")),
+    ).toBeInTheDocument();
+  });
+
+  it("renders never shared description", () => {
+    render(<DataTransparencyPage />);
+
+    expect(
+      screen.getByText((text) =>
+        text.includes("This information stays private in CanadaLogin:"),
+      ),
+    ).toBeInTheDocument();
+  });
 });
