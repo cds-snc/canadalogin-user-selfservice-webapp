@@ -1,4 +1,9 @@
-import { expect, type Page, type Response } from "@playwright/test";
+import {
+  expect,
+  type Locator,
+  type Page,
+  type Response,
+} from "@playwright/test";
 import { copy } from "../support/i18n";
 import { waitForInPersonCaseCreation } from "../support/idvApi";
 import {
@@ -8,8 +13,8 @@ import {
 
 /** /:language/identity-verification/start/in-person/canada-post/id-details */
 export class CanadaPostIdDetailsPage {
-  readonly heading;
-  private readonly continueButton;
+  readonly heading: Locator;
+  private readonly continueButton: Locator;
 
   constructor(private readonly page: Page) {
     const t = copy.en.idv;
