@@ -157,7 +157,7 @@ describe("ConfirmIdentityDetails", () => {
 
     expect(screen.getByText("Success")).toBeInTheDocument();
     expect(
-      screen.getByText(/^You proved your identity with .+\.$/),
+      screen.getByText(/^You verified your identity with .+\.$/),
     ).toBeInTheDocument();
   });
 

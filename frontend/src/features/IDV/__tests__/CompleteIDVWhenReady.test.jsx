@@ -126,7 +126,7 @@ describe("CompleteIdentityProofingPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Localized RP needs you to prove your identity",
+        name: "Localized RP needs you to verify your identity",
       }),
     ).toBeInTheDocument();
   });
@@ -137,13 +137,13 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByRole("heading", {
-          name: "Localized RP needs you to prove your identity",
+          name: "Localized RP needs you to verify your identity",
         }),
       ).toBeInTheDocument();
 
       expect(
         screen.getByText(
-          "You need to complete identity proofing to access Localized RP.",
+          "You need to verify your identity to access Localized RP.",
         ),
       ).toBeInTheDocument();
     });
@@ -161,7 +161,7 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByText(
-          "You need to complete identity proofing to access Fallback Link Name.",
+          "You need to verify your identity to access Fallback Link Name.",
         ),
       ).toBeInTheDocument();
     });
@@ -174,17 +174,17 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByRole("heading", {
-          name: "Prove your identity when you’re ready",
+          name: "Verify your identity when you’re ready",
         }),
       ).toBeInTheDocument();
 
       expect(
         screen.queryByText(
-          "You need to complete identity proofing to access CanadaLogin.",
+          "You need to verify your identity to access CanadaLogin.",
         ),
       ).not.toBeInTheDocument();
       expect(
-        screen.getByText("You need to complete identity proofing to access ."),
+        screen.getByText("You need to verify your identity to access ."),
       ).toBeInTheDocument();
     });
 
@@ -193,7 +193,7 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(
         screen.getByText(
-          "Whether you need to find your ID or take a break, you can sign out and prove your identity when you sign back in.",
+          "Whether you need to find your ID, renew it or take a break, you can sign out and verify your identity when you sign back in.",
         ),
       ).toBeInTheDocument();
     });
@@ -267,7 +267,7 @@ describe("CompleteIdentityProofingPage", () => {
 
       expect(screen.getByTestId("start-button")).toBeInTheDocument();
       expect(screen.getByTestId("start-button")).toHaveTextContent(
-        "Start proving identity",
+        "Start verifying your identity",
       );
     });
 

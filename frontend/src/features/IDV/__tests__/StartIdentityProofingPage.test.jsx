@@ -165,7 +165,7 @@ describe("StartIdentityProofingPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /prove your identity/i,
+        name: /Verify your identity/i,
         level: 1,
       }),
     ).toBeInTheDocument();
@@ -178,7 +178,7 @@ describe("StartIdentityProofingPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "RP Name needs you to prove your identity",
+        name: "RP Name needs you to verify your identity",
         level: 1,
       }),
     ).toBeInTheDocument();
@@ -191,7 +191,7 @@ describe("StartIdentityProofingPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Prove your identity",
+        name: "Verify your identity",
         level: 1,
       }),
     ).toBeInTheDocument();
@@ -236,19 +236,11 @@ describe("StartIdentityProofingPage", () => {
     });
   });
 
-  it("renders the heading with app name", () => {
-    render(<StartIdentityProofingPage />);
-
-    expect(
-      screen.getByText(/Proving your identity confirms who you are/),
-    ).toBeInTheDocument();
-  });
-
   it("renders the learn more link", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByText("Learn more about identity proofing"),
+      screen.getByText("Learn more about verifying your identity"),
     ).toBeInTheDocument();
   });
 
@@ -256,7 +248,7 @@ describe("StartIdentityProofingPage", () => {
     render(<StartIdentityProofingPage />);
 
     expect(
-      screen.getByText("How do you want to prove your identity?"),
+      screen.getByText("How do you want to verify your identity?"),
     ).toBeInTheDocument();
   });
 
