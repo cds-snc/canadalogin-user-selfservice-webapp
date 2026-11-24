@@ -1,241 +1,113 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Response } from "@playwright/test";
 
+import { CanadaPostBarcodePage } from "../../pages/CanadaPostBarcodePage";
+import { CanadaPostIdDetailsPage } from "../../pages/CanadaPostIdDetailsPage";
+import { CanadaPostSelectionPage } from "../../pages/CanadaPostSelectionPage";
+import { IdentityVerificationStartPage } from "../../pages/IdentityVerificationStartPage";
+import { InPersonProviderSelectionPage } from "../../pages/InPersonProviderSelectionPage";
+import { ServiceCanadaCentreCodePage } from "../../pages/ServiceCanadaCentreCodePage";
+import { ServiceCanadaCentreIdDetailsPage } from "../../pages/ServiceCanadaCentreIdDetailsPage";
+import { ServiceCanadaCentreSelectionPage } from "../../pages/ServiceCanadaCentreSelectionPage";
+import type { InPersonApplicant } from "../../pages/components/InPersonApplicantForm";
 import { TEST_USERS } from "../../support/testUsers";
-import { copy } from "../../support/i18n";
 
-const user = TEST_USERS.inPerson;
-const idvCopy = copy.en.idv;
-const applicant = {
+const applicant: InPersonApplicant & {
+  dateOfBirthISO: string;
+  dateOfBirthText: string;
+} = {
   firstName: "Test",
   lastName: "InPerson",
-  month: "December",
-  day: "2",
-  year: "1995",
-  dateOfBirth: "December 2, 1995",
+  dateOfBirth: { month: "December", day: "2", year: "1995" },
+  dateOfBirthISO: "1995-12-02",
+  dateOfBirthText: "December 2, 1995",
   address: "123 Test Street",
   city: "Ottawa",
   province: "ON",
   postalCode: "K1A 0B1",
-  idExpiryMonth: "December",
-  idExpiryDay: "31",
-  idExpiryYear: "2035",
+};
+const canadaPostApplicant = {
+  ...applicant,
+  idExpiryDate: { month: "December", day: "31", year: "2035" },
 };
 
 test.describe("In-person identity verification", () => {
   test.describe.configure({ mode: "serial" });
-  test.use({ storageState: user.storageState });
 
-  test("Service Canada Centre journey displays the generated code", async ({
-    page,
-  }) => {
-    await startInPersonJourney(page, "serviceCanadaLocationsOption");
+  test.describe("Service Canada Centre", () => {
+    test.use({ storageState: TEST_USERS.inPerson.storageState });
 
-    await selectRadio(
+    test("Service Canada Centre journey displays the generated code", async ({
       page,
-      "select-id-radios",
-      idvCopy.ServiceCanadaCentre.documents.driverLicence.label,
-    );
-    await selectRadio(
-      page,
-      "non-expired-id-radios",
-      idvCopy.ServiceCanadaCentre.yesOption,
-    );
-    await page
-      .getByRole("button", {
-        name: idvCopy.ServiceCanadaCentre.continueButton,
-      })
-      .click();
+    }) => {
+      await new IdentityVerificationStartPage(page).chooseInPerson();
+      await new InPersonProviderSelectionPage(page).choose(
+        "serviceCanadaLocationsOption",
+      );
+      await new ServiceCanadaCentreSelectionPage(page).chooseDriverLicence();
 
-    await expect(page).toHaveURL(
-      /\/en\/identity-verification\/start\/in-person\/service-canada-centre\/id-details$/,
-    );
-    await expect(
-      page.getByRole("heading", {
-        name: "Enter your driver licence details",
-      }),
-    ).toBeVisible();
+      const detailsPage = new ServiceCanadaCentreIdDetailsPage(page);
+      await detailsPage.fillApplicant(applicant);
+      await expectCaseCreation(await detailsPage.submit(), "service_canada");
 
-    await page
-      .getByRole("combobox", {
-        name: idvCopy.ServiceCanadaCentre.provinceLabel,
-      })
-      .selectOption(applicant.province);
-    await fillText(page, "first-name-input", applicant.firstName);
-    await fillText(page, "last-name-input", applicant.lastName);
-    await fillDate(page, "date-of-birth-input", {
-      month: applicant.month,
-      day: applicant.day,
-      year: applicant.year,
+      await expect(page).toHaveURL(
+        /\/en\/identity-verification\/start\/in-person\/service-canada-centre\/idv-code$/,
+      );
+      const codePage = new ServiceCanadaCentreCodePage(page);
+      await expect(codePage.heading).toBeVisible();
+      await expect(codePage.codeValue).toHaveText(/\S+/);
+      await expect(codePage.informationHeading).toBeVisible();
+      await expect(
+        codePage.applicantValue(applicant.firstName),
+      ).toBeVisible();
+      await expect(
+        codePage.applicantValue(applicant.lastName),
+      ).toBeVisible();
+      await expect(
+        codePage.applicantValue(applicant.dateOfBirthText),
+      ).toBeVisible();
     });
-    await fillText(page, "address-input", applicant.address);
-    await fillText(page, "city-town-input", applicant.city);
-    await fillText(page, "postal-code-input", applicant.postalCode);
-
-    const createCase = waitForInPersonCaseCreation(page);
-    await page
-      .getByRole("button", {
-        name: idvCopy.ServiceCanadaCentre.continueButton,
-      })
-      .click();
-    await expectCaseCreation(await createCase, "service_canada");
-
-    await expect(page).toHaveURL(
-      /\/en\/identity-verification\/start\/in-person\/service-canada-centre\/idv-code$/,
-    );
-    await expect(
-      page.getByRole("heading", {
-        name: idvCopy.ServiceCanadaCentreCode.heading,
-      }),
-    ).toBeVisible();
-    await expect(page.locator(".service-canada-code-value")).toHaveText(/\S+/);
-    await expect(
-      page.getByRole("heading", {
-        name: idvCopy.ServiceCanadaCentreCode.yourInformationHeading,
-      }),
-    ).toBeVisible();
-    await expect(
-      page.getByText(applicant.firstName, { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByText(applicant.lastName, { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByText(applicant.dateOfBirth, { exact: true }),
-    ).toBeVisible();
   });
 
-  test("Canada Post journey displays the generated barcode", async ({
-    page,
-  }) => {
-    await startInPersonJourney(page, "canadaPostLocationsOption");
-
-    await expect(page).toHaveURL(
-      /\/en\/identity-verification\/start\/in-person\/canada-post$/,
-    );
-    await selectRadio(
-      page,
-      "select-id-radios",
-      idvCopy.CanadaPostSelectId.documents.DRIVERS_LICENCE.label,
-    );
-    await selectRadio(
-      page,
-      "non-expired-id-radios",
-      idvCopy.VisitCanadaPost.yesOption,
-    );
-    await page
-      .getByRole("button", { name: idvCopy.VisitCanadaPost.continueButton })
-      .click();
-
-    await expect(page).toHaveURL(
-      /\/en\/identity-verification\/start\/in-person\/canada-post\/id-details$/,
-    );
-    await expect(
-      page.getByRole("heading", {
-        name: idvCopy.CanadaPostIdDetails.driverLicenceHeading,
-      }),
-    ).toBeVisible();
-
-    await page
-      .getByRole("combobox", {
-        name: idvCopy.CanadaPostIdDetails.provinceLabel,
-      })
-      .selectOption({ label: "Ontario" });
-    await fillDate(page, "id-expiry-date-input", {
-      month: applicant.idExpiryMonth,
-      day: applicant.idExpiryDay,
-      year: applicant.idExpiryYear,
+  test.describe("Canada Post", () => {
+    test.use({
+      storageState: TEST_USERS.inPersonCanadaPost.storageState,
     });
-    await fillText(page, "first-name-input", applicant.firstName);
-    await fillText(page, "last-name-input", applicant.lastName);
-    await fillDate(page, "date-of-birth-input", {
-      month: applicant.month,
-      day: applicant.day,
-      year: applicant.year,
+
+    test("Canada Post journey displays the generated barcode", async ({
+      page,
+    }) => {
+      await new IdentityVerificationStartPage(page).chooseInPerson();
+      await new InPersonProviderSelectionPage(page).choose(
+        "canadaPostLocationsOption",
+      );
+      await new CanadaPostSelectionPage(page).chooseDriverLicence();
+
+      const detailsPage = new CanadaPostIdDetailsPage(page);
+      await detailsPage.fillApplicant(canadaPostApplicant);
+      await expectCaseCreation(await detailsPage.submit(), "canada_post");
+
+      await expect(page).toHaveURL(
+        /\/en\/identity-verification\/start\/in-person\/canada-post\/idv-code$/,
+      );
+      const barcodePage = new CanadaPostBarcodePage(page);
+      await expect(barcodePage.heading).toBeVisible();
+      await expect(barcodePage.barcode).toBeVisible();
+      await expect(barcodePage.informationHeading).toBeVisible();
+      await expect(
+        barcodePage.applicantValue(applicant.firstName),
+      ).toBeVisible();
+      await expect(
+        barcodePage.applicantValue(applicant.lastName),
+      ).toBeVisible();
+      await expect(
+        barcodePage.applicantValue(applicant.dateOfBirthText),
+      ).toBeVisible();
     });
-    await fillText(page, "address-input", applicant.address);
-    await fillText(page, "city-town-input", applicant.city);
-    await fillText(page, "postal-code-input", applicant.postalCode);
-
-    const createCase = waitForInPersonCaseCreation(page);
-    await page
-      .getByRole("button", {
-        name: idvCopy.CanadaPostIdDetails.continueButton,
-      })
-      .click();
-    await expectCaseCreation(await createCase, "canada_post");
-
-    await expect(page).toHaveURL(
-      /\/en\/identity-verification\/start\/in-person\/canada-post\/idv-code$/,
-    );
-    await expect(
-      page.getByRole("heading", {
-        name: idvCopy.ProofingBarcodeCanadaPost.heading,
-      }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("img", {
-        name: /^Barcode for code .+/,
-      }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("heading", {
-        name: idvCopy.ProofingBarcodeCanadaPost.yourInformationHeading,
-      }),
-    ).toBeVisible();
-    await expect(
-      page.getByText(applicant.firstName, { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByText(applicant.lastName, { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByText(applicant.dateOfBirth, { exact: true }),
-    ).toBeVisible();
   });
 });
 
-async function startInPersonJourney(
-  page: Page,
-  providerOption: "serviceCanadaLocationsOption" | "canadaPostLocationsOption",
-) {
-  await page.goto("/en/identity-verification/start");
-  await selectRadio(
-    page,
-    "start-identity-proofing-radios",
-    idvCopy.StartIdentityProofing.inPersonSignBackInOption,
-  );
-  await page
-    .getByRole("button", {
-      name: idvCopy.ServiceCanadaCentre.continueButton,
-    })
-    .click();
-
-  await expect(page).toHaveURL(
-    /\/en\/identity-verification\/start\/in-person$/,
-  );
-  const providerLabel = idvCopy.StartIdentityProofing[providerOption];
-  await selectRadio(page, "prove-identity-in-person-radios", providerLabel);
-  await page
-    .getByRole("button", { name: idvCopy.ProveIdentityInPerson.continueButton })
-    .click();
-}
-
-async function selectRadio(page: Page, groupId: string, label: string) {
-  // GCDS radio labels overlay their native inputs, so click the visible label.
-  await page.locator(`gcds-radios#${groupId}`).getByText(label).click();
-}
-
-function waitForInPersonCaseCreation(page: Page) {
-  return page.waitForResponse(
-    (response) =>
-      new URL(response.url()).pathname.endsWith(
-        "/v1/identity-verification/in-person",
-      ) && response.request().method() === "POST",
-  );
-}
-
 async function expectCaseCreation(
-  response: Awaited<ReturnType<typeof waitForInPersonCaseCreation>>,
+  response: Response,
   provider: "service_canada" | "canada_post",
 ) {
   expect(response.status()).toBe(201);
@@ -244,33 +116,9 @@ async function expectCaseCreation(
     applicant: {
       first_name: applicant.firstName,
       last_name: applicant.lastName,
-      date_of_birth: "1995-12-02",
+      date_of_birth: applicant.dateOfBirthISO,
       id_type: "driverLicence",
       address: { locality: applicant.city },
     },
   });
-}
-
-async function fillText(page: Page, id: string, value: string) {
-  const input = page.locator(`gcds-input#${id}`).getByRole("textbox");
-  await input.fill(value);
-  await input.press("Tab");
-  await expect(input).toHaveValue(value);
-}
-
-async function fillDate(
-  page: Page,
-  id: string,
-  value: { month: string; day: string; year: string },
-) {
-  const dateInput = page.locator(`gcds-date-input#${id}`);
-  await dateInput
-    .getByRole("combobox", { name: "Month" })
-    .selectOption({ label: value.month });
-  const dayInput = dateInput.getByRole("textbox", { name: "Day" });
-  await dayInput.fill(value.day);
-  await dayInput.press("Tab");
-  const yearInput = dateInput.getByRole("textbox", { name: "Year" });
-  await yearInput.fill(value.year);
-  await yearInput.press("Tab");
 }

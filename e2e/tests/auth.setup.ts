@@ -71,6 +71,12 @@ setup("sign in as in-person-user", async ({ page }) => {
   await page.context().storageState({ path: user.storageState });
 });
 
+setup("sign in as in-person-canada-post-user", async ({ page }) => {
+  const user = TEST_USERS.inPersonCanadaPost;
+  await signInAndOpenDashboard(page, user);
+  await page.context().storageState({ path: user.storageState });
+});
+
 /** Signs in through IBM Verify, then clicks dashboard -> "Personal information" -> /en/profile. */
 async function signInAndOpenProfile(page: Page, user: TestUser) {
   const dashboard = await signInAndOpenDashboard(page, user);

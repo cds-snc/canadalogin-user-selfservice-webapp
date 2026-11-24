@@ -64,9 +64,21 @@ export default defineConfig({
       grep: /sign in as in-person-user/,
     },
     {
-      name: "idv-in-person",
+      name: "setup-in-person-canada-post",
+      ...authSetupProject,
+      grep: /sign in as in-person-canada-post-user/,
+    },
+    {
+      name: "idv-service-canada",
       testMatch: /idv\/in-person-journey\.spec\.ts/,
+      grep: /Service Canada Centre journey/,
       dependencies: ["setup-in-person"],
+    },
+    {
+      name: "idv-canada-post",
+      testMatch: /idv\/in-person-journey\.spec\.ts/,
+      grep: /Canada Post journey/,
+      dependencies: ["setup-in-person-canada-post"],
     },
     {
       name: "idv-proven-user",
