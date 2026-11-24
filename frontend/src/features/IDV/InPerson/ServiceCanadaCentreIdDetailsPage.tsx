@@ -107,16 +107,16 @@ export default function ServiceCanadaCentreIdDetailsPage() {
   const isDriverLicence = idType === "driverLicence";
   const isPassport = idType === "passport";
   const showAddressFields =
-    isDriverLicence ||
-    idType === "photoIDHealthCard" ||
-    idType === "photoIDServiceCard";
+    idType === "driverLicence" ||
+    idType === "photoIDServiceCard" ||
+    idType === "COMBO_CARD";
   const { errorCodes } = getCanadaPostIdDetailsValidation(formData, {
     showCountry: false,
     showProvince: isDriverLicence,
   });
-  // Service Canada does not collect expiry dates and only requires driver addresses.
+  // Service Canada does not collect expiry dates and only requires addresses for certain IDs.
   delete errorCodes.idExpiryDate;
-  if (!isDriverLicence) {
+  if (!showAddressFields) {
     delete errorCodes.address;
     delete errorCodes.cityTown;
     delete errorCodes.postalCode;
@@ -278,7 +278,7 @@ export default function ServiceCanadaCentreIdDetailsPage() {
               }
               showIdExpiry={false}
               showAddressFields={showAddressFields}
-              requireAddressFields={isDriverLicence}
+              requireAddressFields={showAddressFields}
               updateField={updateField}
               provinceField={provinceSelect}
             />
