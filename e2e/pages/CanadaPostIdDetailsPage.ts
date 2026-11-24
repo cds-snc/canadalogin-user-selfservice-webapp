@@ -23,10 +23,11 @@ export class CanadaPostIdDetailsPage {
 
   async fillApplicant(applicant: InPersonApplicant) {
     await expect(this.heading).toBeVisible();
-    await new InPersonApplicantForm(
-      this.page,
-      copy.en.idv.CanadaPostIdDetails.provinceLabel,
-    ).fill(applicant);
+    await this.page
+      .locator("gcds-select#select-document-option")
+      .getByRole("combobox")
+      .selectOption({ label: applicant.province.label });
+    await new InPersonApplicantForm(this.page).fill(applicant);
   }
 
   async submit(): Promise<Response> {

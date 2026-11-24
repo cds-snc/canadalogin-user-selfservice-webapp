@@ -22,7 +22,7 @@ const applicant: InPersonApplicant & {
   dateOfBirthText: "December 2, 1995",
   address: "123 Test Street",
   city: "Ottawa",
-  province: "ON",
+  province: { code: "ON", label: "Ontario" },
   postalCode: "K1A 0B1",
 };
 const canadaPostApplicant = {

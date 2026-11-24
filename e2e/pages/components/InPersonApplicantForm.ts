@@ -1,4 +1,5 @@
 import { expect, type Page } from "@playwright/test";
+import { fillGcdsInput } from "../../support/fillGcdsInput";
 
 export type InPersonDate = {
   month: string;
@@ -12,22 +13,18 @@ export type InPersonApplicant = {
   dateOfBirth: InPersonDate;
   address: string;
   city: string;
-  province: string;
+  province: {
+    code: string;
+    label: string;
+  };
   postalCode: string;
   idExpiryDate?: InPersonDate;
 };
 
 export class InPersonApplicantForm {
-  constructor(
-    private readonly page: Page,
-    private readonly provinceLabel: string,
-  ) {}
+  constructor(private readonly page: Page) {}
 
   async fill(applicant: InPersonApplicant) {
-    await this.page
-      .getByRole("combobox", { name: this.provinceLabel })
-      .selectOption(applicant.province);
-
     if (applicant.idExpiryDate) {
       await this.fillDate("id-expiry-date-input", applicant.idExpiryDate);
     }
@@ -44,7 +41,7 @@ export class InPersonApplicantForm {
     const input = this.page
       .locator(`gcds-input#${id}`)
       .getByRole("textbox");
-    await input.fill(value);
+    await fillGcdsInput(input, value);
     await input.press("Tab");
     await expect(input).toHaveValue(value);
   }
@@ -55,10 +52,10 @@ export class InPersonApplicantForm {
       .getByRole("combobox", { name: "Month" })
       .selectOption({ label: value.month });
     const dayInput = dateInput.getByRole("textbox", { name: "Day" });
-    await dayInput.fill(value.day);
+    await fillGcdsInput(dayInput, value.day);
     await dayInput.press("Tab");
     const yearInput = dateInput.getByRole("textbox", { name: "Year" });
-    await yearInput.fill(value.year);
+    await fillGcdsInput(yearInput, value.year);
     await yearInput.press("Tab");
   }
 }
