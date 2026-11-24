@@ -37,7 +37,6 @@ import {
   getValidationSummaryHeading,
 } from "./validation/ErrorsDefinition";
 
-
 const ERROR_SUMMARY_ID = "visit-canada-post-error-summary";
 const RADIOS_ID = "select-id-radios";
 const NON_EXPIRED_ID_RADIOS_ID = "non-expired-id-radios";
@@ -168,7 +167,7 @@ export default function VisitCanadaPost() {
   return (
     <GcdsContainer role="main">
       <form>
-        <GcdsGrid columns="1" gap="450">
+        <GcdsGrid columns="1">
           <GcdsHeading tag="h1">{t("VisitCanadaPost.heading")}</GcdsHeading>
 
           {nonExpiredIdError || idTypeErrorMessage ? (
@@ -233,7 +232,7 @@ export default function VisitCanadaPost() {
               onGcdsChange={(event: CustomEvent<string>) => {
                 setSelectedValue(
                   ((event.target as HTMLInputElement | null)?.value ?? "") as
-                  Exclude<IdentityDocumentType, "noIds"> | "",
+                    Exclude<IdentityDocumentType, "noIds"> | "",
                 );
               }}
             />
@@ -294,8 +293,8 @@ export default function VisitCanadaPost() {
               {t("VisitCanadaPost.differentMethodButton")}
             </GcdsButton>
           </GcdsGrid>
-        </GcdsGrid >
-      </form >
-    </GcdsContainer >
+        </GcdsGrid>
+      </form>
+    </GcdsContainer>
   );
 }
