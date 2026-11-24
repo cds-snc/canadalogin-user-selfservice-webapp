@@ -33,6 +33,8 @@ export type IdentityVerificationClaimsResponse = {
         formatted?: string | null;
       } | null;
       id_document?: string | null;
+      phone_number?: string | null;
+
     };
   };
   source_display?: {

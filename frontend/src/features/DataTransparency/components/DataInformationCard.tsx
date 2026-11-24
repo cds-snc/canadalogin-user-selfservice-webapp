@@ -28,7 +28,7 @@ export default function DataInformationCard({
 
   const legalName = preferredName;
 
-  const dateOfBirth = verifiedClaims?.claims?.birthdate || "February 1, 1990";
+  const dateOfBirth = verifiedClaims?.claims?.birthdate || "1992-08-14";
 
   const contactDetails = [
     {
@@ -49,7 +49,7 @@ export default function DataInformationCard({
     {
       key: "phoneNumber",
       title: t("DataInformationCard.phoneNumber"),
-      value: "613 284 3847",
+      value: verifiedClaims?.claims?.phone_number || "1 613 530 5489",
     },
   ];
 

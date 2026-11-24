@@ -182,7 +182,9 @@ describe("DataInformationCard rendering", () => {
     expect(container).toBeInTheDocument();
 
     expect(screen.getByText("canadalogintester@gmail.com")).toBeInTheDocument();
-    expect(screen.getByText("613 284 3847")).toBeInTheDocument();
+    expect(
+      screen.getByText((text) => text.includes("1 613 530 5489")),
+    ).toBeInTheDocument();
     expect(screen.getByText("English")).toBeInTheDocument();
   });
 

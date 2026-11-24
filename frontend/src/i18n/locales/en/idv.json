@@ -31,7 +31,7 @@
     "noOption": "No",
     "fallbackRpName": "RP Name",
     "enterDetailsHeading": "Enter your ID details",
-    "continueButton": "Continue",
+    "continueButton": "Continue Verification",
     "chooseDifferentMethodButton": "Choose a different method",
     "learnMoreLink": "Learn more about verifying at Service Canada Centre.",
     "selectIdLabel": "Select your ID",
@@ -297,8 +297,8 @@
     "cannotScan": "Can’t scan the QR code? Send this link to your mobile device.",
     "copyLink": "Copy link",
     "copyError": "We couldn’t copy the link. Select and copy the link above instead.",
-    "continueButton": "Continue",
-    "nextStepButton": "Next Step"
+    "continueButton": "Continue Verification",
+    "nextStepButton": "Continue Verification"
   },
   "OnlineVerificationInfo": {
     "pageTitle": "Prove your identity",
