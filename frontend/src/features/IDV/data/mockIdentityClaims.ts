@@ -14,6 +14,7 @@ export const mockIdentityClaims: IdentityVerificationClaimsResponse = {
       address: {
         formatted: "123 Example Street, Ottawa, ON K1A 0B1, Canada",
       },
+      phone_number: "+1 613 530 5489",
     },
   },
   source_display: {
