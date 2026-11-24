@@ -23,7 +23,8 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key) => {
       const translations = {
-        "DataTransparencyPage.title": "Information being shared with {{relyingPartyName}}",
+        "DataTransparencyPage.title":
+          "Information being shared with {{relyingPartyName}}",
         "DataTransparencyPage.descriptionPrefix":
           "By continuing, CanadaLogin will share the following details with ",
         "DataTransparencyPage.descriptionSuffix": ":",
@@ -45,10 +46,12 @@ vi.mock("react-i18next", () => ({
         "DataInformationCard.wrongInformation": "If your information is wrong",
         "DataInformationCard.wrongInformationDescription":
           "If your details have changed, you can still continue to the service and go to update your information in your CanadaLogin settings. You will need to re-sign into the service again to share your newly saved details.",
-        "DataInformationCard.neverSharedHeading": "Never shared with any service",
+        "DataInformationCard.neverSharedHeading":
+          "Never shared with any service",
         "DataInformationCard.neverSharedDescription":
           "This information stays private in CanadaLogin:",
-        "DataInformationCard.passwordDetails": "your password or passkey details",
+        "DataInformationCard.passwordDetails":
+          "your password or passkey details",
         "DataInformationCard.otherServicesInfo":
           "your information from others services",
       };
@@ -164,7 +167,9 @@ describe("DataInformationCard rendering", () => {
     render(<DataTransparencyPage />);
 
     expect(
-      screen.getByText((text) => text.includes("Never shared with any service")),
+      screen.getByText((text) =>
+        text.includes("Never shared with any service"),
+      ),
     ).toBeInTheDocument();
   });
 
