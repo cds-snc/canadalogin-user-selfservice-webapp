@@ -141,7 +141,7 @@ describe("ProveIdentityOnlinePage", () => {
   it("renders the page heading", () => {
     render(<ProveIdentityOnlinePage />);
 
-    expect(screen.getByText("Prove your identity online")).toBeInTheDocument();
+    expect(screen.getByText("Verify your identity online")).toBeInTheDocument();
   });
 
   it("renders OnlineRadioButtons component", () => {
