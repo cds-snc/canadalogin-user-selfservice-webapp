@@ -72,12 +72,14 @@ export default defineConfig({
       name: "idv-service-canada",
       testMatch: /idv\/in-person-journey\.spec\.ts/,
       grep: /Service Canada Centre journey/,
+      retries: 0,
       dependencies: ["setup-in-person"],
     },
     {
       name: "idv-canada-post",
       testMatch: /idv\/in-person-journey\.spec\.ts/,
       grep: /Canada Post journey/,
+      retries: 0,
       dependencies: ["setup-in-person-canada-post"],
     },
     {

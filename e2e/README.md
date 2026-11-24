@@ -60,7 +60,7 @@ npm run report           # open the last HTML report
 npm run typecheck
 ```
 
-Tests run serially (`workers: 1`) because they share a small pool of test accounts. Each test project depends only on the account setup it needs: each provider journey and each proven-information user suite signs in only its corresponding user. The tests reuse saved storage state, so the number of test cases does not increase IBM Verify sign-ins. Setup tests are not automatically retried because a retry would submit credentials to IBM Verify again. Give each journey its own user before enabling parallel runs.
+Tests run serially (`workers: 1`) because they share a small pool of test accounts. Each test project depends only on the account setup it needs: each provider journey and each proven-information user suite signs in only its corresponding user. The tests reuse saved storage state, so the number of test cases does not increase IBM Verify sign-ins. Auth setup tests are not retried because retrying would submit credentials to IBM Verify again; in-person journey tests are not retried because they create external cases subject to per-user cooldowns. Give each journey its own user before enabling parallel runs.
 
 ## CI
 
