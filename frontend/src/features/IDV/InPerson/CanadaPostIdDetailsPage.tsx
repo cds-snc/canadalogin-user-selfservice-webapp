@@ -39,9 +39,6 @@ import {
   getCityRequiredMessage,
   getCountryRequiredMessage,
   getFirstNameRequiredOrInvalidMessage,
-  /* getIdExpiryInvalidMessage,
-  getIdExpiryRequiredMessage,
-  getIdExpiryTooSoonMessage, */
   getLastNameRequiredOrInvalidMessage,
   getPostalCodeRequiredOrInvalidMessage,
   getProvinceRequiredMessage,
@@ -62,7 +59,6 @@ const ID_TYPE_BY_DOCUMENT: Record<IdentityDocument["key"], string> = {
 };
 
 const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
-  // idExpiryDate: "id-expiry-date-input",
   documentOptionId: "select-document-option",
   province: "select-province",
   firstName: "first-name-input",
@@ -105,7 +101,6 @@ export default function CanadaPostIdDetailsPage() {
   const showProvince = !issuerIsProvince;
 
   const [formData, setFormData] = useState<CanadaPostIdDetailsFormData>(() => ({
-    // idExpiryDate: "",
     documentOptionId:
       variant === "passport"
         ? String(
@@ -161,12 +156,6 @@ export default function CanadaPostIdDetailsPage() {
 
   const dobMessages = getSharedDateOfBirthMessages(t);
   const errorMessages: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
-    /* idExpiryDate:
-      errorCodes.idExpiryDate === "too_soon"
-        ? getIdExpiryTooSoonMessage(t)
-        : errorCodes.idExpiryDate === "invalid"
-          ? getIdExpiryInvalidMessage(t)
-          : getIdExpiryRequiredMessage(t), */
     documentOptionId: issuerIsProvince
       ? getProvinceRequiredMessage(t)
       : getCountryRequiredMessage(t),
@@ -241,7 +230,6 @@ export default function CanadaPostIdDetailsPage() {
                 : formData.country || CANADA_COUNTRY_CODE,
           },
           idType: ID_TYPE_BY_DOCUMENT[selectedDocument.key],
-          // idExpiryDate: formData.idExpiryDate,
         },
       });
 
@@ -330,7 +318,6 @@ export default function CanadaPostIdDetailsPage() {
   return (
     <GcdsContainer role="main">
       <form>
-        <GcdsGrid columns="1" gap="450">
           <GcdsContainer>
             <GcdsHeading tag="h1">{t(headingKey)}</GcdsHeading>
 
@@ -346,17 +333,6 @@ export default function CanadaPostIdDetailsPage() {
           </GcdsContainer>
 
           <GcdsContainer>
-            {/* <GcdsDateInput
-              id={FIELD_IDS.idExpiryDate}
-              name={FIELD_IDS.idExpiryDate}
-              legend={t("CanadaPostIdDetails.idExpiryLabel")}
-              hint={t("CanadaPostIdDetails.idExpiryHint")}
-              format="full"
-              lang={currentLanguage}
-              value={formData.idExpiryDate}
-              errorMessage={fieldError("idExpiryDate")}
-              onGcdsChange={updateField("idExpiryDate")}
-            /> */}
 
             {variant === "passport" ? null : variant === "default" ? (
               issuerIsProvince ? (
@@ -480,7 +456,6 @@ export default function CanadaPostIdDetailsPage() {
               {t("CanadaPostIdDetails.backButton")}
             </GcdsButton>
           </GcdsGrid>
-        </GcdsGrid>
       </form>
     </GcdsContainer>
   );
