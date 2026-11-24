@@ -9,7 +9,7 @@ import {
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
 export default function IdentityVerificationSuccess() {
@@ -22,10 +22,6 @@ export default function IdentityVerificationSuccess() {
     language,
     journeyType,
   });
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main">

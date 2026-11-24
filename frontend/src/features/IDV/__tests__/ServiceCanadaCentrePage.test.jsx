@@ -474,14 +474,6 @@ describe("ServiceCanadaCentre pages", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockFlags.devOnlyFeature = false;
-
-    const { container } = render(<ServiceCanadaCentrePage />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it("validates all details before submitting the Service Canada request", async () => {
     mockLocationState.idType = "passport";
     render(<ServiceCanadaCentreIdDetailsPage />);

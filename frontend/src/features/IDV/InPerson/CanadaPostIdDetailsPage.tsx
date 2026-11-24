@@ -16,7 +16,6 @@ import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerifica
 import {
   AVAILABLE_LANGUAGES,
   CANADIAN_PROVINCES_AND_TERRITORIES,
-  DEV_ONLY_FEATURE,
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
@@ -140,10 +139,6 @@ export default function CanadaPostIdDetailsPage() {
     language,
     journeyType,
   });
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   if (!selectedDocument) {
     return <Navigate to={selectIdPage} replace />;

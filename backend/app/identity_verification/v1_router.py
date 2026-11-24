@@ -3,6 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request, status
 from app.auth.services.auth_user_session import get_users_current_session
+from app.identity_verification.dependencies import require_idv_feature_access
 from app.utils.schemas import ResponseModel
 from app.identity_verification.schemas import (
     CreateInPersonIdentityVerificationRequest,
@@ -36,7 +37,7 @@ from app.identity_verification.services.identity_verification_claims import (
 )
 
 logger = logging.getLogger(__name__)
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_idv_feature_access)])
 
 
 @router.get(

@@ -35,6 +35,10 @@ export interface UserProfile {
   } | null;
 }
 
+export interface UserFeatures {
+  idv: boolean;
+}
+
 export interface LocalizedRelyingPartyDetail {
   name: string;
   url: string;
@@ -67,6 +71,7 @@ export interface UserData {
 
 export interface UserState {
   userProfile: UserProfile | null;
+  features?: UserFeatures;
   userData: UserData;
   isLoading: boolean;
   loadingText: string | null;
@@ -87,6 +92,10 @@ export type UserAction =
   | {
       type: typeof CONTEXT_ACTIONS.updated_profile_success;
       payload: UserProfile | null;
+    }
+  | {
+      type: typeof CONTEXT_ACTIONS.set_feature_flags;
+      payload: UserFeatures;
     }
   | {
       type: typeof CONTEXT_ACTIONS.set_relying_party_data;
@@ -135,6 +144,7 @@ export const initialUserState: UserState = {
     passwordValidated: false,
   },
   userProfile: null,
+  features: { idv: false },
   relyingPartyInfo: null,
   authenticatedPages: [],
 };

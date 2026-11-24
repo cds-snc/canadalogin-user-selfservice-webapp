@@ -12,7 +12,6 @@ import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 import {
-  DEV_ONLY_FEATURE,
   OIDC_REDIRECT,
   PAGES,
   PROVINCIAL_PARTNERS,
@@ -55,10 +54,6 @@ export default function ProvincialVerificationPage() {
   const bcPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.bc);
   const abPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.ab);
   const quebecPartnerLoginHref = buildPartnerLoginHref(PROVINCIAL_PARTNERS.qc);
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
-
   return (
     <GcdsContainer role="main">
       <GcdsHeading tag="h1">{t("ProvincialVerification.heading")}</GcdsHeading>

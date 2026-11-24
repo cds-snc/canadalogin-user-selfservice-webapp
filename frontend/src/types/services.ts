@@ -1,9 +1,11 @@
 import type { ApiErrorResponse } from "./utils";
+import type { UserFeatures } from "./user";
 
 export type AuthServiceResponse<TData = unknown> = {
   success?: boolean;
   message?: string;
   data?: TData;
+  features?: UserFeatures;
   [key: string]: unknown;
 };
 

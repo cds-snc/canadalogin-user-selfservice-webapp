@@ -281,12 +281,4 @@ describe("OnlineVerificationInfo", () => {
     );
     expect(link.closest("a")).toHaveAttribute("target", "_blank");
   });
-
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
-
-    const { container } = render(<OnlineVerificationInfo />);
-
-    expect(container).toBeEmptyDOMElement();
-  });
 });

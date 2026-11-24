@@ -6,6 +6,7 @@ import i18n from "../../../i18n/test";
 
 const mockNavigate = vi.fn();
 let mockDevOnlyFeature = true;
+let mockIdvFeatureAccess = true;
 let mockLocationState = null;
 const mockGetClaims = vi.hoisted(() => vi.fn());
 
@@ -36,6 +37,10 @@ vi.mock("../../../components/Providers/useUser", () => ({
   }),
 }));
 
+vi.mock("../../../hooks/useIdvFeatureAccess", () => ({
+  useIdvFeatureAccess: () => mockIdvFeatureAccess,
+}));
+
 vi.mock("../../../utils/constants", () => ({
   get DEV_ONLY_FEATURE() {
     return mockDevOnlyFeature;
@@ -43,7 +48,15 @@ vi.mock("../../../utils/constants", () => ({
   PAGES: {
     editEmailPage: "editEmailPage",
   },
-  VITE_ENVIRONMENTS: { dev: "dev", test: "test" },
+  VITE_ENVIRONMENTS: { local: "local", dev: "dev", test: "test" },
+}));
+
+vi.mock("../../../config", () => ({
+  default: {
+    get environment() {
+      return mockDevOnlyFeature ? "dev" : "prod";
+    },
+  },
 }));
 
 vi.mock("../../../utils/routeHelpers", () => ({
@@ -125,6 +138,7 @@ describe("ProfileHome", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     mockDevOnlyFeature = true;
+    mockIdvFeatureAccess = true;
     mockLocationState = null;
     await i18n.changeLanguage("en");
     mockGetClaims.mockResolvedValue({
@@ -184,7 +198,7 @@ describe("ProfileHome", () => {
     expect(screen.getByTestId("gcds-link")).toHaveTextContent("Change");
   });
 
-  it("renders the Proven information section when DEV_ONLY_FEATURE is true", async () => {
+  it("renders the Proven information section when IDV access is enabled", async () => {
     render(<ProfileHome />);
     await waitFor(() => {
       expect(
@@ -197,8 +211,8 @@ describe("ProfileHome", () => {
     });
   });
 
-  it("hides the Proven information section when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
+  it("hides the Proven information section when IDV access is disabled", () => {
+    mockIdvFeatureAccess = false;
     render(<ProfileHome />);
     expect(screen.queryByTestId("idv-complete-notice")).not.toBeInTheDocument();
     expect(
@@ -209,7 +223,7 @@ describe("ProfileHome", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders the verified badge for proven information when DEV_ONLY_FEATURE is true", async () => {
+  it("renders the verified badge for proven information when IDV access is enabled", async () => {
     render(<ProfileHome />);
     await waitFor(() => {
       const badges = screen.getAllByTestId("verified-badge");
@@ -234,7 +248,7 @@ describe("ProfileHome", () => {
     });
   });
 
-  it("renders the IDV success notice when location state enables it and DEV_ONLY_FEATURE is true", () => {
+  it("renders the IDV success notice when location state enables it and IDV access is enabled", () => {
     mockLocationState = { showIDVSuccessNotice: true };
     render(<ProfileHome />);
     expect(screen.getByTestId("idv-success-notice")).toBeInTheDocument();
@@ -265,8 +279,8 @@ describe("ProfileHome", () => {
     expect(screen.queryByTestId("idv-success-notice")).not.toBeInTheDocument();
   });
 
-  it("hides the IDV success notice when DEV_ONLY_FEATURE is false", () => {
-    mockDevOnlyFeature = false;
+  it("hides the IDV success notice when IDV access is disabled", () => {
+    mockIdvFeatureAccess = false;
     mockLocationState = { showIDVSuccessNotice: true };
     render(<ProfileHome />);
     expect(screen.queryByTestId("idv-success-notice")).not.toBeInTheDocument();

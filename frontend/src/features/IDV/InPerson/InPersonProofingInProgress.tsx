@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import { useRelyingPartyInfo } from "../../../hooks/useRelyingPartyInfo";
 import { inPersonIdentityVerificationApi } from "../api/inPersonIdentityVerificationApi";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
 const formatDisplayDate = (value: Date | string, locale: string = "en-CA") =>
@@ -90,10 +90,6 @@ export default function InPersonProofingInProgress() {
       setIsResending(false);
     }
   };
-
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
 
   return (
     <GcdsContainer role="main">

@@ -230,14 +230,6 @@ describe("CanadaPostIdDetailsPage", () => {
     });
   });
 
-  it("renders nothing when DEV_ONLY_FEATURE is false", () => {
-    mockFlags.devOnlyFeature = false;
-
-    const { container } = renderPage(PASSPORT);
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it("redirects to the Select your ID page without a selected document", () => {
     renderPage(null);
 

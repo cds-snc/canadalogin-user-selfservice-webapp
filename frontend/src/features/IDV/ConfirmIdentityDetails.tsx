@@ -11,7 +11,7 @@ import {
 
 import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 
-import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
+import { PAGES } from "../../utils/constants";
 import { IDV_JOURNEY_TYPE } from "./constants";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
 import ProvenInformationCard from "./ProvenInformationCard";
@@ -33,10 +33,6 @@ export default function ConfirmIdentityDetails() {
     useState<IdentityVerificationClaimsResponse>();
 
   useEffect(() => {
-    if (!DEV_ONLY_FEATURE) {
-      return;
-    }
-
     void identityVerificationApi
       .getClaims()
       .then(setIdentityVerificationClaims)
@@ -77,10 +73,6 @@ export default function ConfirmIdentityDetails() {
     }
   };
 
-  if (!DEV_ONLY_FEATURE) {
-    return null;
-  }
-
   const verifiedClaims =
     identityVerificationClaims?.status === "verified"
       ? identityVerificationClaims.verified_claims
@@ -116,7 +108,7 @@ export default function ConfirmIdentityDetails() {
 
           <GcdsText>{t("ConfirmIdentityDetails.description")}</GcdsText>
 
-          {DEV_ONLY_FEATURE && verifiedClaims && (
+          {verifiedClaims && (
             <GcdsContainer>
               <GcdsGrid columns="1fr auto" className="gridInline">
                 <GcdsHeading tag="h2" marginTop="0">
