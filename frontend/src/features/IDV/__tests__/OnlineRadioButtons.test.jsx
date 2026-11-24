@@ -54,7 +54,7 @@ describe("OnlineRadioButtons", () => {
   it("renders document scanning option", () => {
     render(<OnlineRadioButtons {...defaultProps} />);
 
-    expect(screen.getByText("Selfie and photo of your ID")).toBeInTheDocument();
+    expect(screen.getByText("Self-photo and ID check")).toBeInTheDocument();
   });
 
   it("renders provincial partner option", () => {
@@ -89,7 +89,7 @@ describe("OnlineRadioButtons", () => {
     );
 
     const radio = screen.getByRole("radio", {
-      name: /Selfie and photo of your ID/,
+      name: /Self-photo and ID check/,
     });
     expect(radio).toBeChecked();
   });
@@ -160,7 +160,7 @@ describe("OnlineRadioButtons", () => {
     );
 
     const radio = screen.getByRole("radio", {
-      name: /Selfie and photo of your ID/,
+      name: /Self-photo and ID check/,
     });
     fireEvent.click(radio);
 

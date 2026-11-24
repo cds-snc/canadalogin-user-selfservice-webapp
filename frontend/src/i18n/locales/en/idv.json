@@ -338,7 +338,7 @@
     "cantProveNowOption": "Need more time or a different way in",
     "cantProveNowHint": "Sign out and come back when you're ready, or find out about other ways to access {{rpName}}.",
     "radioOnlineLabel": "Do it online",
-    "documentScanningOption": "Selfie and photo of your ID",
+    "documentScanningOption": "Self-photo and ID check",
     "hintDocumentScanningOption": "You will be asked to take a photo of yourself and then your government issued photo ID with your phone camera.",
     "signBackInNotice": "You will need to sign back in to your {{appName}} after proving your identity in person to confirm the proofing process.",
     "provincialPartnerOption": "Use your provincial sign in",
