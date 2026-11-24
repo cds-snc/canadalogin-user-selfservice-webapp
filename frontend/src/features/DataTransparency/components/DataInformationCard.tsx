@@ -101,10 +101,25 @@ export default function DataInformationCard({
                 }}
               />
             )}
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "0.5rem",
+              }}
+            >
               <CheckmarkIcon />
               <GcdsContainer style={{ flex: 1 }}>
-                <GcdsHeading tag="h4" marginTop="0" marginBottom="0" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <GcdsHeading
+                  tag="h4"
+                  marginTop="0"
+                  marginBottom="0"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
                   <strong>{field.title}</strong>
                 </GcdsHeading>
                 <GcdsText marginTop="200" marginBottom="0">
