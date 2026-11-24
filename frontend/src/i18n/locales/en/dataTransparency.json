@@ -9,10 +9,19 @@
     "continueButton": "Continue"
   },
   "DataInformationCard": {
-    "preferredName": "Preferred name",
-    "languagePreference": "Language preference",
+    "contactDetailsHeading": "Contact details",
+    "preferredName": "Name",
     "emailAddress": "Email address",
+    "languagePreference": "Language preference",
+    "phoneNumber": "Phone number",
+    "identityDetailsHeading": "Identity details",
+    "legalName": "Legal name",
+    "dateOfBirth": "Date of birth",
     "wrongInformation": "If your information is wrong",
-    "updateLink": "Update your information"
+    "wrongInformationDescription": "If your details have changed, you can still continue to the service and go to update your information in your CanadaLogin settings. You will need to re-sign into the service again to share your newly saved details.",
+    "neverSharedHeading": "Never shared with any service",
+    "neverSharedDescription": "This information stays private in CanadaLogin:",
+    "passwordDetails": "your password or passkey details",
+    "otherServicesInfo": "your information from others services"
   }
 }
