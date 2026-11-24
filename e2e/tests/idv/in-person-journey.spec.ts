@@ -55,6 +55,11 @@ test.describe("In-person identity verification", () => {
       }),
     ).toBeVisible();
 
+    await page
+      .getByRole("combobox", {
+        name: idvCopy.ServiceCanadaCentre.provinceLabel,
+      })
+      .selectOption(applicant.province);
     await fillText(page, "first-name-input", applicant.firstName);
     await fillText(page, "last-name-input", applicant.lastName);
     await fillDate(page, "date-of-birth-input", {
@@ -64,11 +69,6 @@ test.describe("In-person identity verification", () => {
     });
     await fillText(page, "address-input", applicant.address);
     await fillText(page, "city-town-input", applicant.city);
-    await page
-      .getByRole("combobox", {
-        name: idvCopy.ServiceCanadaCentre.provinceLabel,
-      })
-      .selectOption(applicant.province);
     await fillText(page, "postal-code-input", applicant.postalCode);
 
     const createCase = waitForInPersonCaseCreation(page);
@@ -246,6 +246,7 @@ async function expectCaseCreation(
       last_name: applicant.lastName,
       date_of_birth: "1995-12-02",
       id_type: "driverLicence",
+      address: { locality: applicant.city },
     },
   });
 }
@@ -254,6 +255,7 @@ async function fillText(page: Page, id: string, value: string) {
   const input = page.locator(`gcds-input#${id}`).getByRole("textbox");
   await input.fill(value);
   await input.press("Tab");
+  await expect(input).toHaveValue(value);
 }
 
 async function fillDate(

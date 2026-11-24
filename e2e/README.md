@@ -14,7 +14,7 @@ e2e/
 ├── support/            # env, test users, i18n copy, API and navigation helpers
 ├── ci/                 # CI workflow scaffold (not enabled yet; see "CI")
 └── tests/
-    ├── auth.setup.ts   # signs in, opens /en/profile from the dashboard, checks Identity details, saves the session
+    ├── auth.setup.ts   # per-account sign-in tests; saves sessions for dependent test projects
     └── idv/            # IDV journeys
 ```
 
@@ -51,14 +51,14 @@ npm ci
 npm run install-browsers
 
 npm test                 # all projects
-npm run test:idv         # IDV suite only
+npx playwright test --project=idv-unproven-user # one project and only its required setup
 npm run test:headed      # watch the browser
 npm run test:ui          # Playwright UI mode
 npm run report           # open the last HTML report
 npm run typecheck
 ```
 
-Tests run serially (`workers: 1`) because they share test accounts whose IDV state is changed by the journeys. Give each journey its own user before enabling parallel runs.
+Tests run serially (`workers: 1`) because they share test accounts whose IDV state is changed by the journeys. Each test project depends only on the account setup it needs: the in-person suite signs in only the in-person user, and the User A and User B proven-information suites each sign in only their corresponding user. The tests reuse saved storage state, so the number of test cases does not increase IBM Verify sign-ins. Setup tests are not automatically retried because a retry would submit credentials to IBM Verify again. Give each journey its own user before enabling parallel runs.
 
 ## CI
 
@@ -76,6 +76,7 @@ This repository is public, so workflow artifacts can be downloaded by any GitHub
 ## Troubleshooting
 
 - **403 from the API:** the API's load balancer rejects non-browser user agents, including Playwright's default `HeadlessChrome`. Every project uses the `Desktop Chrome` device profile for this reason (see `playwright.config.ts`); keep it when adding projects.
+- **IBM Verify temporarily unavailable:** a full run signs in three times total (once for each test account), not once per test. The in-person, User A, or User B suites each sign in only their respective account. If the tenant is unavailable, wait for it to recover before rerunning; setup sign-ins are not automatically retried.
 - **`E2E_BASE_URL`** must be the frontend origin without a path (e.g. `https://app.dev.login-connexion.alpha.canada.ca`, not `.../en`).
 - **User B tests fail because the Identity details card is shown:** User B's account has ID proofing data. Use an account that has never completed ID proofing.
 - **In-person journey tests fail while creating a case:** the backend environment needs a GC Notify test API key and a reachable IDV data store. Each run creates a pending case and sends a verification-code email to the dedicated in-person account.
