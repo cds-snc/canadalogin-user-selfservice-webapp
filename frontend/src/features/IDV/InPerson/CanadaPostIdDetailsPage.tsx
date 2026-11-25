@@ -6,8 +6,9 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsSelect,
+  GcdsText,
 } from "@gcds-core/components-react";
-import { useMemo, useState } from "react";
+import { type CSSProperties, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 
@@ -60,6 +61,16 @@ const ID_TYPE_BY_DOCUMENT: Record<IdentityDocument["key"], string> = {
   INDIAN_STATUS_CARD: "indianStatus",
   COMBO_CARD: "COMBO_CARD",
 };
+
+const ADDRESS_FIELD_SPACING = {
+  "--gcds-input-margin": "0 0 2.5rem",
+  "--gcds-select-margin": "0 0 2.5rem",
+} as CSSProperties;
+
+const DATE_INPUT_NO_TRAILING_SPACE = {
+  "--gcds-input-margin": "0",
+  "--gcds-select-margin": "0",
+} as CSSProperties;
 
 const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
   idExpiryDate: "id-expiry-date-input",
@@ -309,6 +320,7 @@ export default function CanadaPostIdDetailsPage() {
   const provinceSelect = (
     <GcdsSelect
       id={FIELD_IDS.province}
+      style={ADDRESS_FIELD_SPACING}
       selectId={FIELD_IDS.province}
       name={FIELD_IDS.province}
       label={t("CanadaPostIdDetails.provinceLabel")}
@@ -386,6 +398,7 @@ export default function CanadaPostIdDetailsPage() {
 
           <GcdsDateInput
             id={FIELD_IDS.dateOfBirth}
+            style={DATE_INPUT_NO_TRAILING_SPACE}
             name={FIELD_IDS.dateOfBirth}
             legend={t("VisitCanadaPost.dobLabel")}
             format="full"
@@ -400,8 +413,20 @@ export default function CanadaPostIdDetailsPage() {
             onGcdsChange={updateField("dateOfBirth")}
           />
 
+          <GcdsHeading
+            tag="h3"
+            marginBottom="200"
+            style={{ marginBlockStart: "1rem" }}
+          >
+            {t("VisitCanadaPost.addressHeading")}
+          </GcdsHeading>
+          <GcdsText marginBottom="500">
+            {t("VisitCanadaPost.addressDescription")}
+          </GcdsText>
+
           <GcdsInput
             id={FIELD_IDS.address}
+            style={ADDRESS_FIELD_SPACING}
             inputId={FIELD_IDS.address}
             name={FIELD_IDS.address}
             lang={currentLanguage}
@@ -415,6 +440,7 @@ export default function CanadaPostIdDetailsPage() {
 
           <GcdsInput
             id={FIELD_IDS.cityTown}
+            style={ADDRESS_FIELD_SPACING}
             inputId={FIELD_IDS.cityTown}
             name={FIELD_IDS.cityTown}
             lang={currentLanguage}
@@ -429,6 +455,7 @@ export default function CanadaPostIdDetailsPage() {
 
           <GcdsInput
             id={FIELD_IDS.postalCode}
+            style={ADDRESS_FIELD_SPACING}
             inputId={FIELD_IDS.postalCode}
             name={FIELD_IDS.postalCode}
             lang={currentLanguage}
