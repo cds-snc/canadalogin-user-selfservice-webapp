@@ -306,7 +306,10 @@ export default function ServiceCanadaCentreIDVCodePage() {
               onGcdsClick={handleNextStep}
               className="service-canada-small-button service-canada-print-hide"
             >
-              {t("ServiceCanadaCentreCode.continueButtonWithVerification", "Continue Verification")}
+              {t(
+                "ServiceCanadaCentreCode.continueButtonWithVerification",
+                "Continue Verification",
+              )}
             </GcdsButton>
           </section>
         </div>

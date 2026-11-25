@@ -19,7 +19,8 @@ import { enCA, frCA } from "date-fns/locale";
 type ProvenInformationCardProps = {
   claims?: NonNullable<IdentityVerificationClaimsResponse["verified_claims"]>;
   sourceDisplay?: IdentityVerificationClaimsResponse["source_display"];
-  verificationMethod?: "bluink" | "provincial" | "canada_post" | "service_canada";
+  verificationMethod?:
+    "bluink" | "provincial" | "canada_post" | "service_canada";
   province?: "BC" | "AB" | "QC";
 };
 
@@ -50,15 +51,14 @@ export default function ProvenInformationCard({
       const provinceNames: Record<string, string> = {
         BC: t("ProvenInformationCard.bcServicesCard", "BC Services Card"),
         AB: t("ProvenInformationCard.albertaAccount", "Alberta.ca Account"),
-        QC: t(
-          "ProvenInformationCard.quebecAccount",
-          "Québec Digital Identity",
-        ),
+        QC: t("ProvenInformationCard.quebecAccount", "Québec Digital Identity"),
       };
       return provinceNames[province];
     }
     // For other methods, use the backend source display
-    return sourceDisplay?.documents?.[0]?.display_name?.[i18n.language as "en" | "fr"];
+    return sourceDisplay?.documents?.[0]?.display_name?.[
+      i18n.language as "en" | "fr"
+    ];
   })();
 
   const formatFrenchOrdinalDate = (value: string) => {

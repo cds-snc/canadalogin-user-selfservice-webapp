@@ -32,11 +32,10 @@ export default function ConfirmIdentityDetails() {
   const verificationMethodFromState =
     (state?.verificationMethod as VerificationMethod | null) || "bluink";
   const provinceFromState = state?.province as "BC" | "AB" | "QC" | undefined;
-  
+
   // Try to get method from state first, then localStorage, then default to bluink
-  const [verificationMethod, setVerificationMethod] = useState<VerificationMethod>(
-    verificationMethodFromState,
-  );
+  const [verificationMethod, setVerificationMethod] =
+    useState<VerificationMethod>(verificationMethodFromState);
   const [province, setProvince] = useState<"BC" | "AB" | "QC" | undefined>(
     provinceFromState,
   );
@@ -44,12 +43,19 @@ export default function ConfirmIdentityDetails() {
   useEffect(() => {
     // Store method in localStorage when it's available
     if (verificationMethodFromState !== "bluink" || state?.verificationMethod) {
-      localStorage.setItem("lastVerificationMethod", verificationMethodFromState);
+      localStorage.setItem(
+        "lastVerificationMethod",
+        verificationMethodFromState,
+      );
       if (provinceFromState) {
         localStorage.setItem("lastVerificationProvince", provinceFromState);
       }
     }
-  }, [verificationMethodFromState, state?.verificationMethod, provinceFromState]);
+  }, [
+    verificationMethodFromState,
+    state?.verificationMethod,
+    provinceFromState,
+  ]);
 
   useEffect(() => {
     // If we don't have method from state, try to get it from localStorage

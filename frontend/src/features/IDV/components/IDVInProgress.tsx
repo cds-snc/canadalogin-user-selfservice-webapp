@@ -10,10 +10,7 @@ import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 
 type VerificationMethod =
-  | "bluink"
-  | "provincial"
-  | "canada_post"
-  | "service_canada";
+  "bluink" | "provincial" | "canada_post" | "service_canada";
 
 export default function IDVInProgress() {
   const navigate = useNavigate();
