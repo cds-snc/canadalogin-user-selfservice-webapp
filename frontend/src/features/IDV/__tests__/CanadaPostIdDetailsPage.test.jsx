@@ -44,6 +44,7 @@ vi.mock("@gcds-core/components-react", () => {
   return {
     GcdsContainer: ({ children }) => <div>{children}</div>,
     GcdsGrid: ({ children }) => <div>{children}</div>,
+    GcdsText: ({ children }) => <p>{children}</p>,
     GcdsHeading: ({ children, tag }) => {
       const Tag = tag ?? "h2";
       return <Tag>{children}</Tag>;
