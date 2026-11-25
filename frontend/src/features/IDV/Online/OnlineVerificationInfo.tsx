@@ -96,7 +96,11 @@ export default function OnlineVerificationInfo() {
       <GcdsText>{t("OnlineVerificationInfo.planForTime")}</GcdsText>
 
       <GcdsGrid columns="1fr" gap="450">
-        <GcdsGrid columns="max-content max-content" gap="200">
+        <GcdsGrid
+          columns="1"
+          columnsDesktop="max-content max-content"
+          gap="200"
+        >
           <GcdsButton
             type="button"
             onGcdsClick={(ev) => {
