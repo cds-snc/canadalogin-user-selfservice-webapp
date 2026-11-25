@@ -36,11 +36,6 @@ vi.mock("@gcds-core/components-react", () => ({
       {children}
     </div>
   ),
-  GcdsGrid: ({ children, ...props }) => (
-    <div data-testid="gcds-grid" {...props}>
-      {children}
-    </div>
-  ),
   GcdsHeading: ({ children, tag, ...props }) => {
     const Tag = tag || "h1";
     return (
@@ -243,7 +238,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     expect(screen.queryByText("Driver's licence")).not.toBeInTheDocument();
   });
 
-  it("renders each identity detail in an underlined information row", () => {
+  it("renders identity details with individual underline separators", () => {
     render(
       <TestWrapper
         entryState={{
