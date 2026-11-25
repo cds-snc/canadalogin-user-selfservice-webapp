@@ -24,6 +24,7 @@ import type { IdentityDocument } from "../api/identityDocumentsApi";
 import {
   getIdDetailsFormVariant,
   getLocalizedName,
+  getSimpleIdName,
   isProvinceScopedDocument,
   sortOptionsByLabel,
 } from "../data/identityDocuments";
@@ -341,7 +342,11 @@ export default function CanadaPostIdDetailsPage() {
       <form>
         <GcdsGrid columns="1" gap="450">
           <GcdsContainer>
-            <GcdsHeading tag="h1">{t(headingKey)}</GcdsHeading>
+            <GcdsHeading tag="h1">
+              {selectedDocument
+                ? `Enter your ${getSimpleIdName(selectedDocument.key, currentLanguage)} details`
+                : t(headingKey)}
+            </GcdsHeading>
 
             {hasSubmitted && !isFormValid ? (
               <ErrorSummaryWithFocus
