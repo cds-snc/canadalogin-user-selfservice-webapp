@@ -243,6 +243,27 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     expect(screen.queryByText("Driver's licence")).not.toBeInTheDocument();
   });
 
+  it("renders each identity detail in an underlined information row", () => {
+    render(
+      <TestWrapper
+        entryState={{
+          givenName: "Jane",
+          lastName: "Doe",
+          dateOfBirth: "January 1, 1990",
+          idSelected: "passport",
+        }}
+      >
+        <ProofingBarcodeCanadaPostPage />
+      </TestWrapper>,
+    );
+
+    expect(
+      screen
+        .getByTestId("gcds-container")
+        .querySelectorAll(".canada-post-code-detail"),
+    ).toHaveLength(4);
+  });
+
   it("preserves verification details when changing the page language", () => {
     const verificationDetails = {
       idvCode: "CP12345678",
@@ -293,5 +314,34 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     expect(
       screen.getByRole("button", { name: "Sign out" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Continue Verification" }),
+    ).toBeInTheDocument();
+    expect(
+      screen
+        .getByRole("button", { name: "Sign out" })
+        .parentElement.classList.contains("canada-post-code-actions"),
+    ).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "Continue Verification" })
+        .parentElement,
+    ).toBe(screen.getByRole("button", { name: "Sign out" }).parentElement);
+  });
+
+  it("continues verification with the Canada Post method", () => {
+    render(
+      <TestWrapper>
+        <ProofingBarcodeCanadaPostPage />
+      </TestWrapper>,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Continue Verification" }),
+    );
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      `/en/${PAGES.idvInProgressIDVPage}`,
+      { state: { verificationMethod: "canada_post" } },
+    );
   });
 });

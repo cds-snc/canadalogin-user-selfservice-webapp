@@ -87,11 +87,25 @@
   border-bottom: 0.0625rem solid #d1d3d6;
 }
 
+.canada-post-code-details {
+  display: grid;
+  width: 100%;
+  gap: 0.5rem;
+}
+
 .canada-post-code-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
+}
+
+.canada-post-code-update-actions {
+  margin-top: 1rem;
+}
+
+.canada-post-code-verification-actions {
+  margin-top: 0.5rem;
 }
 
 @media (max-width: 40rem) {
