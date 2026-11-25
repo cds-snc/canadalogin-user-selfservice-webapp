@@ -189,6 +189,7 @@ describe("ContinueProofingOnMobile", () => {
         state: {
           mockProofing: true,
           mockIdentityClaims,
+          verificationMethod: "bluink",
         },
       },
     );
@@ -207,6 +208,7 @@ describe("ContinueProofingOnMobile", () => {
         state: {
           mockProofing: true,
           mockIdentityClaims,
+          verificationMethod: "bluink",
         },
       },
     );
@@ -246,6 +248,7 @@ describe("ContinueProofingOnMobile", () => {
         state: {
           mockProofing: true,
           mockIdentityClaims,
+          verificationMethod: "bluink",
         },
       },
     );
@@ -262,6 +265,7 @@ describe("ContinueProofingOnMobile", () => {
         state: {
           mockProofing: true,
           mockIdentityClaims,
+          verificationMethod: "bluink",
         },
       },
     );
@@ -282,7 +286,7 @@ describe("IdentityVerificationSuccess", () => {
     fireEvent.click(screen.getByRole("button"));
     expect(mocks.navigate).toHaveBeenCalledWith(
       "/en/identity-verification/required/IdvDetailsConfirmationPage",
-      { state: { mockProofing: true } },
+      { state: { mockProofing: true, verificationMethod: "bluink" } },
     );
   });
 

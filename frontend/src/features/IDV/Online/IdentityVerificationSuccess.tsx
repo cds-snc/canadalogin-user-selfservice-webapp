@@ -28,7 +28,9 @@ export default function IdentityVerificationSuccess() {
   const handleContinue = () => {
     navigate(
       detailsConfirmationPage,
-      isMockProofing ? { state: { mockProofing: true } } : undefined,
+      isMockProofing
+        ? { state: { mockProofing: true, verificationMethod: "bluink" } }
+        : undefined,
     );
   };
 
