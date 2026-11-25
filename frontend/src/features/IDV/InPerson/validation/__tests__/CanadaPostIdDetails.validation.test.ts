@@ -2,14 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   type CanadaPostIdDetailsFormData,
   getCanadaPostIdDetailsValidation,
-  getIdExpiryValidationError,
   isValidCanadianPostalCode,
 } from "../CanadaPostIdDetails.validation";
 
-const TODAY = new Date(2026, 9, 20);
-
 const VALID_FORM: CanadaPostIdDetailsFormData = {
-  idExpiryDate: "2030-01-01",
   documentOptionId: "1",
   country: "CA",
   province: "ON",
@@ -20,20 +16,6 @@ const VALID_FORM: CanadaPostIdDetailsFormData = {
   cityTown: "Ottawa",
   postalCode: "K1A 0B1",
 };
-
-describe("getIdExpiryValidationError", () => {
-  it.each([
-    ["", "required"],
-    ["2030-02-30", "invalid"],
-    ["not-a-date", "invalid"],
-    ["2026-10-19", "too_soon"],
-    ["2026-11-19", "too_soon"],
-    ["2026-11-20", null],
-    ["2031-01-01", null],
-  ])("returns %s -> %s", (value, expected) => {
-    expect(getIdExpiryValidationError(value, TODAY)).toBe(expected);
-  });
-});
 
 describe("isValidCanadianPostalCode", () => {
   it.each(["K1A 0B1", "k1a0b1", " H2X 1Y4 "])("accepts %s", (value) => {
@@ -47,11 +29,9 @@ describe("isValidCanadianPostalCode", () => {
 
 describe("getCanadaPostIdDetailsValidation", () => {
   it("is valid when every visible field is filled correctly", () => {
-    const result = getCanadaPostIdDetailsValidation(
-      VALID_FORM,
-      { showCountry: true, showProvince: true },
-      TODAY,
-    );
+    const result = getCanadaPostIdDetailsValidation(VALID_FORM, {
+      showProvince: true,
+    });
 
     expect(result).toEqual({ isFormValid: true, errorCodes: {} });
   });
@@ -61,17 +41,13 @@ describe("getCanadaPostIdDetailsValidation", () => {
       Object.keys(VALID_FORM).map((key) => [key, ""]),
     ) as unknown as CanadaPostIdDetailsFormData;
 
-    const result = getCanadaPostIdDetailsValidation(
-      empty,
-      { showCountry: true, showProvince: true },
-      TODAY,
-    );
+    const result = getCanadaPostIdDetailsValidation(empty, {
+      showProvince: true,
+    });
 
     expect(result.isFormValid).toBe(false);
     expect(result.errorCodes).toEqual({
-      idExpiryDate: "required",
       documentOptionId: "required",
-      country: "required",
       province: "required",
       firstName: "required_or_invalid",
       lastName: "required_or_invalid",
@@ -82,11 +58,10 @@ describe("getCanadaPostIdDetailsValidation", () => {
     });
   });
 
-  it("ignores country and province when they are not displayed", () => {
+  it("ignores province when it is not displayed", () => {
     const result = getCanadaPostIdDetailsValidation(
-      { ...VALID_FORM, country: "", province: "" },
-      { showCountry: false, showProvince: false },
-      TODAY,
+      { ...VALID_FORM, province: "" },
+      { showProvince: false },
     );
 
     expect(result.isFormValid).toBe(true);
