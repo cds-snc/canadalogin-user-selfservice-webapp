@@ -31,7 +31,8 @@
     "noOption": "No",
     "fallbackRpName": "RP Name",
     "enterDetailsHeading": "Enter your ID details",
-    "continueButton": "Continue Verification",
+    "continueButton": "Continue",
+    "continueButtonWithVerification": "Continue Verification",
     "chooseDifferentMethodButton": "Choose a different method",
     "learnMoreLink": "Learn more about verifying at Service Canada Centre.",
     "selectIdLabel": "Select your ID",
@@ -414,7 +415,7 @@
     "successNoticeTitle": "Success",
     "successNoticeDescription": "You verified your identity with [proofing method].",
     "successNoticeTitleWithoutRp": "Your CanadaLogin has succesfully saved your changes",
-    "successNoticeDescriptionWithoutRp": "Continue with accessing the service",
+    "successNoticeDescriptionWithoutRp": "You verified your identity with [proofing method].",
     "verifiedBadgeText": "Proven January 27, 2026"
   },
   "IdentityVerificationSuccess": {

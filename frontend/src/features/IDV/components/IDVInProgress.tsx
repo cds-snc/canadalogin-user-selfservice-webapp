@@ -5,20 +5,39 @@ import {
   GcdsHeading,
 } from "@gcds-core/components-react";
 
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import { PAGES } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
+
+type VerificationMethod =
+  "bluink" | "provincial" | "canada_post" | "service_canada";
 
 export default function IDVInProgress() {
   const navigate = useNavigate();
   const { language, journeyType } = useParams();
+  const { state } = useLocation();
+  const isMockProofing = state?.mockProofing === true;
+  const verificationMethod =
+    (state?.verificationMethod as VerificationMethod | null) || "provincial";
+  const province = state?.province as "BC" | "AB" | "QC" | undefined;
   const iDVSuccessPage = path(PAGES.idvDetailsConfirmationPage, {
     language,
     journeyType,
   });
 
   const handleNavigation = async () => {
-    navigate(iDVSuccessPage);
+    navigate(
+      iDVSuccessPage,
+      isMockProofing
+        ? {
+            state: {
+              mockProofing: true,
+              verificationMethod,
+              ...(province && { province }),
+            },
+          }
+        : { state: { verificationMethod, ...(province && { province }) } },
+    );
   };
 
   return (

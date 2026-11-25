@@ -276,6 +276,7 @@ export default function CanadaPostIdDetailsPage() {
           verificationExpiresAt: response.data.verificationExpiresAt,
           verificationValidityDays: response.data.verificationValidityDays,
           proofOfAddressRequired: selectedOption?.requires_proof === true,
+          verificationMethod: "canada_post",
         },
       },
     );
