@@ -318,144 +318,143 @@ export default function CanadaPostIdDetailsPage() {
   return (
     <GcdsContainer role="main">
       <form>
-          <GcdsContainer>
-            <GcdsHeading tag="h1">{t(headingKey)}</GcdsHeading>
+        <GcdsContainer>
+          <GcdsHeading tag="h1">{t(headingKey)}</GcdsHeading>
 
-            {hasSubmitted && !isFormValid ? (
-              <ErrorSummaryWithFocus
-                key={summaryFocusTrigger}
-                id={ERROR_SUMMARY_ID}
-                errorMessage={getValidationSummaryHeading(t)}
-                errorLinks={summaryErrors}
-                language={currentLanguage}
-              />
-            ) : null}
-          </GcdsContainer>
+          {hasSubmitted && !isFormValid ? (
+            <ErrorSummaryWithFocus
+              key={summaryFocusTrigger}
+              id={ERROR_SUMMARY_ID}
+              errorMessage={getValidationSummaryHeading(t)}
+              errorLinks={summaryErrors}
+              language={currentLanguage}
+            />
+          ) : null}
+        </GcdsContainer>
 
-          <GcdsContainer>
-
-            {variant === "passport" ? null : variant === "default" ? (
-              issuerIsProvince ? (
-                issuerSelect
-              ) : (
-                <>
-                  {issuerSelect}
-                  {provinceSelect}
-                </>
-              )
-            ) : (
+        <GcdsContainer>
+          {variant === "passport" ? null : variant === "default" ? (
+            issuerIsProvince ? (
               issuerSelect
-            )}
+            ) : (
+              <>
+                {issuerSelect}
+                {provinceSelect}
+              </>
+            )
+          ) : (
+            issuerSelect
+          )}
 
-            <GcdsInput
-              id={FIELD_IDS.firstName}
-              inputId={FIELD_IDS.firstName}
-              name={FIELD_IDS.firstName}
-              lang={currentLanguage}
-              label={t("VisitCanadaPost.givenNameLabel")}
-              hint={t("VisitCanadaPost.givenNameHint")}
-              value={formData.firstName}
-              required
-              errorMessage={fieldError("firstName")}
-              onGcdsChange={updateField("firstName")}
-            />
+          <GcdsInput
+            id={FIELD_IDS.firstName}
+            inputId={FIELD_IDS.firstName}
+            name={FIELD_IDS.firstName}
+            lang={currentLanguage}
+            label={t("VisitCanadaPost.givenNameLabel")}
+            hint={t("VisitCanadaPost.givenNameHint")}
+            value={formData.firstName}
+            required
+            errorMessage={fieldError("firstName")}
+            onGcdsChange={updateField("firstName")}
+          />
 
-            <GcdsInput
-              id={FIELD_IDS.lastName}
-              inputId={FIELD_IDS.lastName}
-              name={FIELD_IDS.lastName}
-              lang={currentLanguage}
-              label={t("VisitCanadaPost.familyNameLabel")}
-              hint={t("VisitCanadaPost.familyNameHint")}
-              value={formData.lastName}
-              required
-              errorMessage={fieldError("lastName")}
-              onGcdsChange={updateField("lastName")}
-            />
+          <GcdsInput
+            id={FIELD_IDS.lastName}
+            inputId={FIELD_IDS.lastName}
+            name={FIELD_IDS.lastName}
+            lang={currentLanguage}
+            label={t("VisitCanadaPost.familyNameLabel")}
+            hint={t("VisitCanadaPost.familyNameHint")}
+            value={formData.lastName}
+            required
+            errorMessage={fieldError("lastName")}
+            onGcdsChange={updateField("lastName")}
+          />
 
-            <GcdsDateInput
-              id={FIELD_IDS.dateOfBirth}
-              name={FIELD_IDS.dateOfBirth}
-              legend={t("VisitCanadaPost.dobLabel")}
-              format="full"
-              lang={currentLanguage}
-              value={formData.dateOfBirth}
-              required
-              errorMessage={
-                hasSubmitted && errorCodes.dateOfBirth
-                  ? dobMessages[errorCodes.dateOfBirth].inline
-                  : ""
-              }
-              onGcdsChange={updateField("dateOfBirth")}
-            />
+          <GcdsDateInput
+            id={FIELD_IDS.dateOfBirth}
+            name={FIELD_IDS.dateOfBirth}
+            legend={t("VisitCanadaPost.dobLabel")}
+            format="full"
+            lang={currentLanguage}
+            value={formData.dateOfBirth}
+            required
+            errorMessage={
+              hasSubmitted && errorCodes.dateOfBirth
+                ? dobMessages[errorCodes.dateOfBirth].inline
+                : ""
+            }
+            onGcdsChange={updateField("dateOfBirth")}
+          />
 
-            <GcdsInput
-              id={FIELD_IDS.address}
-              inputId={FIELD_IDS.address}
-              name={FIELD_IDS.address}
-              lang={currentLanguage}
-              label={t("VisitCanadaPost.addressLabel")}
-              hint={t("VisitCanadaPost.addressHint")}
-              value={formData.address}
-              required
-              errorMessage={fieldError("address")}
-              onGcdsChange={updateField("address")}
-            />
+          <GcdsInput
+            id={FIELD_IDS.address}
+            inputId={FIELD_IDS.address}
+            name={FIELD_IDS.address}
+            lang={currentLanguage}
+            label={t("VisitCanadaPost.addressLabel")}
+            hint={t("VisitCanadaPost.addressHint")}
+            value={formData.address}
+            required
+            errorMessage={fieldError("address")}
+            onGcdsChange={updateField("address")}
+          />
 
-            <GcdsInput
-              id={FIELD_IDS.cityTown}
-              inputId={FIELD_IDS.cityTown}
-              name={FIELD_IDS.cityTown}
-              lang={currentLanguage}
-              label={t("VisitCanadaPost.cityTownLabel")}
-              value={formData.cityTown}
-              required
-              errorMessage={fieldError("cityTown")}
-              onGcdsChange={updateField("cityTown")}
-            />
+          <GcdsInput
+            id={FIELD_IDS.cityTown}
+            inputId={FIELD_IDS.cityTown}
+            name={FIELD_IDS.cityTown}
+            lang={currentLanguage}
+            label={t("VisitCanadaPost.cityTownLabel")}
+            value={formData.cityTown}
+            required
+            errorMessage={fieldError("cityTown")}
+            onGcdsChange={updateField("cityTown")}
+          />
 
-            {variant !== "default" && showProvince ? provinceSelect : null}
+          {variant !== "default" && showProvince ? provinceSelect : null}
 
-            <GcdsInput
-              id={FIELD_IDS.postalCode}
-              inputId={FIELD_IDS.postalCode}
-              name={FIELD_IDS.postalCode}
-              lang={currentLanguage}
-              label={t("VisitCanadaPost.postalcodeLabel")}
-              hint={t("CanadaPostIdDetails.postalCodeHint")}
-              value={formData.postalCode}
-              autocomplete="postal-code"
-              required
-              errorMessage={fieldError("postalCode")}
-              onGcdsChange={updateField("postalCode")}
-            />
-          </GcdsContainer>
+          <GcdsInput
+            id={FIELD_IDS.postalCode}
+            inputId={FIELD_IDS.postalCode}
+            name={FIELD_IDS.postalCode}
+            lang={currentLanguage}
+            label={t("VisitCanadaPost.postalcodeLabel")}
+            hint={t("CanadaPostIdDetails.postalCodeHint")}
+            value={formData.postalCode}
+            autocomplete="postal-code"
+            required
+            errorMessage={fieldError("postalCode")}
+            onGcdsChange={updateField("postalCode")}
+          />
+        </GcdsContainer>
 
-          <GcdsGrid
-            columns="1"
-            columnsDesktop="max-content max-content"
-            gap="200"
+        <GcdsGrid
+          columns="1"
+          columnsDesktop="max-content max-content"
+          gap="200"
+        >
+          <GcdsButton
+            type="button"
+            onGcdsClick={(event: Event) => {
+              event.preventDefault();
+              void onContinue();
+            }}
           >
-            <GcdsButton
-              type="button"
-              onGcdsClick={(event: Event) => {
-                event.preventDefault();
-                void onContinue();
-              }}
-            >
-              {t("CanadaPostIdDetails.continueButton")}
-            </GcdsButton>
-            <GcdsButton
-              type="button"
-              buttonRole="secondary"
-              onGcdsClick={(event: Event) => {
-                event.preventDefault();
-                navigate(-1);
-              }}
-            >
-              {t("CanadaPostIdDetails.backButton")}
-            </GcdsButton>
-          </GcdsGrid>
+            {t("CanadaPostIdDetails.continueButton")}
+          </GcdsButton>
+          <GcdsButton
+            type="button"
+            buttonRole="secondary"
+            onGcdsClick={(event: Event) => {
+              event.preventDefault();
+              navigate(-1);
+            }}
+          >
+            {t("CanadaPostIdDetails.backButton")}
+          </GcdsButton>
+        </GcdsGrid>
       </form>
     </GcdsContainer>
   );

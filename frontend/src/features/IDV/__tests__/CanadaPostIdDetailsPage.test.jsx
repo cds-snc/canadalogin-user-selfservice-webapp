@@ -3,9 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import CanadaPostIdDetailsPage from "../InPerson/CanadaPostIdDetailsPage";
-import {
-  getPostalCodeRequiredOrInvalidMessage,
-} from "../InPerson/validation/ErrorsDefinition";
+import { getPostalCodeRequiredOrInvalidMessage } from "../InPerson/validation/ErrorsDefinition";
 import i18n from "../../../i18n/test";
 
 const mockNavigate = vi.fn();
@@ -512,8 +510,12 @@ describe("CanadaPostIdDetailsPage", () => {
 
     renderPage(PASSPORT, { formData });
 
-    expect(screen.queryByTestId("id-expiry-date-input")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("select-document-option")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("id-expiry-date-input"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("select-document-option"),
+    ).not.toBeInTheDocument();
     expect(screen.getByTestId("select-province")).toHaveValue(
       formData.province,
     );
