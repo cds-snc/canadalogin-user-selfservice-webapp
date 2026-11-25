@@ -71,22 +71,21 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key) => {
       const translations = {
-        "ContinueProofingOnMobile.heading": "Continue proofing on mobile",
+        "ContinueProofingOnMobile.heading":
+          "Continue to verify your identity on mobile",
         "ContinueProofingOnMobile.description":
-          "In order to capture a photo of yourself and your ID, you will need to use your mobile phone device.",
+          "In order to capture the best quality image of yourself and your ID, you will need to use your mobile phone device.",
         "ContinueProofingOnMobile.keepOpen": "Keep this window open",
-        "ContinueProofingOnMobile.returnHere":
-          "Return here once proofing is complete.",
+        "ContinueProofingOnMobile.returnHere": "Return here when you are done.",
         "ContinueProofingOnMobile.scanInstruction":
-          "Scan the QR code below to continue proofing on your mobile device.",
+          "Scan the QR code below with your mobile device.",
         "ContinueProofingOnMobile.qrLabel": "Example identity proofing QR code",
         "ContinueProofingOnMobile.cannotScan":
           "Can't scan the QR code? Send this link to your mobile device.",
         "ContinueProofingOnMobile.copyLink": "Copy link",
         "ContinueProofingOnMobile.copyError":
           "Select and copy the link above instead.",
-        "ContinueProofingOnMobile.continueButton": "Continue Verification",
-        "ContinueProofingOnMobile.nextStepButton": "Continue Verification",
+        "ContinueProofingOnMobile.continueButton": "Continue verification",
         "OnlineVerificationInfo.chooseDifferentMethodButton":
           "Choose a different method",
       };
@@ -143,17 +142,17 @@ describe("ContinueProofingOnMobile", () => {
     );
     expect(container.querySelector("svg path")).not.toBeNull();
     expect(
-      screen.getByRole("button", { name: "Continue Verification" }),
+      screen.getByRole("button", { name: "Continue verification" }),
     ).toBeEnabled();
     expect(mocks.navigate).not.toHaveBeenCalled();
   });
 
-  it("places primary Copy link beside the link and the approval actions below", () => {
+  it("places primary Copy link beside the link and the verification actions below", () => {
     render(<ContinueProofingOnMobile />);
     const link = screen.getByRole("link");
     const copy = screen.getByRole("button", { name: "Copy link" });
     const continueButton = screen.getByRole("button", {
-      name: "Continue Verification",
+      name: "Continue verification",
     });
     const differentMethod = screen.getByRole("button", {
       name: "Choose a different method",
@@ -165,6 +164,7 @@ describe("ContinueProofingOnMobile", () => {
     expect(copy).toHaveAttribute("data-button-role", "primary");
     expect(continueButton).toHaveAttribute("data-button-role", "primary");
     expect(differentMethod).toHaveAttribute("data-button-role", "secondary");
+    expect(differentMethod.parentElement).toBe(continueButton.parentElement);
     expect(
       copy.compareDocumentPosition(continueButton) &
         Node.DOCUMENT_POSITION_FOLLOWING,
@@ -181,7 +181,7 @@ describe("ContinueProofingOnMobile", () => {
     expect(mocks.navigate).not.toHaveBeenCalled();
 
     fireEvent.click(
-      screen.getByRole("button", { name: "Continue Verification" }),
+      screen.getByRole("button", { name: "Continue verification" }),
     );
     expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith(
       "/en/identity-verification/required/IdvDetailsConfirmationPage",
@@ -200,7 +200,7 @@ describe("ContinueProofingOnMobile", () => {
     mocks.journeyType = "update";
     render(<ContinueProofingOnMobile />);
     fireEvent.click(
-      screen.getByRole("button", { name: "Continue Verification" }),
+      screen.getByRole("button", { name: "Continue verification" }),
     );
     expect(mocks.navigate).toHaveBeenCalledWith(
       "/fr/identity-verification/update/IdvDetailsConfirmationPage",
@@ -229,7 +229,6 @@ describe("ContinueProofingOnMobile", () => {
     );
     expect(mocks.navigate).not.toHaveBeenCalled();
     expect(screen.queryByText("Link copied.")).not.toBeInTheDocument();
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
   it("shows a visible copy error without blocking Continue", async () => {
@@ -240,7 +239,7 @@ describe("ContinueProofingOnMobile", () => {
     render(<ContinueProofingOnMobile />);
     fireEvent.click(screen.getByRole("button", { name: "Copy link" }));
     fireEvent.click(
-      screen.getByRole("button", { name: "Continue Verification" }),
+      screen.getByRole("button", { name: "Continue verification" }),
     );
     expect(mocks.navigate).toHaveBeenCalledWith(
       "/en/identity-verification/required/IdvDetailsConfirmationPage",
@@ -254,20 +253,13 @@ describe("ContinueProofingOnMobile", () => {
     );
   });
 
-  it("allows choosing another method immediately", () => {
+  it("returns to the online verification method options when choosing another method", () => {
     render(<ContinueProofingOnMobile />);
     fireEvent.click(
       screen.getByRole("button", { name: "Choose a different method" }),
     );
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/en/identity-verification/required/IdvDetailsConfirmationPage",
-      {
-        state: {
-          mockProofing: true,
-          mockIdentityClaims,
-          verificationMethod: "bluink",
-        },
-      },
+      "/en/identity-verification/required/IdvProveIdentityOnlinePage",
     );
   });
 

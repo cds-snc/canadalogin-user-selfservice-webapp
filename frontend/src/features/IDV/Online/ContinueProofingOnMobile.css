@@ -2,6 +2,10 @@
   max-width: 34.125rem;
 }
 
+.mobile-proofing-notice {
+  margin-bottom: 1.5rem;
+}
+
 .mobile-proofing-qr {
   display: block;
   width: 100%;
@@ -25,8 +29,4 @@
 
 .mobile-proofing-link gcds-button {
   flex-shrink: 0;
-}
-
-.mobile-proofing-choose-different {
-  margin-bottom: 1.5rem;
 }
