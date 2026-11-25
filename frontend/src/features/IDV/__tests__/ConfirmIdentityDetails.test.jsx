@@ -215,7 +215,7 @@ describe("ConfirmIdentityDetails", () => {
       screen.getByText("Your CanadaLogin has succesfully saved your changes"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Continue with accessing the service"),
+      screen.getByText(/You verified your identity with/),
     ).toBeInTheDocument();
   });
 
