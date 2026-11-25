@@ -103,6 +103,7 @@ export default function ContinueProofingOnMobile() {
                 state: {
                   mockProofing: true,
                   mockIdentityClaims,
+                  verificationMethod: "bluink",
                 },
               },
             );
@@ -125,6 +126,7 @@ export default function ContinueProofingOnMobile() {
                 state: {
                   mockProofing: true,
                   mockIdentityClaims,
+                  verificationMethod: "bluink",
                 },
               },
             );
