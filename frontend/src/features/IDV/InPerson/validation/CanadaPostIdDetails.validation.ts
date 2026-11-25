@@ -11,6 +11,7 @@ const CANADIAN_POSTAL_CODE_PATTERN =
   /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z] ?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
 
 export interface CanadaPostIdDetailsFormData {
+  idExpiryDate?: string;
   documentOptionId: string;
   country: string;
   province: string;
@@ -23,15 +24,18 @@ export interface CanadaPostIdDetailsFormData {
 }
 
 export interface CanadaPostIdDetailsFieldVisibility {
+  showCountry?: boolean;
   showProvince: boolean;
 }
 
-// export type IdExpiryValidationError = "" | "" | "";
+// Id expiry remains a shared compatibility field for Service Canada/API consumers.
+export type IdExpiryValidationError = "required" | "invalid" | "too_soon";
 export type PostalCodeValidationError = "required_or_invalid";
 
 export interface CanadaPostIdDetailsErrorCodes {
-  // idExpiryDate?: IdExpiryValidationError;
+  idExpiryDate?: IdExpiryValidationError;
   documentOptionId?: RequiredValidationError;
+  country?: RequiredValidationError;
   province?: RequiredValidationError;
   firstName?: NameValidationError;
   lastName?: NameValidationError;
@@ -51,12 +55,16 @@ export const isValidCanadianPostalCode = (value: string): boolean =>
 
 export const getCanadaPostIdDetailsValidation = (
   formData: CanadaPostIdDetailsFormData,
-  { showProvince }: CanadaPostIdDetailsFieldVisibility,
+  { showCountry = false, showProvince }: CanadaPostIdDetailsFieldVisibility,
 ): CanadaPostIdDetailsValidationResult => {
   const errorCodes: CanadaPostIdDetailsErrorCodes = {};
 
   if (!isNonEmptyTrimmed(formData.documentOptionId)) {
     errorCodes.documentOptionId = "required";
+  }
+
+  if (showCountry && !isNonEmptyTrimmed(formData.country)) {
+    errorCodes.country = "required";
   }
 
   if (showProvince && !isNonEmptyTrimmed(formData.province)) {

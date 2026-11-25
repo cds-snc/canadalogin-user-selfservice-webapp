@@ -7,7 +7,7 @@ import type {
 } from "./validation/CanadaPostIdDetails.validation";
 
 const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
-  // idExpiryDate: "id-expiry-date-input",
+  idExpiryDate: "id-expiry-date-input",
   documentOptionId: "select-document-option",
   country: "select-country",
   province: "select-province",
@@ -20,8 +20,8 @@ const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
 };
 
 type IdentityApplicantFieldsLabels = {
-  /* idExpiry: string;
-  idExpiryHint: string; */
+  idExpiry: string;
+  idExpiryHint: string;
   firstName: string;
   firstNameHint: string;
   lastName: string;

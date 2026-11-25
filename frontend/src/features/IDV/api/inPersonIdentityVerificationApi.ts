@@ -35,7 +35,7 @@ export type SendInPersonVerificationCodeRequest = {
       country?: string;
     };
     idType?: string;
-    // idExpiryDate?: string;
+    idExpiryDate?: string;
   };
 };
 
@@ -86,7 +86,7 @@ export const inPersonIdentityVerificationApi = {
                       }
                     : undefined,
                   id_type: payload.applicant.idType,
-                  // id_expiry_date: payload.applicant.idExpiryDate,
+                  id_expiry_date: payload.applicant.idExpiryDate,
                 }
               : undefined,
           }
