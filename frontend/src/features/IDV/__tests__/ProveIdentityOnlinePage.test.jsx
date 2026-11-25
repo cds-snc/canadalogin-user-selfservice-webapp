@@ -66,7 +66,7 @@ vi.mock("../components/OnlineRadioButtons", () => ({
           checked={selectedMethod === ONLINE_IDV_METHOD.documentScanning}
           onChange={() => onMethodChange(ONLINE_IDV_METHOD.documentScanning)}
         />
-        Selfie and photo of your ID
+        Self-photo and ID check
       </label>
       <label>
         <input
@@ -179,7 +179,7 @@ describe("ProveIdentityOnlinePage", () => {
     render(<ProveIdentityOnlinePage />);
 
     const documentScanningRadio = screen.getByLabelText(
-      /Selfie and photo of your ID/,
+      /Self-photo and ID check/,
     );
     fireEvent.click(documentScanningRadio);
 
@@ -195,7 +195,7 @@ describe("ProveIdentityOnlinePage", () => {
     render(<ProveIdentityOnlinePage />);
 
     const documentScanningRadio = screen.getByLabelText(
-      /Selfie and photo of your ID/,
+      /Self-photo and ID check/,
     );
     fireEvent.click(documentScanningRadio);
 

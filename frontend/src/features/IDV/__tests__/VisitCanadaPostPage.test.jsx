@@ -47,8 +47,12 @@ vi.mock("@gcds-core/components-react", () => ({
     return <Tag>{children}</Tag>;
   },
   GcdsText: ({ children }) => <div>{children}</div>,
-  GcdsLink: ({ children, href, external }) => (
-    <a href={href} data-external={external}>
+  GcdsLink: ({ children, href, external, onGcdsClick }) => (
+    <a
+      href={href}
+      data-external={external}
+      onClick={(event) => onGcdsClick?.(event)}
+    >
       {children}
     </a>
   ),
@@ -105,7 +109,7 @@ vi.mock("@gcds-core/components-react", () => ({
 
 const PASSPORT = {
   key: "PASSPORT",
-  name_en: "Passport",
+  name_en: "Canadian passport",
   name_fr: "Passeport",
   options: [
     {
@@ -165,12 +169,8 @@ describe("VisitCanadaPost (Select your ID)", () => {
       "PERMANENT_RESIDENT_CARD",
       "INDIAN_STATUS_CARD",
       "COMBO_CARD",
-      "noIds",
     ]);
-    expect(screen.getByLabelText("Passport")).toBeInTheDocument();
-    expect(
-      screen.getByText("Canadian and international accepted"),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Canadian passport")).toBeInTheDocument();
     expect(
       screen.getByText("Only valid for Quebec and British Columbia"),
     ).toBeInTheDocument();
@@ -178,7 +178,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
       screen.getByText("Only valid for Alberta and British Columbia"),
     ).toBeInTheDocument();
     expect(
-      screen.getByLabelText("I don't have any of those IDs"),
+      screen.getByRole("link", { name: t("CanadaPostSelectId.noIds") }),
     ).toBeInTheDocument();
     expect(mockGetIdentityDocuments).not.toHaveBeenCalled();
   });
@@ -210,7 +210,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
   it("navigates to the complete identity proofing page when No is selected and Continue is clicked", () => {
     render(<VisitCanadaPost />);
 
-    fireEvent.click(screen.getByLabelText("Passport"));
+    fireEvent.click(screen.getByLabelText("Canadian passport"));
     fireEvent.click(
       screen.getByRole("radio", {
         name: t("VisitCanadaPost.noOption"),
@@ -236,7 +236,10 @@ describe("VisitCanadaPost (Select your ID)", () => {
       name: t("VisitCanadaPost.learnMoreLink"),
     });
 
-    expect(learnMoreLink).toHaveAttribute("href", "#");
+    expect(learnMoreLink).toHaveAttribute(
+      "href",
+      "https://login.canada.ca/en/users/",
+    );
     expect(learnMoreLink).toHaveAttribute("data-external", "true");
     expect(
       returnToServiceInstructions.compareDocumentPosition(learnMoreLink) &
@@ -293,12 +296,12 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("navigates back to the method selection when the user has none of the IDs", () => {
+  it("navigates to the in-person method selection when the user has none of the IDs", () => {
     render(<VisitCanadaPost />);
 
-    selectYesToNonExpiredId();
-    fireEvent.click(screen.getByLabelText("I don't have any of those IDs"));
-    fireEvent.click(screen.getByTestId("continue-button"));
+    fireEvent.click(
+      screen.getByRole("link", { name: t("CanadaPostSelectId.noIds") }),
+    );
 
     expect(mockGetIdentityDocuments).not.toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledWith(
@@ -315,7 +318,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     );
     render(<VisitCanadaPost />);
 
-    fireEvent.click(screen.getByLabelText("Passport"));
+    fireEvent.click(screen.getByLabelText("Canadian passport"));
     selectYesToNonExpiredId();
     fireEvent.click(screen.getByTestId("continue-button"));
 
@@ -390,7 +393,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     mockGetIdentityDocuments.mockResolvedValue([document]);
     render(<VisitCanadaPost />);
 
-    fireEvent.click(screen.getByLabelText("Passport"));
+    fireEvent.click(screen.getByLabelText("Canadian passport"));
     selectYesToNonExpiredId();
     fireEvent.click(screen.getByTestId("continue-button"));
 
@@ -422,7 +425,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     arrange();
     render(<VisitCanadaPost />);
 
-    fireEvent.click(screen.getByLabelText("Passport"));
+    fireEvent.click(screen.getByLabelText("Canadian passport"));
     selectYesToNonExpiredId();
     fireEvent.click(screen.getByTestId("continue-button"));
 
@@ -435,7 +438,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
         .filter(
           (radio) => radio.closest("fieldset")?.id === "select-id-radios",
         ),
-    ).toHaveLength(8);
+    ).toHaveLength(7);
     expect(screen.getByTestId("continue-button")).toBeInTheDocument();
     expect(mockNavigate).not.toHaveBeenCalled();
   });

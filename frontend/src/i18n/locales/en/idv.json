@@ -123,7 +123,7 @@
     "selectIdLabel": "What ID do you have?",
     "selectIdDropdownDefaultValue": "Select option",
     "enterInfoHeading": "Enter your ID details",
-    "idHint": "You will need to bring this ID to your in-person visit",
+    "idHint": "You must bring the valid and original ID",
     "idExpirationLabel": "When does it expire?",
     "givenNameLabel": "First name",
     "givenNameHint": "Must match what is on your official ID",
@@ -151,27 +151,26 @@
     "loadErrorMessage": "Please try again or choose a different method.",
     "documents": {
       "PASSPORT": {
-        "label": "Passport",
-        "hint": "Canadian and international accepted"
+        "label": "Canadian passport"
       },
       "DRIVERS_LICENCE": {
         "label": "Provincial/Territorial driver's licence"
       },
       "PROVINCIAL_PHOTO_ID": {
-        "label": "Provincial/Territorial photo ID/service card"
+        "label": "Provincial/Territorial photo ID or services card"
       },
       "PROVINCIAL_HEALTH_CARD": {
-        "label": "Health card",
+        "label": "Provincial/Territorial Health card",
         "hint": "Only valid for Quebec and British Columbia"
       },
       "PERMANENT_RESIDENT_CARD": {
-        "label": "Canadian PR card"
+        "label": "Permanent resident card"
       },
       "INDIAN_STATUS_CARD": {
         "label": "Secure Certificate of Indian Status"
       },
       "COMBO_CARD": {
-        "label": "Combo card",
+        "label": "Provincial/Territorial combination driver’s licence/health cards",
         "hint": "Only valid for Alberta and British Columbia"
       }
     },
@@ -338,7 +337,7 @@
     "cantProveNowOption": "Need more time or a different way in",
     "cantProveNowHint": "Sign out and come back when you're ready, or find out about other ways to access {{rpName}}.",
     "radioOnlineLabel": "Do it online",
-    "documentScanningOption": "Selfie and photo of your ID",
+    "documentScanningOption": "Self-photo and ID check",
     "hintDocumentScanningOption": "You will be asked to take a photo of yourself and then your government issued photo ID with your phone camera.",
     "signBackInNotice": "You will need to sign back in to your {{appName}} after proving your identity in person to confirm the proofing process.",
     "provincialPartnerOption": "Use your provincial sign in",
