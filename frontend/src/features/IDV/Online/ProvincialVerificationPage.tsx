@@ -31,6 +31,12 @@ export default function ProvincialVerificationPage() {
     journeyType,
   });
 
+  const handleProvinceClick = (province: "BC" | "AB" | "QC") => {
+    navigate(inProgressPage, {
+      state: { verificationMethod: "provincial", province },
+    });
+  };
+
   return (
     <GcdsContainer role="main">
       <GcdsHeading tag="h1">{t("ProvincialVerification.heading")}</GcdsHeading>
@@ -57,21 +63,33 @@ export default function ProvincialVerificationPage() {
         <GcdsCard
           cardTitle={t("ProvincialVerification.bcServicesCard")}
           cardTitleTag="h3"
-          href={inProgressPage}
+          href="#"
+          onGcdsClick={(event) => {
+            event.preventDefault();
+            handleProvinceClick("BC");
+          }}
           imgSrc={imgBcServicesCard}
           imgAlt="British Columbia Logo"
         ></GcdsCard>
         <GcdsCard
           cardTitle={t("ProvincialVerification.albertaAccount")}
           cardTitleTag="h3"
-          href={inProgressPage}
+          href="#"
+          onGcdsClick={(event) => {
+            event.preventDefault();
+            handleProvinceClick("AB");
+          }}
           imgSrc={imgAlbertaAccount}
           imgAlt="Alberta Logo"
         ></GcdsCard>
         <GcdsCard
           cardTitle={t("ProvincialVerification.quebecAccount")}
           cardTitleTag="h3"
-          href={inProgressPage}
+          href="#"
+          onGcdsClick={(event) => {
+            event.preventDefault();
+            handleProvinceClick("QC");
+          }}
           imgSrc={imgQuebecAccount}
           imgAlt="Québec Logo"
         ></GcdsCard>

@@ -139,7 +139,13 @@ describe("PartnerLinkSuccessPage", () => {
     fireEvent.click(screen.getByTestId("continue-button"));
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/manage-account/details-confirmation?method=provincial",
+      "/en/identity-verification/manage-account/details-confirmation",
+      {
+        state: {
+          province: "BC",
+          verificationMethod: "provincial",
+        },
+      },
     );
   });
 
