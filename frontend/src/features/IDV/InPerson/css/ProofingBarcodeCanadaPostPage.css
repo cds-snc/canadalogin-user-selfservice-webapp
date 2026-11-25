@@ -17,8 +17,6 @@
   box-sizing: border-box;
   max-width: 60rem;
   margin: 0 auto;
-  border: 0.0625rem solid #aeb5bf;
-  border-radius: 0.75rem;
   background: #fff;
 }
 
@@ -82,6 +80,12 @@
   padding-inline-start: 1.25rem;
 }
 
+.canada-post-code-details {
+  display: grid;
+  width: 100%;
+  gap: 0.5rem;
+}
+
 .canada-post-code-detail {
   padding-bottom: 0.5rem;
   border-bottom: 0.0625rem solid #d1d3d6;
@@ -92,6 +96,14 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
+}
+
+.canada-post-code-update-actions {
+  margin-top: 1rem;
+}
+
+.canada-post-code-verification-actions {
+  margin-top: 0.5rem;
 }
 
 @media (max-width: 40rem) {
