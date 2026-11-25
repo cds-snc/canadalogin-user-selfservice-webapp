@@ -363,20 +363,6 @@ export default function CanadaPostIdDetailsPage() {
           </GcdsContainer>
 
         <GcdsContainer>
-          <GcdsHeading tag="h1">{t(headingKey)}</GcdsHeading>
-
-          {hasSubmitted && !isFormValid ? (
-            <ErrorSummaryWithFocus
-              key={summaryFocusTrigger}
-              id={ERROR_SUMMARY_ID}
-              errorMessage={getValidationSummaryHeading(t)}
-              errorLinks={summaryErrors}
-              language={currentLanguage}
-            />
-          ) : null}
-        </GcdsContainer>
-
-        <GcdsContainer>
           {variant === "passport" ? null : variant === "default" ? (
             issuerIsProvince ? (
               issuerSelect
@@ -488,6 +474,7 @@ export default function CanadaPostIdDetailsPage() {
             onGcdsChange={updateField("postalCode")}
           />
         </GcdsContainer>
+        </GcdsGrid>
 
         <GcdsGrid
           columns="1"
