@@ -328,6 +328,11 @@ describe("ServiceCanadaCentre pages", () => {
       }),
     ).toHaveAttribute("data-external", "true");
     expect(
+      screen.getByRole("link", {
+        name: "Learn more about verifying at Service Canada Centre.",
+      }),
+    ).toHaveAttribute("href", "https://login.canada.ca/en/users/");
+    expect(
       screen.queryByTestId("id-expiry-date-input"),
     ).not.toBeInTheDocument();
     expect(screen.queryByTestId("first-name-input")).not.toBeInTheDocument();
