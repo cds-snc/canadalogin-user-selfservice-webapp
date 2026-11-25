@@ -492,7 +492,7 @@ describe("ServiceCanadaCentre pages", () => {
     render(<ServiceCanadaCentreIdDetailsPage />);
 
     expect(
-      screen.getByRole("heading", { name: "Enter your passport details" }),
+      screen.getByRole("heading", { name: "Enter your Passport details" }),
     ).toBeInTheDocument();
     expect(screen.getByTestId("first-name-input")).toHaveAttribute(
       "hint",
@@ -558,7 +558,7 @@ describe("ServiceCanadaCentre pages", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Enter your driver licence details",
+        name: "Enter your Driver's Licence details",
       }),
     ).toBeInTheDocument();
     expect(screen.getByTestId("address-input")).toHaveAttribute(
@@ -633,7 +633,7 @@ describe("ServiceCanadaCentre pages", () => {
     render(<ServiceCanadaCentreIdDetailsPage />);
 
     expect(
-      screen.getByRole("heading", { name: "Enter your ID details" }),
+      screen.getByRole("heading", { name: "Enter your Health card details" }),
     ).toBeInTheDocument();
     expect(
       screen.queryByTestId("id-expiry-date-input"),

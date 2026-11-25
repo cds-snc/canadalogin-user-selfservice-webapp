@@ -44,6 +44,7 @@ vi.mock("@gcds-core/components-react", () => {
   return {
     GcdsContainer: ({ children }) => <div>{children}</div>,
     GcdsGrid: ({ children }) => <div>{children}</div>,
+    GcdsText: ({ children }) => <p>{children}</p>,
     GcdsHeading: ({ children, tag }) => {
       const Tag = tag ?? "h2";
       return <Tag>{children}</Tag>;
@@ -243,7 +244,7 @@ describe("CanadaPostIdDetailsPage", () => {
     renderPage(PASSPORT);
 
     expect(
-      screen.getByRole("heading", { name: "Enter your passport details" }),
+      screen.getByRole("heading", { name: "Enter your Passport details" }),
     ).toBeInTheDocument();
     expect(
       screen.queryByLabelText("What country issued the passport?"),
@@ -258,7 +259,7 @@ describe("CanadaPostIdDetailsPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Enter your driver's licence details",
+        name: "Enter your Driver's Licence details",
       }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("Province/ Territory")).toHaveAttribute(
@@ -273,7 +274,7 @@ describe("CanadaPostIdDetailsPage", () => {
     renderPage(HEALTH_CARD);
 
     expect(
-      screen.getByRole("heading", { name: "Enter your ID details" }),
+      screen.getByRole("heading", { name: "Enter your Health card details" }),
     ).toBeInTheDocument();
     expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
     expect(screen.getByTestId("select-document-option")).toHaveValue("20");

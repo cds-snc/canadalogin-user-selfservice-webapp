@@ -127,6 +127,8 @@
     "dobErrorInvalid": "Enter a valid date of birth.",
     "dobErrorYear": "Year must be after 1900.",
     "dobErrorFuture": "Date of birth cannot be in the future.",
+    "addressHeading": "What is your address",
+    "addressDescription": "Must match what is on your proof of address.",
     "addressLabel": "Adresse",
     "addressHint": "Entrez votre adresse",
     "provinceLabel": "Province/territoire",

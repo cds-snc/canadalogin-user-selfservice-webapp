@@ -207,25 +207,6 @@ export default function ServiceCanadaCentreIDVCodePage() {
             <GcdsHeading
               tag="h2"
               marginTop="0"
-              className="service-canada-code-section-title"
-            >
-              {t("ServiceCanadaCentreCode.nextStepsHeading")}
-            </GcdsHeading>
-            <GcdsText marginBottom="0">
-              <ol>
-                <li>{t("ServiceCanadaCentreCode.nextStepsFindCentre")}</li>
-                <li>{t("ServiceCanadaCentreCode.nextStepsBringCodeAndId")}</li>
-                <li>
-                  {t("ServiceCanadaCentreCode.nextStepsAfterVerification")}
-                </li>
-              </ol>
-            </GcdsText>
-          </section>
-
-          <section className="service-canada-code-section">
-            <GcdsHeading
-              tag="h2"
-              marginTop="0"
               marginBottom="0"
               className="service-canada-code-section-title"
             >
