@@ -62,6 +62,10 @@ export default function ProofingBarcodeCanadaPostPage() {
     language,
     journeyType,
   });
+  const idvInProgressPage = path(PAGES.idvInProgressIDVPage, {
+    language,
+    journeyType,
+  });
 
   const email = state?.userProfile?.userName ?? "";
   const givenName = locationState?.givenName?.trim() || "--";
@@ -112,6 +116,12 @@ export default function ProofingBarcodeCanadaPostPage() {
 
   const handlePrintPage = () => {
     window.print();
+  };
+
+  const handleNextStep = () => {
+    navigate(idvInProgressPage, {
+      state: { verificationMethod: "canada_post" },
+    });
   };
 
   if (!DEV_ONLY_FEATURE) {
@@ -245,49 +255,25 @@ export default function ProofingBarcodeCanadaPostPage() {
               {t("ProofingBarcodeCanadaPost.yourInformationHint")}
             </GcdsText>
 
-            <div>
-              <GcdsText marginBottom="0">
-                <strong>{t("ProofingBarcodeCanadaPost.givenName")}</strong>
-              </GcdsText>
-              <GcdsText marginTop="200" marginBottom="0">
-                {givenName}
-              </GcdsText>
+            <div className="canada-post-code-details">
+              {[
+                ["givenName", givenName],
+                ["lastName", lastName],
+                ["dateOfBirth", dateOfBirth],
+                ["idSelected", idSelected],
+              ].map(([label, value]) => (
+                <div className="canada-post-code-detail" key={label}>
+                  <GcdsText marginTop="0" marginBottom="0">
+                    <strong>{t(`ProofingBarcodeCanadaPost.${label}`)}</strong>
+                  </GcdsText>
+                  <GcdsText marginTop="100" marginBottom="0">
+                    {value}
+                  </GcdsText>
+                </div>
+              ))}
             </div>
 
-            <div>
-              <GcdsText marginTop="0" marginBottom="0">
-                <strong>{t("ProofingBarcodeCanadaPost.lastName")}</strong>
-              </GcdsText>
-              <GcdsText marginTop="200" marginBottom="0">
-                {lastName}
-              </GcdsText>
-            </div>
-
-            <div className="separator" style={{ margin: "0" }} />
-
-            <div>
-              <GcdsText marginTop="0" marginBottom="0">
-                <strong>{t("ProofingBarcodeCanadaPost.dateOfBirth")}</strong>
-              </GcdsText>
-              <GcdsText marginTop="200" marginBottom="0">
-                {dateOfBirth}
-              </GcdsText>
-            </div>
-
-            <div className="separator" style={{ margin: "0" }} />
-
-            <div>
-              <GcdsText marginTop="0" marginBottom="0">
-                <strong>{t("ProofingBarcodeCanadaPost.idSelected")}</strong>
-              </GcdsText>
-              <GcdsText marginTop="200" marginBottom="0">
-                {idSelected}
-              </GcdsText>
-            </div>
-
-            <div className="separator" style={{ margin: "0" }} />
-
-            <div className="canada-post-code-actions canada-post-print-hide">
+            <div className="canada-post-code-actions canada-post-code-update-actions canada-post-print-hide">
               <GcdsButton
                 buttonRole="secondary"
                 type="button"
@@ -317,16 +303,31 @@ export default function ProofingBarcodeCanadaPostPage() {
               </GcdsLink>
             </div>
 
-            <GcdsButton
-              buttonRole="danger"
-              size="small"
-              type="button"
-              disabled={isSigningOut}
-              onGcdsClick={handleSignOut}
-              className="canada-post-small-button canada-post-print-hide"
-            >
-              {t("ProofingBarcodeCanadaPost.signOut")}
-            </GcdsButton>
+            <div className="canada-post-code-actions canada-post-code-verification-actions canada-post-print-hide">
+              <GcdsButton
+                buttonRole="danger"
+                size="small"
+                type="button"
+                disabled={isSigningOut}
+                onGcdsClick={handleSignOut}
+                className="canada-post-small-button"
+              >
+                {t("ProofingBarcodeCanadaPost.signOut")}
+              </GcdsButton>
+
+              <GcdsButton
+                buttonRole="primary"
+                size="small"
+                type="button"
+                onGcdsClick={handleNextStep}
+                className="canada-post-small-button"
+              >
+                {t(
+                  "ProofingBarcodeCanadaPost.continueButtonWithVerification",
+                  "Continue Verification",
+                )}
+              </GcdsButton>
+            </div>
           </section>
         </div>
       </section>
