@@ -84,47 +84,45 @@ export default function ProveIdentityOnlinePage() {
 
   return (
     <GcdsContainer role="main">
-      <GcdsGrid columns="1" gap="450">
-        <GcdsHeading tag="h1">{t("ProveIdentityOnline.heading")}</GcdsHeading>
+      <GcdsHeading tag="h1">{t("ProveIdentityOnline.heading")}</GcdsHeading>
 
-        {selectMethodErrorMessage ? (
-          <ErrorSummaryWithFocus
-            key={summaryFocusTrigger}
-            id={ERROR_SUMMARY_ID}
-            errorMessage={getValidationSummaryHeading(t)}
-            errorLinks={{ [`#${RADIOS_ID}`]: selectMethodErrorMessage }}
-            language={currentLanguage}
-          />
-        ) : null}
+      {selectMethodErrorMessage ? (
+        <ErrorSummaryWithFocus
+          key={summaryFocusTrigger}
+          id={ERROR_SUMMARY_ID}
+          errorMessage={getValidationSummaryHeading(t)}
+          errorLinks={{ [`#${RADIOS_ID}`]: selectMethodErrorMessage }}
+          language={currentLanguage}
+        />
+      ) : null}
 
-        <form onSubmit={handleSubmit}>
-          <OnlineRadioButtons
-            id={RADIOS_ID}
-            selectedMethod={selectedMethod}
-            onMethodChange={setSelectedMethod}
-            errorMessage={selectMethodErrorMessage}
-          />
+      <form onSubmit={handleSubmit}>
+        <OnlineRadioButtons
+          id={RADIOS_ID}
+          selectedMethod={selectedMethod}
+          onMethodChange={setSelectedMethod}
+          errorMessage={selectMethodErrorMessage}
+        />
 
-          <GcdsGrid
-            columns="1"
-            columnsDesktop="max-content max-content"
-            gap="200"
+        <GcdsGrid
+          columns="1"
+          columnsDesktop="max-content max-content"
+          gap="200"
+        >
+          <GcdsButton type="submit">
+            {t("ProveIdentityOnline.continueButton")}
+          </GcdsButton>
+          <GcdsButton
+            type="button"
+            buttonRole="secondary"
+            onClick={() => {
+              navigate(startIdentityProofingPage);
+            }}
           >
-            <GcdsButton type="submit">
-              {t("ProveIdentityOnline.continueButton")}
-            </GcdsButton>
-            <GcdsButton
-              type="button"
-              buttonRole="secondary"
-              onClick={() => {
-                navigate(startIdentityProofingPage);
-              }}
-            >
-              {t("ProveIdentityOnline.backButton")}
-            </GcdsButton>
-          </GcdsGrid>
-        </form>
-      </GcdsGrid>
+            {t("ProveIdentityOnline.backButton")}
+          </GcdsButton>
+        </GcdsGrid>
+      </form>
     </GcdsContainer>
   );
 }

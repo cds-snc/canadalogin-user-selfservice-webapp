@@ -39,4 +39,16 @@ export const TEST_USERS = {
     "E2E_UNPROVEN_USER",
     "has no ID proofing data",
   ),
+  /** Dedicated account for Service Canada Centre journeys. */
+  inPerson: user(
+    "in-person-user",
+    "E2E_IN_PERSON_USER",
+    "dedicated account for Service Canada Centre journeys",
+  ),
+  /** Separate account to avoid the per-user in-person case-creation cooldown. */
+  inPersonCanadaPost: user(
+    "in-person-canada-post-user",
+    "E2E_IN_PERSON_CANADA_POST_USER",
+    "dedicated account for Canada Post journeys",
+  ),
 } satisfies Record<string, TestUser>;

@@ -23,7 +23,6 @@ export const SELECTABLE_DOCUMENT_TYPES: IdentityDocumentType[] = [
 ];
 
 const DOCUMENTS_WITH_HINT = new Set<IdentityDocumentType>([
-  "PASSPORT",
   "PROVINCIAL_HEALTH_CARD",
   "COMBO_CARD",
 ]);

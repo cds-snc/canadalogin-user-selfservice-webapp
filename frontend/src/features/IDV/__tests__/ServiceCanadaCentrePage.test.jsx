@@ -328,6 +328,11 @@ describe("ServiceCanadaCentre pages", () => {
       }),
     ).toHaveAttribute("data-external", "true");
     expect(
+      screen.getByRole("link", {
+        name: "Learn more about verifying at Service Canada Centre.",
+      }),
+    ).toHaveAttribute("href", "https://login.canada.ca/en/users/");
+    expect(
       screen.queryByTestId("id-expiry-date-input"),
     ).not.toBeInTheDocument();
     expect(screen.queryByTestId("first-name-input")).not.toBeInTheDocument();
@@ -634,10 +639,10 @@ describe("ServiceCanadaCentre pages", () => {
       screen.queryByTestId("id-expiry-date-input"),
     ).not.toBeInTheDocument();
     expect(screen.queryByTestId("select-country")).not.toBeInTheDocument();
-    expect(screen.getByTestId("address-input")).not.toBeRequired();
-    expect(screen.getByTestId("city-town-input")).not.toBeRequired();
-    expect(screen.getByTestId("select-province")).not.toBeRequired();
-    expect(screen.getByTestId("postal-code-input")).not.toBeRequired();
+    expect(screen.queryByTestId("address-input")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("city-town-input")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("select-province")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("postal-code-input")).not.toBeInTheDocument();
     expect(screen.getByTestId("first-name-input")).toHaveAttribute(
       "hint",
       "Must match what is on your official ID",

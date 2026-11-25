@@ -5,7 +5,6 @@
   "description": "Playwright end-to-end tests for the CanadaLogin self-service webapp",
   "scripts": {
     "test": "playwright test",
-    "test:idv": "playwright test --project=idv",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "report": "playwright show-report",
