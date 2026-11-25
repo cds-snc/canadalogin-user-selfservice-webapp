@@ -265,8 +265,6 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.queryByText("Address")).not.toBeInTheDocument();
   });
 
-
-
   it("falls back to the raw id type when it is not a known approved document key", () => {
     mockLocationState.idType = "Employee ID";
 
