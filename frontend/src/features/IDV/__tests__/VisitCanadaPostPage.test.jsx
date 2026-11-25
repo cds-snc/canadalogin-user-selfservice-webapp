@@ -325,7 +325,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(mockGetIdentityDocuments).toHaveBeenCalledWith(["PASSPORT"]);
     expect(
       await screen.findByRole("heading", {
-        name: t("CanadaPostSelectId.loading"),
+        name: "Loading...",
       }),
     ).toBeInTheDocument();
 
