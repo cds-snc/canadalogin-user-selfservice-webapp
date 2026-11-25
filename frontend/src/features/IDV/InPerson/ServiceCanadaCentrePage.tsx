@@ -15,6 +15,7 @@ import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/Err
 import {
   AVAILABLE_LANGUAGES,
   DEV_ONLY_FEATURE,
+  manageDashboardLinks,
   PAGES,
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
@@ -58,6 +59,10 @@ export default function ServiceCanadaCentrePage() {
   const [nonExpiredIdAnswer, setNonExpiredIdAnswer] = useState("");
   const { t } = useTranslation("idv");
   const { relyingPartyName: rpName } = useRelyingPartyInfo();
+  const helpAndSupportLink =
+    language === "fr"
+      ? manageDashboardLinks.helpAndSupport.fr
+      : manageDashboardLinks.helpAndSupport.en;
 
   const completeIdentityProofingPage = path(
     PAGES.idvCompleteIdentityProofingPage,
@@ -144,7 +149,7 @@ export default function ServiceCanadaCentrePage() {
   return (
     <GcdsContainer role="main">
       <form>
-        <GcdsGrid columns="1" gap="450">
+        <GcdsGrid columns="1">
           <GcdsHeading tag="h1">{t("ServiceCanadaCentre.heading")}</GcdsHeading>
 
           {nonExpiredIdError || idTypeError ? (
@@ -174,7 +179,7 @@ export default function ServiceCanadaCentrePage() {
             </GcdsText>
             <GcdsText>
               <GcdsLink
-                href="#"
+                href={helpAndSupportLink}
                 external={true}
                 style={{ textDecoration: "underline" }}
               >
@@ -183,54 +188,56 @@ export default function ServiceCanadaCentrePage() {
             </GcdsText>
           </GcdsContainer>
 
-          <GcdsRadios
-            id={ID_RADIOS_ID}
-            name="select-id"
-            legend={t("ServiceCanadaCentre.selectIdLabel")}
-            hint={t("ServiceCanadaCentre.idHint")}
-            lang={currentLanguage}
-            options={idOptions}
-            value={selectedIdType}
-            required
-            errorMessage={idTypeError}
-            onGcdsChange={(event: CustomEvent<string>) => {
-              setSelectedIdType(
-                ((event.target as HTMLInputElement | null)?.value ?? "") as
-                  Exclude<ApprovedDocumentValue, "noIds"> | "",
-              );
-            }}
-          />
-
-          <GcdsText>
-            <GcdsLink
-              href={path(PAGES.idvProveIdentityInPersonPage, {
-                language,
-                journeyType,
-              })}
-              onGcdsClick={(event: Event) => {
-                event.preventDefault();
-                navigate(
-                  path(PAGES.idvProveIdentityInPersonPage, {
-                    language,
-                    journeyType,
-                  }),
+          <GcdsContainer>
+            <GcdsRadios
+              id={ID_RADIOS_ID}
+              name="select-id"
+              legend={t("ServiceCanadaCentre.selectIdLabel")}
+              hint={t("ServiceCanadaCentre.idHint")}
+              lang={currentLanguage}
+              options={idOptions}
+              value={selectedIdType}
+              required
+              errorMessage={idTypeError}
+              onGcdsChange={(event: CustomEvent<string>) => {
+                setSelectedIdType(
+                  ((event.target as HTMLInputElement | null)?.value ?? "") as
+                    Exclude<ApprovedDocumentValue, "noIds"> | "",
                 );
               }}
-            >
-              {t("ApprovedDocuments.noIds")}
-            </GcdsLink>
-          </GcdsText>
+            />
 
-          <GcdsRadios
-            id={NON_EXPIRED_ID_RADIOS_ID}
-            name="non-expired-id-radios"
-            legend={t("ServiceCanadaCentre.nonExpiredIdTitle")}
-            hint={t("ServiceCanadaCentre.nonExpiredIdHint")}
-            options={nonExpiredIdRadioOptions}
-            required
-            errorMessage={nonExpiredIdError}
-            onGcdsChange={onNonExpiredIdChange}
-          />
+            <GcdsText>
+              <GcdsLink
+                href={path(PAGES.idvProveIdentityInPersonPage, {
+                  language,
+                  journeyType,
+                })}
+                onGcdsClick={(event: Event) => {
+                  event.preventDefault();
+                  navigate(
+                    path(PAGES.idvProveIdentityInPersonPage, {
+                      language,
+                      journeyType,
+                    }),
+                  );
+                }}
+              >
+                {t("ApprovedDocuments.noIds")}
+              </GcdsLink>
+            </GcdsText>
+
+            <GcdsRadios
+              id={NON_EXPIRED_ID_RADIOS_ID}
+              name="non-expired-id-radios"
+              legend={t("ServiceCanadaCentre.nonExpiredIdTitle")}
+              hint={t("ServiceCanadaCentre.nonExpiredIdHint")}
+              options={nonExpiredIdRadioOptions}
+              required
+              errorMessage={nonExpiredIdError}
+              onGcdsChange={onNonExpiredIdChange}
+            />
+          </GcdsContainer>
 
           <GcdsGrid
             columns="1"

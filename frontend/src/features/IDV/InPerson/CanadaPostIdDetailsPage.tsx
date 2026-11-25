@@ -6,8 +6,9 @@ import {
   GcdsHeading,
   GcdsInput,
   GcdsSelect,
+  GcdsText,
 } from "@gcds-core/components-react";
-import { useMemo, useState } from "react";
+import { type CSSProperties, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 
@@ -24,6 +25,7 @@ import type { IdentityDocument } from "../api/identityDocumentsApi";
 import {
   getIdDetailsFormVariant,
   getLocalizedName,
+  getSimpleIdName,
   isProvinceScopedDocument,
   sortOptionsByLabel,
 } from "../data/identityDocuments";
@@ -60,6 +62,16 @@ const ID_TYPE_BY_DOCUMENT: Record<IdentityDocument["key"], string> = {
   INDIAN_STATUS_CARD: "indianStatus",
   COMBO_CARD: "COMBO_CARD",
 };
+
+const ADDRESS_FIELD_SPACING = {
+  "--gcds-input-margin": "0 0 2.5rem",
+  "--gcds-select-margin": "0 0 2.5rem",
+} as CSSProperties;
+
+const DATE_INPUT_NO_TRAILING_SPACE = {
+  "--gcds-input-margin": "0",
+  "--gcds-select-margin": "0",
+} as CSSProperties;
 
 const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
   idExpiryDate: "id-expiry-date-input",
@@ -101,18 +113,24 @@ export default function CanadaPostIdDetailsPage() {
   const issuerIsProvince = selectedDocument
     ? isProvinceScopedDocument(selectedDocument)
     : false;
-  // Default form: the API options fill whichever of country/province the
-  // document is scoped to, the other one is a static select.
-  const showCountry = variant === "default" && issuerIsProvince;
+  // Default form: province-scoped API options use an issuer province select;
+  // country-scoped documents use a static province field instead.
   const showProvince = !issuerIsProvince;
 
   const [formData, setFormData] = useState<CanadaPostIdDetailsFormData>(() => ({
-    idExpiryDate: "",
     documentOptionId:
-      selectedDocument?.options.length === 1
-        ? String(selectedDocument.options[0].id)
-        : "",
-    country: showCountry ? CANADA_COUNTRY_CODE : "",
+      variant === "passport"
+        ? String(
+            selectedDocument?.options.find(
+              (option) => option.country_code === CANADA_COUNTRY_CODE,
+            )?.id ??
+              selectedDocument?.options[0]?.id ??
+              "",
+          )
+        : selectedDocument?.options.length === 1
+          ? String(selectedDocument.options[0].id)
+          : "",
+    country: CANADA_COUNTRY_CODE,
     province: "",
     firstName: "",
     lastName: "",
@@ -129,10 +147,9 @@ export default function CanadaPostIdDetailsPage() {
     () =>
       [
         FIELD_IDS.documentOptionId,
-        showCountry ? FIELD_IDS.country : null,
         showProvince ? FIELD_IDS.province : null,
       ].filter((id): id is string => id !== null),
-    [showCountry, showProvince],
+    [showProvince],
   );
   useGcdsSelectWidth(selectElementIds);
 
@@ -151,7 +168,7 @@ export default function CanadaPostIdDetailsPage() {
 
   const { isFormValid, errorCodes } = getCanadaPostIdDetailsValidation(
     formData,
-    { showCountry, showProvince },
+    { showProvince },
   );
 
   const dobMessages = getSharedDateOfBirthMessages(t);
@@ -231,10 +248,12 @@ export default function CanadaPostIdDetailsPage() {
             region:
               formData.province || selectedOption?.province_code || undefined,
             postalCode: formData.postalCode,
-            country: CANADA_COUNTRY_CODE,
+            country:
+              variant === "passport"
+                ? CANADA_COUNTRY_CODE
+                : formData.country || CANADA_COUNTRY_CODE,
           },
           idType: ID_TYPE_BY_DOCUMENT[selectedDocument.key],
-          idExpiryDate: formData.idExpiryDate,
         },
       });
 
@@ -299,25 +318,10 @@ export default function CanadaPostIdDetailsPage() {
     </GcdsSelect>
   );
 
-  const countrySelect = (
-    <GcdsSelect
-      id={FIELD_IDS.country}
-      selectId={FIELD_IDS.country}
-      name={FIELD_IDS.country}
-      label={t("CanadaPostIdDetails.countryLabel")}
-      lang={currentLanguage}
-      value={formData.country}
-      required
-      errorMessage={fieldError("country")}
-      onGcdsChange={updateField("country")}
-    >
-      <option value={CANADA_COUNTRY_CODE}>Canada</option>
-    </GcdsSelect>
-  );
-
   const provinceSelect = (
     <GcdsSelect
       id={FIELD_IDS.province}
+      style={ADDRESS_FIELD_SPACING}
       selectId={FIELD_IDS.province}
       name={FIELD_IDS.province}
       label={t("CanadaPostIdDetails.provinceLabel")}
@@ -341,7 +345,11 @@ export default function CanadaPostIdDetailsPage() {
       <form>
         <GcdsGrid columns="1" gap="450">
           <GcdsContainer>
-            <GcdsHeading tag="h1">{t(headingKey)}</GcdsHeading>
+            <GcdsHeading tag="h1">
+              {selectedDocument
+                ? `Enter your ${getSimpleIdName(selectedDocument.key, currentLanguage)} details`
+                : t(headingKey)}
+            </GcdsHeading>
 
             {hasSubmitted && !isFormValid ? (
               <ErrorSummaryWithFocus
@@ -355,25 +363,9 @@ export default function CanadaPostIdDetailsPage() {
           </GcdsContainer>
 
           <GcdsContainer>
-            <GcdsDateInput
-              id={FIELD_IDS.idExpiryDate}
-              name={FIELD_IDS.idExpiryDate}
-              legend={t("CanadaPostIdDetails.idExpiryLabel")}
-              hint={t("CanadaPostIdDetails.idExpiryHint")}
-              format="full"
-              lang={currentLanguage}
-              value={formData.idExpiryDate}
-              required
-              errorMessage={fieldError("idExpiryDate")}
-              onGcdsChange={updateField("idExpiryDate")}
-            />
-
-            {variant === "default" ? (
+            {variant === "passport" ? null : variant === "default" ? (
               issuerIsProvince ? (
-                <>
-                  {countrySelect}
-                  {issuerSelect}
-                </>
+                issuerSelect
               ) : (
                 <>
                   {issuerSelect}
@@ -412,6 +404,7 @@ export default function CanadaPostIdDetailsPage() {
 
             <GcdsDateInput
               id={FIELD_IDS.dateOfBirth}
+              style={DATE_INPUT_NO_TRAILING_SPACE}
               name={FIELD_IDS.dateOfBirth}
               legend={t("VisitCanadaPost.dobLabel")}
               format="full"
@@ -426,8 +419,20 @@ export default function CanadaPostIdDetailsPage() {
               onGcdsChange={updateField("dateOfBirth")}
             />
 
+            <GcdsHeading
+              tag="h3"
+              marginBottom="200"
+              style={{ marginBlockStart: "1rem" }}
+            >
+              {t("VisitCanadaPost.addressHeading")}
+            </GcdsHeading>
+            <GcdsText marginBottom="500">
+              {t("VisitCanadaPost.addressDescription")}
+            </GcdsText>
+
             <GcdsInput
               id={FIELD_IDS.address}
+              style={ADDRESS_FIELD_SPACING}
               inputId={FIELD_IDS.address}
               name={FIELD_IDS.address}
               lang={currentLanguage}
@@ -441,6 +446,7 @@ export default function CanadaPostIdDetailsPage() {
 
             <GcdsInput
               id={FIELD_IDS.cityTown}
+              style={ADDRESS_FIELD_SPACING}
               inputId={FIELD_IDS.cityTown}
               name={FIELD_IDS.cityTown}
               lang={currentLanguage}
@@ -455,6 +461,7 @@ export default function CanadaPostIdDetailsPage() {
 
             <GcdsInput
               id={FIELD_IDS.postalCode}
+              style={ADDRESS_FIELD_SPACING}
               inputId={FIELD_IDS.postalCode}
               name={FIELD_IDS.postalCode}
               lang={currentLanguage}
@@ -467,32 +474,32 @@ export default function CanadaPostIdDetailsPage() {
               onGcdsChange={updateField("postalCode")}
             />
           </GcdsContainer>
+        </GcdsGrid>
 
-          <GcdsGrid
-            columns="1"
-            columnsDesktop="max-content max-content"
-            gap="200"
+        <GcdsGrid
+          columns="1"
+          columnsDesktop="max-content max-content"
+          gap="200"
+        >
+          <GcdsButton
+            type="button"
+            onGcdsClick={(event: Event) => {
+              event.preventDefault();
+              void onContinue();
+            }}
           >
-            <GcdsButton
-              type="button"
-              onGcdsClick={(event: Event) => {
-                event.preventDefault();
-                void onContinue();
-              }}
-            >
-              {t("CanadaPostIdDetails.continueButton")}
-            </GcdsButton>
-            <GcdsButton
-              type="button"
-              buttonRole="secondary"
-              onGcdsClick={(event: Event) => {
-                event.preventDefault();
-                navigate(-1);
-              }}
-            >
-              {t("CanadaPostIdDetails.backButton")}
-            </GcdsButton>
-          </GcdsGrid>
+            {t("CanadaPostIdDetails.continueButton")}
+          </GcdsButton>
+          <GcdsButton
+            type="button"
+            buttonRole="secondary"
+            onGcdsClick={(event: Event) => {
+              event.preventDefault();
+              navigate(-1);
+            }}
+          >
+            {t("CanadaPostIdDetails.backButton")}
+          </GcdsButton>
         </GcdsGrid>
       </form>
     </GcdsContainer>

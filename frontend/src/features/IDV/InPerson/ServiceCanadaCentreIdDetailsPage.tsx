@@ -19,6 +19,7 @@ import {
 } from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import type { ApprovedDocumentValue } from "../data/approvedDocuments";
+import { getSimpleApprovedDocName } from "../data/identityDocuments";
 import IdentityApplicantFields from "./IdentityApplicantFields";
 import {
   getAddressRequiredMessage,
@@ -105,7 +106,6 @@ export default function ServiceCanadaCentreIdDetailsPage() {
   }
 
   const isDriverLicence = idType === "driverLicence";
-  const isPassport = idType === "passport";
   const showAddressFields =
     idType === "driverLicence" ||
     idType === "photoIDServiceCard" ||
@@ -235,11 +235,9 @@ export default function ServiceCanadaCentreIdDetailsPage() {
         <GcdsGrid columns="1" gap="450">
           <GcdsContainer>
             <GcdsHeading tag="h1">
-              {isDriverLicence
-                ? "Enter your driver licence details"
-                : isPassport
-                  ? "Enter your passport details"
-                  : t("ServiceCanadaCentre.enterDetailsHeading")}
+              {idType
+                ? `Enter your ${getSimpleApprovedDocName(idType, currentLanguage)} details`
+                : t("ServiceCanadaCentre.enterDetailsHeading")}
             </GcdsHeading>
             {hasSubmitted && !isFormValid ? (
               <ErrorSummaryWithFocus
@@ -276,7 +274,6 @@ export default function ServiceCanadaCentreIdDetailsPage() {
                   ? dobMessages[errorCodes.dateOfBirth].inline
                   : ""
               }
-              showIdExpiry={false}
               showAddressFields={showAddressFields}
               requireAddressFields={showAddressFields}
               updateField={updateField}

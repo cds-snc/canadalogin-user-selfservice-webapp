@@ -1,4 +1,9 @@
-import { expect, type APIRequestContext } from "@playwright/test";
+import {
+  expect,
+  type APIRequestContext,
+  type Page,
+  type Response,
+} from "@playwright/test";
 import { env } from "./env";
 
 export type IdvStatus =
@@ -40,4 +45,13 @@ export async function getIdvClaims(api: APIRequestContext): Promise<IdvClaims> {
   ).toBeOK();
   const body = (await response.json()) as { data: IdvClaims };
   return body.data;
+}
+
+export function waitForInPersonCaseCreation(page: Page): Promise<Response> {
+  return page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname.endsWith(
+        "/v1/identity-verification/in-person",
+      ) && response.request().method() === "POST",
+  );
 }
