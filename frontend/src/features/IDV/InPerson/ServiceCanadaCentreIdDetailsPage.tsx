@@ -274,7 +274,6 @@ export default function ServiceCanadaCentreIdDetailsPage() {
                   ? dobMessages[errorCodes.dateOfBirth].inline
                   : ""
               }
-              showIdExpiry={false}
               showAddressFields={showAddressFields}
               requireAddressFields={showAddressFields}
               updateField={updateField}
