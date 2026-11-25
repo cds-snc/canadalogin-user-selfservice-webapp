@@ -148,7 +148,7 @@
   },
   "CanadaPostSelectId": {
     "legend": "Select your ID",
-    "loading": "Loading your ID details...",
+    "loading": "Loading...",
     "loadErrorTitle": "We couldn't load the details for this ID",
     "loadErrorMessage": "Please try again or choose a different method.",
     "documents": {
