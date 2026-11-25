@@ -41,17 +41,18 @@ export default function ContinueProofingOnMobile() {
 
   return (
     <GcdsContainer role="main" className="mobile-proofing">
-      <GcdsHeading tag="h1">
-        {t("ContinueProofingOnMobile.heading")}
-      </GcdsHeading>
-      <GcdsText>{t("ContinueProofingOnMobile.description")}</GcdsText>
       <AccessibleNotice
         noticeRole="info"
         noticeTitleTag="h2"
         noticeTitle={t("ContinueProofingOnMobile.keepOpen")}
+        className="mobile-proofing-notice"
       >
         <GcdsText>{t("ContinueProofingOnMobile.returnHere")}</GcdsText>
       </AccessibleNotice>
+      <GcdsHeading tag="h1">
+        {t("ContinueProofingOnMobile.heading")}
+      </GcdsHeading>
+      <GcdsText>{t("ContinueProofingOnMobile.description")}</GcdsText>
 
       {error && (
         <div role="alert">
@@ -89,28 +90,6 @@ export default function ContinueProofingOnMobile() {
           {t("ContinueProofingOnMobile.copyLink")}
         </GcdsButton>
       </div>
-      <div className="mobile-proofing-choose-different">
-        <GcdsButton
-          type="button"
-          buttonRole="secondary"
-          onClick={() => {
-            navigate(
-              path(PAGES.idvDetailsConfirmationPage, {
-                language,
-                journeyType,
-              }),
-              {
-                state: {
-                  mockProofing: true,
-                  mockIdentityClaims,
-                },
-              },
-            );
-          }}
-        >
-          {t("OnlineVerificationInfo.chooseDifferentMethodButton")}
-        </GcdsButton>
-      </div>
       <GcdsGrid columns="1" columnsDesktop="max-content max-content" gap="200">
         <GcdsButton
           type="button"
@@ -130,7 +109,21 @@ export default function ContinueProofingOnMobile() {
             );
           }}
         >
-          {t("ContinueProofingOnMobile.nextStepButton")}
+          {t("ContinueProofingOnMobile.continueButton")}
+        </GcdsButton>
+        <GcdsButton
+          type="button"
+          buttonRole="secondary"
+          onClick={() => {
+            navigate(
+              path(PAGES.idvProveIdentityOnlinePage, {
+                language,
+                journeyType,
+              }),
+            );
+          }}
+        >
+          {t("OnlineVerificationInfo.chooseDifferentMethodButton")}
         </GcdsButton>
       </GcdsGrid>
     </GcdsContainer>
