@@ -64,7 +64,12 @@ export default function PartnerLinkSuccessPage() {
   });
 
   const handleContinue = () => {
-    navigate(idvInProgressPage + "?method=provincial");
+    navigate(idvInProgressPage, {
+      state: {
+        verificationMethod: "provincial",
+        province: normalizedPartnerId as "BC" | "AB" | "QC",
+      },
+    });
   };
 
   return (

@@ -19,11 +19,15 @@ import { enCA, frCA } from "date-fns/locale";
 type ProvenInformationCardProps = {
   claims?: NonNullable<IdentityVerificationClaimsResponse["verified_claims"]>;
   sourceDisplay?: IdentityVerificationClaimsResponse["source_display"];
+  verificationMethod?: "bluink" | "provincial" | "canada_post" | "service_canada";
+  province?: "BC" | "AB" | "QC";
 };
 
 export default function ProvenInformationCard({
   claims,
   sourceDisplay,
+  verificationMethod,
+  province,
 }: ProvenInformationCardProps) {
   const { t, i18n } = useTranslation("profile");
   const { language } = useParams();
@@ -40,8 +44,22 @@ export default function ProvenInformationCard({
     : "";
   const address = claims?.claims?.address?.formatted;
 
-  const sourceOfInformation =
-    sourceDisplay?.documents?.[0]?.display_name?.[i18n.language as "en" | "fr"];
+  const sourceOfInformation = (() => {
+    // For provincial verification, show the province instead of the ID type
+    if (verificationMethod === "provincial" && province) {
+      const provinceNames: Record<string, string> = {
+        BC: t("ProvenInformationCard.bcServicesCard", "BC Services Card"),
+        AB: t("ProvenInformationCard.albertaAccount", "Alberta.ca Account"),
+        QC: t(
+          "ProvenInformationCard.quebecAccount",
+          "Québec Digital Identity",
+        ),
+      };
+      return provinceNames[province];
+    }
+    // For other methods, use the backend source display
+    return sourceDisplay?.documents?.[0]?.display_name?.[i18n.language as "en" | "fr"];
+  })();
 
   const formatFrenchOrdinalDate = (value: string) => {
     if (i18n.language !== "fr" || !value.startsWith("1er ")) {

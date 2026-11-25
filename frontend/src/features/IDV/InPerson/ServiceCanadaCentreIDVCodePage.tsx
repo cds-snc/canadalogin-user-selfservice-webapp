@@ -101,7 +101,9 @@ export default function ServiceCanadaCentreIDVCodePage() {
   });
 
   const handleNextStep = () => {
-    navigate(idvInProgressPage + "?method=service_canada");
+    navigate(idvInProgressPage, {
+      state: { verificationMethod: "service_canada" },
+    });
   };
 
   const handleSignOut = async (event: Event) => {
@@ -304,7 +306,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
               onGcdsClick={handleNextStep}
               className="service-canada-small-button service-canada-print-hide"
             >
-              {t("ServiceCanadaCentreCode.nextStepButton", "Next step")}
+              {t("ServiceCanadaCentreCode.continueButtonWithVerification", "Continue Verification")}
             </GcdsButton>
           </section>
         </div>

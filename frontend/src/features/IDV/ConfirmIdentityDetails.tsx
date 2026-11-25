@@ -29,8 +29,42 @@ export default function ConfirmIdentityDetails() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const isMockProofing = state?.mockProofing === true;
-  const verificationMethod =
-    state?.verificationMethod as VerificationMethod | null;
+  const verificationMethodFromState =
+    (state?.verificationMethod as VerificationMethod | null) || "bluink";
+  const provinceFromState = state?.province as "BC" | "AB" | "QC" | undefined;
+  
+  // Try to get method from state first, then localStorage, then default to bluink
+  const [verificationMethod, setVerificationMethod] = useState<VerificationMethod>(
+    verificationMethodFromState,
+  );
+  const [province, setProvince] = useState<"BC" | "AB" | "QC" | undefined>(
+    provinceFromState,
+  );
+
+  useEffect(() => {
+    // Store method in localStorage when it's available
+    if (verificationMethodFromState !== "bluink" || state?.verificationMethod) {
+      localStorage.setItem("lastVerificationMethod", verificationMethodFromState);
+      if (provinceFromState) {
+        localStorage.setItem("lastVerificationProvince", provinceFromState);
+      }
+    }
+  }, [verificationMethodFromState, state?.verificationMethod, provinceFromState]);
+
+  useEffect(() => {
+    // If we don't have method from state, try to get it from localStorage
+    if (!state?.verificationMethod && !isMockProofing) {
+      const storedMethod = localStorage.getItem("lastVerificationMethod");
+      if (storedMethod) {
+        setVerificationMethod(storedMethod as VerificationMethod);
+      }
+      const storedProvince = localStorage.getItem("lastVerificationProvince");
+      if (storedProvince) {
+        setProvince(storedProvince as "BC" | "AB" | "QC");
+      }
+    }
+  }, [state?.verificationMethod, isMockProofing]);
+
   const { t, i18n } = useTranslation(["idv", "profile"]);
   const { language, journeyType } = useParams();
   const { hasRelyingParty } = useRelyingPartyInfo();
@@ -164,9 +198,12 @@ export default function ConfirmIdentityDetails() {
               <ProvenInformationCard
                 claims={verifiedClaims}
                 sourceDisplay={reviewClaims?.source_display}
+                verificationMethod={verificationMethod}
+                province={province}
               />
             </GcdsContainer>
           )}
+
           <GcdsButton
             type="button"
             onGcdsClick={(event) => {
