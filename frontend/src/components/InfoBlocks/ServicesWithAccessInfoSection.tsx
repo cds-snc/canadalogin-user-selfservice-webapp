@@ -49,6 +49,7 @@ export default function ServicesWithAccessInfoSection({
         {t("ServicesWithAccessInfo.searchOtherAccounts")}&nbsp;
         <GcdsLink
           href={gcAccountDirectoryLink}
+          lang={currentLang}
           target="_blank"
           style={{ textDecoration: "underline" }}
         >
