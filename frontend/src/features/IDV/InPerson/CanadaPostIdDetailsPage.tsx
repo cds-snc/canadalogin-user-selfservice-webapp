@@ -39,6 +39,9 @@ import {
   getCityRequiredMessage,
   getCountryRequiredMessage,
   getFirstNameRequiredOrInvalidMessage,
+  getIdExpiryInvalidMessage,
+  getIdExpiryRequiredMessage,
+  getIdExpiryTooSoonMessage,
   getLastNameRequiredOrInvalidMessage,
   getPostalCodeRequiredOrInvalidMessage,
   getProvinceRequiredMessage,
@@ -59,7 +62,9 @@ const ID_TYPE_BY_DOCUMENT: Record<IdentityDocument["key"], string> = {
 };
 
 const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
+  idExpiryDate: "id-expiry-date-input",
   documentOptionId: "select-document-option",
+  country: "select-country",
   province: "select-province",
   firstName: "first-name-input",
   lastName: "last-name-input",
@@ -156,9 +161,16 @@ export default function CanadaPostIdDetailsPage() {
 
   const dobMessages = getSharedDateOfBirthMessages(t);
   const errorMessages: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
+    idExpiryDate:
+      errorCodes.idExpiryDate === "too_soon"
+        ? getIdExpiryTooSoonMessage(t)
+        : errorCodes.idExpiryDate === "invalid"
+          ? getIdExpiryInvalidMessage(t)
+          : getIdExpiryRequiredMessage(t),
     documentOptionId: issuerIsProvince
       ? getProvinceRequiredMessage(t)
       : getCountryRequiredMessage(t),
+    country: getCountryRequiredMessage(t),
     province: getProvinceRequiredMessage(t),
     firstName: getFirstNameRequiredOrInvalidMessage(t),
     lastName: getLastNameRequiredOrInvalidMessage(t),
