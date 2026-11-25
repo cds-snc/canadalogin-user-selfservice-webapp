@@ -96,7 +96,7 @@ export default function TopNav({ currentLang }: TopNavProps) {
       </GcdsContainer>
       <GcdsTopNav
         slot="menu"
-        label="Top navigation"
+        label="Navigation"
         alignment="end"
         lang={currentLang}
       >
@@ -108,9 +108,10 @@ export default function TopNav({ currentLang }: TopNavProps) {
   const renderDesktopNavigation = () => (
     <GcdsTopNav
       slot="menu"
-      label="Top navigation"
+      label="Navigation"
       alignment="end"
       className="gcds-top-nav"
+      lang={currentLang}
     >
       <GcdsNavLink href={homeLink} slot="home">
         {t("TopNavBar.appName")}
