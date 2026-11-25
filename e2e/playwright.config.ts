@@ -2,6 +2,17 @@ import { defineConfig, devices } from "@playwright/test";
 import { env } from "./support/env";
 
 const isCI = !!process.env.CI;
+const authSetupProject = {
+  testMatch: /.*\.setup\.ts/,
+  // Retrying auth setup would repeat password submissions to the external tenant.
+  retries: 0,
+  // Sign-in posts the test users' passwords: never record it.
+  use: {
+    trace: "off" as const,
+    video: "off" as const,
+    screenshot: "off" as const,
+  },
+};
 
 export default defineConfig({
   testDir: "./tests",
@@ -38,15 +49,50 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "setup",
-      testMatch: /.*\.setup\.ts/,
-      // Sign-in posts the test users' passwords: never record it.
-      use: { trace: "off", video: "off", screenshot: "off" },
+      name: "setup-proven",
+      ...authSetupProject,
+      grep: /sign in as proven-user/,
     },
     {
-      name: "idv",
-      testMatch: /idv\/.*\.spec\.ts/,
-      dependencies: ["setup"],
+      name: "setup-unproven",
+      ...authSetupProject,
+      grep: /sign in as unproven-user/,
+    },
+    {
+      name: "setup-in-person",
+      ...authSetupProject,
+      grep: /sign in as in-person-user/,
+    },
+    {
+      name: "setup-in-person-canada-post",
+      ...authSetupProject,
+      grep: /sign in as in-person-canada-post-user/,
+    },
+    {
+      name: "idv-service-canada",
+      testMatch: /idv\/in-person-journey\.spec\.ts/,
+      grep: /Service Canada Centre journey/,
+      retries: 0,
+      dependencies: ["setup-in-person"],
+    },
+    {
+      name: "idv-canada-post",
+      testMatch: /idv\/in-person-journey\.spec\.ts/,
+      grep: /Canada Post journey/,
+      retries: 0,
+      dependencies: ["setup-in-person-canada-post"],
+    },
+    {
+      name: "idv-proven-user",
+      testMatch: /idv\/proven-information-card\.spec\.ts/,
+      grep: /user with fake ID proofing \(User A\)/,
+      dependencies: ["setup-proven"],
+    },
+    {
+      name: "idv-unproven-user",
+      testMatch: /idv\/proven-information-card\.spec\.ts/,
+      grep: /user without ID proofing \(User B\)/,
+      dependencies: ["setup-unproven"],
     },
   ],
 });
