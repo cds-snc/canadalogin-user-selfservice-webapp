@@ -105,7 +105,6 @@ export default function ServiceCanadaCentreIdDetailsPage() {
     return <Navigate to={serviceCanadaCentrePage} replace />;
   }
 
-  const isDriverLicence = idType === "driverLicence";
   const showAddressFields =
     idType === "driverLicence" ||
     idType === "photoIDServiceCard" ||
