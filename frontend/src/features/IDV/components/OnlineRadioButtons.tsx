@@ -1,4 +1,4 @@
-import { GcdsRadios } from "@gcds-core/components-react";
+import { GcdsErrorMessage, GcdsRadios } from "@gcds-core/components-react";
 import { useTranslation } from "react-i18next";
 import { JSX } from "react";
 import { ONLINE_IDV_METHOD, type IdvMethod } from "./methods";
@@ -41,19 +41,30 @@ export default function OnlineRadioButtons({
       checked: selectedMethod === ONLINE_IDV_METHOD.provincialPartner,
     },
   ];
+  const errorMessageId = "online-idv-method-error";
 
   return (
-    <GcdsRadios
-      id={id}
-      name="online-idv-method"
-      legend={t("StartIdentityProofing.radioOnlineLabel")}
-      hideLegend
-      options={radioOptions}
-      value={selectedMethod ?? ""}
-      errorMessage={errorMessage}
-      onGcdsChange={(e: CustomEvent<string>) => {
-        onMethodChange((e.target as HTMLInputElement).value as IdvMethod);
-      }}
-    ></GcdsRadios>
+    <>
+      <GcdsRadios
+        id={id}
+        name="online-idv-method"
+        legend={t("StartIdentityProofing.radioOnlineLabel")}
+        hideLegend
+        options={radioOptions}
+        value={selectedMethod ?? ""}
+        aria-invalid={errorMessage ? "true" : undefined}
+        aria-describedby={
+          errorMessage ? `error-message-${errorMessageId}` : undefined
+        }
+        onGcdsChange={(e: CustomEvent<string>) => {
+          onMethodChange((e.target as HTMLInputElement).value as IdvMethod);
+        }}
+      ></GcdsRadios>
+      {errorMessage ? (
+        <GcdsErrorMessage messageId={errorMessageId}>
+          {errorMessage}
+        </GcdsErrorMessage>
+      ) : null}
+    </>
   );
 }
