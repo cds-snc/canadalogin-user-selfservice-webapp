@@ -7,12 +7,12 @@ import {
   GcdsGrid,
   GcdsHeading,
   GcdsText,
+  GcdsDetails,
   GcdsLink,
 } from "@gcds-core/components-react";
 
 import { DEV_ONLY_FEATURE, PAGES } from "../../utils/constants";
 import { useRelyingPartyInfo } from "../../hooks/useRelyingPartyInfo";
-import AccessibleNotice from "../../components/InfoBlocks/AccessibleNotice";
 import DataInformationCard from "./components/DataInformationCard";
 import { path } from "../../utils/routeHelpers";
 import {
@@ -82,15 +82,10 @@ export default function DataTransparencyPage() {
         </GcdsContainer>
 
         <GcdsContainer>
-          <DataInformationCard verifiedClaims={verifiedClaims} />
-        </GcdsContainer>
-
-        {hasRelyingParty && (
-          <GcdsContainer>
-            <AccessibleNotice
-              noticeRole="info"
-              noticeTitleTag="h2"
-              noticeTitle={t("DataTransparencyPage.informationSharingTitle")}
+          <div style={{ marginBottom: "2rem" }}>
+            <GcdsDetails
+              detailsTitle={t("DataTransparencyPage.informationSharingTitle")}
+              open={false}
             >
               <GcdsText>
                 {t("DataTransparencyPage.informationSharingDescription")}
@@ -100,9 +95,13 @@ export default function DataTransparencyPage() {
                   {t("DataTransparencyPage.learnMoreLink")}
                 </GcdsLink>
               </GcdsText>
-            </AccessibleNotice>
-          </GcdsContainer>
-        )}
+            </GcdsDetails>
+          </div>
+        </GcdsContainer>
+
+        <GcdsContainer>
+          <DataInformationCard verifiedClaims={verifiedClaims} />
+        </GcdsContainer>
 
         <GcdsContainer>
           <GcdsButton
