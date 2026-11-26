@@ -112,7 +112,7 @@ export default function ServiceCanadaCentreIdDetailsPage() {
     idType === "COMBO_CARD";
   const { errorCodes } = getCanadaPostIdDetailsValidation(formData, {
     showCountry: false,
-    showProvince: isDriverLicence,
+    showProvince: false,
     requireAddressFields: false,
   });
   // Service Canada does not collect expiry dates
@@ -214,8 +214,6 @@ export default function ServiceCanadaCentreIdDetailsPage() {
       lang={currentLanguage}
       value={formData.province}
       defaultValue={t("ServiceCanadaCentre.selectIdDropdownDefaultValue")}
-      required={isDriverLicence}
-      errorMessage={isDriverLicence ? fieldError("province") : ""}
       onGcdsChange={updateField("province")}
     >
       {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (

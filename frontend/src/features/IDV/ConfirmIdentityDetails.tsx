@@ -113,7 +113,7 @@ export default function ConfirmIdentityDetails() {
   const getMethodDisplayName = (method: VerificationMethod | null): string => {
     switch (method) {
       case "bluink":
-        return t("IDVInProgress.methodBluink", "Bluink verification");
+        return t("IDVInProgress.methodBluink", "Self-photo and ID check verification");
       case "provincial":
         return t("IDVInProgress.methodProvincial", "Provincial verification");
       case "canada_post":

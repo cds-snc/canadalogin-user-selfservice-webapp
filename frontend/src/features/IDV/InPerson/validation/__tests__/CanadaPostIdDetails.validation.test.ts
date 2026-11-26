@@ -49,7 +49,6 @@ describe("getCanadaPostIdDetailsValidation", () => {
 
     expect(result.isFormValid).toBe(false);
     expect(result.errorCodes).toEqual({
-      documentOptionId: "required",
       province: "required",
       firstName: "required_or_invalid",
       lastName: "required_or_invalid",

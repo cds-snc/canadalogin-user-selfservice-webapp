@@ -66,10 +66,6 @@ export const getCanadaPostIdDetailsValidation = (
 ): CanadaPostIdDetailsValidationResult => {
   const errorCodes: CanadaPostIdDetailsErrorCodes = {};
 
-  if (!isNonEmptyTrimmed(formData.documentOptionId)) {
-    errorCodes.documentOptionId = "required";
-  }
-
   if (showCountry && !isNonEmptyTrimmed(formData.country)) {
     errorCodes.country = "required";
   }

@@ -24,10 +24,7 @@ import { path } from "../../../utils/routeHelpers";
 import type { IdentityDocument } from "../api/identityDocumentsApi";
 import {
   getIdDetailsFormVariant,
-  getLocalizedName,
   getSimpleIdName,
-  isProvinceScopedDocument,
-  sortOptionsByLabel,
 } from "../data/identityDocuments";
 import useGcdsSelectWidth from "../helpers/useGcdsSelectWidth";
 import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.validation";
@@ -91,6 +88,8 @@ export interface CanadaPostIdDetailsLocationState {
   formData?: CanadaPostIdDetailsFormData;
   proofOfAddressAcknowledged?: boolean;
   proofOfAddress?: string;
+  idDetails?: CanadaPostIdDetailsFormData;
+  showIdDetails?: boolean;
 }
 
 export default function CanadaPostIdDetailsPage() {
@@ -110,12 +109,8 @@ export default function CanadaPostIdDetailsPage() {
   const variant = selectedDocument
     ? getIdDetailsFormVariant(selectedDocument.key)
     : "default";
-  const issuerIsProvince = selectedDocument
-    ? isProvinceScopedDocument(selectedDocument)
-    : false;
-  // Default form: province-scoped API options use an issuer province select;
-  // country-scoped documents use a static province field instead.
-  const showProvince = !issuerIsProvince;
+  // Show province for all document types
+  const showProvince = true;
 
   const [formData, setFormData] = useState<CanadaPostIdDetailsFormData>(() => ({
     documentOptionId:
@@ -139,6 +134,7 @@ export default function CanadaPostIdDetailsPage() {
     cityTown: "",
     postalCode: "",
     ...locationState?.formData,
+    ...locationState?.idDetails,
   }));
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [summaryFocusTrigger, setSummaryFocusTrigger] = useState(0);
@@ -172,16 +168,13 @@ export default function CanadaPostIdDetailsPage() {
   );
 
   const dobMessages = getSharedDateOfBirthMessages(t);
-  const errorMessages: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
+  const errorMessages: Partial<Record<keyof CanadaPostIdDetailsErrorCodes, string>> = {
     idExpiryDate:
       errorCodes.idExpiryDate === "too_soon"
         ? getIdExpiryTooSoonMessage(t)
         : errorCodes.idExpiryDate === "invalid"
           ? getIdExpiryInvalidMessage(t)
           : getIdExpiryRequiredMessage(t),
-    documentOptionId: issuerIsProvince
-      ? getProvinceRequiredMessage(t)
-      : getCountryRequiredMessage(t),
     country: getCountryRequiredMessage(t),
     province: getProvinceRequiredMessage(t),
     firstName: getFirstNameRequiredOrInvalidMessage(t),
@@ -199,8 +192,8 @@ export default function CanadaPostIdDetailsPage() {
 
   const summaryErrors = Object.fromEntries(
     (Object.keys(FIELD_IDS) as (keyof CanadaPostIdDetailsErrorCodes)[])
-      .filter((field) => errorCodes[field])
-      .map((field) => [`#${FIELD_IDS[field]}`, errorMessages[field]]),
+      .filter((field) => field !== "documentOptionId" && errorCodes[field] && errorMessages[field])
+      .map((field) => [`#${FIELD_IDS[field]}`, errorMessages[field]!]),
   );
 
   const updateField =
@@ -230,7 +223,7 @@ export default function CanadaPostIdDetailsPage() {
     ) {
       navigate(
         path(PAGES.idvCanadaPostProofOfAddressPage, { language, journeyType }),
-        { state: { document: selectedDocument, formData } },
+        { state: { document: selectedDocument, formData, proofOfAddress: locationState?.proofOfAddress } },
       );
       return;
     }
@@ -277,6 +270,9 @@ export default function CanadaPostIdDetailsPage() {
           verificationValidityDays: response.data.verificationValidityDays,
           proofOfAddressRequired: selectedOption?.requires_proof === true,
           verificationMethod: "canada_post",
+          idDetails: formData,
+          document: selectedDocument,
+          proofOfAddress: locationState?.proofOfAddress,
         },
       },
     );
@@ -288,36 +284,6 @@ export default function CanadaPostIdDetailsPage() {
       : variant === "driverLicence"
         ? "CanadaPostIdDetails.driverLicenceHeading"
         : "CanadaPostIdDetails.defaultHeading";
-
-  const issuerLabel =
-    variant === "passport"
-      ? t("CanadaPostIdDetails.passportCountryLabel")
-      : issuerIsProvince
-        ? t("CanadaPostIdDetails.provinceLabel")
-        : t("CanadaPostIdDetails.countryLabel");
-
-  const issuerSelect = (
-    <GcdsSelect
-      id={FIELD_IDS.documentOptionId}
-      selectId={FIELD_IDS.documentOptionId}
-      name={FIELD_IDS.documentOptionId}
-      label={issuerLabel}
-      lang={currentLanguage}
-      value={formData.documentOptionId}
-      defaultValue={t("CanadaPostIdDetails.selectDefaultValue")}
-      required
-      errorMessage={fieldError("documentOptionId")}
-      onGcdsChange={updateField("documentOptionId")}
-    >
-      {sortOptionsByLabel(selectedDocument.options, currentLanguage).map(
-        (option) => (
-          <option key={option.id} value={String(option.id)}>
-            {getLocalizedName(option, currentLanguage)}
-          </option>
-        ),
-      )}
-    </GcdsSelect>
-  );
 
   const provinceSelect = (
     <GcdsSelect
@@ -364,24 +330,11 @@ export default function CanadaPostIdDetailsPage() {
           </GcdsContainer>
 
           <GcdsContainer>
-            {variant === "passport" ? null : variant === "default" ? (
-              issuerIsProvince ? (
-                issuerSelect
-              ) : (
-                <>
-                  {issuerSelect}
-                  {provinceSelect}
-                </>
-              )
-            ) : (
-              issuerSelect
-            )}
-
             <GcdsInput
               id={FIELD_IDS.firstName}
               inputId={FIELD_IDS.firstName}
               name={FIELD_IDS.firstName}
-              lang={currentLanguage}
+              lang={currentLanguage}  
               label={t("VisitCanadaPost.givenNameLabel")}
               hint={t("VisitCanadaPost.givenNameHint")}
               value={formData.firstName}
@@ -458,7 +411,31 @@ export default function CanadaPostIdDetailsPage() {
               onGcdsChange={updateField("cityTown")}
             />
 
-            {variant !== "default" && showProvince ? provinceSelect : null}
+            {showProvince ? (
+              variant !== "default" ? (
+                provinceSelect
+              ) : (
+                <GcdsSelect
+                  id={FIELD_IDS.province}
+                  style={ADDRESS_FIELD_SPACING}
+                  selectId={FIELD_IDS.province}
+                  name={FIELD_IDS.province}
+                  label={t("CanadaPostIdDetails.provinceLabel")}
+                  lang={currentLanguage}
+                  value={formData.province}
+                  defaultValue={t("CanadaPostIdDetails.selectDefaultValue")}
+                  required
+                  errorMessage={fieldError("province")}
+                  onGcdsChange={updateField("province")}
+                >
+                  {CANADIAN_PROVINCES_AND_TERRITORIES.map((province) => (
+                    <option key={province.code} value={province.code}>
+                      {province.labels[currentLanguage]}
+                    </option>
+                  ))}
+                </GcdsSelect>
+              )
+            ) : null}
 
             <GcdsInput
               id={FIELD_IDS.postalCode}

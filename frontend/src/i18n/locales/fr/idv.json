@@ -93,6 +93,7 @@
     "firstName": "Prénom",
     "lastName": "Nom de famille",
     "dateOfBirth": "Date de naissance",
+    "address": "Adresse",
     "idSelected": "Document d’identité sélectionné",
     "printBannerAlt": "Gouvernement du Canada",
     "printPageButton": "Imprimer la page",
