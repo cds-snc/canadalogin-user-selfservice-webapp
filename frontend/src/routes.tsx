@@ -39,6 +39,7 @@ import CompleteIdentityProofingPage from "./features/IDV/CompleteIDVWhenReady";
 import ConfirmIdentityDetails from "./features/IDV/ConfirmIdentityDetails";
 import IdentityVerificationSuccess from "./features/IDV/Online/IdentityVerificationSuccess";
 import ConnectedServicesPage from "./features/ConnectedServices/components/ConnectedServicesPage";
+import NotFound from "./components/ErrorPages/NotFound";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -258,7 +259,7 @@ export const appRoutes: RouteObject[] = [
                 : []),
             ],
           },
-          { path: "*", element: <ManageDashboard /> },
+          { path: "*", element: <NotFound /> },
         ],
       },
     ],
