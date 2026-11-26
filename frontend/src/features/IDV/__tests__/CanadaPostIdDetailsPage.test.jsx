@@ -244,7 +244,9 @@ describe("CanadaPostIdDetailsPage", () => {
     renderPage(PASSPORT);
 
     expect(
-      screen.getByRole("heading", { name: "Enter your Passport details" }),
+      screen.getByRole("heading", {
+        name: "Enter your Canadian passport details",
+      }),
     ).toBeInTheDocument();
     expect(
       screen.queryByLabelText("What country issued the passport?"),

@@ -240,13 +240,11 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       screen.getByText("Your code (printed or on your phone) within 30 days"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "Your valid and original Canadian and International Passport",
-      ),
+      screen.getByText("Your valid and original Canadian passport"),
     ).toBeInTheDocument();
   });
 
-  it("renders the your information details without address", () => {
+  it("renders the your information details with address", () => {
     render(
       <TestWrapper>
         <ServiceCanadaCentreIDVCodePage />
@@ -262,7 +260,8 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("Doe")).toBeInTheDocument();
     expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
     expect(screen.queryByText("passport")).not.toBeInTheDocument();
-    expect(screen.queryByText("Address")).not.toBeInTheDocument();
+    expect(screen.getByText("Address")).toBeInTheDocument();
+    expect(screen.getByText("31 Ottawa street")).toBeInTheDocument();
   });
 
   it("falls back to the raw id type when it is not a known approved document key", () => {
@@ -282,7 +281,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     expect(screen.getByText("Jane")).toBeInTheDocument();
     expect(screen.getByText("Doe")).toBeInTheDocument();
     expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
-    expect(screen.queryByText("Address")).not.toBeInTheDocument();
+    expect(screen.getByText("Employee ID")).toBeInTheDocument();
   });
 
   it("navigates back to service canada form when update information is clicked", () => {
