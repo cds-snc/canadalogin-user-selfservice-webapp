@@ -90,7 +90,7 @@ const SIMPLE_ID_NAMES: Record<string, Record<Language, string>> = {
     fr: "Carte de santé",
   },
   PERMANENT_RESIDENT_CARD: {
-    en: "Resident card",
+    en: "Permanent resident card",
     fr: "Carte de résident",
   },
   INDIAN_STATUS_CARD: {
