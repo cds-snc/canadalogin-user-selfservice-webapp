@@ -20,7 +20,7 @@ type ViewProfileNameCardProps = {
 export default function ViewProfileNameCard({
   isConfirmIdentityDetails = false,
 }: ViewProfileNameCardProps) {
-  const { t } = useTranslation("profile");
+  const { t, i18n } = useTranslation("profile");
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
   const { state } = useUser();
@@ -29,7 +29,7 @@ export default function ViewProfileNameCard({
   const editProfile = path(PAGES.editProfileNamePage, {
     language: routeLanguage,
   });
-  const editPreferredNameAriaLabel = `${t("ProfileHome.edit")} ${t("ProfileHome.preferredName")}`;
+  const editPreferredNameAriaLabel = t("ProfileHome.editPreferredName");
 
   return (
     <GcdsContainer>
@@ -44,8 +44,10 @@ export default function ViewProfileNameCard({
           <GcdsText>{name}</GcdsText>
         </div>
         <GcdsLink
+          key={i18n.resolvedLanguage ?? routeLanguage}
           href={editProfile}
           className="mobileOverflowWrapAction"
+          lang={i18n.resolvedLanguage ?? routeLanguage}
           size="regular"
           aria-label={editPreferredNameAriaLabel}
           style={{ textDecoration: "underline" }}

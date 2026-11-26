@@ -27,13 +27,7 @@ export default function CompleteIdentityProofingPage() {
   const { t } = useTranslation("idv");
   const { t: tCommon } = useTranslation("common");
   const appName = tCommon("RelyingParty.canadaLogin");
-  const { relyingPartyName: relyingPartyLinkName, hasRelyingParty } =
-    useRelyingPartyInfo();
-  const heading = hasRelyingParty
-    ? t("CompleteIdentityProofing.headingWithRpName", {
-        rpName: relyingPartyLinkName,
-      })
-    : t("CompleteIdentityProofing.headingWithoutRpName");
+  const { relyingPartyName: relyingPartyLinkName } = useRelyingPartyInfo();
 
   const handleStartIdentityProofing = () => {
     navigate(
@@ -71,7 +65,9 @@ export default function CompleteIdentityProofingPage() {
     <GcdsContainer role="main">
       <GcdsGrid columns="1" gap="450">
         <GcdsContainer>
-          <GcdsHeading tag="h1">{heading}</GcdsHeading>
+          <GcdsHeading tag="h1">
+            {t("CompleteIdentityProofing.headingWithoutRpName")}
+          </GcdsHeading>
           <GcdsText>
             <strong>
               {t("CompleteIdentityProofing.accessRPServicePortalTitle", {

@@ -81,7 +81,9 @@ function ContactPhoneNumber({
   phoneNumbers: ContactPhoneDisplayEntry[];
   language?: string;
 }) {
-  const { t } = useTranslation("profile");
+  const { t, i18n } = useTranslation("profile");
+  const routeLanguage = language === "fr" ? "fr" : "en";
+  const activeLanguage = i18n.resolvedLanguage ?? routeLanguage;
   const newContactPhoneNumber = path(PAGES.editContactPhoneNumberPage, {
     language,
   });
@@ -97,9 +99,11 @@ function ContactPhoneNumber({
           <DisplayPhoneNumbers phoneNumbers={phoneNumbers} />
         </div>
         <GcdsLink
+          key={`${activeLanguage}:${editPhoneAriaLabel}`}
           href={newContactPhoneNumber}
           className="mobileOverflowWrapAction"
           size="regular"
+          lang={activeLanguage}
           aria-label={editPhoneAriaLabel}
           style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {
