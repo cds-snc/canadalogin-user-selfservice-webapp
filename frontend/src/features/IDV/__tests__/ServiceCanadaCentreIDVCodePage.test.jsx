@@ -241,7 +241,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Your valid and original Canadian and International Passport",
+        "Your valid and original Canadian passport",
       ),
     ).toBeInTheDocument();
   });
