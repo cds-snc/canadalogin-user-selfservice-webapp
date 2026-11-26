@@ -35,6 +35,8 @@ type ProofingBarcodeCanadaPostState = {
   verificationExpiresAt?: string;
   verificationValidityDays?: number;
   proofOfAddressRequired?: boolean;
+  document?: any;
+  formData?: any;
 };
 
 const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
@@ -56,7 +58,7 @@ export default function ProofingBarcodeCanadaPostPage() {
 
   const barcodeValue = locationState?.idvCode ?? "CP387DHROGJ";
 
-  const visitCanadaPostPage = path(PAGES.idvVisitCanadaPostPage, {
+  const canadaPostIdDetailsPage = path(PAGES.idvCanadaPostIdDetailsPage, {
     language,
     journeyType,
   });
@@ -291,7 +293,14 @@ export default function ProofingBarcodeCanadaPostPage() {
                 type="button"
                 onGcdsClick={(event) => {
                   event.preventDefault();
-                  navigate(visitCanadaPostPage);
+                  navigate(canadaPostIdDetailsPage, {
+                    state: {
+                      document: locationState?.document,
+                      formData: locationState?.formData,
+                      proofOfAddressAcknowledged: true,
+                      proofOfAddress: locationState?.formData?.proofOfAddress,
+                    },
+                  });
                 }}
               >
                 {t("ProofingBarcodeCanadaPost.update")}

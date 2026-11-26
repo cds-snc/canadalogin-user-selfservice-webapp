@@ -296,6 +296,12 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "/en/identity-verification/update/in-person/service-canada-centre",
+      {
+        state: {
+          document: undefined,
+          formData: undefined,
+        },
+      },
     );
   });
 

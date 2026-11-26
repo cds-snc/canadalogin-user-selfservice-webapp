@@ -31,6 +31,8 @@ type ServiceCanadaCentreIDVCodePageLocationState = {
   idType?: string;
   verificationExpiresAt?: string;
   verificationValidityDays?: number;
+  document?: any;
+  formData?: any;
 };
 
 const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
@@ -52,10 +54,13 @@ export default function ServiceCanadaCentreIDVCodePage() {
   const { t } = useTranslation("idv");
   const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const serviceCanadaCentrePage = path(PAGES.idvServiceCanadaCentrePage, {
-    language,
-    journeyType,
-  });
+  const serviceCanadaCentreIdDetailsPage = path(
+    PAGES.idvServiceCanadaCentreIdDetailsPage,
+    {
+      language,
+      journeyType,
+    },
+  );
 
   const email = state?.userProfile?.userName ?? "";
   const locationState =
@@ -114,7 +119,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
   }
 
   if (!idvCode) {
-    return <Navigate to={serviceCanadaCentrePage} replace />;
+    return <Navigate to={serviceCanadaCentreIdDetailsPage} replace />;
   }
 
   return (
@@ -242,7 +247,13 @@ export default function ServiceCanadaCentreIDVCodePage() {
                 className="service-canada-small-button"
                 onGcdsClick={(event) => {
                   event.preventDefault();
-                  navigate(serviceCanadaCentrePage);
+                  navigate(serviceCanadaCentreIdDetailsPage, {
+                    state: {
+                      idType: locationState?.idType,
+                      document: locationState?.document,
+                      formData: locationState?.formData,
+                    },
+                  });
                 }}
               >
                 {t("ServiceCanadaCentreCode.updateButton")}

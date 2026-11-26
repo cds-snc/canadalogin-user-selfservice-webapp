@@ -454,12 +454,14 @@ describe("ServiceCanadaCentre pages", () => {
     expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
   });
 
-  it("calls navigate(-1) when Back button is clicked", () => {
+  it("navigates to prove identity in-person page when Choose different method button is clicked", () => {
     render(<ServiceCanadaCentrePage />);
 
     fireEvent.click(screen.getByTestId("back-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/in-person",
+    );
   });
 
   it("keeps ID labels in English when French translations were not provided", async () => {
