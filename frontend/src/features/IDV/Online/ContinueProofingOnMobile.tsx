@@ -96,7 +96,7 @@ export default function ContinueProofingOnMobile() {
           buttonRole="primary"
           onClick={() => {
             navigate(
-              path(PAGES.idvDetailsConfirmationPage, {
+              path(PAGES.idvInProgressIDVPage, {
                 language,
                 journeyType,
               }),
