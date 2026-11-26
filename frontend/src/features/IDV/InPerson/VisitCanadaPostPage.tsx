@@ -11,7 +11,7 @@ import {
 import AccessibleNotice from "../../../components/InfoBlocks/AccessibleNotice";
 import Loader from "../../../components/Layout/Loading";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 import {
@@ -199,7 +199,14 @@ export default function VisitCanadaPost() {
               {t("VisitCanadaPost.canadaPostVisitInstruction")}
             </GcdsText>
             <GcdsText>
-              {t("VisitCanadaPost.returnToServiceInstructions", { rpName })}
+              <Trans
+                ns="idv"
+                i18nKey="VisitCanadaPost.returnToServiceInstructions"
+                values={{
+                  rpName: rpName || t("VisitCanadaPost.fallbackRpName"),
+                }}
+                components={{ bold: <strong /> }}
+              />
             </GcdsText>
             <GcdsText>
               <GcdsLink
@@ -242,18 +249,10 @@ export default function VisitCanadaPost() {
             />
             <GcdsText>
               <GcdsLink
-                href={path(PAGES.idvProveIdentityInPersonPage, {
-                  language,
-                  journeyType,
-                })}
+                href={completeIdentityProofingPage}
                 onGcdsClick={(event: Event) => {
                   event.preventDefault();
-                  navigate(
-                    path(PAGES.idvProveIdentityInPersonPage, {
-                      language,
-                      journeyType,
-                    }),
-                  );
+                  navigate(completeIdentityProofingPage);
                 }}
               >
                 {t("CanadaPostSelectId.noIds")}

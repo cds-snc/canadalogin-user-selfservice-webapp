@@ -25,7 +25,7 @@
     "step4": "Un agent ou une agente de service vérifiera votre identité. Après cela, connectez-vous à nouveau à {{rpName}} pour continuer.",
     "intro1": "Choose your ID and enter your details to get a verification code which is valid for 30 days.",
     "intro2": "Bring the code and your ID to any Service Canada Centre, where an agent will check your identity.",
-    "intro3": "Sign back in to {{rpName}} once done to access the service.",
+    "intro3": "Sign back in to <bold>{{rpName}}</bold> once done to access the service.",
     "nonExpiredIdTitle": "Can you bring a non-expired ID?",
     "nonExpiredIdHint": "ID must be valid when you visit the Service Canada Centre",
     "yesOption": "Yes",
@@ -58,7 +58,7 @@
       },
       "photoIDHealthCard": {
         "label": "Provincial/Territorial Health card",
-        "hint": "Only valid for Quebec and British Columbia"
+        "hint": "Only valid for Quebec"
       },
       "canadianPRCard": {
         "label": "Permanent resident card"
@@ -103,6 +103,7 @@
   },
   "VisitCanadaPost": {
     "heading": "Préparez-vous à vous rendre dans un bureau Postes Canada",
+    "fallbackRpName": "RP Name",
     "followSteps": "Suivez les différentes étapes pour terminer le processus",
     "step1": "Sélectionnez votre type de document d’identité et entrez les renseignements correspondants.",
     "step2": "Recevez par courriel un code unique, valide pour une durée de 30 jours.",
@@ -143,7 +144,7 @@
   "CanadaPostSelectId": {
     "documents": {
       "PROVINCIAL_HEALTH_CARD": {
-        "hint": "Only valid for Quebec and British Columbia"
+        "hint": "Only valid for Quebec"
       },
       "COMBO_CARD": {
         "hint": "Only valid for Alberta and British Columbia"

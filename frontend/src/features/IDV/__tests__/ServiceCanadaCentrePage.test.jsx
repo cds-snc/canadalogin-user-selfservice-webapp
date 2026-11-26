@@ -286,6 +286,9 @@ describe("ServiceCanadaCentre pages", () => {
       }),
     ).toBeInTheDocument();
     expect(
+      screen.getByText("RP Name", { selector: "strong" }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole("radio", { name: /passport/i }),
     ).toBeInTheDocument();
     expect(
@@ -316,9 +319,7 @@ describe("ServiceCanadaCentre pages", () => {
       "indianStatus",
       "COMBO_CARD",
     ]);
-    expect(
-      screen.getByText("Only valid for Quebec and British Columbia"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Only valid for Quebec")).toBeInTheDocument();
     expect(
       screen.getByText("Only valid for Alberta and British Columbia"),
     ).toBeInTheDocument();
@@ -441,7 +442,7 @@ describe("ServiceCanadaCentre pages", () => {
     expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
   });
 
-  it("returns to method selection when the user has none of the listed IDs", () => {
+  it("navigates to the not-ready page when the user has none of the listed IDs", () => {
     render(<ServiceCanadaCentrePage />);
 
     fireEvent.click(
@@ -449,7 +450,7 @@ describe("ServiceCanadaCentre pages", () => {
     );
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/in-person",
+      expect.stringContaining("/not-ready"),
     );
     expect(mockSendInPersonVerificationCode).not.toHaveBeenCalled();
   });
