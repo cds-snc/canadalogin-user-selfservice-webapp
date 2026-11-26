@@ -103,6 +103,7 @@
   },
   "VisitCanadaPost": {
     "heading": "Préparez-vous à vous rendre dans un bureau Postes Canada",
+    "fallbackRpName": "RP Name",
     "followSteps": "Suivez les différentes étapes pour terminer le processus",
     "step1": "Sélectionnez votre type de document d’identité et entrez les renseignements correspondants.",
     "step2": "Recevez par courriel un code unique, valide pour une durée de 30 jours.",

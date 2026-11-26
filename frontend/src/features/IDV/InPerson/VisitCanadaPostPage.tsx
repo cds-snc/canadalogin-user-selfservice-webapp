@@ -202,7 +202,9 @@ export default function VisitCanadaPost() {
               <Trans
                 ns="idv"
                 i18nKey="VisitCanadaPost.returnToServiceInstructions"
-                values={{ rpName }}
+                values={{
+                  rpName: rpName || t("VisitCanadaPost.fallbackRpName"),
+                }}
                 components={{ bold: <strong /> }}
               />
             </GcdsText>

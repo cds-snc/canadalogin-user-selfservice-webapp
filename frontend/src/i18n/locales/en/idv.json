@@ -110,6 +110,7 @@
   },
   "VisitCanadaPost": {
     "heading": "Get ready to visit a Canada Post location",
+    "fallbackRpName": "RP Name",
     "verificationBarcodeInstructions": "Choose your ID and enter your details to get a verification barcode which is valid for 30 days. ",
     "canadaPostVisitInstruction": "Bring the barcode, your ID and proof of address to any Canada Post, where an agent will check your identity.",
     "returnToServiceInstructions": "Sign back in to <bold>{{rpName}}</bold> once done to access the service.",

@@ -11,6 +11,9 @@ import i18n from "../../../i18n/test";
 const mockNavigate = vi.fn();
 const mockFlags = vi.hoisted(() => ({ devOnlyFeature: true }));
 const mockGetIdentityDocuments = vi.hoisted(() => vi.fn());
+const mockRelyingPartyInfo = vi.hoisted(() => ({
+  relyingPartyName: "RP Name",
+}));
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -22,7 +25,7 @@ vi.mock("react-router", async () => {
 });
 
 vi.mock("../../../hooks/useRelyingPartyInfo", () => ({
-  useRelyingPartyInfo: () => ({ relyingPartyName: "RP Name" }),
+  useRelyingPartyInfo: () => mockRelyingPartyInfo,
 }));
 
 vi.mock("../../../utils/constants", async () => {
@@ -138,6 +141,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
+    mockRelyingPartyInfo.relyingPartyName = "RP Name";
     mockGetIdentityDocuments.mockResolvedValue([PASSPORT]);
     Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
       configurable: true,
@@ -245,6 +249,16 @@ describe("VisitCanadaPost (Select your ID)", () => {
       returnToServiceInstructions.compareDocumentPosition(learnMoreLink) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+  });
+
+  it("uses the fallback RP name when no relying party name is available", () => {
+    mockRelyingPartyInfo.relyingPartyName = "";
+
+    render(<VisitCanadaPost />);
+
+    expect(
+      screen.getByText("RP Name", { selector: "strong" }),
+    ).toBeInTheDocument();
   });
 
   it("requires an ID selection before continuing", () => {
