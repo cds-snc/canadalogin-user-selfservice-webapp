@@ -224,7 +224,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     expect(screen.getByText("Lastname")).toBeInTheDocument();
     expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
     expect(
-      screen.getByText("Canadian and International Passport"),
+      screen.getByText("Canadian passport"),
     ).toBeInTheDocument();
     expect(
       screen.getByText("You must bring a proof of address"),
