@@ -85,11 +85,11 @@ export default function DataInformationCard({
   );
 
   const renderSection = (title: string, fields: typeof contactDetails) => (
-    <div style={{ marginBottom: "2rem" }}>
-      <GcdsHeading tag="h3" marginTop="0" marginBottom="300">
+    <div style={{ marginBottom: "1.5rem" }}>
+      <GcdsHeading tag="h2" marginTop="0" marginBottom="200">
         {title}
       </GcdsHeading>
-      <GcdsGrid columns="1" gap="300">
+      <GcdsGrid columns="1" gap="200">
         {fields.map((field, index) => (
           <Fragment key={field.key}>
             {index > 0 && (
@@ -97,7 +97,7 @@ export default function DataInformationCard({
                 style={{
                   borderTop: "1px solid #ccc",
                   margin: "0",
-                  paddingTop: "300",
+                  paddingTop: "200",
                 }}
               />
             )}
@@ -113,7 +113,7 @@ export default function DataInformationCard({
                 <GcdsHeading
                   tag="h4"
                   marginTop="0"
-                  marginBottom="0"
+                  marginBottom="50"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -122,7 +122,7 @@ export default function DataInformationCard({
                 >
                   <strong>{field.title}</strong>
                 </GcdsHeading>
-                <GcdsText marginTop="200" marginBottom="0">
+                <GcdsText marginTop="0" marginBottom="0">
                   {field.value}
                 </GcdsText>
               </GcdsContainer>
@@ -144,8 +144,8 @@ export default function DataInformationCard({
         style={{
           borderTop: "1px solid #ccc",
           margin: "0",
-          paddingTop: "2rem",
-          marginBottom: "2rem",
+          paddingTop: "1.5rem",
+          marginBottom: "1.5rem",
         }}
       />
 
@@ -158,12 +158,12 @@ export default function DataInformationCard({
         style={{
           borderTop: "1px solid #ccc",
           margin: "0",
-          paddingTop: "2rem",
-          marginBottom: "2rem",
+          paddingTop: "1.5rem",
+          marginBottom: "1.5rem",
         }}
       />
 
-      <div style={{ marginBottom: "2rem" }}>
+      <div style={{ marginBottom: "1.5rem" }}>
         <GcdsDetails detailsTitle={t("DataInformationCard.wrongInformation")}>
           <GcdsText>
             {t("DataInformationCard.wrongInformationDescription")}
@@ -172,13 +172,13 @@ export default function DataInformationCard({
       </div>
 
       <div>
-        <GcdsHeading tag="h3" marginTop="0" marginBottom="300">
+        <GcdsHeading tag="h2" marginTop="0" marginBottom="200">
           {t("DataInformationCard.neverSharedHeading")}
         </GcdsHeading>
-        <GcdsText marginBottom="200">
+        <GcdsText marginBottom="100">
           {t("DataInformationCard.neverSharedDescription")}
         </GcdsText>
-        <ul style={{ marginLeft: "1rem", marginTop: "0.5rem" }}>
+        <ul style={{ marginLeft: "1rem", marginTop: "0.25rem" }}>
           <li>
             <GcdsText marginBottom="0">
               {t("DataInformationCard.passwordDetails")}

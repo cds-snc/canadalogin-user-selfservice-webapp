@@ -43,6 +43,12 @@ vi.mock("react-i18next", () => ({
         "DataInformationCard.identityDetailsHeading": "Identity details",
         "DataInformationCard.legalName": "Legal name",
         "DataInformationCard.dateOfBirth": "Date of birth",
+        "DataInformationCard.informationSharingTitle":
+          "How CanadaLogin shares your information",
+        "DataInformationCard.informationSharingDescription":
+          "Services request your details from CanadaLogin to know who you are and to provide a personalized experience.",
+        "DataInformationCard.learnMoreLink":
+          "Learn how your information is shared and stored with services",
         "DataInformationCard.wrongInformation": "If your information is wrong",
         "DataInformationCard.wrongInformationDescription":
           "If your details have changed, you can still continue to the service and go to update your information in your CanadaLogin settings. You will need to re-sign into the service again to share your newly saved details.",
