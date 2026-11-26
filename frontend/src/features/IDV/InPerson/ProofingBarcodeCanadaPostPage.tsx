@@ -258,6 +258,7 @@ export default function ProofingBarcodeCanadaPostPage() {
                 ["givenName", givenName],
                 ["lastName", lastName],
                 ["dateOfBirth", dateOfBirth],
+                ["address", "31 Ottawa Street"],
                 ["idSelected", idSelected],
               ].map(([label, value]) => (
                 <div className="canada-post-code-detail" key={label}>

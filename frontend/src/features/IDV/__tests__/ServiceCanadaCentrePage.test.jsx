@@ -492,7 +492,9 @@ describe("ServiceCanadaCentre pages", () => {
     render(<ServiceCanadaCentreIdDetailsPage />);
 
     expect(
-      screen.getByRole("heading", { name: "Enter your Passport details" }),
+      screen.getByRole("heading", {
+        name: "Enter your Canadian passport details",
+      }),
     ).toBeInTheDocument();
     expect(screen.getByTestId("first-name-input")).toHaveAttribute(
       "hint",

@@ -261,9 +261,7 @@ describe("CompleteIdentityProofingPage", () => {
       expect(
         screen.getByText("Provincial/Territorial Photo ID Service Card"),
       ).toBeInTheDocument();
-      expect(
-        screen.getByText("Canadian and International Passport"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Canadian passport")).toBeInTheDocument();
       expect(screen.getByText("Canadian PR Card")).toBeInTheDocument();
       expect(
         screen.getByText("Secure Certificate of Indian Status"),

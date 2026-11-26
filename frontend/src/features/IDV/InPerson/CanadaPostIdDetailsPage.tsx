@@ -272,7 +272,7 @@ export default function CanadaPostIdDetailsPage() {
             formData.dateOfBirth,
             currentLanguage,
           ),
-          idSelected: getLocalizedName(selectedDocument, currentLanguage),
+          idSelected: ID_TYPE_BY_DOCUMENT[selectedDocument.key],
           verificationExpiresAt: response.data.verificationExpiresAt,
           verificationValidityDays: response.data.verificationValidityDays,
           proofOfAddressRequired: selectedOption?.requires_proof === true,

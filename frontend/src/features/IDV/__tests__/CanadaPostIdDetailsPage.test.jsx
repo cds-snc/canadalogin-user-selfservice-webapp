@@ -244,7 +244,9 @@ describe("CanadaPostIdDetailsPage", () => {
     renderPage(PASSPORT);
 
     expect(
-      screen.getByRole("heading", { name: "Enter your Passport details" }),
+      screen.getByRole("heading", {
+        name: "Enter your Canadian passport details",
+      }),
     ).toBeInTheDocument();
     expect(
       screen.queryByLabelText("What country issued the passport?"),
@@ -393,7 +395,7 @@ describe("CanadaPostIdDetailsPage", () => {
             givenName: "Jane",
             lastName: "Doe",
             dateOfBirth: "May 15, 1990",
-            idSelected: "Driver's licence",
+            idSelected: "driverLicence",
             verificationExpiresAt: "2026-08-12T20:58:26.760127+00:00",
             verificationValidityDays: 30,
             proofOfAddressRequired: false,
@@ -431,7 +433,7 @@ describe("CanadaPostIdDetailsPage", () => {
             givenName: "Jane",
             lastName: "Doe",
             dateOfBirth: "May 15, 1990",
-            idSelected: "PR card",
+            idSelected: "canadianPRCard",
           }),
         }),
       );
