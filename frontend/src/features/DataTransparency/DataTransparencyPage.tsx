@@ -83,7 +83,10 @@ export default function DataTransparencyPage() {
 
         <GcdsContainer>
           <div style={{ marginBottom: "2rem" }}>
-            <GcdsDetails detailsTitle={t("DataTransparencyPage.informationSharingTitle")} open={false}>
+            <GcdsDetails
+              detailsTitle={t("DataTransparencyPage.informationSharingTitle")}
+              open={false}
+            >
               <GcdsText>
                 {t("DataTransparencyPage.informationSharingDescription")}
               </GcdsText>
