@@ -100,6 +100,7 @@
     "firstName": "First name",
     "lastName": "Last name",
     "dateOfBirth": "Date of birth",
+    "address": "Address",
     "idSelected": "ID selected",
     "printBannerAlt": "Government of Canada",
     "printPageButton": "Print page",
@@ -180,7 +181,7 @@
     "noIds": "I don't have any of those IDs"
   },
   "CanadaPostIdDetails": {
-    "passportHeading": "Enter your passport details",
+    "passportHeading": "Enter your Canadian passport details",
     "driverLicenceHeading": "Enter your driver's licence details",
     "defaultHeading": "Enter your ID details",
     "idExpiryLabel": "When does the ID expire?",
@@ -391,7 +392,7 @@
     "driverLicence": "Provincial/Territorial Driver's Licence",
     "photoIDHealthCard": "Provincial/Territorial Photo ID Health Card",
     "photoIDServiceCard": "Provincial/Territorial Photo ID Service Card",
-    "passport": "Canadian and International Passport",
+    "passport": "Canadian Passport",
     "canadianPRCard": "Canadian PR Card",
     "indianStatus": "Secure Certificate of Indian Status",
     "COMBO_CARD": "Provincial/Territorial combination driver's licence/health cards",
