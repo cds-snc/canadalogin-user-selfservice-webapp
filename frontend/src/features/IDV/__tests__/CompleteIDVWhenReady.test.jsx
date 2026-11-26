@@ -134,9 +134,7 @@ describe("CompleteIdentityProofingPage", () => {
       setup();
 
       expect(
-        screen.getByRole("heading", {
-          name: "Localized RP needs you to verify your identity",
-        }),
+        screen.getByText("Verify your identity when you’re ready"),
       ).toBeInTheDocument();
     });
   });
@@ -144,12 +142,6 @@ describe("CompleteIdentityProofingPage", () => {
   describe("RP name resolution", () => {
     it("uses localized RP name when available", () => {
       setup();
-
-      expect(
-        screen.getByRole("heading", {
-          name: "Localized RP needs you to verify your identity",
-        }),
-      ).toBeInTheDocument();
 
       expect(
         screen.getByText(
@@ -214,8 +206,8 @@ describe("CompleteIdentityProofingPage", () => {
       const paragraph = screen.getByText(
         (content, element) =>
           element?.tagName === "P" &&
-          content.includes(
-            "If you don’t have an acceptable ID, find other ways to access the service by contacting",
+          element.textContent.includes(
+            "If you don’t have an acceptable, non-expired ID, find other ways to access the service by contacting",
           ),
       );
 
