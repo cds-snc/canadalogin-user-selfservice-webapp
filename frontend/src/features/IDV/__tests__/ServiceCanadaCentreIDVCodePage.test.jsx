@@ -298,6 +298,7 @@ describe("ServiceCanadaCentreIDVCodePage", () => {
       "/en/identity-verification/update/in-person/service-canada-centre",
       {
         state: {
+          idType: "passport",
           document: undefined,
           formData: undefined,
         },
