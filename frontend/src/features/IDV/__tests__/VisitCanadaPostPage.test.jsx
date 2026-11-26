@@ -171,9 +171,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
       "COMBO_CARD",
     ]);
     expect(screen.getByLabelText("Canadian passport")).toBeInTheDocument();
-    expect(
-      screen.getByText("Only valid for Quebec and British Columbia"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Only valid for Quebec")).toBeInTheDocument();
     expect(
       screen.getByText("Only valid for Alberta and British Columbia"),
     ).toBeInTheDocument();
@@ -229,8 +227,10 @@ describe("VisitCanadaPost (Select your ID)", () => {
   it("renders the external learn-more link immediately after the visit steps", () => {
     render(<VisitCanadaPost />);
 
-    const returnToServiceInstructions = screen.getByText(
-      t("VisitCanadaPost.returnToServiceInstructions", { rpName: "RP Name" }),
+    const rpName = screen.getByText("RP Name", { selector: "strong" });
+    const returnToServiceInstructions = rpName.parentElement;
+    expect(returnToServiceInstructions).toHaveTextContent(
+      "Sign back in to RP Name once done to access the service.",
     );
     const learnMoreLink = screen.getByRole("link", {
       name: t("VisitCanadaPost.learnMoreLink"),
@@ -296,7 +296,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("navigates to the in-person method selection when the user has none of the IDs", () => {
+  it("navigates to the not-ready page when the user has none of the IDs", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(
@@ -305,7 +305,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
 
     expect(mockGetIdentityDocuments).not.toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/start/in-person",
+      "/en/identity-verification/start/not-ready",
     );
   });
 
