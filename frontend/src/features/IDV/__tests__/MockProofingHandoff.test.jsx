@@ -184,7 +184,7 @@ describe("ContinueProofingOnMobile", () => {
       screen.getByRole("button", { name: "Continue verification" }),
     );
     expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith(
-      "/en/identity-verification/required/IdvDetailsConfirmationPage",
+      "/en/identity-verification/required/InProgressIDVPage",
       {
         state: {
           mockProofing: true,
@@ -203,7 +203,7 @@ describe("ContinueProofingOnMobile", () => {
       screen.getByRole("button", { name: "Continue verification" }),
     );
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/fr/identity-verification/update/IdvDetailsConfirmationPage",
+      "/fr/identity-verification/update/InProgressIDVPage",
       {
         state: {
           mockProofing: true,
@@ -242,7 +242,7 @@ describe("ContinueProofingOnMobile", () => {
       screen.getByRole("button", { name: "Continue verification" }),
     );
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "/en/identity-verification/required/IdvDetailsConfirmationPage",
+      "/en/identity-verification/required/InProgressIDVPage",
       {
         state: {
           mockProofing: true,

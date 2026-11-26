@@ -20,6 +20,7 @@ export default function IDVInProgress() {
   const verificationMethod =
     (state?.verificationMethod as VerificationMethod | null) || "provincial";
   const province = state?.province as "BC" | "AB" | "QC" | undefined;
+  const mockIdentityClaims = state?.mockIdentityClaims;
   const iDVSuccessPage = path(PAGES.idvDetailsConfirmationPage, {
     language,
     journeyType,
@@ -34,6 +35,7 @@ export default function IDVInProgress() {
               mockProofing: true,
               verificationMethod,
               ...(province && { province }),
+              ...(mockIdentityClaims && { mockIdentityClaims }),
             },
           }
         : { state: { verificationMethod, ...(province && { province }) } },
