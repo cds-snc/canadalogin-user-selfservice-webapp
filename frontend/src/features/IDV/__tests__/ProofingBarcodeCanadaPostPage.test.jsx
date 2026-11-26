@@ -154,7 +154,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     mockNavigate.mockReset();
   });
 
-  it("navigates back to the Canada Post page when update information is clicked", () => {
+  it("navigates to the Canada Post ID details page when update information is clicked", () => {
     render(
       <TestWrapper>
         <ProofingBarcodeCanadaPostPage />
@@ -163,7 +163,10 @@ describe("ProofingBarcodeCanadaPostPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Update" }));
     expect(mockNavigate).toHaveBeenCalledWith(
-      `/en/${PAGES.idvVisitCanadaPostPage}`,
+      `/en/${PAGES.idvCanadaPostIdDetailsPage}`,
+      expect.objectContaining({
+        state: expect.any(Object),
+      }),
     );
   });
 

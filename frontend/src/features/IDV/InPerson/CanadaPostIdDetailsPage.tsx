@@ -116,6 +116,10 @@ export default function CanadaPostIdDetailsPage() {
   // Default form: province-scoped API options use an issuer province select;
   // country-scoped documents use a static province field instead.
   const showProvince = !issuerIsProvince;
+  const idHasAddress =
+    selectedDocument?.options.some(
+      (option) => option.requires_proof === false,
+    ) ?? false;
 
   const [formData, setFormData] = useState<CanadaPostIdDetailsFormData>(() => ({
     documentOptionId:
@@ -168,7 +172,7 @@ export default function CanadaPostIdDetailsPage() {
 
   const { isFormValid, errorCodes } = getCanadaPostIdDetailsValidation(
     formData,
-    { showProvince },
+    { showProvince, idHasAddress },
   );
 
   const dobMessages = getSharedDateOfBirthMessages(t);
@@ -276,6 +280,8 @@ export default function CanadaPostIdDetailsPage() {
           verificationExpiresAt: response.data.verificationExpiresAt,
           verificationValidityDays: response.data.verificationValidityDays,
           proofOfAddressRequired: selectedOption?.requires_proof === true,
+          document: selectedDocument,
+          formData,
         },
       },
     );
@@ -363,18 +369,13 @@ export default function CanadaPostIdDetailsPage() {
           </GcdsContainer>
 
           <GcdsContainer>
-            {variant === "passport" ? null : variant === "default" ? (
-              issuerIsProvince ? (
-                issuerSelect
-              ) : (
-                <>
-                  {issuerSelect}
-                  {provinceSelect}
-                </>
-              )
-            ) : (
-              issuerSelect
-            )}
+            {variant === "passport"
+              ? null
+              : variant === "default"
+                ? issuerIsProvince
+                  ? issuerSelect
+                  : issuerSelect
+                : issuerSelect}
 
             <GcdsInput
               id={FIELD_IDS.firstName}
@@ -427,7 +428,9 @@ export default function CanadaPostIdDetailsPage() {
               {t("VisitCanadaPost.addressHeading")}
             </GcdsHeading>
             <GcdsText marginBottom="500">
-              {t("VisitCanadaPost.addressDescription")}
+              {idHasAddress
+                ? t("VisitCanadaPost.addressDescriptionWithAddress")
+                : t("VisitCanadaPost.addressDescription")}
             </GcdsText>
 
             <GcdsInput
@@ -439,7 +442,7 @@ export default function CanadaPostIdDetailsPage() {
               label={t("VisitCanadaPost.addressLabel")}
               hint={t("VisitCanadaPost.addressHint")}
               value={formData.address}
-              required
+              required={!idHasAddress}
               errorMessage={fieldError("address")}
               onGcdsChange={updateField("address")}
             />
@@ -457,7 +460,7 @@ export default function CanadaPostIdDetailsPage() {
               onGcdsChange={updateField("cityTown")}
             />
 
-            {variant !== "default" && showProvince ? provinceSelect : null}
+            {showProvince ? provinceSelect : null}
 
             <GcdsInput
               id={FIELD_IDS.postalCode}
@@ -495,7 +498,7 @@ export default function CanadaPostIdDetailsPage() {
             buttonRole="secondary"
             onGcdsClick={(event: Event) => {
               event.preventDefault();
-              navigate(-1);
+              navigate(selectIdPage);
             }}
           >
             {t("CanadaPostIdDetails.backButton")}

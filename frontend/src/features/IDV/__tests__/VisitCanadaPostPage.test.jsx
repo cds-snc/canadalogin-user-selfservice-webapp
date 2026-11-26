@@ -443,11 +443,13 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("goes back when choosing a different method", () => {
+  it("navigates to prove identity in-person when choosing a different method", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(screen.getByTestId("back-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/start/in-person",
+    );
   });
 });

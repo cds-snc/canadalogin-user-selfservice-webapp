@@ -31,6 +31,7 @@ describe("getCanadaPostIdDetailsValidation", () => {
   it("is valid when every visible field is filled correctly", () => {
     const result = getCanadaPostIdDetailsValidation(VALID_FORM, {
       showProvince: true,
+      idHasAddress: false,
     });
 
     expect(result).toEqual({ isFormValid: true, errorCodes: {} });
@@ -43,6 +44,7 @@ describe("getCanadaPostIdDetailsValidation", () => {
 
     const result = getCanadaPostIdDetailsValidation(empty, {
       showProvince: true,
+      idHasAddress: false,
     });
 
     expect(result.isFormValid).toBe(false);
@@ -61,9 +63,29 @@ describe("getCanadaPostIdDetailsValidation", () => {
   it("ignores province when it is not displayed", () => {
     const result = getCanadaPostIdDetailsValidation(
       { ...VALID_FORM, province: "" },
-      { showProvince: false },
+      { showProvince: false, idHasAddress: false },
     );
 
     expect(result.isFormValid).toBe(true);
+  });
+
+  it("makes address optional when ID has an address", () => {
+    const result = getCanadaPostIdDetailsValidation(
+      { ...VALID_FORM, address: "" },
+      { showProvince: true, idHasAddress: true },
+    );
+
+    expect(result.isFormValid).toBe(true);
+    expect(result.errorCodes.address).toBeUndefined();
+  });
+
+  it("requires address when ID does not have an address", () => {
+    const result = getCanadaPostIdDetailsValidation(
+      { ...VALID_FORM, address: "" },
+      { showProvince: true, idHasAddress: false },
+    );
+
+    expect(result.isFormValid).toBe(false);
+    expect(result.errorCodes.address).toBe("required");
   });
 });

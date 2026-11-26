@@ -49,6 +49,10 @@ export default function VisitCanadaPost() {
     language === AVAILABLE_LANGUAGES.fr
       ? AVAILABLE_LANGUAGES.fr
       : AVAILABLE_LANGUAGES.en;
+  const proveIdentityInPersonPage = path(PAGES.idvProveIdentityInPersonPage, {
+    language,
+    journeyType,
+  });
   const completeIdentityProofingPage = path(
     PAGES.idvCompleteIdentityProofingPage,
     { language, journeyType },
@@ -287,7 +291,7 @@ export default function VisitCanadaPost() {
               buttonRole="secondary"
               onGcdsClick={(event: Event) => {
                 event.preventDefault();
-                navigate(-1);
+                navigate(proveIdentityInPersonPage);
               }}
             >
               {t("VisitCanadaPost.differentMethodButton")}

@@ -72,6 +72,11 @@ export default function ServiceCanadaCentrePage() {
     },
   );
 
+  const proveIdentityInPersonPage = path(PAGES.idvProveIdentityInPersonPage, {
+    language,
+    journeyType,
+  });
+
   const serviceCanadaDetailsPage = path(
     PAGES.idvServiceCanadaCentreIdDetailsPage,
     { language, journeyType },
@@ -251,7 +256,7 @@ export default function ServiceCanadaCentrePage() {
               type="button"
               buttonRole="secondary"
               onClick={() => {
-                navigate(-1);
+                navigate(proveIdentityInPersonPage);
               }}
             >
               {t("ServiceCanadaCentre.chooseDifferentMethodButton")}
