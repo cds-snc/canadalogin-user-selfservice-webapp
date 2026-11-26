@@ -25,10 +25,6 @@ const applicant: InPersonApplicant & {
   province: { code: "ON", label: "Ontario" },
   postalCode: "K1A 0B1",
 };
-const canadaPostApplicant = {
-  ...applicant,
-  idExpiryDate: { month: "December", day: "31", year: "2035" },
-};
 
 test.describe("In-person identity verification", () => {
   test.describe.configure({ mode: "serial" });
@@ -83,7 +79,7 @@ test.describe("In-person identity verification", () => {
       await new CanadaPostSelectionPage(page).chooseDriverLicence();
 
       const detailsPage = new CanadaPostIdDetailsPage(page);
-      await detailsPage.fillApplicant(canadaPostApplicant);
+      await detailsPage.fillApplicant(applicant);
       await expectCaseCreation(await detailsPage.submit(), "canada_post");
 
       await expect(page).toHaveURL(

@@ -26,7 +26,7 @@ Assertions use the frontend's own translation files (`frontend/src/i18n/locales`
 - Test users must not be prompted for OTP/MFA. In dev/test tenants, add them to an MFA-exempt group (e.g. `MFA_Exempt`) that the self-service app's access policy allows without MFA, rather than removing the policy for everyone.
 - Four dedicated test users in the target IBM Verify tenant:
   - **User A** (`E2E_PROVEN_USER_*`) has completed fake ID proofing.
-  - **User B** (`E2E_UNPROVEN_USER_*`) has no ID proofing data. The tests assume this and don't reset it, so don't use this account to complete ID proofing.
+  - **User B** (`E2E_UNPROVEN_USER_*`) has no ID proofing data. The tests assume this and don't reset it, so don't use this account to complete ID proofing. The online journey uses this account, tests both the self-photo and provincial sign-in paths, and mocks case creation to avoid creating an external IDV case.
   - **Service Canada user** (`E2E_IN_PERSON_USER_*`) is reserved for Service Canada Centre journeys.
   - **Canada Post user** (`E2E_IN_PERSON_CANADA_POST_USER_*`) is reserved for Canada Post journeys. Each provider creates in-person cases and sends verification-code emails through GC Notify; use controlled test mailboxes and a test Notify service. Separate accounts avoid the backend's per-user case-creation cooldown.
 
@@ -54,6 +54,8 @@ npm run install-browsers
 
 npm test                 # all projects
 npx playwright test --project=idv-canada-post # one project and only its required setup
+npx playwright test --project=idv-online-self-photo # self-photo and ID check path
+npx playwright test --project=idv-online-provincial # provincial sign-in path
 npm run test:headed      # watch the browser
 npm run test:ui          # Playwright UI mode
 npm run report           # open the last HTML report
