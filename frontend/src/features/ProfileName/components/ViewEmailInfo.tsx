@@ -15,7 +15,8 @@ export default function DisplayEmailInfo() {
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
   const navigate = useNavigate();
-  const { t } = useTranslation("profile");
+  const { t, i18n } = useTranslation("profile");
+  const activeLanguage = i18n.resolvedLanguage ?? routeLanguage;
   const { state } = useUser();
   const email = state?.userProfile?.userName || "";
   const emailActionLabel =
@@ -36,9 +37,11 @@ export default function DisplayEmailInfo() {
           <GcdsText>{email}</GcdsText>
         </div>
         <GcdsLink
+          key={`${activeLanguage}:${emailActionAriaLabel}`}
           href={editEmail}
           className="mobileOverflowWrapAction"
           size="regular"
+          lang={activeLanguage}
           aria-label={emailActionAriaLabel}
           style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {

@@ -8,9 +8,10 @@ import { useUser } from "../../../components/Providers/useUser";
 import type { GcdsNavigationEvent } from "../../../types/languagePreference";
 
 export default function ViewLanguagePreferences() {
-  const { t } = useTranslation("profile");
+  const { t, i18n } = useTranslation("profile");
   const { language = "en" } = useParams<{ language: string }>();
   const routeLanguage = language === "fr" ? "fr" : "en";
+  const activeLanguage = i18n.resolvedLanguage ?? routeLanguage;
   const { state } = useUser();
   const navigate = useNavigate();
   const preferredLanguage = state?.userProfile?.preferredLanguage || "";
@@ -35,9 +36,11 @@ export default function ViewLanguagePreferences() {
           <GcdsText>{displayLanguageName}</GcdsText>
         </div>
         <GcdsLink
+          key={`${activeLanguage}:${editLanguageAriaLabel}`}
           href={editLanguagePreferences}
           className="mobileOverflowWrapAction"
           size="regular"
+          lang={activeLanguage}
           aria-label={editLanguageAriaLabel}
           style={{ textDecoration: "underline" }}
           onGcdsClick={(event: GcdsNavigationEvent) => {
