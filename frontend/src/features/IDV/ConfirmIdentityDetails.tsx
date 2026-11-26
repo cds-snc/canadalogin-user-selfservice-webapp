@@ -92,42 +92,6 @@ export default function ConfirmIdentityDetails() {
       return;
     }
 
-    if (isMockProofing && state?.mockIdentityClaims) {
-      setIdentityVerificationClaims(state.mockIdentityClaims);
-      return;
-    }
-
-    if (isMockProofing) {
-      return;
-    }
-
-    if (isMockProofing && state?.mockIdentityClaims) {
-      setIdentityVerificationClaims(state.mockIdentityClaims);
-      return;
-    }
-
-    if (isMockProofing) {
-      return;
-    }
-
-    if (isMockProofing && state?.mockIdentityClaims) {
-      setIdentityVerificationClaims(state.mockIdentityClaims);
-      return;
-    }
-
-    if (isMockProofing) {
-      return;
-    }
-
-    if (isMockProofing && state?.mockIdentityClaims) {
-      setIdentityVerificationClaims(state.mockIdentityClaims);
-      return;
-    }
-
-    if (isMockProofing) {
-      return;
-    }
-
     void identityVerificationApi
       .getClaims()
       .then(setIdentityVerificationClaims)

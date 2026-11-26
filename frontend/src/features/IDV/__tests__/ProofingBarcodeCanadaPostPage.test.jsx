@@ -149,7 +149,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     mockNavigate.mockReset();
   });
 
-  it("navigates to the Canada Post ID details page when update information is clicked", () => {
+  it("navigates back to the Canada Post page when update information is clicked", () => {
     render(
       <TestWrapper>
         <ProofingBarcodeCanadaPostPage />
@@ -158,10 +158,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Update" }));
     expect(mockNavigate).toHaveBeenCalledWith(
-      `/en/${PAGES.idvCanadaPostIdDetailsPage}`,
-      expect.objectContaining({
-        state: expect.any(Object),
-      }),
+      `/en/${PAGES.idvVisitCanadaPostPage}`,
     );
   });
 
@@ -226,9 +223,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Lastname")).toBeInTheDocument();
     expect(screen.getByText("January 1, 1990")).toBeInTheDocument();
-    expect(
-      screen.getByText("Canadian and International Passport"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Canadian passport")).toBeInTheDocument();
     expect(
       screen.getByText("You must bring a proof of address"),
     ).toBeInTheDocument();
@@ -259,7 +254,7 @@ describe("ProofingBarcodeCanadaPostPage", () => {
       screen
         .getByTestId("gcds-container")
         .querySelectorAll(".canada-post-code-detail"),
-    ).toHaveLength(4);
+    ).toHaveLength(5);
   });
 
   it("preserves verification details when changing the page language", () => {

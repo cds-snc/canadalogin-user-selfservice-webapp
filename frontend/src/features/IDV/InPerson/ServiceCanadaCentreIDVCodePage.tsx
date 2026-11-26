@@ -237,6 +237,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
                 ["firstName", firstName],
                 ["lastName", lastName],
                 ["dateOfBirth", dateOfBirth],
+                ["address", "31 Ottawa street"],
                 ["idSelected", idSelectedText],
               ].map(([label, value]) => (
                 <div className="service-canada-code-detail" key={label}>

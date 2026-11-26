@@ -244,7 +244,9 @@ describe("CanadaPostIdDetailsPage", () => {
     renderPage(PASSPORT);
 
     expect(
-      screen.getByRole("heading", { name: "Enter your Passport details" }),
+      screen.getByRole("heading", {
+        name: "Enter your Canadian passport details",
+      }),
     ).toBeInTheDocument();
     expect(
       screen.queryByLabelText("What country issued the passport?"),
@@ -393,22 +395,11 @@ describe("CanadaPostIdDetailsPage", () => {
             givenName: "Jane",
             lastName: "Doe",
             dateOfBirth: "May 15, 1990",
-            idSelected: "Driver's licence",
+            idSelected: "driverLicence",
             verificationExpiresAt: "2026-08-12T20:58:26.760127+00:00",
             verificationValidityDays: 30,
             proofOfAddressRequired: false,
-            document: DRIVERS_LICENCE,
-            formData: {
-              documentOptionId: "10",
-              country: "CA",
-              province: "",
-              firstName: "Jane",
-              lastName: "Doe",
-              dateOfBirth: "1990-05-15",
-              address: "123 Main St",
-              cityTown: "Ottawa",
-              postalCode: "K1A 0B1",
-            },
+            verificationMethod: "canada_post",
           },
         },
       );
@@ -442,7 +433,7 @@ describe("CanadaPostIdDetailsPage", () => {
             givenName: "Jane",
             lastName: "Doe",
             dateOfBirth: "May 15, 1990",
-            idSelected: "PR card",
+            idSelected: "canadianPRCard",
           }),
         }),
       );
@@ -550,13 +541,11 @@ describe("CanadaPostIdDetailsPage", () => {
     );
   });
 
-  it("goes back to the select ID page", () => {
+  it("goes back to the previous page", () => {
     renderPage(PASSPORT);
 
     fireEvent.click(screen.getByTestId("back-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/start/in-person/canada-post",
-    );
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 });
