@@ -197,6 +197,7 @@ export default function ServiceCanadaCentreIdDetailsPage() {
           formData.dateOfBirth,
           currentLanguage,
         ),
+        address: formData.address,
         idType,
         verificationExpiresAt: response.data.verificationExpiresAt,
         verificationValidityDays: response.data.verificationValidityDays,
@@ -229,11 +230,17 @@ export default function ServiceCanadaCentreIdDetailsPage() {
   return (
     <GcdsContainer role="main">
       <form>
-        <GcdsGrid columns="1" gap="450">
           <GcdsContainer>
             <GcdsHeading tag="h1">
               {idType
-                ? `Enter your ${getSimpleApprovedDocName(idType, currentLanguage)} details`
+                ? `Enter your ${
+                    currentLanguage === AVAILABLE_LANGUAGES.fr
+                      ? getSimpleApprovedDocName(
+                          idType,
+                          currentLanguage,
+                        ).toLocaleLowerCase("fr")
+                      : getSimpleApprovedDocName(idType, currentLanguage)
+                  } details`
                 : t("ServiceCanadaCentre.enterDetailsHeading")}
             </GcdsHeading>
             {hasSubmitted && !isFormValid ? (
@@ -303,7 +310,6 @@ export default function ServiceCanadaCentreIdDetailsPage() {
               {t("ServiceCanadaCentre.backButton")}
             </GcdsButton>
           </GcdsGrid>
-        </GcdsGrid>
       </form>
     </GcdsContainer>
   );

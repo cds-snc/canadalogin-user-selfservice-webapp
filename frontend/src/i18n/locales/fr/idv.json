@@ -48,7 +48,7 @@
     "idHint": "You must bring the valid and original ID",
     "documents": {
       "passport": {
-        "label": "Canadian passport"
+        "label": "Passeport canadien"
       },
       "driverLicence": {
         "label": "Provincial/Territorial driver's licence"
@@ -93,6 +93,7 @@
     "firstName": "Prénom",
     "lastName": "Nom de famille",
     "dateOfBirth": "Date de naissance",
+    "address": "Adresse",
     "idSelected": "Document d’identité sélectionné",
     "printBannerAlt": "Gouvernement du Canada",
     "printPageButton": "Imprimer la page",
@@ -324,7 +325,7 @@
     "driverLicence": "Permis de conduire provincial/territorial",
     "photoIDHealthCard": "Carte d'assurance-maladie avec photo provincial/territorial",
     "photoIDServiceCard": "Carte de service avec photo provincial/territorial",
-    "passport": "Passeport canadien et international",
+    "passport": "Passeport canadien",
     "canadianPRCard": "Carte de résidence permanente canadienne",
     "indianStatus": "Certificat de statut d'Indien sécurisé",
     "COMBO_CARD": "Provincial/Territorial combination driver's licence/health cards",

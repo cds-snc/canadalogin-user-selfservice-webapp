@@ -28,6 +28,7 @@ type ServiceCanadaCentreIDVCodePageLocationState = {
   firstName?: string;
   lastName?: string;
   dateOfBirth?: string;
+  address?: string;
   idType?: string;
   verificationExpiresAt?: string;
   verificationValidityDays?: number;
@@ -73,6 +74,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
   const firstName = locationState?.firstName?.trim() || "--";
   const lastName = locationState?.lastName?.trim() || "--";
   const dateOfBirth = locationState?.dateOfBirth?.trim() || "--";
+  const address = locationState?.address?.trim() || "--";
   const rawIdSelected = locationState?.idType?.trim() || "";
   const idSelectedText = rawIdSelected
     ? isApprovedDocumentValue(rawIdSelected)
@@ -190,7 +192,10 @@ export default function ServiceCanadaCentreIDVCodePage() {
                 <li>{t("ServiceCanadaCentreCode.whatToBringCode")}</li>
                 <li>
                   {t("ServiceCanadaCentreCode.whatToBringId", {
-                    idSelected: idSelectedText,
+                    idSelected:
+                      language === "fr"
+                        ? idSelectedText.toLocaleLowerCase()
+                        : idSelectedText,
                   })}
                 </li>
               </ul>
@@ -226,6 +231,7 @@ export default function ServiceCanadaCentreIDVCodePage() {
                 ["firstName", firstName],
                 ["lastName", lastName],
                 ["dateOfBirth", dateOfBirth],
+                ["address", address],
                 ["idSelected", idSelectedText],
               ].map(([label, value]) => (
                 <div className="service-canada-code-detail" key={label}>

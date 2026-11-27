@@ -74,8 +74,8 @@ export const sortOptionsByLabel = (
 
 const SIMPLE_ID_NAMES: Record<string, Record<Language, string>> = {
   PASSPORT: {
-    en: "Passport",
-    fr: "Passeport",
+    en: "Canadian passport",
+    fr: "Passeport canadien",
   },
   DRIVERS_LICENCE: {
     en: "Driver's Licence",

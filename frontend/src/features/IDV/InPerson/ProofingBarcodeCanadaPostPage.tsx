@@ -32,6 +32,7 @@ type ProofingBarcodeCanadaPostState = {
   lastName?: string;
   dateOfBirth?: string;
   idSelected?: string;
+  address?: string;
   verificationExpiresAt?: string;
   verificationValidityDays?: number;
   proofOfAddressRequired?: boolean;
@@ -297,6 +298,7 @@ export default function ProofingBarcodeCanadaPostPage() {
                     state: {
                       document: locationState?.document,
                       formData: locationState?.formData,
+                      address: locationState?.address,
                       proofOfAddressAcknowledged: true,
                       proofOfAddress: locationState?.formData?.proofOfAddress,
                     },

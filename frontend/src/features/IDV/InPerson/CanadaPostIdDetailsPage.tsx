@@ -88,6 +88,7 @@ const FIELD_IDS: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
 
 export interface CanadaPostIdDetailsLocationState {
   document?: IdentityDocument;
+  address?: string;
   formData?: CanadaPostIdDetailsFormData;
   proofOfAddressAcknowledged?: boolean;
   proofOfAddress?: string;
@@ -277,6 +278,7 @@ export default function CanadaPostIdDetailsPage() {
             currentLanguage,
           ),
           idSelected: getLocalizedName(selectedDocument, currentLanguage),
+          address: formData.address,
           verificationExpiresAt: response.data.verificationExpiresAt,
           verificationValidityDays: response.data.verificationValidityDays,
           proofOfAddressRequired: selectedOption?.requires_proof === true,
