@@ -11,6 +11,9 @@ import i18n from "../../../i18n/test";
 const mockNavigate = vi.fn();
 const mockFlags = vi.hoisted(() => ({ devOnlyFeature: true }));
 const mockGetIdentityDocuments = vi.hoisted(() => vi.fn());
+const mockRelyingPartyInfo = vi.hoisted(() => ({
+  relyingPartyName: "RP Name",
+}));
 
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -22,7 +25,7 @@ vi.mock("react-router", async () => {
 });
 
 vi.mock("../../../hooks/useRelyingPartyInfo", () => ({
-  useRelyingPartyInfo: () => ({ relyingPartyName: "RP Name" }),
+  useRelyingPartyInfo: () => mockRelyingPartyInfo,
 }));
 
 vi.mock("../../../utils/constants", async () => {
@@ -138,6 +141,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFlags.devOnlyFeature = true;
+    mockRelyingPartyInfo.relyingPartyName = "RP Name";
     mockGetIdentityDocuments.mockResolvedValue([PASSPORT]);
     Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
       configurable: true,
@@ -171,9 +175,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
       "COMBO_CARD",
     ]);
     expect(screen.getByLabelText("Canadian passport")).toBeInTheDocument();
-    expect(
-      screen.getByText("Only valid for Quebec and British Columbia"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Only valid for Quebec")).toBeInTheDocument();
     expect(
       screen.getByText("Only valid for Alberta and British Columbia"),
     ).toBeInTheDocument();
@@ -229,8 +231,10 @@ describe("VisitCanadaPost (Select your ID)", () => {
   it("renders the external learn-more link immediately after the visit steps", () => {
     render(<VisitCanadaPost />);
 
-    const returnToServiceInstructions = screen.getByText(
-      t("VisitCanadaPost.returnToServiceInstructions", { rpName: "RP Name" }),
+    const rpName = screen.getByText("RP Name", { selector: "strong" });
+    const returnToServiceInstructions = rpName.parentElement;
+    expect(returnToServiceInstructions).toHaveTextContent(
+      "Sign back in to RP Name once done to access the service.",
     );
     const learnMoreLink = screen.getByRole("link", {
       name: t("VisitCanadaPost.learnMoreLink"),
@@ -245,6 +249,16 @@ describe("VisitCanadaPost (Select your ID)", () => {
       returnToServiceInstructions.compareDocumentPosition(learnMoreLink) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+  });
+
+  it("uses the fallback RP name when no relying party name is available", () => {
+    mockRelyingPartyInfo.relyingPartyName = "";
+
+    render(<VisitCanadaPost />);
+
+    expect(
+      screen.getByText("RP Name", { selector: "strong" }),
+    ).toBeInTheDocument();
   });
 
   it("requires an ID selection before continuing", () => {
@@ -296,7 +310,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("navigates to the in-person method selection when the user has none of the IDs", () => {
+  it("navigates to the not-ready page when the user has none of the IDs", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(
@@ -305,7 +319,7 @@ describe("VisitCanadaPost (Select your ID)", () => {
 
     expect(mockGetIdentityDocuments).not.toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledWith(
-      "/en/identity-verification/start/in-person",
+      "/en/identity-verification/start/not-ready",
     );
   });
 
@@ -443,11 +457,13 @@ describe("VisitCanadaPost (Select your ID)", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("goes back when choosing a different method", () => {
+  it("navigates to prove identity in-person when choosing a different method", () => {
     render(<VisitCanadaPost />);
 
     fireEvent.click(screen.getByTestId("back-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/start/in-person",
+    );
   });
 });

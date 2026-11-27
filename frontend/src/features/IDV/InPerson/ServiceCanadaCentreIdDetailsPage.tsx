@@ -113,14 +113,10 @@ export default function ServiceCanadaCentreIdDetailsPage() {
   const { errorCodes } = getCanadaPostIdDetailsValidation(formData, {
     showCountry: false,
     showProvince: isDriverLicence,
+    requireAddressFields: false,
   });
-  // Service Canada does not collect expiry dates and only requires addresses for certain IDs.
+  // Service Canada does not collect expiry dates
   delete errorCodes.idExpiryDate;
-  if (!showAddressFields) {
-    delete errorCodes.address;
-    delete errorCodes.cityTown;
-    delete errorCodes.postalCode;
-  }
   const isFormValid = Object.keys(errorCodes).length === 0;
   const dobMessages = getSharedDateOfBirthMessages(t);
   const errorMessages: Record<keyof CanadaPostIdDetailsErrorCodes, string> = {
@@ -204,6 +200,7 @@ export default function ServiceCanadaCentreIdDetailsPage() {
         idType,
         verificationExpiresAt: response.data.verificationExpiresAt,
         verificationValidityDays: response.data.verificationValidityDays,
+        formData,
       },
     });
   };
@@ -275,7 +272,7 @@ export default function ServiceCanadaCentreIdDetailsPage() {
                   : ""
               }
               showAddressFields={showAddressFields}
-              requireAddressFields={showAddressFields}
+              requireAddressFields={false}
               updateField={updateField}
               provinceField={provinceSelect}
             />
@@ -300,7 +297,7 @@ export default function ServiceCanadaCentreIdDetailsPage() {
               buttonRole="secondary"
               onGcdsClick={(event: Event) => {
                 event.preventDefault();
-                navigate(-1);
+                navigate(serviceCanadaCentrePage);
               }}
             >
               {t("ServiceCanadaCentre.backButton")}

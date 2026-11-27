@@ -8,8 +8,24 @@ import { ONLINE_IDV_METHOD } from "../components/methods";
 // Mocks
 // ────────────────────────────────────────────────
 vi.mock("@gcds-core/components-react", () => ({
-  GcdsRadios: ({ name, legend, options, value, onGcdsChange }) => (
-    <fieldset data-testid="gcds-radios" data-name={name} data-value={value}>
+  GcdsRadios: ({
+    name,
+    legend,
+    options,
+    value,
+    onGcdsChange,
+    "aria-invalid": ariaInvalid,
+    "aria-describedby": ariaDescribedby,
+    errorMessage,
+  }) => (
+    <fieldset
+      data-testid="gcds-radios"
+      data-name={name}
+      data-value={value}
+      data-invalid={ariaInvalid}
+      data-describedby={ariaDescribedby}
+      data-error-message={errorMessage}
+    >
       <legend>{legend}</legend>
       {options.map((opt) => (
         <label key={opt.id}>
@@ -33,6 +49,9 @@ vi.mock("@gcds-core/components-react", () => ({
         </label>
       ))}
     </fieldset>
+  ),
+  GcdsErrorMessage: ({ children, messageId }) => (
+    <div id={`error-message-${messageId}`}>{children}</div>
   ),
 }));
 
@@ -76,6 +95,27 @@ describe("OnlineRadioButtons", () => {
         /Use your BC Service Card, Alberta.ca account or Quebec Government Authentication Service./,
       ),
     ).toBeInTheDocument();
+  });
+
+  it("associates the validation message without using aria-description", () => {
+    const errorMessage = "Select an option";
+    render(
+      <OnlineRadioButtons {...defaultProps} errorMessage={errorMessage} />,
+    );
+
+    const radios = screen.getByTestId("gcds-radios");
+    const error = screen.getByText(errorMessage);
+
+    expect(radios).toHaveAttribute("data-invalid", "true");
+    expect(radios).toHaveAttribute(
+      "data-describedby",
+      "error-message-online-idv-method-error",
+    );
+    expect(radios).not.toHaveAttribute("data-error-message");
+    expect(error).toHaveAttribute(
+      "id",
+      "error-message-online-idv-method-error",
+    );
   });
 
   it("marks document scanning as checked when selected", () => {

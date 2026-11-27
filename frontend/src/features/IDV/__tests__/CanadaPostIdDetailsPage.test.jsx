@@ -397,6 +397,18 @@ describe("CanadaPostIdDetailsPage", () => {
             verificationExpiresAt: "2026-08-12T20:58:26.760127+00:00",
             verificationValidityDays: 30,
             proofOfAddressRequired: false,
+            document: DRIVERS_LICENCE,
+            formData: {
+              documentOptionId: "10",
+              country: "CA",
+              province: "",
+              firstName: "Jane",
+              lastName: "Doe",
+              dateOfBirth: "1990-05-15",
+              address: "123 Main St",
+              cityTown: "Ottawa",
+              postalCode: "K1A 0B1",
+            },
           },
         },
       );
@@ -538,11 +550,13 @@ describe("CanadaPostIdDetailsPage", () => {
     );
   });
 
-  it("goes back to the previous page", () => {
+  it("goes back to the select ID page", () => {
     renderPage(PASSPORT);
 
     fireEvent.click(screen.getByTestId("back-button"));
 
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/en/identity-verification/start/in-person/canada-post",
+    );
   });
 });

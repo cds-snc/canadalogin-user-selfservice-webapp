@@ -9,7 +9,7 @@ import {
 } from "@gcds-core/components-react";
 
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 import ErrorSummaryWithFocus from "../../../components/ErrorSummaryWithFocus/ErrorSummaryWithFocus";
 import {
@@ -71,6 +71,11 @@ export default function ServiceCanadaCentrePage() {
       journeyType: journeyType,
     },
   );
+
+  const proveIdentityInPersonPage = path(PAGES.idvProveIdentityInPersonPage, {
+    language,
+    journeyType,
+  });
 
   const serviceCanadaDetailsPage = path(
     PAGES.idvServiceCanadaCentreIdDetailsPage,
@@ -173,9 +178,14 @@ export default function ServiceCanadaCentrePage() {
             <GcdsText>{t("ServiceCanadaCentre.intro1")}</GcdsText>
             <GcdsText>{t("ServiceCanadaCentre.intro2")}</GcdsText>
             <GcdsText>
-              {t("ServiceCanadaCentre.intro3", {
-                rpName: rpName || t("ServiceCanadaCentre.fallbackRpName"),
-              })}
+              <Trans
+                ns="idv"
+                i18nKey="ServiceCanadaCentre.intro3"
+                values={{
+                  rpName: rpName || t("ServiceCanadaCentre.fallbackRpName"),
+                }}
+                components={{ bold: <strong /> }}
+              />
             </GcdsText>
             <GcdsText>
               <GcdsLink
@@ -209,18 +219,10 @@ export default function ServiceCanadaCentrePage() {
 
             <GcdsText>
               <GcdsLink
-                href={path(PAGES.idvProveIdentityInPersonPage, {
-                  language,
-                  journeyType,
-                })}
+                href={completeIdentityProofingPage}
                 onGcdsClick={(event: Event) => {
                   event.preventDefault();
-                  navigate(
-                    path(PAGES.idvProveIdentityInPersonPage, {
-                      language,
-                      journeyType,
-                    }),
-                  );
+                  navigate(completeIdentityProofingPage);
                 }}
               >
                 {t("ApprovedDocuments.noIds")}
@@ -251,7 +253,7 @@ export default function ServiceCanadaCentrePage() {
               type="button"
               buttonRole="secondary"
               onClick={() => {
-                navigate(-1);
+                navigate(proveIdentityInPersonPage);
               }}
             >
               {t("ServiceCanadaCentre.chooseDifferentMethodButton")}
