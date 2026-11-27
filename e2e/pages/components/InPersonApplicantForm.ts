@@ -18,17 +18,12 @@ export type InPersonApplicant = {
     label: string;
   };
   postalCode: string;
-  idExpiryDate?: InPersonDate;
 };
 
 export class InPersonApplicantForm {
   constructor(private readonly page: Page) {}
 
   async fill(applicant: InPersonApplicant) {
-    if (applicant.idExpiryDate) {
-      await this.fillDate("id-expiry-date-input", applicant.idExpiryDate);
-    }
-
     await this.fillText("first-name-input", applicant.firstName);
     await this.fillText("last-name-input", applicant.lastName);
     await this.fillDate("date-of-birth-input", applicant.dateOfBirth);
@@ -48,9 +43,9 @@ export class InPersonApplicantForm {
 
   private async fillDate(id: string, value: InPersonDate) {
     const dateInput = this.page.locator(`gcds-date-input#${id}`);
-    await dateInput
-      .getByRole("combobox", { name: "Month" })
-      .selectOption({ label: value.month });
+    const monthSelect = dateInput.getByRole("combobox");
+    await expect(monthSelect).toHaveCount(1);
+    await monthSelect.selectOption({ label: value.month });
     const dayInput = dateInput.getByRole("textbox", { name: "Day" });
     await fillGcdsInput(dayInput, value.day);
     await dayInput.press("Tab");

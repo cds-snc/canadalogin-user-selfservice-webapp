@@ -83,6 +83,20 @@ export default defineConfig({
       dependencies: ["setup-in-person-canada-post"],
     },
     {
+      name: "idv-online-self-photo",
+      testMatch: /idv\/online-journey\.spec\.ts/,
+      grep: /Self-photo and ID check reaches the confirmation screen/,
+      retries: 0,
+      dependencies: ["setup-unproven"],
+    },
+    {
+      name: "idv-online-provincial",
+      testMatch: /idv\/online-journey\.spec\.ts/,
+      grep: /Provincial sign-in displays partner choices/,
+      retries: 0,
+      dependencies: ["setup-unproven"],
+    },
+    {
       name: "idv-proven-user",
       testMatch: /idv\/proven-information-card\.spec\.ts/,
       grep: /user with fake ID proofing \(User A\)/,

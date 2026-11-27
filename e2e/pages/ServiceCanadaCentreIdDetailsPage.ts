@@ -19,7 +19,7 @@ export class ServiceCanadaCentreIdDetailsPage {
   constructor(private readonly page: Page) {
     const t = copy.en.idv.ServiceCanadaCentre;
     this.heading = page.getByRole("heading", {
-      name: "Enter your driver licence details",
+      name: "Enter your Driver's Licence details",
     });
     this.continueButton = page.getByRole("button", {
       name: t.continueButton,
