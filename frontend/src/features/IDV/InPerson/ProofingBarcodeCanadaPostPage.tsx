@@ -13,14 +13,15 @@ import BarcodeDisplay from "../helpers/BarcodeDisplay";
 import { useUser } from "../../../components/Providers/useUser";
 import { authService } from "../../../services/authService";
 import governmentBannerImage from "../../../assets/images/gov-canada-banner.svg";
-import { DEV_ONLY_FEATURE, PAGES } from "../../../utils/constants";
+import {
+  AVAILABLE_LANGUAGES,
+  DEV_ONLY_FEATURE,
+  PAGES,
+} from "../../../utils/constants";
 import { path } from "../../../utils/routeHelpers";
 import AcceptableProofOfAddressDocuments from "../components/AcceptableProofOfAddressDocuments";
 import { formatDateOfBirthForDisplay } from "./validation/InPersonIdentity.validation";
-import {
-  APPROVED_DOCUMENT_VALUES,
-  type ApprovedDocumentValue,
-} from "../data/approvedDocuments";
+import { getSimpleIdName } from "../data/identityDocuments";
 import "./css/ProofingBarcodeCanadaPostPage.css";
 import "./css/ProofingBarcodeCanadaPostPage.print.css";
 import { useState } from "react";
@@ -39,12 +40,6 @@ type ProofingBarcodeCanadaPostState = {
   document?: any;
   formData?: any;
 };
-
-const APPROVED_DOCUMENT_VALUE_SET = new Set<string>(APPROVED_DOCUMENT_VALUES);
-
-const isApprovedDocumentValue = (
-  value: string,
-): value is ApprovedDocumentValue => APPROVED_DOCUMENT_VALUE_SET.has(value);
 
 export default function ProofingBarcodeCanadaPostPage() {
   const { t } = useTranslation("idv");
@@ -67,6 +62,7 @@ export default function ProofingBarcodeCanadaPostPage() {
   const email = state?.userProfile?.userName ?? "";
   const givenName = locationState?.givenName?.trim() || "--";
   const lastName = locationState?.lastName?.trim() || "--";
+  const address = locationState?.address?.trim() || "--";
   const dateOfBirth = formatDateOfBirthForDisplay(
     locationState?.dateOfBirth?.trim() || "--",
   );
@@ -74,11 +70,16 @@ export default function ProofingBarcodeCanadaPostPage() {
   const verificationValidityDays = locationState?.verificationValidityDays;
   const proofOfAddressRequired = locationState?.proofOfAddressRequired === true;
   const rawIdSelected = locationState?.idSelected?.trim() || "";
-  const idSelected = rawIdSelected
-    ? isApprovedDocumentValue(rawIdSelected)
-      ? t(`ApprovedDocuments.${rawIdSelected}`)
-      : rawIdSelected
-    : "--";
+  const idSelectedKey = locationState?.document?.key ?? null;
+  const currentLanguage =
+    language === AVAILABLE_LANGUAGES.fr
+      ? AVAILABLE_LANGUAGES.fr
+      : AVAILABLE_LANGUAGES.en;
+  const mappedIdSelected = idSelectedKey
+    ? getSimpleIdName(idSelectedKey, currentLanguage)
+    : "";
+
+  const idSelected = mappedIdSelected || rawIdSelected || "--";
 
   const formattedExpiryDate = verificationExpiresAt
     ? new Intl.DateTimeFormat("en-CA", {
@@ -272,6 +273,17 @@ export default function ProofingBarcodeCanadaPostPage() {
               </GcdsText>
               <GcdsText marginTop="200" marginBottom="0">
                 {dateOfBirth}
+              </GcdsText>
+            </div>
+
+            <div className="separator" style={{ margin: "0" }} />
+
+            <div>
+              <GcdsText marginTop="0" marginBottom="0">
+                <strong>{t("ProofingBarcodeCanadaPost.address")}</strong>
+              </GcdsText>
+              <GcdsText marginTop="200" marginBottom="0">
+                {address}
               </GcdsText>
             </div>
 

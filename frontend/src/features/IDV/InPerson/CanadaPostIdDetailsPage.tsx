@@ -107,7 +107,6 @@ export default function CanadaPostIdDetailsPage() {
   const locationState =
     location.state as CanadaPostIdDetailsLocationState | null;
   const selectedDocument = locationState?.document;
-
   const variant = selectedDocument
     ? getIdDetailsFormVariant(selectedDocument.key)
     : "default";
@@ -277,7 +276,10 @@ export default function CanadaPostIdDetailsPage() {
             formData.dateOfBirth,
             currentLanguage,
           ),
-          idSelected: getLocalizedName(selectedDocument, currentLanguage),
+          idSelected:
+            selectedDocument.key === "PASSPORT"
+              ? getSimpleIdName(selectedDocument.key, currentLanguage)
+              : getLocalizedName(selectedDocument, currentLanguage),
           address: formData.address,
           verificationExpiresAt: response.data.verificationExpiresAt,
           verificationValidityDays: response.data.verificationValidityDays,
@@ -351,12 +353,16 @@ export default function CanadaPostIdDetailsPage() {
   return (
     <GcdsContainer role="main">
       <form>
-        <GcdsGrid columns="1" gap="450">
           <GcdsContainer>
             <GcdsHeading tag="h1">
-              {selectedDocument
-                ? `Enter your ${getSimpleIdName(selectedDocument.key, currentLanguage)} details`
-                : t(headingKey)}
+              {`Enter your ${
+                  currentLanguage === AVAILABLE_LANGUAGES.fr
+                    ? getSimpleIdName(
+                        selectedDocument.key, currentLanguage,
+                      ).toLocaleLowerCase("fr")
+                        : getSimpleIdName(selectedDocument.key, currentLanguage)
+                } details`
+              }
             </GcdsHeading>
 
             {hasSubmitted && !isFormValid ? (
@@ -479,7 +485,6 @@ export default function CanadaPostIdDetailsPage() {
               onGcdsChange={updateField("postalCode")}
             />
           </GcdsContainer>
-        </GcdsGrid>
 
         <GcdsGrid
           columns="1"

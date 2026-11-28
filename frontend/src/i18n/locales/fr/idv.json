@@ -144,6 +144,9 @@
   },
   "CanadaPostSelectId": {
     "documents": {
+      "PASSPORT": {
+        "label": "Passeport canadien"
+      },
       "PROVINCIAL_HEALTH_CARD": {
         "hint": "Only valid for Quebec"
       },
